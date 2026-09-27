@@ -61,7 +61,7 @@
       <p id="userLine" class="small"></p>
       <div id="stationCards" class="cards"></div>
       <div id="stationStatus" class="status"></div>
-      <a id="openApp" class="linkbtn" href="../">Zur TankstellenErtrag-Plattform</a>
+      <button id="linkStationBtn" class="linkbtn" type="button">Pilotstation verknüpfen</button><div id="linkStationPanel" class="panel hidden" style="margin-top:14px;padding:18px"><h3 style="margin-top:0">Pilotstation verknüpfen</h3><p class="small">Bitte die von TankstellenErtrag bereitgestellten Stationsdaten eingeben. Für den ersten Test verwenden wir noch keine echten HUTH-Daten.</p><div class="form"><div class="field"><label>Stationsschlüssel</label><input id="stationKey" type="text" autocomplete="off" placeholder="Pilot-Stationsschlüssel"></div><div class="field"><label>Stations-ID</label><input id="stationId" type="text" placeholder="z. B. PILOT-001"></div><div class="field"><label>Stationsname</label><input id="stationName" type="text" placeholder="Teststation"></div><div class="field"><label>PLZ</label><input id="stationPostcode" type="text" placeholder="86495"></div><div class="field"><label>Ort</label><input id="stationCity" type="text" placeholder="Eurasburg"></div><div class="field"><label>HUTH-Stationscode (optional)</label><input id="huthStationCode" type="text" placeholder="z. B. 001"></div><button id="claimStationBtn" class="btn primary" type="button">Station verknüpfen</button><div id="claimStatus" class="status hidden"></div></div></div><a id="openApp" class="linkbtn hidden" href="./">Zur TankstellenErtrag-Plattform</a>
       <div style="margin-top:12px"><button id="logoutBtn" class="btn secondary">Abmelden</button></div>
     </div>
   </section>
@@ -88,7 +88,8 @@ async function loadStation(session){
   const row=rows&&rows[0];
   if(!row){
     $('stationCards').innerHTML='<div class="card"><div class="label">Pilotstation</div><div class="value">Noch nicht verknüpft</div></div>';
-    $('stationStatus').textContent='Ihr Kundenkonto ist angelegt. Die Pilotstation wird im nächsten Schritt verknüpft bzw. freigeschaltet.';
+    $('stationStatus').textContent='Ihr Kundenkonto ist angelegt. Die Pilotstation kann jetzt verknüpft werden.';
+    $('linkStationBtn').classList.remove('hidden');
     return;
   }
   const active=row.subscription_status==='founding_partner' && row.founding_partner_free_until && new Date(row.founding_partner_free_until)>new Date();
@@ -111,6 +112,47 @@ async function boot(){
 }
 $('loginBtn').onclick=async()=>{if(!client)return;setBusy(true);status('Anmeldung läuft …');try{const {data,error}=await client.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)throw error;await loadStation(data.session);}catch(e){status(e.message||String(e),'err')}finally{setBusy(false)}};
 $('signupBtn').onclick=async()=>{if(!client)return;setBusy(true);status('Konto wird angelegt …');try{const email=$('email').value.trim(),password=$('password').value;if(!email||password.length<8)throw new Error('Bitte eine gültige E-Mail und ein Passwort mit mindestens 8 Zeichen eingeben.');const {data,error}=await client.auth.signUp({email,password});if(error)throw error;if(data.session){await loadStation(data.session)}else{status('Konto angelegt. Bitte bestätige gegebenenfalls die E-Mail-Adresse und melde dich danach an.','ok')}}catch(e){status(e.message||String(e),'err')}finally{setBusy(false)}};
+
+async function sha256Hex(value){
+  const bytes=new TextEncoder().encode(String(value));
+  const hash=await crypto.subtle.digest('SHA-256',bytes);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function claimStation(){
+  const claim=$('claimStatus');
+  const show=(msg,type='')=>{claim.className='status '+type;claim.textContent=msg;};
+  const key=$('stationKey').value.trim();
+  const stationId=$('stationId').value.trim();
+  const stationName=$('stationName').value.trim();
+  const postcode=$('stationPostcode').value.trim();
+  const city=$('stationCity').value.trim();
+  const huthCode=$('huthStationCode').value.trim();
+  if(!key||!stationId||!stationName||!postcode||!city){show('Bitte Stationsschlüssel, Stations-ID, Stationsname, PLZ und Ort ausfüllen.','err');return;}
+  $('claimStationBtn').disabled=true;show('Pilotstation wird verknüpft …');
+  try{
+    const stationKeyHash=await sha256Hex(key);
+    const huthProofHash=await sha256Hex(stationId+'|'+key+'|'+huthCode);
+    const {data,error}=await client.rpc('claim_station_trial',{
+      p_station_key_hash:stationKeyHash,
+      p_station_id:stationId,
+      p_station_name:stationName,
+      p_postcode:postcode,
+      p_city:city,
+      p_huth_station_code:huthCode||null,
+      p_huth_proof_hash:huthProofHash
+    });
+    if(error)throw error;
+    const result=Array.isArray(data)?data[0]:data;
+    if(result?.status==='used_by_other')throw new Error('Dieser Stationsschlüssel ist bereits einer anderen Station zugeordnet.');
+    if(result?.status==='trial_already_used')throw new Error('Für dieses Kundenkonto wurde bereits eine Pilotstation verknüpft.');
+    if(result?.status!=='created')throw new Error('Die Station konnte nicht verknüpft werden.');
+    show('Pilotstation erfolgreich verknüpft.','ok');
+    await loadStation((await client.auth.getSession()).data.session);
+  }catch(e){show(e.message||String(e),'err')}finally{$('claimStationBtn').disabled=false;}
+}
+$('linkStationBtn').onclick=()=>{$('linkStationPanel').classList.toggle('hidden');};
+$('claimStationBtn').onclick=claimStation;
+
 $('logoutBtn').onclick=async()=>{await client.auth.signOut();location.reload();};
 boot();
 </script>
