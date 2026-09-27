@@ -1,27 +1,177 @@
 <!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TankstellenErtrag · Auswertung</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./supabase-config.js"></script>
-<style>:root{--bg:#0d0f10;--p:#181c1f;--p2:#23282c;--l:#353c41;--t:#f5f6f7;--m:#aeb6bc;--o:#f47b20;--g:#45c477;--y:#f0bd4f;--r:#ef6461;--in:#fff1e7}*{box-sizing:border-box}body{margin:0;background:#0d0f10;color:var(--t);font-family:Inter,system-ui,sans-serif}.wrap{max-width:1400px;margin:auto;padding:25px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.brand{font-size:23px;font-weight:900}.brand span{color:var(--o)}.pill{padding:7px 11px;border:1px solid #4b3a2b;border-radius:999px;color:#ffc08b;background:#211b16;font-size:12px}.grid{display:grid;gap:14px}.cards{grid-template-columns:repeat(5,1fr)}.card,.panel{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:18px}.label{font-size:12px;color:var(--m)}.value{font-size:24px;font-weight:900;margin-top:7px}.small{font-size:12px;color:var(--m);line-height:1.5}.ok{border-color:#285c42;background:#17271f}.warn{border-color:#5a482b;background:#24201a}.danger{border-color:#673535;background:#2b1c1c}.nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:15px}.nav button,.btn{border:0;border-radius:9px;padding:10px 13px;font-weight:800;cursor:pointer}.nav button{background:#30363a;color:#fff}.nav button.active,.primary{background:var(--o);color:#fff}.secondary{background:#30363a;color:#fff}.view{display:none}.view.active{display:block}.form{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.field label{display:block;font-size:12px;color:var(--m);margin-bottom:6px}.field input,.field select{width:100%;padding:11px;border-radius:8px;border:1px solid #d9c1b1;background:var(--in);color:#171717}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid var(--l);text-align:left;font-size:13px}th{color:var(--m)}@media(max-width:1000px){.cards,.form{grid-template-columns:1fr 1fr}}@media(max-width:650px){.wrap{padding:14px}.cards,.form{grid-template-columns:1fr}.top{align-items:flex-start;gap:10px;flex-direction:column}}</style></head><body><div class="wrap">
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TankstellenErtrag · Auswertung</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
+<style>
+:root{--bg:#0d0f10;--p:#181c1f;--p2:#23282c;--l:#353c41;--t:#f5f6f7;--m:#aeb6bc;--o:#f47b20;--o2:#ff9b4a;--g:#45c477;--y:#f0bd4f;--r:#ef6461;--in:#fff1e7;--b:#72a7ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 5%,#2a2119 0,#111416 35%,#0d0f10 72%);color:var(--t);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}.wrap{max-width:1450px;margin:auto;padding:25px 20px 55px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.brand{font-size:23px;font-weight:900}.brand span{color:var(--o)}.pill{padding:7px 11px;border:1px solid #4b3a2b;border-radius:999px;color:#ffc08b;background:#211b16;font-size:12px}.panel{background:rgba(24,28,31,.97);border:1px solid var(--l);border-radius:15px;padding:18px}.station{margin-bottom:14px}.small{font-size:12px;color:var(--m);line-height:1.55}.nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:15px}.nav button,.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:800;cursor:pointer}.nav button{background:#30363a;color:#fff}.nav button.active,.primary{background:var(--o);color:#fff}.secondary{background:#30363a;color:#fff}.nav button:disabled,.btn:disabled{opacity:.55;cursor:not-allowed}.view{display:none}.view.active{display:block}.grid{display:grid;gap:12px}.cards{grid-template-columns:repeat(5,1fr)}.card{background:var(--p2);border:1px solid var(--l);border-radius:12px;padding:15px}.label{font-size:11px;color:var(--m)}.value{font-size:22px;font-weight:900;margin-top:6px}.ok{border-color:#285c42!important;background:#17271f!important}.warn{border-color:#5a482b!important;background:#24201a!important}.danger{border-color:#673535!important;background:#2b1c1c!important}.blue{border-color:#385477!important;background:#182431!important}.form{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.field label{display:block;font-size:12px;color:var(--m);margin-bottom:6px}.field input,.field select{width:100%;padding:11px;border-radius:8px;border:1px solid #d9c1b1;background:var(--in);color:#171717}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.subnav{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 15px}.subnav button{background:#30363a;color:#fff;border:0;border-radius:8px;padding:8px 11px;font-weight:700;cursor:pointer}.subnav button.active{background:#59636a}.subview{display:none}.subview.active{display:block}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid var(--l);text-align:left;font-size:13px}th{color:var(--m);font-weight:700}.right{text-align:right}.tag{display:inline-block;padding:4px 7px;border-radius:999px;font-size:11px;font-weight:800;background:#30363a}.tag.g{background:#173525;color:#8fe0ad}.tag.y{background:#3a301b;color:#ffd879}.tag.r{background:#3b2020;color:#ff9b9b}.tag.b{background:#1d2d42;color:#9fc4ff}.notice{padding:13px;border-radius:10px;border:1px solid var(--l);margin:10px 0;line-height:1.5}.muted{color:var(--m)}.report-page{max-width:1000px;margin:auto;background:#fff;color:#161616;border-radius:4px;padding:34px;min-height:700px}.report-page h1,.report-page h2{color:#161616}.report-page p,.report-page li{line-height:1.55}.report-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:15px 0}.report-kpi div{border:1px solid #ddd;padding:10px}.report-actions{display:flex;gap:8px;margin-bottom:12px}.sim-result{font-size:18px;font-weight:900;margin-top:12px}.footer{margin-top:25px;color:#70777d;font-size:11px;display:flex;gap:14px}.footer a{color:#9aa1a6;text-decoration:none}@media(max-width:1050px){.cards{grid-template-columns:repeat(3,1fr)}.form{grid-template-columns:1fr 1fr}.report-kpi{grid-template-columns:1fr 1fr}}@media(max-width:650px){.wrap{padding:14px}.cards,.form{grid-template-columns:1fr}.top{align-items:flex-start;gap:10px;flex-direction:column}.report-page{padding:20px}.report-kpi{grid-template-columns:1fr}}@media print{body{background:#fff;color:#111}.top,.nav,.footer,.report-actions,#gate{display:none!important}.wrap{padding:0;max-width:none}.view{display:none!important}#report{display:block!important}.report-page{box-shadow:none;border:0;min-height:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
 <header class="top"><div class="brand">Tankstellen<span>Ertrag</span></div><div class="pill">Geschützte Auswertung · Gründungspartner</div></header>
 <div id="gate" class="panel">Verbindung zur Station wird hergestellt …</div>
+
 <div id="app" style="display:none">
-<div id="stationInfo" class="panel" style="margin-bottom:14px"></div>
-<nav class="nav"><button class="active" data-v="dashboard">Übersicht</button><button data-v="monthly">Monatsdaten</button><button data-v="analysis">Analyse</button><button data-v="report">Bericht</button><button id="back" class="secondary">Kundenkonto</button></nav>
-<section id="dashboard" class="view active"><div id="kpis" class="grid cards"></div><div id="alerts" class="panel" style="margin-top:14px"></div></section>
-<section id="monthly" class="view"><div class="panel"><h2>Monatsdaten</h2><div class="form"><div class="field"><label>Monat</label><input id="month" type="month"></div><div class="field"><label>Shop-Umsatz €</label><input id="rev" type="number" step="0.01"></div><div class="field"><label>Shop-EK €</label><input id="ek" type="number" step="0.01"></div><div class="field"><label>Schwund €</label><input id="shrink" type="number" step="0.01"></div></div><h3>Warengruppen</h3><div id="groups"></div><div class="actions"><button id="save" class="btn primary">Monat speichern</button><button id="load" class="btn secondary">Cloud-Daten neu laden</button></div><div id="msg" class="small" style="margin-top:10px"></div></div></section>
-<section id="analysis" class="view"><div class="panel"><h2>Analyse</h2><div id="analysisBody"></div></div></section>
-<section id="report" class="view"><div class="panel"><h2>Beratungsbericht · Kurzfassung</h2><div id="reportBody"></div></div></section>
-</div></div>
+  <div id="stationInfo" class="panel station"></div>
+
+  <nav class="nav">
+    <button class="active" data-v="dashboard">Übersicht</button>
+    <button data-v="monthly">Monatsdaten</button>
+    <button data-v="analysis">Analyse</button>
+    <button data-v="report">Bericht</button>
+    <button id="back" class="secondary">Kundenkonto</button>
+  </nav>
+
+  <section id="dashboard" class="view active">
+    <div id="kpis" class="grid cards"></div>
+    <div id="dashboardNotice" class="notice"></div>
+    <div class="grid" style="grid-template-columns:1.2fr .8fr;margin-top:12px">
+      <div class="panel"><h2 style="margin-top:0">Monatsentwicklung</h2><div id="trendTable"></div></div>
+      <div class="panel"><h2 style="margin-top:0">Aktuelle Prüfsignale</h2><div id="alerts"></div></div>
+    </div>
+  </section>
+
+  <section id="monthly" class="view">
+    <div class="panel">
+      <h2 style="margin-top:0">Monatsdaten</h2>
+      <p class="small">Hier werden die Rohwerte je Monat erfasst. HUTH-EK wird als gemessener EK geführt; Plan- und Zielwerte werden davon getrennt.</p>
+      <div class="form">
+        <div class="field"><label>Monat</label><input id="month" type="month"></div>
+        <div class="field"><label>Shop-Umsatz €</label><input id="rev" type="number" step="0.01"></div>
+        <div class="field"><label>Shop-EK €</label><input id="ek" type="number" step="0.01"></div>
+        <div class="field"><label>Schwund €</label><input id="shrink" type="number" step="0.01"></div>
+      </div>
+      <h3>Warengruppen</h3>
+      <div id="groups"></div>
+      <div class="actions"><button id="save" class="btn primary">Monat speichern</button><button id="load" class="btn secondary">Cloud-Daten neu laden</button></div>
+      <div id="msg" class="small" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <section id="analysis" class="view">
+    <div class="subnav">
+      <button class="active" data-sv="overviewA">Monatsentwicklung</button>
+      <button data-sv="groupsA">Warengruppen</button>
+      <button data-sv="shrinkA">Schwund</button>
+      <button data-sv="causesA">Ursachenprüfung</button>
+      <button data-sv="leversA">Gewinnhebel</button>
+      <button data-sv="simA">Simulation</button>
+      <button data-sv="actionsA">Maßnahmen</button>
+    </div>
+
+    <div id="overviewA" class="subview active panel"><h2 style="margin-top:0">Monatsentwicklung</h2><div id="analysisTrend"></div></div>
+    <div id="groupsA" class="subview panel"><h2 style="margin-top:0">Warengruppenanalyse</h2><div id="groupAnalysis"></div></div>
+    <div id="shrinkA" class="subview panel"><h2 style="margin-top:0">Schwundentwicklung</h2><div id="shrinkAnalysis"></div></div>
+    <div id="causesA" class="subview panel"><h2 style="margin-top:0">Ursachenprüfung</h2><div id="causeAnalysis"></div></div>
+    <div id="leversA" class="subview panel"><h2 style="margin-top:0">Gewinnhebel</h2><div id="leverAnalysis"></div></div>
+    <div id="simA" class="subview panel"><h2 style="margin-top:0">Simulation</h2>
+      <p class="small">Die Simulation ist eine Rechenhilfe und keine Prognose. Sie verändert keine gespeicherten Monatsdaten.</p>
+      <div class="form">
+        <div class="field"><label>Zusätzlicher Umsatz €</label><input id="simRevenue" type="number" step="0.01" value="1000"></div>
+        <div class="field"><label>Zielmarge %</label><input id="simMargin" type="number" step="0.1" value="50"></div>
+        <div class="field"><label>Schwundreduktion €</label><input id="simShrink" type="number" step="0.01" value="100"></div>
+        <div class="field"><label>Preis-/Margenhebel € Rohertrag</label><input id="simGross" type="number" step="0.01" value="0"></div>
+      </div>
+      <button id="runSim" class="btn primary" style="margin-top:12px">Simulation berechnen</button>
+      <div id="simResult" class="notice sim-result"></div>
+    </div>
+    <div id="actionsA" class="subview panel"><h2 style="margin-top:0">Maßnahmen</h2><div id="actionList"></div></div>
+  </section>
+
+  <section id="report" class="view">
+    <div class="report-actions"><button id="printReport" class="btn primary">Bericht drucken / PDF</button><button id="backFromReport" class="btn secondary">Zur Übersicht</button></div>
+    <div class="report-page" id="reportBody"></div>
+  </section>
+</div>
+
+<footer class="footer"><a href="https://tankstellenertrag.de/impressum.html">Impressum</a><a href="https://tankstellenertrag.de/datenschutz.html">Datenschutz</a><a href="https://tankstellenertrag.de/agb.html">AGB</a></footer>
+</div>
+
 <script>
-const cfg=window.TANKSTELLENERTRAG_SUPABASE||{};const sb=window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});let station=null,snap=null;
+const cfg=window.TANKSTELLENERTRAG_SUPABASE||{};
+const sb=window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+let station=null,snap=null;
 const groups=['Süßwaren','Backshop','Kaffee','Drogerie','Lebensmittel','Spielzeug','Waschen','Getränke','Eis'];
-const $=id=>document.getElementById(id);const eur=n=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(Number(n)||0);const pct=n=>(Number(n)||0).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
+const targets={'Süßwaren':50,'Backshop':59.2,'Lebensmittel':50,'Eis':56.8};
+const $=id=>document.getElementById(id);
+const eur=n=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(Number(n)||0);
+const pct=n=>(Number(n)||0).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
+const num=n=>Number(n)||0;
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function empty(){return {schemaVersion:1,appVersion:'43.19-cloud-core',months:{}}}function current(){return $('month').value||new Date().toISOString().slice(0,7)}
-function row(){snap.months[current()]??={revenue:0,ek:0,shrink:0,groups:{}};return snap.months[current()]}
-function renderGroups(){const r=row();$('groups').innerHTML='<div class="form">'+groups.map(g=>'<div class="field"><label>'+g+' · Umsatz €</label><input data-g="'+g+'" type="number" step="0.01" value="'+Number(r.groups[g]||0)+'"></div>').join('')+'</div>'}
-function render(){const r=row(),rev=Number(r.revenue),ek=Number(r.ek),gross=rev-ek,margin=rev?gross/rev*100:0,sh=rev?Number(r.shrink)/rev*100:0;$('kpis').innerHTML=[['Shop-Umsatz',eur(rev)],['Shop-EK',eur(ek)],['Rohertrag',eur(gross)],['Shop-Marge',pct(margin)],['Schwundquote',pct(sh)]].map(x=>'<div class="card"><div class="label">'+x[0]+'</div><div class="value">'+x[1]+'</div></div>').join('');$('alerts').innerHTML=margin<20?'<div class="panel warn"><b>Prüfsignal: niedrige Shop-Marge</b><div class="small">Die gemessene Marge liegt unter 20 %. Ursache muss anhand EK, Preisstellung, Warenmix und Monatsabgrenzung geprüft werden.</div></div>':'<div class="panel ok"><b>Keine harte Margenwarnung im Testmonat.</b><div class="small">Die Kennzahl ist eine rechnerische Einordnung und ersetzt keine Ursachenprüfung.</div></div>';const rows=groups.map(g=>{const v=Number(r.groups[g]||0);return '<tr><td>'+g+'</td><td>'+eur(v)+'</td></tr>'}).join('');$('analysisBody').innerHTML='<p class="small">Monat: '+esc(current())+'</p><table><thead><tr><th>Warengruppe</th><th>Umsatz</th></tr></thead><tbody>'+rows+'</tbody></table>';$('reportBody').innerHTML='<p><b>Stationsdaten:</b> '+esc(station.station_name)+' · '+esc(station.postcode)+' '+esc(station.city)+'</p><p><b>Monatswert:</b> '+esc(current())+'</p><p><b>Shop-Umsatz:</b> '+eur(rev)+' · <b>Shop-EK:</b> '+eur(ek)+' · <b>Rohertrag:</b> '+eur(gross)+' · <b>Marge:</b> '+pct(margin)+'</p><p>Die Zahlen bilden die aktuelle Cloud-Auswertung ab. Auffälligkeiten sind als Prüfsignale zu verstehen; konkrete Ursachen werden erst nach Prüfung der HUTH-Daten und betrieblichen Abläufe festgelegt.</p>';renderGroups()}
-async function load(){const {data:u,error:ue}=await sb.auth.getUser();if(ue||!u.user){location.href='./';return}const {data:s,error:se}=await sb.from('stations').select('*').eq('owner_id',u.user.id).maybeSingle();if(se||!s)throw new Error('Keine freigeschaltete Station gefunden.');station=s;const active=s.subscription_status==='active'||(s.subscription_status==='trial'&&new Date(s.trial_ends_at)>new Date())||(s.subscription_status==='founding_partner'&&new Date(s.founding_partner_free_until)>new Date());if(!active)throw new Error('Der Zugang ist nicht aktiv.');const {data:x,error:xe}=await sb.from('station_snapshots').select('payload,updated_at').eq('station_id',s.id).maybeSingle();if(xe)throw xe;snap=x?.payload&&typeof x.payload==='object'?x.payload:empty();snap.months=snap.months||{};$('stationInfo').innerHTML='<b>'+esc(s.station_name)+'</b><div class="small">'+esc(s.postcode)+' '+esc(s.city)+' · Zugang: '+esc(s.subscription_status)+' · bis '+new Date(s.founding_partner_free_until||s.subscription_ends_at||s.trial_ends_at).toLocaleDateString('de-DE')+'</div>';const m=new Date().toISOString().slice(0,7);$('month').value=Object.keys(snap.months)[0]||m;render();$('gate').style.display='none';$('app').style.display='block'}
-$('month').addEventListener('change',render);$('save').onclick=async()=>{try{const r=row();r.revenue=Number($('rev').value)||0;r.ek=Number($('ek').value)||0;r.shrink=Number($('shrink').value)||0;document.querySelectorAll('[data-g]').forEach(i=>r.groups[i.dataset.g]=Number(i.value)||0);const {error}=await sb.from('station_snapshots').upsert({station_id:station.id,schema_version:1,app_version:'43.19-cloud-core',payload:snap},{onConflict:'station_id'});if(error)throw error;$('msg').textContent='Monat erfolgreich in der Cloud gespeichert.';render()}catch(e){$('msg').textContent='Fehler: '+(e.message||e)}};
-$('load').onclick=()=>location.reload();$('back').onclick=()=>location.href='./';document.querySelectorAll('.nav button[data-v]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button[data-v]').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$(b.dataset.v).classList.add('active');render()});load().catch(e=>{$('gate').className='panel danger';$('gate').textContent=e.message||String(e)});
-</script></body></html>
+function empty(){return {schemaVersion:1,appVersion:'43.19-cloud-core-plus',months:{}}}
+function current(){return $('month').value||new Date().toISOString().slice(0,7)}
+function normalizeSnapshot(){
+  snap=snap&&typeof snap==='object'?snap:empty();snap.months=snap.months||{};
+  for(const [m,r0] of Object.entries(snap.months)){
+    const r=r0||{};r.revenue=num(r.revenue);r.ek=num(r.ek);r.shrink=num(r.shrink);r.groups=r.groups||{};
+    for(const g of groups){const v=r.groups[g];r.groups[g]=typeof v==='object'&&v!==null?{revenue:num(v.revenue),ek:num(v.ek),shrink:num(v.shrink)}:{revenue:num(v),ek:0,shrink:0};}
+    snap.months[m]=r;
+  }
+}
+function row(){snap.months[current()]??={revenue:0,ek:0,shrink:0,groups:{}};const r=snap.months[current()];r.groups=r.groups||{};for(const g of groups)r.groups[g]=r.groups[g]||{revenue:0,ek:0,shrink:0};return r}
+function months(){return Object.keys(snap.months).sort()}
+function metrics(r){const revenue=num(r?.revenue),ek=num(r?.ek),shrink=num(r?.shrink),gross=revenue-ek;return {revenue,ek,shrink,gross,margin:revenue?gross/revenue*100:0,shrinkRate:revenue?shrink/revenue*100:0}}
+function groupMetric(r,g){const x=r?.groups?.[g];if(typeof x==='number')return {revenue:x,ek:0,shrink:0};const revenue=num(x?.revenue),ek=num(x?.ek),shrink=num(x?.shrink);return {revenue,ek,shrink,gross:revenue-ek,margin:revenue?(revenue-ek)/revenue*100:0,shrinkRate:revenue?shrink/revenue*100:0}}
+function renderGroups(){const r=row();$('groups').innerHTML='<div class="form">'+groups.map(g=>{const x=groupMetric(r,g);return '<div class="panel" style="padding:12px"><b>'+esc(g)+'</b><div class="field" style="margin-top:8px"><label>Umsatz €</label><input data-g="'+g+'" data-k="revenue" type="number" step="0.01" value="'+x.revenue.toFixed(2)+'"></div><div class="field" style="margin-top:8px"><label>EK €</label><input data-g="'+g+'" data-k="ek" type="number" step="0.01" value="'+x.ek.toFixed(2)+'"></div><div class="field" style="margin-top:8px"><label>Schwund €</label><input data-g="'+g+'" data-k="shrink" type="number" step="0.01" value="'+x.shrink.toFixed(2)+'"></div></div>'}).join('')+'</div>'}
+function render(){
+ const r=row(),m=metrics(r);$('rev').value=m.revenue||'';$('ek').value=m.ek||'';$('shrink').value=m.shrink||'';renderGroups();
+ $('kpis').innerHTML=[['Shop-Umsatz',eur(m.revenue)],['Shop-EK',eur(m.ek)],['Rohertrag',eur(m.gross)],['Shop-Marge',pct(m.margin)],['Schwundquote',pct(m.shrinkRate)]].map(x=>'<div class="card"><div class="label">'+x[0]+'</div><div class="value">'+x[1]+'</div></div>').join('');
+ const note=m.margin<20?'<div class="notice warn"><b>Prüfsignal: niedrige Shop-Marge</b><div class="small">Die gemessene Marge liegt unter 20 %. Ursache muss anhand EK, Preisstellung, Warenmix und Monatsabgrenzung geprüft werden.</div></div>':'<div class="notice ok"><b>Keine harte Margenwarnung im Testmonat.</b><div class="small">Die Kennzahl ist eine rechnerische Einordnung und ersetzt keine Ursachenprüfung.</div></div>';
+ $('alerts').innerHTML=note+ (m.shrinkRate>=2?'<div class="notice warn"><b>Schwund prüfen</b><div class="small">Die aktuelle Schwundquote liegt bei '+pct(m.shrinkRate)+'. Prüfe MHD, Bruch, Verderb, Inventur und Buchungszeitraum.</div></div>':'<div class="notice"><b>Schwund im aktuellen Monat</b><div class="small">'+eur(m.shrink)+' bei '+eur(m.revenue)+' Shop-Umsatz.</div></div>');
+ $('dashboardNotice').innerHTML='<b>Datenbasis: '+esc(current())+'</b><div class="small">Grün = aktive Zugangs-/Prüfinformation. Messwerte und Zielwerte werden im System getrennt geführt. Unklare Ursachen werden nicht als Tatsache dargestellt.</div>';
+ renderTrend();renderAnalysis();renderReport();
+}
+function renderTrend(){
+ const ms=months();if(!ms.length){$('trendTable').innerHTML='<div class="small">Noch keine Monatsdaten vorhanden.</div>';return}
+ const rows=ms.slice().reverse().map(m=>{const x=metrics(snap.months[m]);return '<tr><td>'+m+'</td><td class="right">'+eur(x.revenue)+'</td><td class="right">'+eur(x.ek)+'</td><td class="right">'+eur(x.gross)+'</td><td class="right">'+pct(x.margin)+'</td><td class="right">'+eur(x.shrink)+'</td></tr>'}).join('');
+ const html='<table><thead><tr><th>Monat</th><th class="right">Umsatz</th><th class="right">EK</th><th class="right">Rohertrag</th><th class="right">Marge</th><th class="right">Schwund</th></tr></thead><tbody>'+rows+'</tbody></table>';$('trendTable').innerHTML=html;$('analysisTrend').innerHTML=html;
+}
+function renderAnalysis(){
+ const r=row();
+ const ga=groups.map(g=>{const x=groupMetric(r,g),target=targets[g];let tag='—',cls='b';if(target&&x.revenue&&x.ek){if(x.margin>=target)tag='Ziel erreicht',cls='g';else if(x.margin>=target-5)tag='nah am Ziel',cls='y';else tag='unter Ziel',cls='r'}return {g,x,target,tag,cls}}).sort((a,b)=>b.x.revenue-a.x.revenue);
+ $('groupAnalysis').innerHTML='<table><thead><tr><th>Warengruppe</th><th class="right">Umsatz</th><th class="right">EK</th><th class="right">Marge</th><th class="right">Schwund</th><th>Ziel*</th><th>Status</th></tr></thead><tbody>'+ga.map(a=>'<tr><td>'+esc(a.g)+'</td><td class="right">'+eur(a.x.revenue)+'</td><td class="right">'+eur(a.x.ek)+'</td><td class="right">'+pct(a.x.margin)+'</td><td class="right">'+eur(a.x.shrink)+'</td><td>'+ (a.target?pct(a.target):'—')+'</td><td><span class="tag '+a.cls+'">'+a.tag+'</span></td></tr>').join('')+'</tbody></table><p class="small">* Zielwerte sind nur dort eingeblendet, wo im aktuellen Beratungsmodell ein Zielwert hinterlegt ist. Ein fehlender Zielwert ist keine Bewertung.</p>';
+ const shrinkRows=ga.filter(a=>a.x.shrink>0).sort((a,b)=>b.x.shrink-a.x.shrink);$('shrinkAnalysis').innerHTML=shrinkRows.length?'<table><thead><tr><th>Warengruppe</th><th class="right">Schwund</th><th class="right">Umsatz</th><th class="right">Schwundquote</th></tr></thead><tbody>'+shrinkRows.map(a=>'<tr><td>'+esc(a.g)+'</td><td class="right">'+eur(a.x.shrink)+'</td><td class="right">'+eur(a.x.revenue)+'</td><td class="right">'+pct(a.x.shrinkRate)+'</td></tr>').join('')+'</tbody></table>':'<div class="small">Noch kein Warengruppen-Schwund erfasst.</div>';
+ const m=metrics(r);let causes=[];
+ if(m.margin<20)causes.push(['Niedrige Shop-Marge','EK-Abgrenzung, Preisstellung, Warenmix und Monatsabgrenzung prüfen.']);
+ if(m.shrinkRate>=2)causes.push(['Erhöhte Schwundquote','MHD, Bruch, Verderb, Inventurzeitpunkt und Abschriften prüfen.']);
+ if(!causes.length)causes.push(['Keine harte Auffälligkeit','Die aktuellen Kennzahlen liefern kein automatisches Prüfsignal. Das ersetzt keine fachliche Prüfung.']);
+ $('causeAnalysis').innerHTML=causes.map(c=>'<div class="notice"><b>'+c[0]+'</b><div class="small">'+c[1]+'</div></div>').join('')+'<div class="notice blue"><b>Wichtig</b><div class="small">Eine Auffälligkeit ist eine Prüfspur, keine Feststellung über Mitarbeiter, Lieferanten oder Ursachen.</div></div>';
+ const levers=[];
+ if(m.revenue)levers.push(['Umsatzhebel','Zusätzlicher Umsatz mit vorhandener Zielmarge','Je 1.000 € Zusatzumsatz ergeben sich bei 50 % Marge rechnerisch 500 € Rohertrag.']);
+ if(m.shrink)levers.push(['Schwundhebel','Schwund reduzieren','Jeder vermiedene 1 € Schwund erhöht den Rohertrag rechnerisch um 1 €, sofern kein gegenläufiger Effekt entsteht.']);
+ const below=ga.filter(a=>a.target&&a.x.revenue&&a.x.ek&&a.x.margin<a.target);if(below.length)levers.push(['Margenhebel',below.map(a=>a.g).join(', '),'Preisstellung, EK und Sortimentsmix je Warengruppe prüfen.']);
+ $('leverAnalysis').innerHTML=levers.map(x=>'<div class="notice"><b>'+x[0]+': '+x[1]+'</b><div class="small">'+x[2]+'</div></div>').join('');
+ const actions=[];if(m.margin<20)actions.push('Shop-Marge und EK-Abgrenzung des Monats prüfen.');if(m.shrinkRate>=2)actions.push('Schwund nach MHD, Bruch und Verderb aufteilen.');if(below.length)actions.push('Warengruppen unter hinterlegtem Zielwert auf Preis/EK/Sortiment prüfen.');actions.push('Nächsten Monat dieselben Kennzahlen erfassen und Effekt der Maßnahme vergleichen.');
+ $('actionList').innerHTML='<ol>'+actions.map(a=>'<li style="margin:9px 0">'+a+'</li>').join('')+'</ol>';
+}
+function renderReport(){
+ const r=row(),m=metrics(r),top=groups.map(g=>({g,x:groupMetric(r,g)})).filter(a=>a.x.revenue>0).sort((a,b)=>b.x.revenue-a.x.revenue).slice(0,5);
+ $('reportBody').innerHTML='<h1>TankstellenErtrag · Warenwirtschaftliche Monatsanalyse</h1><p><b>'+esc(station.station_name)+'</b> · '+esc(station.postcode)+' '+esc(station.city)+'</p><p>Auswertungsmonat: <b>'+esc(current())+'</b></p><div class="report-kpi"><div><small>Shop-Umsatz</small><br><b>'+eur(m.revenue)+'</b></div><div><small>Shop-EK</small><br><b>'+eur(m.ek)+'</b></div><div><small>Rohertrag</small><br><b>'+eur(m.gross)+'</b></div><div><small>Shop-Marge</small><br><b>'+pct(m.margin)+'</b></div></div><h2>Einordnung</h2><p>'+ (m.margin<20?'Die gemessene Shop-Marge enthält ein Prüfsignal. Vor einer Maßnahme sind EK-Abgrenzung, Preisstellung, Warenmix und Monatsabgrenzung zu prüfen.':'Die aktuelle Shop-Marge liefert kein hartes automatisches Prüfsignal. Die Kennzahl ist rechnerisch und ersetzt keine fachliche Ursachenprüfung.')+'</p><h2>Top-Warengruppen nach Umsatz</h2><table><thead><tr><th>Warengruppe</th><th>Umsatz</th><th>EK</th><th>Marge</th></tr></thead><tbody>'+top.map(a=>'<tr><td>'+esc(a.g)+'</td><td>'+eur(a.x.revenue)+'</td><td>'+eur(a.x.ek)+'</td><td>'+pct(a.x.margin)+'</td></tr>').join('')+'</tbody></table><h2>Schwund</h2><p>'+eur(m.shrink)+' bzw. '+pct(m.shrinkRate)+' des Shop-Umsatzes im Auswertungsmonat.</p><h2>Beratungsansatz</h2><ul><li>Zahl → Auffälligkeit → Ursachenfragen → Maßnahme → Effektkontrolle.</li><li>Messdaten, Zielwerte und fachliche Hypothesen werden getrennt betrachtet.</li><li>Konkrete Ursachen werden erst nach Prüfung der HUTH-Daten und betrieblichen Abläufe festgelegt.</li></ul><p style="margin-top:35px;border-top:1px solid #ddd;padding-top:12px;color:#666;font-size:11px">TankstellenErtrag · Warenwirtschaftliche Monatsanalyse</p>';
+}
+$('month').addEventListener('change',render);
+$('save').onclick=async()=>{
+ try{const r=row();r.revenue=num($('rev').value);r.ek=num($('ek').value);r.shrink=num($('shrink').value);document.querySelectorAll('[data-g]').forEach(i=>r.groups[i.dataset.g][i.dataset.k]=num(i.value));
+ const {error}=await sb.from('station_snapshots').upsert({station_id:station.id,schema_version:1,app_version:'43.19-cloud-core-plus',payload:snap},{onConflict:'station_id'});if(error)throw error;$('msg').textContent='Monat erfolgreich in der Cloud gespeichert.';render();
+ }catch(e){$('msg').textContent='Fehler: '+(e.message||e)}
+};
+$('load').onclick=()=>location.reload();
+document.querySelectorAll('.nav button[data-v]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button[data-v]').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$(b.dataset.v).classList.add('active');render()});
+document.querySelectorAll('.subnav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.subnav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.subview').forEach(v=>v.classList.remove('active'));$(b.dataset.sv).classList.add('active');});
+$('runSim').onclick=()=>{const m=metrics(row()),add=num($('simRevenue').value),target=num($('simMargin').value),sh=num($('simShrink').value),gross=num($('simGross').value),extra=add*target/100+sh+gross;$('simResult').innerHTML='Rechnerischer zusätzlicher Rohertrag: <b>'+eur(extra)+'</b><div class="small">Zusatzumsatz: '+eur(add)+' · bei '+pct(target)+' Zielmarge = '+eur(add*target/100)+' · Schwundreduktion: '+eur(sh)+' · sonstiger Rohertragshebel: '+eur(gross)+'. Aktueller Rohertrag: '+eur(m.gross)+'.</div>';};
+$('printReport').onclick=()=>window.print();$('backFromReport').onclick=()=>document.querySelector('[data-v="dashboard"]').click();$('back').onclick=()=>location.href='./';
+async function load(){
+ const {data:u,error:ue}=await sb.auth.getUser();if(ue||!u.user){location.href='./';return}
+ const {data:s,error:se}=await sb.from('stations').select('*').eq('owner_id',u.user.id).maybeSingle();if(se||!s)throw new Error('Keine freigeschaltete Station gefunden.');
+ station=s;const active=s.subscription_status==='active'||(s.subscription_status==='trial'&&new Date(s.trial_ends_at)>new Date())||(s.subscription_status==='founding_partner'&&new Date(s.founding_partner_free_until)>new Date());if(!active)throw new Error('Der Zugang ist nicht aktiv.');
+ const {data:x,error:xe}=await sb.from('station_snapshots').select('payload,updated_at').eq('station_id',s.id).maybeSingle();if(xe)throw xe;snap=x?.payload&&typeof x.payload==='object'?x.payload:empty();normalizeSnapshot();
+ $('stationInfo').innerHTML='<b>'+esc(s.station_name)+'</b><div class="small">'+esc(s.postcode)+' '+esc(s.city)+' · Zugang: '+esc(s.subscription_status)+' · bis '+new Date(s.founding_partner_free_until||s.subscription_ends_at||s.trial_ends_at).toLocaleDateString('de-DE')+'</div>';
+ const first=months()[0]||new Date().toISOString().slice(0,7);$('month').value=first;render();$('gate').style.display='none';$('app').style.display='block';
+}
+load().catch(e=>{$('gate').className='panel danger';$('gate').textContent=e.message||String(e)});
+</script>
+</body></html>
