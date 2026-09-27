@@ -143,9 +143,9 @@ async function claimStation(){
     });
     if(error)throw error;
     const result=Array.isArray(data)?data[0]:data;
-    if(result?.status==='used_by_other')throw new Error('Dieser Stationsschlüssel ist bereits einer anderen Station zugeordnet.');
-    if(result?.status==='trial_already_used')throw new Error('Für dieses Kundenkonto wurde bereits eine Pilotstation verknüpft.');
-    if(result?.status!=='created')throw new Error('Die Station konnte nicht verknüpft werden.');
+    if(result?.claim_status==='used_by_other')throw new Error('Dieser Stationsschlüssel ist bereits einer anderen Station zugeordnet.');
+    if(result?.claim_status==='trial_already_used')throw new Error('Für dieses Kundenkonto wurde bereits eine Pilotstation verknüpft.');
+    if(result?.claim_status!=='created')throw new Error('Die Station konnte nicht verknüpft werden. Status: '+(result?.claim_status||'unbekannt'));
     show('Pilotstation erfolgreich verknüpft.','ok');
     await loadStation((await client.auth.getSession()).data.session);
   }catch(e){show(e.message||String(e),'err')}finally{$('claimStationBtn').disabled=false;}
