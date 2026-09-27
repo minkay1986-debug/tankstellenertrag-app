@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TankstellenErtrag · Kundenplattform</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
+<style>
+:root{--bg:#0d0f10;--panel:#181c1f;--panel2:#22272b;--line:#353c41;--text:#f5f6f7;--muted:#aeb6bc;--orange:#f47b20;--orange2:#ff9b4a;--green:#45c477;--red:#ef6461;--input:#fff1e7}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 10%,#2a2119 0,#111416 35%,#0d0f10 70%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
+.wrap{width:min(1120px,calc(100% - 32px));margin:auto;padding:28px 0 50px}.brand{font-weight:900;font-size:22px}.brand span{color:var(--orange)}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:34px}.pill{border:1px solid #4b3a2b;background:#211b16;color:#ffc08b;padding:7px 10px;border-radius:999px;font-size:12px}
+.hero{display:grid;grid-template-columns:1.25fr .75fr;gap:20px;align-items:stretch}.panel{background:rgba(24,28,31,.96);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:0 18px 60px rgba(0,0,0,.2)}h1{font-size:42px;line-height:1.05;margin:10px 0 14px}.lead{font-size:17px;line-height:1.6;color:#d6dce0}.badges{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}.badge{background:#22282c;border:1px solid #3b4348;border-radius:999px;padding:7px 10px;font-size:12px}.feature{padding:12px 0;border-bottom:1px solid var(--line)}.feature:last-child{border-bottom:0}.feature b{display:block;margin-bottom:3px}.small{font-size:12px;color:var(--muted);line-height:1.55}
+.form{display:grid;gap:12px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}.field input{width:100%;padding:12px;border-radius:9px;border:1px solid #d9c1b1;background:var(--input);color:#1a1a1a;font-size:14px}.btn{width:100%;padding:12px 14px;border:0;border-radius:9px;font-weight:800;cursor:pointer}.primary{background:var(--orange);color:#fff}.secondary{background:#30363a;color:#fff}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}.status{margin-top:14px;padding:13px;border-radius:10px;background:#20262a;border:1px solid var(--line);font-size:13px;line-height:1.5}.status.ok{background:#17271f;border-color:#285c42}.status.err{background:#2b1c1c;border-color:#673535}.hidden{display:none}.dashboard{margin-top:20px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}.card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:15px}.card .label{font-size:11px;color:var(--muted)}.card .value{font-size:20px;font-weight:800;margin-top:6px}.linkbtn{display:inline-block;text-decoration:none;text-align:center;margin-top:14px;padding:12px 16px;border-radius:9px;background:var(--orange);color:#fff;font-weight:800}.footer{margin-top:28px;color:#6f777d;font-size:11px;display:flex;gap:14px;flex-wrap:wrap}.footer a{color:#969fa6;text-decoration:none}
+@media(max-width:850px){.hero{grid-template-columns:1fr}h1{font-size:34px}.cards{grid-template-columns:1fr}.actions{grid-template-columns:1fr}.top{align-items:flex-start;gap:12px;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">Tankstellen<span>Ertrag</span></div>
+    <div class="pill">Kundenbereich · Pilot</div>
+  </header>
+
+  <main id="authView" class="hero">
+    <section class="panel">
+      <div class="small" style="color:var(--orange2);font-weight:800;text-transform:uppercase;letter-spacing:.12em">Geschützter Kundenbereich</div>
+      <h1>Kundenbereich.<br>Ihre Auswertung.</h1>
+      <p class="lead">Hier befindet sich der geschützte Zugang für Pilotkunden von TankstellenErtrag. Nach der Anmeldung gelangen Sie zur Analyseplattform mit Monatsdaten, Warengruppen, Margen, Schwund, Auffälligkeiten und Beratungsbericht.</p>
+      <div class="badges">
+        <span class="badge">🔐 persönlicher Zugang</span>
+        <span class="badge">🏪 1 Pilotstation</span>
+        <span class="badge">📊 Auswertungen</span>
+        <span class="badge">📄 Bericht</span>
+      </div>
+      <div class="feature"><b>Stationsdaten bleiben dem jeweiligen Kundenkonto zugeordnet</b><span class="small">Die Stationsdaten werden serverseitig dem angemeldeten Kundenkonto zugeordnet.</span></div>
+      <div class="feature"><b>Pilotzugang wird separat freigeschaltet</b><span class="small">Ein Pilotzugang wird nach der Registrierung separat für die vereinbarte Pilotstation freigeschaltet.</span></div>
+      <div class="feature"><b>Keine automatische kostenpflichtige Verlängerung</b><span class="small">Nach der Pilotphase entsteht nicht automatisch ein kostenpflichtiges Abo.</span></div>
+    </section>
+
+    <section class="panel">
+      <h2 id="formTitle" style="margin-top:0">Anmelden</h2>
+      <p id="formHint" class="small">Mit Ihrem Kundenkonto anmelden.</p>
+      <div class="form">
+        <div class="field"><label>E-Mail</label><input id="email" type="email" autocomplete="email" placeholder="name@unternehmen.de"></div>
+        <div class="field"><label>Passwort</label><input id="password" type="password" autocomplete="current-password" placeholder="Mindestens 8 Zeichen"></div>
+        <div class="actions">
+          <button class="btn primary" id="loginBtn">Anmelden</button>
+          <button class="btn secondary" id="signupBtn">Konto registrieren</button>
+        </div>
+      </div>
+      <div id="status" class="status">Verbindung wird geprüft …</div>
+      <p class="small" style="margin-top:14px">Das Kundenkonto kann angelegt werden. Die konkrete Pilotstation wird anschließend separat verknüpft bzw. freigeschaltet.</p>
+    </section>
+  </main>
+
+  <section id="dashboardView" class="dashboard hidden">
+    <div class="panel">
+      <div class="small" style="color:var(--orange2);font-weight:800;text-transform:uppercase;letter-spacing:.12em">Kundenkonto</div>
+      <h1 style="font-size:30px">Kundenkonto</h1>
+      <p id="userLine" class="small"></p>
+      <div id="stationCards" class="cards"></div>
+      <div id="stationStatus" class="status"></div>
+      <a id="openApp" class="linkbtn" href="../">Zur TankstellenErtrag-Plattform</a>
+      <div style="margin-top:12px"><button id="logoutBtn" class="btn secondary">Abmelden</button></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <a href="../impressum.html">Impressum</a>
+    <a href="../datenschutz.html">Datenschutz</a>
+    <a href="../agb.html">AGB</a>
+  </footer>
+</div>
+
+<script>
+const cfg=window.TANKSTELLENERTRAG_SUPABASE||{};
+const client=(cfg.url&&cfg.publishableKey&&window.supabase)?window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
+const $=id=>document.getElementById(id);
+function status(msg,type=''){const el=$('status');if(el){el.className='status '+type;el.textContent=msg;}}
+function setBusy(v){$('loginBtn').disabled=v;$('signupBtn').disabled=v;}
+async function loadStation(session){
+  if(!client||!session){return;}
+  $('authView').classList.add('hidden');$('dashboardView').classList.remove('hidden');
+  $('userLine').textContent='Angemeldet als '+(session.user.email||'Kundenkonto');
+  const {data:rows,error}=await client.from('stations').select('id,station_name,postcode,city,subscription_status,trial_ends_at,subscription_ends_at,founding_partner_free_until,data_delete_at').eq('owner_id',session.user.id);
+  if(error){$('stationStatus').className='status err';$('stationStatus').textContent='Das Konto ist aktiv, aber der Stationsstatus konnte noch nicht gelesen werden: '+error.message;return;}
+  const row=rows&&rows[0];
+  if(!row){
+    $('stationCards').innerHTML='<div class="card"><div class="label">Pilotstation</div><div class="value">Noch nicht verknüpft</div></div>';
+    $('stationStatus').textContent='Ihr Kundenkonto ist angelegt. Die Pilotstation wird im nächsten Schritt verknüpft bzw. freigeschaltet.';
+    return;
+  }
+  const active=row.subscription_status==='founding_partner' && row.founding_partner_free_until && new Date(row.founding_partner_free_until)>new Date();
+  const activePaid=row.subscription_status==='active';
+  const end=row.founding_partner_free_until||row.subscription_ends_at||row.trial_ends_at;
+  $('stationCards').innerHTML=
+    '<div class="card"><div class="label">Station</div><div class="value">'+esc(row.station_name||'—')+'</div><div class="small">'+esc(row.postcode||'')+' '+esc(row.city||'')+'</div></div>'+
+    '<div class="card"><div class="label">Zugang</div><div class="value">'+(active?'Gründungspartner':activePaid?'Aktiv':esc(row.subscription_status||'—'))+'</div></div>'+
+    '<div class="card"><div class="label">Zugang bis</div><div class="value">'+(end?new Date(end).toLocaleDateString('de-DE'):'—')+'</div></div>';
+  $('stationStatus').className='status '+(active||activePaid?'ok':'');
+  $('stationStatus').textContent=active?'Pilotzugang ist aktiv.':activePaid?'Bezahlzugang ist aktiv.':row.data_delete_at?'Für die Station ist eine Datenlöschung vorgemerkt.':'Station gefunden. Der Zugang muss ggf. noch freigeschaltet werden.';
+}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+async function boot(){
+  if(!client){status('Supabase ist noch nicht konfiguriert. Zuerst Projekt-URL und Publishable Key eintragen.','err');return;}
+  const {data,error}=await client.auth.getSession();
+  if(error){status(error.message,'err');return;}
+  if(data.session){await loadStation(data.session);return;}
+  status('Bereit. Bitte anmelden oder ein Kundenkonto anlegen.');
+}
+$('loginBtn').onclick=async()=>{if(!client)return;setBusy(true);status('Anmeldung läuft …');try{const {data,error}=await client.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)throw error;await loadStation(data.session);}catch(e){status(e.message||String(e),'err')}finally{setBusy(false)}};
+$('signupBtn').onclick=async()=>{if(!client)return;setBusy(true);status('Konto wird angelegt …');try{const email=$('email').value.trim(),password=$('password').value;if(!email||password.length<8)throw new Error('Bitte eine gültige E-Mail und ein Passwort mit mindestens 8 Zeichen eingeben.');const {data,error}=await client.auth.signUp({email,password});if(error)throw error;if(data.session){await loadStation(data.session)}else{status('Konto angelegt. Bitte bestätige gegebenenfalls die E-Mail-Adresse und melde dich danach an.','ok')}}catch(e){status(e.message||String(e),'err')}finally{setBusy(false)}};
+$('logoutBtn').onclick=async()=>{await client.auth.signOut();location.reload();};
+boot();
+</script>
+</body>
+</html>
