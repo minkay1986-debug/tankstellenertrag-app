@@ -188,7 +188,7 @@ function applySourceValues(){
     row.huth={monthly:{shop:p.shop,fuel:p.fuel,wash:p.wash,groups:p.groups,lines:p.sourceLines},updatedAt:new Date().toISOString()};
   }
 
-  const ekMatch=String(ekText||'').match(/Gesamt\s*EK[-\s]?Netto[\s\S]{0,350}?(-?\d{1,3}(?:\.\d{3})*,\d{2})/i);
+  const ekMatch=String(ekText||'').match(/Gesamt\s*EK[-\s]?Netto[\s\S]{0,350}?Warengruppe\s+0\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})/i);
   const ek=ekMatch?parseMoney(ekMatch[1]):null;
   if(ek!==null)row.ek=ek;
 
@@ -201,9 +201,8 @@ function applySourceValues(){
   const invLines=String(invText||'').replace(/\u00a0/g,' ').split(/\r?\n/);
   const stockVals=[];
   for(const line of invLines){
-    const vals=moneyTokens(line).map(parseMoney).filter(v=>v!==null);
-    // Inventurzeilen: erster Geldwert = Lager-EK, zweiter = Lager-VK.
-    if(vals.length>=2)stockVals.push(vals[0]);
+    const m=line.match(/^\s*.+?\s+\d+\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})\s+EUR\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})\s+EUR\s*$/);
+    if(m)stockVals.push(parseMoney(m[1]));
   }
   if(stock!==null)row.stock=stock;
 
@@ -249,7 +248,7 @@ function rehydrateSources(){
    r.huth={monthly:{shop:p.shop,fuel:p.fuel,wash:p.wash,groups:p.groups,lines:p.sourceLines},updatedAt:new Date().toISOString()};
   }
   if(ekText.trim()){
-   const m=ekText.match(/Gesamt\s*EK[-\s]?Netto[\s\S]{0,350}?(-?\d{1,3}(?:\.\d{3})*,\d{2})/i);
+   const m=ekText.match(/Gesamt\s*EK[-\s]?Netto[\s\S]{0,350}?Warengruppe\s+0\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})/i);
    if(m)r.ek=parseMoney(m[1]);
   }
   if(shText.trim()){
@@ -258,8 +257,8 @@ function rehydrateSources(){
   if(invText.trim()){
    const vals=[];
    for(const line of invText.replace(/\u00a0/g,' ').split(/\r?\n/)){
-    const amounts=moneyTokens(line).map(parseMoney).filter(v=>v!==null);
-    if(amounts.length>=2)vals.push(amounts[0]);
+    const m=line.match(/^\s*.+?\s+\d+\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})\s+EUR\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})\s+EUR\s*$/);
+    if(m)vals.push(parseMoney(m[1]));
    }
    if(vals.length)r.stock=vals.reduce((a,b)=>a+(b||0),0);
   }
