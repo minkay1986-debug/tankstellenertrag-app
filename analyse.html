@@ -193,12 +193,9 @@ function applySourceValues(){
   const ek=findLabeled(ekText,[/Gesamt\\s*EK[-\\s]?Netto/i,/Gesamt.*EK\\s*Netto/i]);
   if(ek!==null)row.ek=ek;
 
-  let shrink=findLabeled(shText,[/Gesamt(?:er)?\\s*Schwund/i,/Summe.*Schwund/i,/Schwund\\s*gesamt/i]);
-  if(shrink===null){
-    const vals=['MHD','Bruch','Verderb'].map(x=>findLabeled(shText,[new RegExp(x+'\\\\s*[: ]','i')])).filter(v=>v!==null);
-    if(vals.length)shrink=vals.reduce((a,b)=>a+b,0);
-  }
-  if(shrink!==null)row.shrink=shrink;
+  // Separate Schwundreport: keep its own total; do not overwrite the Monatsabrechnung KPI.
+  const shrinkMatch=String(shText||'').match(/Warengruppe\\s+0\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})/i);
+  if(shrinkMatch)row.shrinkReportTotal=parseMoney(shrinkMatch[6]);
 
   // Inventurreport has no total row: sum all Lager-EK values.
   let stock=null;
