@@ -61,18 +61,9 @@ function renderAll(){dashboard();fill();analysis();insights();radar();yearly();e
 function parseHuth(text){
  const rows={},neutral={};let fuel=0,wash=0,shop=0,other=0;
  const raw=String(text||'').replace(/\u00a0/g,' ');
- const neutralMatches=[...raw.matchAll(/Schwund\s*\((?:MHD|Bruch|Verderb)\)[\s\S]{0,180}?(-?\d{1,3}(?:\.\d{3})*,\d{2})\s*EUR/gi)];
- const neutralShrink=neutralMatches.reduce((sum,m)=>sum+Number(m[1].replace(/\./g,'').replace(',','.')),0);
- const lines=raw
-   .replace(/\s+/g,' ')
-   .replace(/(?=\b(?:WG\d{3}|Shopware\b|Eigen\s+Kraftstoff)\b)/gi,'\n')
-   .split(/\r?\n/)
-   .map(x=>x.trim()).filter(Boolean);
+ const compact=raw.replace(/\s+/g,' ');
+ const money=s=>{const m=String(s||'').match(/-?\d{1,3}(?:\.\d{3})*,\d{2}|-?\d+(?:,\d{2})/);return m?Number(m[0].replace(/\./g,'').replace(',','.')):null};
  const normName=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ß/g,'ss').replace(/\s+/g,' ').trim();
- const money=s=>{
-   const m=String(s||'').match(/-?\d{1,3}(?:\.\d{3})*,\d{2}|-?\d+(?:,\d{2})/);
-   return m?Number(m[0].replace(/\./g,'').replace(',','.')):null
- };
  const aliases={
   'süsswaren':['susswaren','suesswaren','suss'],
   'backshop':['backshop','backwaren','back shop','fast-food','fastfood'],
@@ -85,56 +76,35 @@ function parseHuth(text){
   'eis':['eis']
  };
  const groupFor=s=>{
-   const n=normName(s);
-   const custom=(data&&data.settings&&data.settings.huthMapping)||{};
-   for(const [source,target] of Object.entries(custom)){
-     const src=normName(source);
-     if(src && (n===src || n.includes(src))) return GROUPS.some(g=>g[0]===target)?target:null;
-   }
-   for(const [id,a] of Object.entries(aliases)) if(a.some(x=>n.includes(x))) return id;
+   const n=normName(s),custom=(data&&data.settings&&data.settings.huthMapping)||{};
+   for(const [source,target] of Object.entries(custom)){const src=normName(source);if(src&&(n===src||n.includes(src)))return GROUPS.some(g=>g[0]===target)?target:null}
+   for(const [id,a] of Object.entries(aliases))if(a.some(x=>n.includes(x)))return id;
    return null
  };
- // HUTH: after Stk/KLt comes quantity, then Netto EUR. We need the SECOND number.
- const netAfterUnit=s=>{
-   const str=String(s||'');
-   const m=str.match(/(?:Stk|KLt)\s+(-?\d{1,3}(?:\.\d{3})*,\d{2}|-?\d+(?:,\d{2}))\s*EUR/i);
-   if(m)return money(m[1]);
-   const eur=str.match(/(-?\d{1,3}(?:\.\d{3})*,\d{2}|-?\d+(?:,\d{2}))\s*EUR/i);
-   return eur?money(eur[1]):null
- };
  const add=(id,v)=>{if(v===null)return;rows[id]=(rows[id]||0)+v};
- for(const rawLine of lines){
-   const line=rawLine.trim(); if(!line)continue;
-   const l=normName(line);
-   if(/^eigen\s+kraftstoff\b/i.test(line)){
-     const v=netAfterUnit(line); if(v!==null)fuel+=v;
-     continue;
-   }
-   if(/\bshopware\s+v\.?mwst\b/i.test(line)){
-     const v=netAfterUnit(line); if(v!==null)shop=v;
-     continue;
-   }
-   if(/\bshopware\b.*\bmwst\b/i.test(line)) continue;
-   if(/storno|warenrucknahme|warenruecknahme|eigenverbrauch|pfand|neutral|nachlass|zahlart/.test(l))continue;
-   if(/e-loading|telefonkarten|lose|hermes|aviacard|gutschein/.test(l))continue;
-   const wg=line.match(/^WG\d{3}\s+(.+?)\s+\d+(?:[.,]\d+)?\s*%\s+/i);
-   const name=wg?wg[1]:line;
-   const id=groupFor(name);
-   if(id){
-     const amount=netAfterUnit(line);
-     add(id,amount);
-     continue
-   }
-   if(/^WG\d{3}\b/i.test(line)){
-     if(/tabak|zigarett|zeitschrift|zubehor|schmierstoff|tier|propangas/.test(l)){
-       const amount=netAfterUnit(line); if(amount!==null)other+=amount;
-     }
-   }
+ const euroAfterUnit=part=>{
+   const m=String(part||'').match(/(?:Stk|KLt)\s+(-?\d{1,3}(?:\.\d{3})*,\d{2}|-?\d+(?:,\d{2}))\s*EUR/i);
+   return m?money(m[1]):null
+ };
+ // Global HUTH parsing: independent of PDF.js line wrapping.
+ const sm=compact.match(/Shopware\s+v\.?\s*MwSt[\s\S]{0,100}?(?:Stk|KLt)\s+(-?\d{1,3}(?:\.\d{3})*,\d{2}|-?\d+(?:,\d{2}))\s*EUR/i);
+ if(sm)shop=money(sm[1]);
+ const fm=compact.match(/Eigen\s+Kraftstoff[\s\S]{0,100}?(?:Stk|KLt)\s+(-?\d{1,3}(?:\.\d{3})*,\d{2}|-?\d+(?:,\d{2}))\s*EUR/i);
+ if(fm)fuel=money(fm[1])||0;
+ const wgRe=/WG\d{3}\s+(.+?)\s+\d+(?:[.,]\d+)?\s*%\s+[-\d.,]+\s+(?:Stk|KLt)\s+(-?\d{1,3}(?:\.\d{3})*,\d{2}|-?\d+(?:,\d{2}))\s*EUR/gi;
+ let wm;
+ while((wm=wgRe.exec(compact))){
+   const name=wm[1].trim(),id=groupFor(name),amount=money(wm[2]);
+   if(id)add(id,amount);
+   else if(/tabak|zigarett|zeitschrift|zubehor|schmierstoff|tier|propangas/.test(normName(name)))other+=amount||0;
  }
- if(!shop) shop=Object.values(rows).reduce((a,b)=>a+b,0)+other;
+ const neutralMatches=[...raw.matchAll(/Schwund\s*\((?:MHD|Bruch|Verderb)\)[\s\S]{0,180}?(-?\d{1,3}(?:\.\d{3})*,\d{2})\s*EUR/gi)];
+ const neutralShrink=neutralMatches.reduce((sum,m)=>sum+money(m[1]),0);
+ if(!shop)shop=Object.values(rows).reduce((a,b)=>a+b,0)+other;
  if(!wash)wash=rows.waschen||0;
- return {groups:rows,fuel,wash,shop,other,neutral,neutralShrink,sourceLines:lines.length,groupCount:Object.keys(rows).length};
+ return {groups:rows,fuel,wash,shop,other,neutral,neutralShrink,sourceLines:raw.split(/\r?\n/).length,groupCount:Object.keys(rows).length};
 }
+
 let huthParsed=null;function renderHuth(p){huthParsed=p;let rows=Object.entries(p.groups).map(([id,v])=>'<tr><td>'+GROUPS.find(g=>g[0]===id)[1]+'</td><td>'+eur(v)+'</td></tr>').join('');$('huthResult').innerHTML='<div class="alert ok"><strong>HUTH-Prüfung</strong>Kraftstoff '+eur(p.fuel)+' · Shopgruppen '+eur(p.shop)+' · Waschen '+eur(p.wash)+'. Storno/Schwund/Eigenverbrauch/Pfand werden nicht als Umsatz addiert.</div><table><tr><th>Gemappte Shopgruppe</th><th>Netto</th></tr>'+rows+'</table>';$('huthApply').disabled=!rows}
 function applyHuth(){if(!huthParsed)return;const r=mrow();r.groups= r.groups||{};Object.entries(huthParsed.groups).forEach(([id,v])=>{r.groups[id]??={revenue:0,margin:(GROUPS.find(g=>g[0]===id)||[])[2]||0,shrink:0,writeoff:0};r.groups[id].revenue=v});r.fuel=huthParsed.fuel;r.wash=huthParsed.wash;r.revenue=huthParsed.shop;r.shrink=Object.entries(huthParsed.neutral).filter(([k])=>/Schwund/i.test(k)).reduce((a,[,v])=>a+v,0);fill();analysis();dashboard();persist()}
 function parseMoney(v){if(v==null)return null;const s=String(v).replace(/\s/g,'').replace(/€$/,'').replace(/\./g,'').replace(',','.');const n=Number(s);return Number.isFinite(n)?n:null}
