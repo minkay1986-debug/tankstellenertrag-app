@@ -60,7 +60,7 @@ function parseHuth(text){
  const raw=String(text||'').replace(/\\u00a0/g,' ');
  const lines=raw
    .replace(/\\s+/g,' ')
-   .replace(/(?=\\b(?:WG\\d{3}|Shopware\\s+v\\.?MwSt|Eigen\\s+Kraftstoff)\\b)/gi,'\\n')
+   .replace(/(?=\\b(?:WG\\d{3}|Shopware\\b|Eigen\\s+Kraftstoff)\\b)/gi,'\\n')
    .split(/\\r?\\n/)
    .map(x=>x.trim()).filter(Boolean);
  const normName=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/ß/g,'ss').replace(/\\s+/g,' ').trim();
