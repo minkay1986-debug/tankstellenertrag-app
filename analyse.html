@@ -136,8 +136,8 @@ function parseHuth(text){
 }
 let huthParsed=null;function renderHuth(p){huthParsed=p;let rows=Object.entries(p.groups).map(([id,v])=>'<tr><td>'+GROUPS.find(g=>g[0]===id)[1]+'</td><td>'+eur(v)+'</td></tr>').join('');$('huthResult').innerHTML='<div class="alert ok"><strong>HUTH-Prüfung</strong>Kraftstoff '+eur(p.fuel)+' · Shopgruppen '+eur(p.shop)+' · Waschen '+eur(p.wash)+'. Storno/Schwund/Eigenverbrauch/Pfand werden nicht als Umsatz addiert.</div><table><tr><th>Gemappte Shopgruppe</th><th>Netto</th></tr>'+rows+'</table>';$('huthApply').disabled=!rows}
 function applyHuth(){if(!huthParsed)return;const r=mrow();r.groups= r.groups||{};Object.entries(huthParsed.groups).forEach(([id,v])=>{r.groups[id]??={revenue:0,margin:(GROUPS.find(g=>g[0]===id)||[])[2]||0,shrink:0,writeoff:0};r.groups[id].revenue=v});r.fuel=huthParsed.fuel;r.wash=huthParsed.wash;r.revenue=huthParsed.shop;r.shrink=Object.entries(huthParsed.neutral).filter(([k])=>/Schwund/i.test(k)).reduce((a,[,v])=>a+v,0);fill();analysis();dashboard();persist()}
-function parseMoney(v){if(v==null)return null;const s=String(v).replace(/\\s/g,'').replace(/€$/,'').replace(/\\./g,'').replace(',','.');const n=Number(s);return Number.isFinite(n)?n:null}
-function moneyTokens(s){return String(s||'').match(/-?\\d{1,3}(?:\\.\\d{3})*,\\d{2}|-?\\d+(?:,\\d{2})/g)||[]}
+function parseMoney(v){if(v==null)return null;const s=String(v).replace(/\s/g,'').replace(/€$/,'').replace(/\./g,'').replace(',','.');const n=Number(s);return Number.isFinite(n)?n:null}
+function moneyTokens(s){return String(s||'').match(/-?\d{1,3}(?:\.\d{3})*,\d{2}|-?\d+(?:,\d{2})/g)||[]}
 function findAmountNear(text,patterns){
   const t=String(text||'').replace(/\\u00a0/g,' ');
   for(const re of patterns){
