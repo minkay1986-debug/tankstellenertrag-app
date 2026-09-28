@@ -141,7 +141,7 @@ function moneyTokens(s){return String(s||'').match(/-?\\d{1,3}(?:\\.\\d{3})*,\\d
 function findAmountNear(text,patterns){
   const t=String(text||'').replace(/\\u00a0/g,' ');
   for(const re of patterns){
-    const m=t.match(re); if(m){const tail=t.slice(m.index,m.index+500);const vals=moneyTokens(tail).map(parseMoney).filter(v=>v!==null);if(vals.length)return vals[vals.length-1]}
+    const m=t.match(re); if(m){const tail=t.slice(m.index,m.index+500);const vals=moneyTokens(tail).map(parseMoney).filter(v=>v!==null);if(vals.length)return vals[0]}
   }
   return null
 }
@@ -195,7 +195,7 @@ function applySourceValues(){
       if(m){
         const tail=t.slice(m.index,m.index+500);
         const vals=moneyTokens(tail).map(parseMoney).filter(v=>v!==null);
-        if(vals.length)return vals[vals.length-1];
+        if(vals.length)return vals[0];
       }
     }
     return null;
@@ -213,10 +213,10 @@ function applySourceValues(){
   const invLines=String(invText||'').replace(/\u00a0/g,' ').split(/\r?\n/);
   const stockVals=[];
   for(const line of invLines){
-    const m=line.match(/^\s*.+?\s+\d+\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})\s+EUR\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})\s+EUR\s*$/);
-    if(m)stockVals.push(parseMoney(m[1]));
+    const vals=moneyTokens(line).map(parseMoney).filter(v=>v!==null);
+    // Inventurzeilen: erster Geldwert = Lager-EK, zweiter = Lager-VK.
+    if(vals.length>=2)stockVals.push(vals[0]);
   }
-  if(stockVals.length)stock=stockVals.reduce((a,b)=>a+(b||0),0);
   if(stock!==null)row.stock=stock;
 
   row.sourceMonthly=!!monthly.trim();
@@ -268,7 +268,12 @@ function rehydrateSources(){
    const m=shText.match(/Warengruppe\\s+0\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})/i);if(m)r.shrinkReportTotal=parseMoney(m[5]);
   }
   if(invText.trim()){
-   const vals=[]; for(const line of invText.replace(/\\u00a0/g,' ').split(/\\r?\\n/)){const m=line.match(/^\\s*.+?\\s+\\d+\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})\\s+EUR\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})\\s+EUR\\s*$/);if(m)vals.push(parseMoney(m[1]));} if(vals.length)r.stock=vals.reduce((a,b)=>a+(b||0),0);
+   const vals=[];
+   for(const line of invText.replace(/\u00a0/g,' ').split(/\r?\n/)){
+    const amounts=moneyTokens(line).map(parseMoney).filter(v=>v!==null);
+    if(amounts.length>=2)vals.push(amounts[0]);
+   }
+   if(vals.length)r.stock=vals.reduce((a,b)=>a+(b||0),0);
   }
   r.sourceMonthly=!!monthly.trim();r.sourceEK=!!ekText.trim();r.sourceShrink=!!shText.trim();r.sourceInventory=!!invText.trim();r.sourceTexts={monthly,ek:ekText,shrink:shText,inventory:invText};
   if(prevMonth!==JSON.stringify({revenue:r.revenue,ek:r.ek,stock:r.stock,shrink:r.shrink,shrinkReportTotal:r.shrinkReportTotal,groups:r.groups}))changed=true;
