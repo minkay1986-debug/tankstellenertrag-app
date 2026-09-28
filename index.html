@@ -72,7 +72,7 @@ function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;',
 async function loadApplicants(){
   const el=$('adminStatus'),body=$('applicantRows'); if(!el||!body||!client)return;
   el.className='status';el.textContent='Bewerber werden geladen …';body.innerHTML='';
-  const {data,error}=await client.from('pilot_applications').select('id,user_id,email,full_name,station_name,postcode,city,phone,status,access_type,access_until,created_at').order('created_at',{ascending:false});
+  const {data,error}=await client.from('pilot_applications').select('id,user_id,email,full_name,station_name,postcode,city,phone,status,access_type,access_until,created_at').neq('email','svenkrick@gmx.de').order('created_at',{ascending:false});
   if(error){el.className='status err';el.textContent='Bewerber konnten nicht geladen werden: '+error.message;return;}
   if(!data?.length){el.className='status ok';el.textContent='Noch keine Bewerbungen vorhanden.';return;}
   el.className='status ok';el.textContent=data.length+' Bewerber gefunden.';
