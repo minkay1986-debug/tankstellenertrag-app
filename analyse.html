@@ -208,6 +208,7 @@ function applySourceValues(){
     if(m)stockVals.push(parseMoney(m[1]));
   }
   if(stockVals.length)stock=stockVals.reduce((a,b)=>a+(b||0),0);
+  if(stockVals.length)stock=stockVals.reduce((a,b)=>a+(b||0),0);
   if(stock!==null)row.stock=stock;
 
   row.sourceMonthly=!!monthly.trim();
