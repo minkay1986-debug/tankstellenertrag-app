@@ -15,7 +15,7 @@
 <div class="footer">TankstellenErtrag · Warenwirtschaftliche Monatsanalyse</div></div></main></div>
 <script>
 let pdfjsPromise=null;
-async function getPdfJs(){if(!pdfjsPromise) pdfjsPromise=import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs');return pdfjsPromise}
+async function getPdfJs(){if(!pdfjsPromise){pdfjsPromise=import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs').then(pdfjs=>{if(pdfjs.GlobalWorkerOptions) pdfjs.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs'; return pdfjs})}return pdfjsPromise}
 async function extractFileText(file){
   if(!file) return '';
   if(file.type==='text/plain'||/\\.txt$/i.test(file.name)) return await file.text();
