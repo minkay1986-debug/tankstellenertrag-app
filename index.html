@@ -46,6 +46,8 @@ async function loadStation(session){
   if(!client||!session){return;}
   $('authView').classList.add('hidden');$('dashboardView').classList.remove('hidden');
   $('userLine').textContent='Angemeldet als '+(session.user.email||'Kundenkonto');
+  const isAdmin=(session.user.email||'').toLowerCase()==='svenkrick@gmx.de';
+  if(isAdmin){$('adminView').classList.remove('hidden');loadApplicants();}
   const {data:rows,error}=await client.from('stations').select('id,station_name,postcode,city,subscription_status,trial_ends_at,subscription_ends_at,founding_partner_free_until,data_delete_at').eq('owner_id',session.user.id);
   if(error){$('stationStatus').className='status err';$('stationStatus').textContent='Das Konto ist aktiv, aber der Stationsstatus konnte noch nicht gelesen werden: '+error.message;return;}
   const row=rows&&rows[0];
@@ -113,8 +115,6 @@ async function loadStation(session){
   $('stationStatus').className='status '+(active?'ok':'err');
   $('stationStatus').textContent=active?'Zugang ist aktiv.':'Station vorhanden, aber Zugang aktuell nicht aktiv.';
   if(active)$('openApp').classList.remove('hidden');
-  const isAdmin=(session.user.email||'').toLowerCase()==='svenkrick@gmx.de';
-  if(isAdmin){$('adminView').classList.remove('hidden');loadApplicants();}
 }
 function openAuth(){ $('authView').classList.remove('hidden'); document.body.style.overflow='hidden'; setTimeout(()=>document.getElementById('email')?.focus(),50); }
 function closeAuth(){ $('authView').classList.add('hidden'); document.body.style.overflow=''; }
