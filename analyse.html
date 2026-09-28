@@ -188,8 +188,11 @@ function applySourceValues(){
     row.huth={monthly:{shop:p.shop,fuel:p.fuel,wash:p.wash,groups:p.groups,lines:p.sourceLines},updatedAt:new Date().toISOString()};
   }
 
-  const ekMatch=String(ekText||'').match(/Gesamt\s*EK[-\s]?Netto[\s\S]{0,350}?Warengruppe\s+0\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})/i);
-  const ek=ekMatch?parseMoney(ekMatch[1]):null;
+  const ekLabel=String(ekText||'');
+  const ekPos=ekLabel.search(/Gesamt\s*EK[-\s]?Netto/i);
+  const ekTail=ekPos>=0?ekLabel.slice(ekPos,ekPos+1200):'';
+  const ekValue=ekTail.match(/Warengruppe\s+0\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})/i);
+  const ek=ekValue?parseMoney(ekValue[1]):null;
   if(ek!==null)row.ek=ek;
 
   // Separate Schwundreport: keep its own total; do not overwrite the Monatsabrechnung KPI.
@@ -249,7 +252,10 @@ function rehydrateSources(){
    r.huth={monthly:{shop:p.shop,fuel:p.fuel,wash:p.wash,groups:p.groups,lines:p.sourceLines},updatedAt:new Date().toISOString()};
   }
   if(ekText.trim()){
-   const m=ekText.match(/Gesamt\s*EK[-\s]?Netto[\s\S]{0,350}?Warengruppe\s+0\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})/i);
+   const label=String(ekText);
+   const pos=label.search(/Gesamt\s*EK[-\s]?Netto/i);
+   const tail=pos>=0?label.slice(pos,pos+1200):'';
+   const m=tail.match(/Warengruppe\s+0\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})/i);
    if(m)r.ek=parseMoney(m[1]);
   }
   if(shText.trim()){
