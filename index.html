@@ -74,49 +74,7 @@ async function boot(){
 $('loginBtn').onclick=async()=>{if(!client)return;setBusy(true);status('Anmeldung läuft …');try{const {data,error}=await client.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)throw error;await loadStation(data.session);}catch(e){status(e.message||String(e),'err')}finally{setBusy(false)}};
 $('signupBtn').onclick=async()=>{if(!client)return;setBusy(true);status('Konto wird angelegt …');try{const email=$('email').value.trim(),password=$('password').value;if(!email||password.length<8)throw new Error('Bitte eine gültige E-Mail und ein Passwort mit mindestens 8 Zeichen eingeben.');const {data,error}=await client.auth.signUp({email,password});if(error)throw error;if(data.session){await loadStation(data.session)}else{status('Konto angelegt. Bitte bestätige gegebenenfalls die E-Mail-Adresse und melde dich danach an.','ok')}}catch(e){status(e.message||String(e),'err')}finally{setBusy(false)}};
 
-async function sha256Hex(value){
-  const bytes=new TextEncoder().encode(String(value));
-  const hash=await crypto.subtle.digest('SHA-256',bytes);
-  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-async function claimStation(){
-  const claim=$('claimStatus');
-  const show=(msg,type='')=>{claim.className='status '+type;claim.textContent=msg;};
-  const key=$('stationKey').value.trim();
-  const stationId=$('stationId').value.trim();
-  const stationName=$('stationName').value.trim();
-  const postcode=$('stationPostcode').value.trim();
-  const city=$('stationCity').value.trim();
-  const huthCode=$('huthStationCode').value.trim();
-  if(!key||!stationId||!stationName||!postcode||!city){show('Bitte Stationsschlüssel, Stations-ID, Stationsname, PLZ und Ort ausfüllen.','err');return;}
-  $('claimStationBtn').disabled=true;show('Pilotstation wird verknüpft …');
-  try{
-    const stationKeyHash=await sha256Hex(key);
-    const huthProofHash=await sha256Hex(stationId+'|'+key+'|'+huthCode);
-    const {data,error}=await client.rpc('claim_station_trial',{
-      p_station_key_hash:stationKeyHash,
-      p_station_id:stationId,
-      p_station_name:stationName,
-      p_postcode:postcode,
-      p_city:city,
-      p_huth_station_code:huthCode||null,
-      p_huth_proof_hash:huthProofHash
-    });
-    if(error)throw error;
-    const result=Array.isArray(data)?data[0]:data;
-    if(result?.claim_status==='used_by_other')throw new Error('Dieser Stationsschlüssel ist bereits einer anderen Station zugeordnet.');
-    if(result?.claim_status==='trial_already_used')throw new Error('Für dieses Kundenkonto wurde bereits eine Pilotstation verknüpft.');
-    if(result?.claim_status!=='created')throw new Error('Die Station konnte nicht verknüpft werden. Status: '+(result?.claim_status||'unbekannt'));
-    show('Pilotstation erfolgreich verknüpft.','ok');
-    await loadStation((await client.auth.getSession()).data.session);
-  }catch(e){show(e.message||String(e),'err')}finally{$('claimStationBtn').disabled=false;}
-}
-$('linkStationBtn').onclick=()=>{$('linkStationPanel').classList.toggle('hidden');};
-$('claimStationBtn').onclick=claimStation;
-
-$('logoutBtn').onclick=async()=>{await client.auth.signOut();location.reload();};
-
-const originalLoadStation=loadStation;
+$('logoutBtn').onclick=async()=>{if(client){await client.auth.signOut();location.reload();}};const originalLoadStation=loadStation;
 async function loadStation(session){
   if(!client||!session)return;
   $('authView').classList.add('hidden');
