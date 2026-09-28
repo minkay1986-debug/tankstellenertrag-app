@@ -16,63 +16,24 @@
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <div class="brand">Tankstellen<span>Ertrag</span></div>
-    <div class="pill">Kundenbereich · Pilot</div>
-  </header>
-
-  <main id="authView" class="hero">
-    <section class="panel">
-      <div class="small" style="color:var(--orange2);font-weight:800;text-transform:uppercase;letter-spacing:.12em">Geschützter Kundenbereich</div>
-      <h1>Kundenbereich.<br>Ihre Auswertung.</h1>
-      <p class="lead">Hier befindet sich der geschützte Zugang für Pilotkunden von TankstellenErtrag. Nach der Anmeldung gelangen Sie zur Analyseplattform mit Monatsdaten, Warengruppen, Margen, Schwund, Auffälligkeiten und Beratungsbericht.</p>
-      <div class="badges">
-        <span class="badge">🔐 persönlicher Zugang</span>
-        <span class="badge">🏪 1 Pilotstation</span>
-        <span class="badge">📊 Auswertungen</span>
-        <span class="badge">📄 Bericht</span>
-      </div>
-      <div class="feature"><b>Stationsdaten bleiben dem jeweiligen Kundenkonto zugeordnet</b><span class="small">Die Stationsdaten werden serverseitig dem angemeldeten Kundenkonto zugeordnet.</span></div>
-      <div class="feature"><b>Pilotzugang wird separat freigeschaltet</b><span class="small">Ein Pilotzugang wird nach der Registrierung separat für die vereinbarte Pilotstation freigeschaltet.</span></div>
-      <div class="feature"><b>Keine automatische kostenpflichtige Verlängerung</b><span class="small">Nach der Pilotphase entsteht nicht automatisch ein kostenpflichtiges Abo.</span></div>
-    </section>
-
-    <section class="panel">
-      <h2 id="formTitle" style="margin-top:0">Anmelden</h2>
-      <p id="formHint" class="small">Mit Ihrem Kundenkonto anmelden.</p>
-      <div class="form">
-        <div class="field"><label>E-Mail</label><input id="email" type="email" autocomplete="email" placeholder="name@unternehmen.de"></div>
-        <div class="field"><label>Passwort</label><input id="password" type="password" autocomplete="current-password" placeholder="Mindestens 8 Zeichen"></div>
-        <div class="actions">
-          <button class="btn primary" id="loginBtn">Anmelden</button>
-          <button class="btn secondary" id="signupBtn">Konto registrieren</button>
-        </div>
-      </div>
-      <div id="status" class="status">Verbindung wird geprüft …</div>
-      <p class="small" style="margin-top:14px">Das Kundenkonto kann angelegt werden. Die konkrete Pilotstation wird anschließend separat verknüpft bzw. freigeschaltet.</p>
-    </section>
-  </main>
-
-  <section id="dashboardView" class="dashboard hidden">
-    <div class="panel">
-      <div class="small" style="color:var(--orange2);font-weight:800;text-transform:uppercase;letter-spacing:.12em">Kundenkonto</div>
-      <h1 style="font-size:30px">Kundenkonto</h1>
-      <p id="userLine" class="small"></p>
-      <div id="stationCards" class="cards"></div>
-      <div id="stationStatus" class="status"></div>
-      <button id="linkStationBtn" class="linkbtn" type="button">Pilotstation verknüpfen</button><div id="linkStationPanel" class="panel hidden" style="margin-top:14px;padding:18px"><h3 style="margin-top:0">Pilotstation verknüpfen</h3><p class="small">Bitte die von TankstellenErtrag bereitgestellten Stationsdaten eingeben. Für den ersten Test verwenden wir noch keine echten HUTH-Daten.</p><div class="form"><div class="field"><label>Stationsschlüssel</label><input id="stationKey" type="text" autocomplete="off" placeholder="Pilot-Stationsschlüssel"></div><div class="field"><label>Stations-ID</label><input id="stationId" type="text" placeholder="z. B. PILOT-001"></div><div class="field"><label>Stationsname</label><input id="stationName" type="text" placeholder="Teststation"></div><div class="field"><label>PLZ</label><input id="stationPostcode" type="text" placeholder="86495"></div><div class="field"><label>Ort</label><input id="stationCity" type="text" placeholder="Eurasburg"></div><div class="field"><label>HUTH-Stationscode (optional)</label><input id="huthStationCode" type="text" placeholder="z. B. 001"></div><button id="claimStationBtn" class="btn primary" type="button">Station verknüpfen</button><div id="claimStatus" class="status hidden"></div></div></div><a id="openApp" class="linkbtn hidden" href="./analyse.html">Zur TankstellenErtrag-Plattform</a>
-      <div style="margin-top:12px"><button id="logoutBtn" class="btn secondary">Abmelden</button></div>
-    </div>
-  </section>
-
-  <footer class="footer">
-    <a href="../impressum.html">Impressum</a>
-    <a href="../datenschutz.html">Datenschutz</a>
-    <a href="../agb.html">AGB</a>
-  </footer>
+<div class="site">
+<header class="topbar"><div class="wrap navrow"><a class="brand" href="./">Tankstellen<span>Ertrag</span></a><nav><a href="#vorteile">Vorteile</a><a href="#ablauf">So funktioniert's</a><a href="#wissen">Branchenwissen</a><button id="navLogin" class="navbtn">Kundenlogin</button></nav></div></header>
+<main>
+<section class="hero"><div class="wrap heroGrid"><div><div class="eyebrow">Warenwirtschaft für Tankstellenshops</div><h1>Ihre Warenwirtschaft.<br><span>Ihr Überblick.</span><br>Ihr Ertrag.</h1><p class="lead">TankstellenErtrag macht sichtbar, wo Umsatz, Marge und Schwund im Shop wirtschaftlich auffällig sind – verständlich, praxisnah und ohne komplizierte Warenwirtschaftssoftware.</p><div class="actions"><button id="heroTest" class="cta">Jetzt kostenlos testen</button><button id="heroLogin" class="ghost">Kundenlogin</button></div><div class="trust"><span>✓ Aus der Tankstellenpraxis</span><span>✓ Manuelle Monatsanalyse</span><span>✓ Beratungsbericht</span></div></div><div class="heroVisual"><div class="visualHead"><span>Stationsergebnis</span><b>09/2026</b></div><div class="metric big"><span>Shop-Umsatz</span><strong>210.000 €</strong></div><div class="metricRow"><div class="metric"><span>Rohertrag</span><strong>100.000 €</strong></div><div class="metric"><span>Marge</span><strong class="green">47,6 %</strong></div></div><div class="signal"><span class="dot"></span><div><b>Prüfsignal erkannt</b><small>Schwundquote 3,8 % · Prüfen</small></div></div><div class="miniBars"><i style="width:88%"></i><i style="width:66%"></i><i style="width:48%"></i><i style="width:34%"></i></div><div class="visualFoot"><span>Ertragsradar</span><b>Getränke · 260 €/Monat Hebel</b></div></div></div></section>
+<section id="vorteile" class="section"><div class="wrap"><div class="sectionHead"><div><div class="eyebrow">Warum TankstellenErtrag?</div><h2>Vom Zahlenchaos zur klaren Handlung.</h2></div><p>Die Software verbindet Monatsdaten, Warengruppen, Zielmargen und Prüfsignale zu einer verständlichen Beratungsanalyse.</p></div><div class="cards"><article><div class="icon">📊</div><h3>Monatsanalyse</h3><p>Umsatz, EK, Rohertrag, Marge, Schwund und Bestand auf einen Blick.</p></article><article><div class="icon">🎯</div><h3>Ertragsradar</h3><p>Erkennt relevante Warengruppen und zeigt rechnerische Ertragspotenziale.</p></article><article><div class="icon">💡</div><h3>Beratung statt Bauchgefühl</h3><p>Prüfsignale führen zu konkreten Fragen und Maßnahmen – ohne Ursachen zu erfinden.</p></article><article><div class="icon">📄</div><h3>Beratungsbericht</h3><p>Druckfähige Zusammenfassung für die monatliche Beratung vor Ort.</p></article></div></div></section>
+<section id="ablauf" class="section dark"><div class="wrap"><div class="eyebrow">So funktioniert's</div><h2>Vier Schritte. Ein klares Ziel.</h2><div class="steps"><div><b>01</b><strong>Daten eingeben</strong><span>Monatliche Shopdaten und Warengruppen erfassen.</span></div><div><b>02</b><strong>Auffälligkeiten erkennen</strong><span>Abweichungen bei Marge, Schwund und Entwicklung sichtbar machen.</span></div><div><b>03</b><strong>Maßnahmen ableiten</strong><span>Prüffelder priorisieren und wirtschaftliche Hebel simulieren.</span></div><div><b>04</b><strong>Wirkung kontrollieren</strong><span>Monate vergleichen und sehen, ob Maßnahmen Wirkung zeigen.</span></div></div></div></section>
+<section id="wissen" class="section"><div class="wrap split"><div><div class="eyebrow">Branchenwissen</div><h2>Stationsdaten zuerst.<br>Branchenwissen als Kontext.</h2><p>TankstellenErtrag kombiniert die eigenen Stationsdaten mit ausgewählten Branchenstudien und Quellen. Studien liefern Vergleichswissen und mögliche Prüffelder – sie ersetzen niemals die Prüfung der konkreten Station.</p><button id="knowledgeLogin" class="ghost darkBtn">Plattform ansehen</button></div><div class="quote"><span>„Nicht jede Abweichung braucht eine Vermutung. Sie braucht die richtige Prüffrage.“</span><small>TankstellenErtrag · Warenwirtschaftliche Monatsanalyse</small></div></div></section>
+<section class="ctaSection"><div class="wrap"><div><div class="eyebrow">Pilotphase</div><h2>Erkennen, wo Geld im Shop liegen bleibt.</h2><p>Teste TankstellenErtrag mit deinen Monatsdaten und erhalte eine klare wirtschaftliche Auswertung.</p></div><button id="bottomTest" class="cta">Jetzt kostenlos testen</button></div></section>
+<section id="authView" class="auth hidden"><div class="wrap"><div class="authBox"><button id="closeAuth" class="close">×</button><div class="eyebrow">Geschützter Kundenbereich</div><h2 id="formTitle">Anmelden</h2><p id="formHint" class="small">Mit Ihrem Kundenkonto anmelden.</p><div class="form"><div class="field"><label>E-Mail</label><input id="email" type="email" autocomplete="email" placeholder="name@unternehmen.de"></div><div class="field"><label>Passwort</label><input id="password" type="password" autocomplete="current-password" placeholder="Mindestens 8 Zeichen"></div><div class="actions"><button class="btn primary" id="loginBtn">Anmelden</button><button class="btn secondary" id="signupBtn">Konto registrieren</button></div></div><div id="status" class="status">Verbindung wird geprüft …</div></div></div></section>
+<section id="dashboardView" class="dashboard hidden"><div class="wrap"><div class="panel"><div class="eyebrow">Kundenkonto</div><h2>Kundenkonto</h2><p id="userLine" class="small"></p><div id="stationCards" class="cards"></div><div id="stationStatus" class="status"></div><a id="openApp" class="linkbtn hidden" href="./analyse.html">Zur TankstellenErtrag-Plattform</a><button id="logoutBtn" class="btn secondary">Abmelden</button></div></div></section>
+</main>
+<footer><div class="wrap footer"><b>Tankstellen<span>Ertrag</span></b><span>Warenwirtschaftliche Monatsanalyse</span><a href="./impressum.html">Impressum</a><a href="./datenschutz.html">Datenschutz</a><a href="./agb.html">AGB</a></div></footer>
 </div>
-
+<style>
+:root{--bg:#0b0d0f;--panel:#171b1e;--panel2:#20262a;--line:#343b40;--text:#f5f6f7;--muted:#aeb6bc;--orange:#f47b20;--orange2:#ff9b4a;--green:#45c477}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1160px,calc(100% - 36px));margin:auto}.topbar{position:sticky;top:0;z-index:10;background:rgba(11,13,15,.88);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.06)}.navrow{height:70px;display:flex;align-items:center;justify-content:space-between}.brand{font-size:23px;font-weight:900;color:#fff;text-decoration:none}.brand span,footer span{color:var(--orange)}nav{display:flex;gap:22px;align-items:center}nav a{color:#bfc6ca;text-decoration:none;font-size:13px}nav a:hover{color:#fff}.navbtn{border:1px solid #4a5155;background:#20262a;color:#fff;border-radius:9px;padding:10px 15px;font-weight:800;cursor:pointer}.hero{padding:78px 0 86px;background:radial-gradient(circle at 78% 35%,#352216 0,#171310 20%,#0b0d0f 58%)}.heroGrid{display:grid;grid-template-columns:1.02fr .98fr;gap:65px;align-items:center}.eyebrow{color:var(--orange2);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.15em}.hero h1{font-size:58px;line-height:1.01;margin:14px 0 22px;letter-spacing:-.035em}.hero h1 span{color:var(--orange)}.lead{font-size:18px;line-height:1.65;color:#d0d6da;max-width:650px}.actions{display:flex;gap:10px;margin-top:26px}.cta,.ghost{padding:13px 19px;border-radius:9px;font-weight:850;cursor:pointer;font-size:14px}.cta{background:var(--orange);border:1px solid var(--orange);color:#fff}.cta:hover{background:#ff8a32}.ghost{background:transparent;border:1px solid #4a5155;color:#fff}.trust{display:flex;flex-wrap:wrap;gap:14px;margin-top:22px;color:#8f999f;font-size:11px}.heroVisual{background:linear-gradient(145deg,#20262a,#131719);border:1px solid #3b4348;border-radius:20px;padding:22px;box-shadow:0 30px 90px rgba(0,0,0,.4);transform:perspective(1000px) rotateY(-3deg)}.visualHead,.visualFoot{display:flex;justify-content:space-between;color:#aeb6bc;font-size:12px}.visualHead b{color:#fff}.metric{background:#191e21;border:1px solid #30373c;border-radius:12px;padding:15px;margin-top:12px}.metric span{display:block;color:#8f999f;font-size:11px}.metric strong{display:block;font-size:26px;margin-top:5px}.metric.big strong{font-size:35px}.metricRow{display:grid;grid-template-columns:1fr 1fr;gap:12px}.green{color:var(--green)}.signal{display:flex;gap:12px;align-items:center;margin-top:12px;padding:14px;border:1px solid #5a482b;background:#24201a;border-radius:12px}.signal .dot{width:10px;height:10px;border-radius:50%;background:var(--orange);box-shadow:0 0 12px var(--orange)}.signal b,.signal small{display:block}.signal small{color:#b5bdc2;margin-top:3px}.miniBars{display:flex;gap:8px;align-items:flex-end;height:62px;padding:12px 3px}.miniBars i{display:block;height:100%;background:linear-gradient(var(--orange2),var(--orange));border-radius:5px;opacity:.9}.miniBars i:nth-child(2){height:72%}.miniBars i:nth-child(3){height:54%}.miniBars i:nth-child(4){height:39%}.visualFoot{border-top:1px solid #30373c;padding-top:13px}.visualFoot b{color:#fff}.section{padding:92px 0}.section.dark{background:#111517;border-top:1px solid #1f2528;border-bottom:1px solid #1f2528}.sectionHead{display:flex;justify-content:space-between;gap:50px;align-items:end;margin-bottom:30px}.section h2,.ctaSection h2{font-size:37px;line-height:1.1;margin:8px 0 0}.sectionHead>p{max-width:460px;color:var(--muted);line-height:1.6}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.section .cards article{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:22px}.icon{font-size:25px}.cards h3{margin:16px 0 8px}.cards p{color:var(--muted);line-height:1.55;font-size:13px}.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:35px;background:#30373c;border:1px solid #30373c;border-radius:15px;overflow:hidden}.steps>div{background:#181d20;padding:25px;min-height:170px}.steps b{display:block;color:var(--orange);font-size:12px}.steps strong{display:block;font-size:18px;margin:32px 0 9px}.steps span{color:var(--muted);font-size:13px;line-height:1.5}.split{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}.split p{color:var(--muted);line-height:1.7}.quote{padding:35px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,#1c2225,#121618)}.quote span{font-size:25px;line-height:1.35;font-weight:800}.quote small{display:block;color:#7f898f;margin-top:22px}.darkBtn{margin-top:15px}.ctaSection{padding:55px 0;background:linear-gradient(100deg,#24170e,#121618)}.ctaSection .wrap{display:flex;justify-content:space-between;align-items:center;gap:25px}.ctaSection p{color:var(--muted)}footer{border-top:1px solid #202529}.footer{min-height:75px;display:flex;align-items:center;gap:20px;color:#687177;font-size:11px}.footer a{color:#899298;text-decoration:none;margin-left:auto}.footer a+a{margin-left:0}.auth{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);padding:8vh 0;overflow:auto}.authBox{width:min(470px,100%);margin:auto;background:#171b1e;border:1px solid #41494e;border-radius:18px;padding:28px;position:relative;box-shadow:0 30px 100px rgba(0,0,0,.55)}.close{position:absolute;right:16px;top:13px;border:0;background:none;color:#aeb6bc;font-size:28px;cursor:pointer}.form{display:grid;gap:12px;margin-top:18px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}.field input{width:100%;padding:12px;border-radius:9px;border:1px solid #d9c1b1;background:#fff1e7;color:#171717}.btn{padding:12px 14px;border:0;border-radius:9px;font-weight:800;cursor:pointer}.primary{background:var(--orange);color:#fff}.secondary{background:#30363a;color:#fff}.form .actions{display:grid;grid-template-columns:1fr 1fr;margin-top:2px}.status{margin-top:14px;padding:13px;border-radius:10px;background:#20262a;border:1px solid var(--line);font-size:13px}.status.ok{background:#17271f;border-color:#285c42}.status.err{background:#2b1c1c;border-color:#673535}.hidden{display:none!important}.dashboard{padding:60px 0;background:#101416;min-height:60vh}.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:25px}.dashboard .cards{margin:20px 0}.dashboard .card{background:var(--panel2);padding:18px;border:1px solid var(--line);border-radius:12px}.dashboard .label{color:var(--muted);font-size:11px}.dashboard .value{font-size:20px;font-weight:800;margin-top:6px}.linkbtn{display:inline-block;text-decoration:none;padding:12px 18px;background:var(--orange);color:#fff;border-radius:9px;font-weight:800;margin:8px 8px 0 0}.dashboard .btn{margin-top:8px}@media(max-width:900px){.heroGrid,.split{grid-template-columns:1fr}.hero h1{font-size:45px}.cards{grid-template-columns:1fr 1fr}.steps{grid-template-columns:1fr 1fr}.sectionHead{display:block}.heroVisual{transform:none}}@media(max-width:600px){nav a{display:none}.hero{padding-top:55px}.hero h1{font-size:39px}.cards,.steps{grid-template-columns:1fr}.ctaSection .wrap{display:block}.footer{flex-wrap:wrap;padding:18px 0}.footer a{margin-left:0}.actions{flex-wrap:wrap}}
+</style>
+</body>
 <script>
 const cfg=window.TANKSTELLENERTRAG_SUPABASE||{};
 const client=(cfg.url&&cfg.publishableKey&&window.supabase)?window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
@@ -154,6 +115,28 @@ $('linkStationBtn').onclick=()=>{$('linkStationPanel').classList.toggle('hidden'
 $('claimStationBtn').onclick=claimStation;
 
 $('logoutBtn').onclick=async()=>{await client.auth.signOut();location.reload();};
+
+const originalLoadStation=loadStation;
+async function loadStation(session){
+  if(!client||!session)return;
+  $('authView').classList.add('hidden');
+  $('dashboardView').classList.remove('hidden');
+  $('userLine').textContent='Angemeldet als '+(session.user.email||'Kundenkonto');
+  const {data:rows,error}=await client.from('stations').select('id,station_name,postcode,city,subscription_status,trial_ends_at,subscription_ends_at,founding_partner_free_until,data_delete_at').eq('owner_id',session.user.id);
+  if(error){$('stationStatus').className='status err';$('stationStatus').textContent='Konto aktiv, Stationsstatus konnte nicht gelesen werden: '+error.message;return;}
+  const row=rows&&rows[0];
+  if(!row){$('stationCards').innerHTML='<div class="card"><div class="label">Pilotstation</div><div class="value">Noch nicht verknüpft</div></div>';$('stationStatus').textContent='Ihr Kundenkonto ist angelegt. Die Pilotstation wird separat freigeschaltet.';return;}
+  const end=row.founding_partner_free_until||row.subscription_ends_at||row.trial_ends_at;
+  const active=row.subscription_status==='active'||(row.subscription_status==='founding_partner'&&end&&new Date(end)>new Date())||(row.subscription_status==='trial'&&end&&new Date(end)>new Date());
+  $('stationCards').innerHTML='<div class="card"><div class="label">Station</div><div class="value">'+esc(row.station_name||'—')+'</div><div class="small">'+esc(row.postcode||'')+' '+esc(row.city||'')+'</div></div><div class="card"><div class="label">Zugang</div><div class="value">'+esc(row.subscription_status||'—')+'</div></div><div class="card"><div class="label">Zugang bis</div><div class="value">'+(end?new Date(end).toLocaleDateString('de-DE'):'—')+'</div></div>';
+  $('stationStatus').className='status '+(active?'ok':'err');
+  $('stationStatus').textContent=active?'Zugang ist aktiv.':'Station vorhanden, aber Zugang aktuell nicht aktiv.';
+  if(active)$('openApp').classList.remove('hidden');
+}
+function openAuth(){ $('authView').classList.remove('hidden'); document.body.style.overflow='hidden'; setTimeout(()=>document.getElementById('email')?.focus(),50); }
+function closeAuth(){ $('authView').classList.add('hidden'); document.body.style.overflow=''; }
+$('navLogin').onclick=openAuth;$('heroLogin').onclick=openAuth;$('knowledgeLogin').onclick=openAuth;$('heroTest').onclick=openAuth;$('bottomTest').onclick=openAuth;$('closeAuth').onclick=closeAuth;
+
 boot();
 </script>
 </body>
