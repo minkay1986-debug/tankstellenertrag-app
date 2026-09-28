@@ -57,9 +57,17 @@ function account(){const end=station.founding_partner_free_until||station.subscr
 function renderAll(){dashboard();fill();analysis();insights();radar();yearly();economic();report();sources();settingsUI();account()}
 function parseHuth(text){
  const rows={},neutral={};let fuel=0,wash=0,shop=0,other=0;
- const lines=String(text||'').replace(/\u00a0/g,' ').split(/\r?\n/);
- const normName=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ß/g,'ss').replace(/\s+/g,' ').trim();
- const money=s=>{const m=String(s||'').match(/-?\d{1,3}(?:\.\d{3})*,\d{2}|-?\d+(?:,\d{2})/);return m?Number(m[0].replace(/\./g,'').replace(',','.')):null};
+ const raw=String(text||'').replace(/\\u00a0/g,' ');
+ const lines=raw
+   .replace(/\\s+/g,' ')
+   .replace(/(?=\\b(?:WG\\d{3}|Shopware\\s+v\\.?MwSt|Eigen\\s+Kraftstoff)\\b)/gi,'\\n')
+   .split(/\\r?\\n/)
+   .map(x=>x.trim()).filter(Boolean);
+ const normName=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/ß/g,'ss').replace(/\\s+/g,' ').trim();
+ const money=s=>{
+   const m=String(s||'').match(/-?\\d{1,3}(?:\\.\\d{3})*,\\d{2}|-?\\d+(?:,\\d{2})/);
+   return m?Number(m[0].replace(/\\./g,'').replace(',','.')):null
+ };
  const aliases={
   'süsswaren':['susswaren','suesswaren','suss'],
   'backshop':['backshop','backwaren','back shop','fast-food','fastfood'],
@@ -71,23 +79,48 @@ function parseHuth(text){
   'getraenke':['getraenke','getranke','beverage'],
   'eis':['eis']
  };
- const groupFor=s=>{const n=normName(s);for(const [id,a] of Object.entries(aliases))if(a.some(x=>n.includes(x)))return id;return null};
- const amountAfterUnit=s=>{const m=String(s||'').match(/\b(?:Stk|KLt)\s+(-?\d{1,3}(?:\.\d{3})*,\d{2}|-?\d+(?:,\d{2}))\s*EUR/i);return m?Number(m[1].replace(/\./g,'').replace(',','.')):null};
- for(const line0 of lines){
-  const raw=line0.trim();if(!raw)continue;
-  const l=normName(raw);
-  if(/^eigen\s+kraftstoff\b/i.test(raw)){const m=raw.match(/\bKLt\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})\s*EUR/i);if(m)fuel=Number(m[1].replace(/\./g,'').replace(',','.'));continue}
-  // HUTH writes this as "Shopware v.MwSt" (not always "Shopwaren").
-  if(/\bshopware\b.*\bv\.?\s*mwst\b/i.test(raw)){const m=raw.match(/\b(?:Stk|KLt)\s+(-?\d{1,3}(?:\.\d{3})*,\d{2}|-?\d+(?:,\d{2}))\s*EUR/i);if(m)shop=Number(m[1].replace(/\./g,'').replace(',','.'));continue}
-  if(/storno|warenrucknahme|warenruecknahme|eigenverbrauch|pfand|neutral|nachlass|zahlart/.test(l))continue;
-  if(/e-loading|telefonkarten|lose|hermes|aviacard|gutschein/.test(l))continue;
-  const wg=raw.match(/^WG\d{3}\s+(.+?)\s+\d+(?:[.,]\d+)?\s*%\s+/i);
-  const name=wg?wg[1]:raw;
-  const id=groupFor(name);
-  if(id){const amount=amountAfterUnit(raw);if(amount!==null)rows[id]=(rows[id]||0)+amount;continue}
-  if(/^WG\d{3}\b/i.test(raw)){if(/tabak|zigarett|zeitschrift|zubehor|schmierstoff|tier|propangas/.test(l)){const amount=amountAfterUnit(raw);if(amount!==null)other+=amount}continue}
+ const groupFor=s=>{
+   const n=normName(s);
+   for(const [id,a] of Object.entries(aliases)) if(a.some(x=>n.includes(x))) return id;
+   return null
+ };
+ // HUTH: after Stk/KLt comes quantity, then Netto EUR. We need the SECOND number.
+ const netAfterUnit=s=>{
+   const m=String(s||'').match(/\\b(?:Stk|KLt)\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2}|-?\\d+(?:,\\d{2}))\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2}|-?\\d+(?:,\\d{2}))\\s*EUR/i);
+   return m?money(m[2]):null;
+ };
+ const add=(id,v)=>{if(v===null)return;rows[id]=(rows[id]||0)+v};
+ for(const rawLine of lines){
+   const line=rawLine.trim(); if(!line)continue;
+   const l=normName(line);
+   if(/^eigen\\s+kraftstoff\\b/i.test(line)){
+     const v=netAfterUnit(line); if(v!==null)fuel+=v;
+     continue;
+   }
+   if(/\\bshopware\\b.*\\bv\\.?\\s*mwst\\b/i.test(line)){
+     const v=netAfterUnit(line); if(v!==null)shop+=v;
+     continue;
+   }
+   if(/storno|warenrucknahme|warenruecknahme|eigenverbrauch|pfand|neutral|nachlass|zahlart/.test(l))continue;
+   if(/e-loading|telefonkarten|lose|hermes|aviacard|gutschein/.test(l))continue;
+   const wg=line.match(/^WG\\d{3}\\s+(.+?)\\s+\\d+(?:[.,]\\d+)?\\s*%\\s+/i);
+   const name=wg?wg[1]:line;
+   const id=groupFor(name);
+   if(id){
+     const amount=netAfterUnit(line);
+     add(id,amount);
+     continue
+   }
+   if(/^WG\\d{3}\\b/i.test(line)){
+     if(/tabak|zigarett|zeitschrift|zubehor|schmierstoff|tier|propangas/.test(l)){
+       const amount=netAfterUnit(line); if(amount!==null)other+=amount;
+     }
+   }
  }
- if(!shop){const explicit=lines.find(x=>/\bshopware\b.*\bv\.?\s*mwst\b/i.test(x));if(explicit)shop=amountAfterUnit(explicit)||0}
+ if(!shop){
+   const explicit=lines.find(x=>/\\bshopware\\b.*\\bv\\.?\\s*mwst\\b/i.test(x));
+   if(explicit)shop=netAfterUnit(explicit)||0;
+ }
  if(!shop)shop=Object.values(rows).reduce((a,b)=>a+b,0)+other;
  if(!wash)wash=rows.waschen||0;
  return {groups:rows,fuel,wash,shop,other,neutral,sourceLines:lines.length,groupCount:Object.keys(rows).length};
