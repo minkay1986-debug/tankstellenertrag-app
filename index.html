@@ -134,7 +134,15 @@ async function loadStation(session){
   document.body.style.overflow='';
   $('userLine').textContent='Angemeldet als '+(session.user.email||'Kundenkonto');
   const isAdmin=(session.user.email||'').toLowerCase()==='svenkrick@gmx.de';
-  if(isAdmin){$('adminView').classList.remove('hidden');loadApplicants();}
+  if(isAdmin){
+    const aal=await client.auth.mfa.getAuthenticatorAssuranceLevel();
+    if(aal.error){status('Admin-Sicherheitsprüfung fehlgeschlagen: '+aal.error.message,'err');return;}
+    if(aal.data.nextLevel==='aal2'&&aal.data.currentLevel!=='aal2'){await showAdminMfaChallenge();return;}
+    const factors=await client.auth.mfa.listFactors();
+    const verified=(factors.data?.totp||[]).find(x=>x.status==='verified');
+    if(!verified){await showAdminMfaSetup();return;}
+    $('adminView').classList.remove('hidden');loadApplicants();
+  }
   const {data:rows,error}=await client.from('stations').select('id,station_name,postcode,city,subscription_status,trial_ends_at,subscription_ends_at,founding_partner_free_until,data_delete_at').eq('owner_id',session.user.id);
   if(error){$('stationStatus').className='status err';$('stationStatus').textContent='Konto aktiv, Stationsstatus konnte nicht gelesen werden: '+error.message;return;}
   const row=rows&&rows[0];
