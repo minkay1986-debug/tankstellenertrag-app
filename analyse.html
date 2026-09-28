@@ -99,7 +99,7 @@ function parseHuth(text){
      continue;
    }
    if(/\\bshopware\\b.*\\bmwst\\b/i.test(line)){
-     const v=netAfterUnit(line); if(v!==null)shop+=v;
+     // HUTH Shopware-Zeilen sind Abschnittssummen und dürfen nicht zusätzlich zu WG-Zeilen addiert werden.
      continue;
    }
    if(/storno|warenrucknahme|warenruecknahme|eigenverbrauch|pfand|neutral|nachlass|zahlart/.test(l))continue;
@@ -118,11 +118,7 @@ function parseHuth(text){
      }
    }
  }
- if(!shop){
-   const explicit=lines.filter(x=>/\\bshopware\\b.*\\bmwst\\b/i.test(x));
-   if(explicit.length)shop=explicit.reduce((sum,x)=>sum+(netAfterUnit(x)||0),0);
- }
- if(!shop)shop=Object.values(rows).reduce((a,b)=>a+b,0)+other;
+ shop=Object.values(rows).reduce((a,b)=>a+b,0)+other;
  if(!wash)wash=rows.waschen||0;
  return {groups:rows,fuel,wash,shop,other,neutral,sourceLines:lines.length,groupCount:Object.keys(rows).length};
 }
