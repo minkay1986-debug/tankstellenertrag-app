@@ -98,10 +98,12 @@ function parseHuth(text){
      const v=netAfterUnit(line); if(v!==null)fuel+=v;
      continue;
    }
-   if(/\\bshopware\\b.*\\bmwst\\b/i.test(line)){
-     // HUTH Shopware-Zeilen sind Abschnittssummen und dürfen nicht zusätzlich zu WG-Zeilen addiert werden.
+   if(/\\bshopware\\s+v\\.?mwst\\b/i.test(line)){
+     // HUTH liefert hier die belastbare Shop-Netto-Summe des 19%-Bereichs.
+     const v=netAfterUnit(line); if(v!==null)shop=v;
      continue;
    }
+   if(/\\bshopware\\b.*\\bmwst\\b/i.test(line)) continue;
    if(/storno|warenrucknahme|warenruecknahme|eigenverbrauch|pfand|neutral|nachlass|zahlart/.test(l))continue;
    if(/e-loading|telefonkarten|lose|hermes|aviacard|gutschein/.test(l))continue;
    const wg=line.match(/^WG\\d{3}\\s+(.+?)\\s+\\d+(?:[.,]\\d+)?\\s*%\\s+/i);
@@ -118,7 +120,7 @@ function parseHuth(text){
      }
    }
  }
- shop=Object.values(rows).reduce((a,b)=>a+b,0)+other;
+ if(!shop) shop=Object.values(rows).reduce((a,b)=>a+b,0)+other;
  if(!wash)wash=rows.waschen||0;
  return {groups:rows,fuel,wash,shop,other,neutral,sourceLines:lines.length,groupCount:Object.keys(rows).length};
 }
