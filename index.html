@@ -79,6 +79,7 @@ async function loadStation(session){
   if(!client||!session)return;
   $('authView').classList.add('hidden');
   $('dashboardView').classList.remove('hidden');
+  document.body.style.overflow='';
   $('userLine').textContent='Angemeldet als '+(session.user.email||'Kundenkonto');
   const {data:rows,error}=await client.from('stations').select('id,station_name,postcode,city,subscription_status,trial_ends_at,subscription_ends_at,founding_partner_free_until,data_delete_at').eq('owner_id',session.user.id);
   if(error){$('stationStatus').className='status err';$('stationStatus').textContent='Konto aktiv, Stationsstatus konnte nicht gelesen werden: '+error.message;return;}
