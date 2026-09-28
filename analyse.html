@@ -57,7 +57,7 @@ function sources(){const d=calc(month());$('sourceKnowledge').innerHTML='<div cl
 function report(){const d=calc(month()),s=settings();let html='<h2>TankstellenErtrag · Warenwirtschaftliche Monatsanalyse</h2><p><b>Station:</b> '+esc(station.station_name)+' · '+esc(station.postcode)+' '+esc(station.city)+'</p><p><b>Monat:</b> '+month()+'</p><div class="grid cards"><div class="card"><div class="label">Umsatz</div><div class="value">'+eur(d.revenue)+'</div></div><div class="card"><div class="label">Rohertrag</div><div class="value">'+eur(d.gross)+'</div></div><div class="card"><div class="label">Marge</div><div class="value">'+pct(d.margin)+'</div></div><div class="card"><div class="label">Schwund</div><div class="value">'+eur(d.shrink)+'</div></div><div class="card"><div class="label">Bestand EK</div><div class="value">'+eur(d.stock)+'</div></div></div><h3>Top-Prüffelder</h3><ul>';d.groups.filter(g=>g.revenue>0).sort((a,b)=>(b.shrink+b.writeoff)-(a.shrink+a.writeoff)).slice(0,5).forEach(g=>html+='<li>'+g.name+' · Umsatz '+eur(g.revenue)+' · Marge '+pct(g.margin)+' · Schwund '+eur(g.shrink)+'</li>');html+='</ul><h3>Daten- und Interpretationshinweise</h3><p>Stationsdaten bilden die Primärgrundlage. Auffälligkeiten sind Prüfsignale. Branchenwissen wird getrennt davon als Kontext verwendet; eine konkrete Ursache wird nicht allein aus einer Kennzahl behauptet.</p><p><b>Verwendete Prüfschwellen:</b> Umsatzrückgang '+s.revenueDrop+' %, Margenrückgang '+s.marginDrop+' %-Pkt., Schwund '+s.shrinkRate+' %, Abschriften '+s.writeoffRate+' %, Bestandsanstieg '+s.stockIncrease+' %.</p><p style="margin-top:40px;border-top:1px solid #aaa;padding-top:10px">Notizen / Maßnahmen vor Ort:</p><div style="height:120px;border-bottom:1px solid #aaa"></div><p style="margin-top:25px">TankstellenErtrag · Warenwirtschaftliche Monatsanalyse</p>';$('reportBody').innerHTML=html}
 function settingsUI(){const s=settings();$('setRevDrop').value=s.revenueDrop;$('setMarginDrop').value=s.marginDrop;$('setShrinkRate').value=s.shrinkRate;$('setWriteoffRate').value=s.writeoffRate;$('setStockIncrease').value=s.stockIncrease}
 function account(){const end=station.founding_partner_free_until||station.subscription_ends_at||station.trial_ends_at;$('accountBody').innerHTML='<p><b>'+esc(station.station_name)+'</b></p><p class="small">'+esc(station.postcode)+' '+esc(station.city)+' · Zugang: '+esc(station.subscription_status)+' · bis '+(end?new Date(end).toLocaleDateString('de-DE'):'–')+'</p><div class="alert ok"><strong>Geschützte Cloud-Auswertung</strong>Die Daten dieser Station werden ausschließlich über das angemeldete Kundenkonto gelesen und gespeichert.</div><div class="actions"><button class="btn secondary" id="logout">Abmelden</button></div>';$('logout').onclick=async()=>{await sb.auth.signOut();location.href='./'}}
-function renderAll(){dashboard();fill();analysis();insights();radar();yearly();economic();report();sources();settingsUI();account()}
+function renderAll(){dashboard();fill();analysis();insights();radar();yearly();economic();report();sources();settingsUI();loadSettingsUI();account()}
 function parseHuth(text){
  const rows={},neutral={};let fuel=0,wash=0,shop=0,other=0;
  const raw=String(text||'').replace(/\u00a0/g,' ');
@@ -86,6 +86,11 @@ function parseHuth(text){
  };
  const groupFor=s=>{
    const n=normName(s);
+   const custom=(data&&data.settings&&data.settings.huthMapping)||{};
+   for(const [source,target] of Object.entries(custom)){
+     const src=normName(source);
+     if(src && (n===src || n.includes(src))) return GROUPS.some(g=>g[0]===target)?target:null;
+   }
    for(const [id,a] of Object.entries(aliases)) if(a.some(x=>n.includes(x))) return id;
    return null
  };
