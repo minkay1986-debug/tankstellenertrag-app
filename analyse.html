@@ -120,7 +120,7 @@ function parseHuth(text){
  }
  if(!shop){
    const explicit=lines.find(x=>/\\bshopware\\b.*\\bv\\.?\\s*mwst\\b/i.test(x));
-   if(explicit)shop=netAfterUnit(explicit)||0;
+   if(explicit.length)shop=explicit.reduce((sum,x)=>sum+(netAfterUnit(x)||0),0);
  }
  if(!shop)shop=Object.values(rows).reduce((a,b)=>a+b,0)+other;
  if(!wash)wash=rows.waschen||0;
