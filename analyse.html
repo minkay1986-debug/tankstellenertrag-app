@@ -56,7 +56,7 @@ function settingsUI(){const s=settings();$('setRevDrop').value=s.revenueDrop;$('
 function account(){const end=station.founding_partner_free_until||station.subscription_ends_at||station.trial_ends_at;$('accountBody').innerHTML='<p><b>'+esc(station.station_name)+'</b></p><p class="small">'+esc(station.postcode)+' '+esc(station.city)+' · Zugang: '+esc(station.subscription_status)+' · bis '+(end?new Date(end).toLocaleDateString('de-DE'):'–')+'</p><div class="alert ok"><strong>Geschützte Cloud-Auswertung</strong>Die Daten dieser Station werden ausschließlich über das angemeldete Kundenkonto gelesen und gespeichert.</div><div class="actions"><button class="btn secondary" id="logout">Abmelden</button></div>';$('logout').onclick=async()=>{await sb.auth.signOut();location.href='./'}}
 function renderAll(){dashboard();fill();analysis();insights();radar();yearly();economic();report();sources();settingsUI();account()}
 function parseHuth(text){
- const rows={},neutral={};let fuel=0,wash=0,shop=0,other=0;
+ const rows={},neutral={};let fuel=0,wash=0,shop=0,other=0,neutralShrink=0;
  const raw=String(text||'').replace(/\u00a0/g,' ');
  const lines=raw
    .replace(/\s+/g,' ')
@@ -92,6 +92,11 @@ function parseHuth(text){
  };
  const add=(id,v)=>{if(v===null)return;rows[id]=(rows[id]||0)+v};
  for(const rawLine of lines){
+   const neutralLine=normName(rawLine);
+   if(/schwund\\s*\\((mhd|bruch|verderb)\\)/i.test(neutralLine)){
+     const vals=moneyTokens(rawLine).map(money).filter(v=>v!==null);
+     if(vals.length)neutralShrink+=vals[vals.length-1];
+   }
    const line=rawLine.trim(); if(!line)continue;
    const l=normName(line);
    if(/^eigen\s+kraftstoff\b/i.test(line)){
@@ -122,7 +127,7 @@ function parseHuth(text){
  }
  if(!shop) shop=Object.values(rows).reduce((a,b)=>a+b,0)+other;
  if(!wash)wash=rows.waschen||0;
- return {groups:rows,fuel,wash,shop,other,neutral,sourceLines:lines.length,groupCount:Object.keys(rows).length};
+ return {groups:rows,fuel,wash,shop,other,neutral,neutralShrink,sourceLines:lines.length,groupCount:Object.keys(rows).length};
 }
 let huthParsed=null;function renderHuth(p){huthParsed=p;let rows=Object.entries(p.groups).map(([id,v])=>'<tr><td>'+GROUPS.find(g=>g[0]===id)[1]+'</td><td>'+eur(v)+'</td></tr>').join('');$('huthResult').innerHTML='<div class="alert ok"><strong>HUTH-Prüfung</strong>Kraftstoff '+eur(p.fuel)+' · Shopgruppen '+eur(p.shop)+' · Waschen '+eur(p.wash)+'. Storno/Schwund/Eigenverbrauch/Pfand werden nicht als Umsatz addiert.</div><table><tr><th>Gemappte Shopgruppe</th><th>Netto</th></tr>'+rows+'</table>';$('huthApply').disabled=!rows}
 function applyHuth(){if(!huthParsed)return;const r=mrow();r.groups= r.groups||{};Object.entries(huthParsed.groups).forEach(([id,v])=>{r.groups[id]??={revenue:0,margin:(GROUPS.find(g=>g[0]===id)||[])[2]||0,shrink:0,writeoff:0};r.groups[id].revenue=v});r.fuel=huthParsed.fuel;r.wash=huthParsed.wash;r.revenue=huthParsed.shop;r.shrink=Object.entries(huthParsed.neutral).filter(([k])=>/Schwund/i.test(k)).reduce((a,[,v])=>a+v,0);fill();analysis();dashboard();persist()}
@@ -171,6 +176,7 @@ function applySourceValues(){
     if(p.shop>0)row.revenue=p.shop;
     row.fuel=p.fuel;
     row.wash=p.wash;
+    if(p.neutralShrink>0)row.shrink=p.neutralShrink;
     row.groups=row.groups||{};
     GROUPS.forEach(g=>row.groups[g[0]]??={revenue:0,margin:g[2],shrink:0,writeoff:0});
     Object.entries(p.groups).forEach(([id,v])=>{row.groups[id].revenue=v});
