@@ -56,8 +56,10 @@ function settingsUI(){const s=settings();$('setRevDrop').value=s.revenueDrop;$('
 function account(){const end=station.founding_partner_free_until||station.subscription_ends_at||station.trial_ends_at;$('accountBody').innerHTML='<p><b>'+esc(station.station_name)+'</b></p><p class="small">'+esc(station.postcode)+' '+esc(station.city)+' · Zugang: '+esc(station.subscription_status)+' · bis '+(end?new Date(end).toLocaleDateString('de-DE'):'–')+'</p><div class="alert ok"><strong>Geschützte Cloud-Auswertung</strong>Die Daten dieser Station werden ausschließlich über das angemeldete Kundenkonto gelesen und gespeichert.</div><div class="actions"><button class="btn secondary" id="logout">Abmelden</button></div>';$('logout').onclick=async()=>{await sb.auth.signOut();location.href='./'}}
 function renderAll(){dashboard();fill();analysis();insights();radar();yearly();economic();report();sources();settingsUI();account()}
 function parseHuth(text){
- const rows={},neutral={};let fuel=0,wash=0,shop=0,other=0,neutralShrink=0;
+ const rows={},neutral={};let fuel=0,wash=0,shop=0,other=0;
  const raw=String(text||'').replace(/\u00a0/g,' ');
+ const neutralMatches=[...raw.matchAll(/Schwund\s*\((?:MHD|Bruch|Verderb)\)[\s\S]{0,180}?(-?\d{1,3}(?:\.\d{3})*,\d{2})\s*EUR/gi)];
+ const neutralShrink=neutralMatches.reduce((sum,m)=>sum+Number(m[1].replace(/\./g,'').replace(',','.')),0);
  const lines=raw
    .replace(/\s+/g,' ')
    .replace(/(?=\b(?:WG\d{3}|Shopware\b|Eigen\s+Kraftstoff)\b)/gi,'\n')
@@ -92,11 +94,6 @@ function parseHuth(text){
  };
  const add=(id,v)=>{if(v===null)return;rows[id]=(rows[id]||0)+v};
  for(const rawLine of lines){
-   const neutralLine=normName(rawLine);
-   if(/schwund\s*\((mhd|bruch|verderb)\)/i.test(neutralLine)){
-     const vals=moneyTokens(rawLine).map(money).filter(v=>v!==null);
-     if(vals.length)neutralShrink+=vals[vals.length-1];
-   }
    const line=rawLine.trim(); if(!line)continue;
    const l=normName(line);
    if(/^eigen\s+kraftstoff\b/i.test(line)){
@@ -201,7 +198,7 @@ function applySourceValues(){
 
   // Separate Schwundreport: keep its own total; do not overwrite the Monatsabrechnung KPI.
   const shrinkMatch=String(shText||'').match(/Warengruppe\s+0\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})/i);
-  if(shrinkMatch)row.shrinkReportTotal=parseMoney(shrinkMatch[6]);
+  if(shrinkMatch)row.shrinkReportTotal=parseMoney(shrinkMatch[5]);
 
   // Inventurreport has no total row: sum all Lager-EK values.
   let stock=null;
