@@ -188,20 +188,8 @@ function applySourceValues(){
     row.huth={monthly:{shop:p.shop,fuel:p.fuel,wash:p.wash,groups:p.groups,lines:p.sourceLines},updatedAt:new Date().toISOString()};
   }
 
-  const findLabeled=(text,patterns)=>{
-    const t=String(text||'').replace(/\\u00a0/g,' ');
-    for(const re of patterns){
-      const m=t.match(re);
-      if(m){
-        const tail=t.slice(m.index,m.index+500);
-        const vals=moneyTokens(tail).map(parseMoney).filter(v=>v!==null);
-        if(vals.length)return vals[0];
-      }
-    }
-    return null;
-  };
-
-  const ek=findLabeled(ekText,[/Gesamt\\s*EK[-\\s]?Netto/i,/Gesamt.*EK\\s*Netto/i]);
+  const ekMatch=String(ekText||'').match(/Gesamt\s*EK[-\s]?Netto[\s\S]{0,350}?(-?\d{1,3}(?:\.\d{3})*,\d{2})/i);
+  const ek=ekMatch?parseMoney(ekMatch[1]):null;
   if(ek!==null)row.ek=ek;
 
   // Separate Schwundreport: keep its own total; do not overwrite the Monatsabrechnung KPI.
@@ -261,8 +249,8 @@ function rehydrateSources(){
    r.huth={monthly:{shop:p.shop,fuel:p.fuel,wash:p.wash,groups:p.groups,lines:p.sourceLines},updatedAt:new Date().toISOString()};
   }
   if(ekText.trim()){
-   const m=ekText.match(/Gesamt\\s*EK[-\\s]?Netto/i);
-   if(m){const tail=ekText.slice(m.index,m.index+500);const vals=moneyTokens(tail).map(parseMoney).filter(v=>v!==null);if(vals.length)r.ek=vals[vals.length-1];}
+   const m=ekText.match(/Gesamt\s*EK[-\s]?Netto[\s\S]{0,350}?(-?\d{1,3}(?:\.\d{3})*,\d{2})/i);
+   if(m)r.ek=parseMoney(m[1]);
   }
   if(shText.trim()){
    const m=shText.match(/Warengruppe\\s+0\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})\\s+(-?\\d{1,3}(?:\\.\\d{3})*,\\d{2})/i);if(m)r.shrinkReportTotal=parseMoney(m[5]);
