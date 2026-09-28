@@ -98,7 +98,7 @@ function parseHuth(text){
      const v=netAfterUnit(line); if(v!==null)fuel+=v;
      continue;
    }
-   if(/\\bshopware\\b.*\\bv\\.?\\s*mwst\\b/i.test(line)){
+   if(/\\bshopware\\b.*\\bmwst\\b/i.test(line)){
      const v=netAfterUnit(line); if(v!==null)shop+=v;
      continue;
    }
@@ -119,7 +119,7 @@ function parseHuth(text){
    }
  }
  if(!shop){
-   const explicit=lines.find(x=>/\\bshopware\\b.*\\bv\\.?\\s*mwst\\b/i.test(x));
+   const explicit=lines.filter(x=>/\\bshopware\\b.*\\bmwst\\b/i.test(x));
    if(explicit.length)shop=explicit.reduce((sum,x)=>sum+(netAfterUnit(x)||0),0);
  }
  if(!shop)shop=Object.values(rows).reduce((a,b)=>a+b,0)+other;
