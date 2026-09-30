@@ -138,30 +138,33 @@ $('logoutBtn').onclick=async()=>{if(client){await client.auth.signOut();location
 const originalLoadStation=loadStation;
 async function loadStation(session){
   if(!client||!session)return;
+  status('Anmeldung erfolgreich – Kundenkonto wird geladen …','ok');
   $('authView').classList.add('hidden');
   $('dashboardView').classList.remove('hidden');
   document.body.style.overflow='';
   $('userLine').textContent='Angemeldet als '+(session.user.email||'Kundenkonto');
   const isAdmin=(session.user.email||'').toLowerCase()==='svenkrick@gmx.de';
   if(isAdmin){
-    const aal=await client.auth.mfa.getAuthenticatorAssuranceLevel();
+    status('Anmeldung erfolgreich – Admin-Sicherheit wird geprüft …','ok');
+    const aal=await withTimeout(client.auth.mfa.getAuthenticatorAssuranceLevel(),10000,'Admin-Sicherheitsprüfung antwortet nicht.');
     if(aal.error){status('Admin-Sicherheitsprüfung fehlgeschlagen: '+aal.error.message,'err');return;}
     if(aal.data.nextLevel==='aal2'&&aal.data.currentLevel!=='aal2'){await showAdminMfaChallenge();return;}
-    const factors=await client.auth.mfa.listFactors();
+    const factors=await withTimeout(client.auth.mfa.listFactors(),10000,'Admin-Faktoren konnten nicht geladen werden.');
     const verified=(factors.data?.totp||[]).find(x=>x.status==='verified');
     if(!verified){await showAdminMfaSetup();return;}
     $('adminView').classList.remove('hidden');loadApplicants();
   }
-  const {data:rows,error}=await client.from('stations').select('id,station_name,postcode,city,subscription_status,trial_ends_at,subscription_ends_at,founding_partner_free_until,data_delete_at').eq('owner_id',session.user.id);
-  if(error){$('stationStatus').className='status err';$('stationStatus').textContent='Konto aktiv, Stationsstatus konnte nicht gelesen werden: '+error.message;return;}
+  status('Konto angemeldet – Stationsdaten werden geladen …','ok');
+  const {data:rows,error}=await withTimeout(client.from('stations').select('id,station_name,postcode,city,subscription_status,trial_ends_at,subscription_ends_at,founding_partner_free_until,data_delete_at').eq('owner_id',session.user.id),10000,'Stationsdaten antworten nicht.');
+  if(error){$('stationStatus').className='status err';$('stationStatus').textContent='Konto aktiv, Stationsstatus konnte nicht gelesen werden: '+error.message;status('Stationsdaten konnten nicht geladen werden.','err');return;}
   const row=rows&&rows[0];
-  if(!row){$('stationCards').innerHTML='<div class="card"><div class="label">Pilotstation</div><div class="value">Noch nicht verknüpft</div></div>';$('stationStatus').textContent='Ihr Kundenkonto ist angelegt. Die Pilotstation wird separat freigeschaltet.';return;}
+  if(!row){$('stationCards').innerHTML='<div class="card"><div class="label">Pilotstation</div><div class="value">Noch nicht verknüpft</div></div>';$('stationStatus').textContent='Ihr Kundenkonto ist angelegt. Die Pilotstation wird separat freigeschaltet.';status('Anmeldung erfolgreich. Keine Station verknüpft.','ok');return;}
   const end=row.founding_partner_free_until||row.subscription_ends_at||row.trial_ends_at;
   const active=row.subscription_status==='active'||(row.subscription_status==='founding_partner'&&end&&new Date(end)>new Date())||(row.subscription_status==='trial'&&end&&new Date(end)>new Date());
   $('stationCards').innerHTML='<div class="card"><div class="label">Station</div><div class="value">'+esc(row.station_name||'—')+'</div><div class="small">'+esc(row.postcode||'')+' '+esc(row.city||'')+'</div></div><div class="card"><div class="label">Zugang</div><div class="value">'+esc(row.subscription_status||'—')+'</div></div><div class="card"><div class="label">Zugang bis</div><div class="value">'+(end?new Date(end).toLocaleDateString('de-DE'):'—')+'</div></div>';
   $('stationStatus').className='status '+(active?'ok':'err');
   $('stationStatus').textContent=active?'Zugang ist aktiv.':'Station vorhanden, aber Zugang aktuell nicht aktiv.';
-  if(active){$('openApp').classList.remove('hidden');$('openApp').onclick=async(e)=>{e.preventDefault();try{const {data:s}=await client.auth.getSession();if(!s.session)throw new Error('Die Anmeldung ist abgelaufen.');localStorage.setItem('tankstellenertrag-session-handoff',JSON.stringify({access_token:s.session.access_token,refresh_token:s.session.refresh_token}));location.href='./analyse.html';}catch(err){status(err.message||String(err),'err')}};}
+  if(active){$('openApp').classList.remove('hidden');$('openApp').onclick=async(e)=>{e.preventDefault();try{const {data:s}=await withTimeout(client.auth.getSession(),10000,'Die Sitzung konnte nicht gelesen werden.');if(!s.session)throw new Error('Die Anmeldung ist abgelaufen.');location.href='https://app.tankstellenertrag.de/analyse.html';}catch(err){status(err.message||String(err),'err')}};}
 }
 function openAuth(){ $('authView').classList.remove('hidden'); document.body.style.overflow='hidden'; setTimeout(()=>document.getElementById('email')?.focus(),50); }
 function closeAuth(){ $('authView').classList.add('hidden'); document.body.style.overflow=''; }
