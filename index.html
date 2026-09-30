@@ -61,7 +61,7 @@ async function loadStation(session){
     const factors=await client.auth.mfa.listFactors();
     const verified=(factors.data?.totp||[]).find(x=>x.status==='verified');
     if(!verified){await showAdminMfaSetup();return;}
-    $('adminView').classList.remove('hidden');loadApplicants();loadVisitorStats();
+    $('adminView').classList.remove('hidden');loadApplicants();loadVisitorStats();status('Administrator angemeldet – keine Station erforderlich.','ok');return;loadVisitorStats();
   }
   const {data:rows,error}=await client.from('stations').select('id,station_name,postcode,city,subscription_status,trial_ends_at,subscription_ends_at,founding_partner_free_until,data_delete_at').eq('owner_id',session.user.id);
   if(error){$('stationStatus').className='status err';$('stationStatus').textContent='Das Konto ist aktiv, aber der Stationsstatus konnte noch nicht gelesen werden: '+error.message;return;}
