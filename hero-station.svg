@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
+<defs>
+ <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#071018"/><stop offset=".45" stop-color="#29313a"/><stop offset=".78" stop-color="#d66b2b"/><stop offset="1" stop-color="#ff9b3d"/></linearGradient>
+ <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#202326"/><stop offset="1" stop-color="#050709"/></linearGradient>
+ <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#20343c"/><stop offset="1" stop-color="#101a20"/></linearGradient>
+ <linearGradient id="jacket" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#171d21"/><stop offset="1" stop-color="#050607"/></linearGradient>
+ <radialGradient id="sun"><stop stop-color="#fff2c1"/><stop offset=".35" stop-color="#ffb34c"/><stop offset="1" stop-color="#ff7b24" stop-opacity="0"/></radialGradient>
+ <filter id="blur"><feGaussianBlur stdDeviation="22"/></filter>
+</defs>
+<rect width="1200" height="900" fill="url(#sky)"/>
+<circle cx="935" cy="285" r="170" fill="url(#sun)" filter="url(#blur)"/>
+<circle cx="935" cy="285" r="38" fill="#fff2c4"/>
+<path d="M0 520 Q180 455 360 520 T720 500 T1200 510 V900 H0Z" fill="url(#ground)"/>
+<!-- distant trees -->
+<path d="M0 505l65-90 45 90 60-120 55 120 75-80 50 80 65-105 50 105 80-70 45 70 90-100 45 100 70-80 60 80 85-110 50 110 70-75 65 75 80-105 60 105V555H0Z" fill="#11181b" opacity=".8"/>
+<!-- station building -->
+<rect x="565" y="420" width="570" height="250" rx="8" fill="#172329"/>
+<rect x="585" y="455" width="530" height="185" fill="url(#glass)"/>
+<path d="M535 420 H1160 L1190 465 H505Z" fill="#111a1e"/>
+<path d="M525 412 H1168 L1190 432 H505Z" fill="#ff7f20"/>
+<rect x="530" y="432" width="650" height="13" fill="#ff9a35"/>
+<!-- station lights -->
+<g fill="#ffe6b0">
+ <rect x="610" y="465" width="18" height="10"/><rect x="690" y="465" width="18" height="10"/><rect x="770" y="465" width="18" height="10"/>
+ <rect x="850" y="465" width="18" height="10"/><rect x="930" y="465" width="18" height="10"/><rect x="1010" y="465" width="18" height="10"/>
+</g>
+<!-- windows -->
+<g fill="#1c3038" stroke="#45606a" stroke-width="4">
+ <rect x="610" y="500" width="120" height="115"/><rect x="745" y="500" width="120" height="115"/>
+ <rect x="880" y="500" width="120" height="115"/><rect x="1015" y="500" width="80" height="115"/>
+</g>
+<!-- pumps -->
+<g>
+ <rect x="445" y="535" width="55" height="115" rx="7" fill="#252d31"/>
+ <rect x="452" y="548" width="41" height="28" rx="4" fill="#9ca9ad"/>
+ <path d="M500 575 Q530 580 530 610" fill="none" stroke="#111" stroke-width="7"/>
+ <rect x="365" y="535" width="55" height="115" rx="7" fill="#252d31"/>
+ <rect x="372" y="548" width="41" height="28" rx="4" fill="#9ca9ad"/>
+ <path d="M420 575 Q450 580 450 610" fill="none" stroke="#111" stroke-width="7"/>
+</g>
+<!-- foreground person -->
+<ellipse cx="340" cy="790" rx="245" ry="80" fill="#050607" opacity=".7"/>
+<path d="M210 900 Q220 650 310 570 Q350 535 390 570 Q500 660 530 900Z" fill="url(#jacket)"/>
+<ellipse cx="350" cy="530" rx="82" ry="105" fill="#080b0d"/>
+<path d="M275 515 Q295 400 355 395 Q425 405 435 520 Q400 470 345 470 Q305 475 275 515Z" fill="#101417"/>
+<!-- laptop -->
+<path d="M430 690 L700 640 L760 780 L490 825Z" fill="#161c20" stroke="#657278" stroke-width="5"/>
+<path d="M450 700 L680 660 L720 760 L500 795Z" fill="#0d2530"/>
+<g stroke="#44e59a" stroke-width="6" fill="none">
+ <path d="M525 770 L525 735 L550 745 L550 720 L575 730 L575 695 L600 710 L600 675"/>
+ <path d="M630 740 L630 700 L655 705 L655 680 L680 688"/>
+</g>
+<path d="M425 825 L760 780 L810 805 L470 865Z" fill="#30383c" stroke="#566168" stroke-width="4"/>
+<!-- jacket branding -->
+<text x="270" y="700" fill="#fff" font-family="Arial,sans-serif" font-size="27" font-weight="700">Tankstellen<tspan fill="#ff8a24">Ertrag</tspan></text>
+<rect width="1200" height="900" fill="url(#sky)" opacity=".08"/>
+</svg>
