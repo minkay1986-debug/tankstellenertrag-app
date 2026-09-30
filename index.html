@@ -156,7 +156,7 @@ async function loadStation(session){
   $('stationCards').innerHTML='<div class="card"><div class="label">Station</div><div class="value">'+esc(row.station_name||'—')+'</div><div class="small">'+esc(row.postcode||'')+' '+esc(row.city||'')+'</div></div><div class="card"><div class="label">Zugang</div><div class="value">'+esc(row.subscription_status||'—')+'</div></div><div class="card"><div class="label">Zugang bis</div><div class="value">'+(end?new Date(end).toLocaleDateString('de-DE'):'—')+'</div></div>';
   $('stationStatus').className='status '+(active?'ok':'err');
   $('stationStatus').textContent=active?'Zugang ist aktiv.':'Station vorhanden, aber Zugang aktuell nicht aktiv.';
-  if(active){$('openApp').classList.remove('hidden');$('openApp').onclick=async()=>{try{const {data:s}=await client.auth.getSession();if(s.session)localStorage.setItem('tankstellenertrag-session-handoff',JSON.stringify(s.session));}catch(_e){}};}
+  if(active){$('openApp').classList.remove('hidden');$('openApp').onclick=async(e)=>{e.preventDefault();try{const {data:s}=await client.auth.getSession();if(!s.session)throw new Error('Die Anmeldung ist abgelaufen.');localStorage.setItem('tankstellenertrag-session-handoff',JSON.stringify({access_token:s.session.access_token,refresh_token:s.session.refresh_token}));location.href='./analyse.html';}catch(err){status(err.message||String(err),'err')}};}
 }
 function openAuth(){ $('authView').classList.remove('hidden'); document.body.style.overflow='hidden'; setTimeout(()=>document.getElementById('email')?.focus(),50); }
 function closeAuth(){ $('authView').classList.add('hidden'); document.body.style.overflow=''; }
