@@ -55,8 +55,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   `;
   document.head.appendChild(style);
 
-  const pickerNames={faucet:'Zapfhahn',route66:'Route 66',oldtimer:'Oldtimer',business:'Geschäftsmann',mechanic:'Mechaniker',roadtrip:'Roadtrip'};
-  picker.innerHTML='<div class="te-profile-title">Dein Profilbild</div><div class="te-picker-grid">'+Object.keys(avatarArt).map(type=>'<button data-avatar="'+type+'" title="'+pickerNames[type]+'"><span class="av">'+avatarArt[type]+'</span><small>'+pickerNames[type]+'</small></button>').join('')+'</div>';
   const btn=document.getElementById('teProfileBtn'), menu=document.getElementById('teProfileMenu');
   const guest=document.getElementById('teGuest'), userBox=document.getElementById('teUser'), picker=document.getElementById('tePicker');
   const avatar=document.getElementById('teAvatar'), name=document.getElementById('teName'), email=document.getElementById('teEmail');
@@ -69,6 +67,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     mechanic:'<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="20" r="9" fill="#c88e69"/><path d="M17 59c1-14 6-23 15-23s14 9 15 23z" fill="#4e5c4a"/><path d="M20 39h24v9H20z" fill="#374438"/><path d="M20 13c4-8 17-9 23 0l-2 5H22z" fill="#f47b20"/><path d="M43 42 54 31" stroke="#e2b65b" stroke-width="5" stroke-linecap="round"/><circle cx="54" cy="31" r="5" fill="none" stroke="#e2b65b" stroke-width="3"/><path d="M28 24h8" stroke="#8d614d" stroke-width="2" stroke-linecap="round"/></svg>',
     roadtrip:'<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="49" cy="14" r="8" fill="#f5b84b"/><path d="M5 54c11-13 20-16 30-13 9 3 16 0 24-8" fill="none" stroke="#d6d9d5" stroke-width="4" stroke-linecap="round"/><path d="M11 43h40l-5-11H24l-8 6z" fill="#d06d42"/><path d="M24 32h8v-7h7l8 7" fill="#2c3b42"/><path d="M18 37h7" stroke="#f3d4ae" stroke-width="2"/><circle cx="20" cy="45" r="6" fill="#20262a" stroke="#eee" stroke-width="2"/><circle cx="44" cy="45" r="6" fill="#20262a" stroke="#eee" stroke-width="2"/></svg>'
   };
+  const pickerNames={faucet:'Zapfhahn',route66:'Route 66',oldtimer:'Oldtimer',business:'Geschäftsmann',mechanic:'Mechaniker',roadtrip:'Roadtrip'};
+  picker.innerHTML='<div class="te-profile-title">Dein Profilbild</div><div class="te-picker-grid">'+Object.keys(avatarArt).map(type=>'<button data-avatar="'+type+'" title="'+pickerNames[type]+'"><span class="av">'+avatarArt[type]+'</span><small>'+pickerNames[type]+'</small></button>').join('')+'</div>';
   function renderAvatar(type){
     const art=avatarArt[type]||avatarArt.faucet;
     avatar.className='te-avatar te-avatar-'+type;
