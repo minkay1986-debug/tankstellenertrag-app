@@ -170,7 +170,7 @@ function openAuth(){ $('authView').classList.remove('hidden'); document.body.sty
 function closeAuth(){ $('authView').classList.add('hidden'); document.body.style.overflow=''; }
 $('navLogin').onclick=openAuth;$('heroLogin').onclick=openAuth;$('knowledgeLogin').onclick=openAuth;$('heroTest').onclick=openAuth;$('bottomTest').onclick=openAuth;$('closeAuth').onclick=closeAuth;
 
-$('refreshApplicants')?.addEventListener('click',loadApplicants);
+$('refreshApplicants')?.addEventListener('click',()=>{loadApplicants();loadVisitorStats();});
 boot();
 </script>
 </body>
