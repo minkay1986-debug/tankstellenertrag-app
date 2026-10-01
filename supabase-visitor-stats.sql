@@ -57,3 +57,29 @@ $$;
 
 revoke all on function public.get_visitor_stats() from public;
 grant execute on function public.get_visitor_stats() to authenticated;
+
+
+-- Öffentliche Pilotplatz-Anzeige: zählt echte, nicht abgelehnte Pilotbewerbungen.
+create or replace function public.get_pilot_slots()
+returns json
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  used_slots integer;
+begin
+  used_slots := (select count(*)::integer from public.pilot_applications
+                 where lower(coalesce(email,'')) <> 'svenkrick@gmx.de'
+                   and coalesce(status,'new') <> 'rejected');
+
+  return json_build_object(
+    'total', 10,
+    'used', used_slots,
+    'remaining', greatest(0, 10 - used_slots)
+  );
+end;
+$$;
+
+revoke all on function public.get_pilot_slots() from public;
+grant execute on function public.get_pilot_slots() to anon, authenticated;
