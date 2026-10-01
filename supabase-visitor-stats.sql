@@ -83,3 +83,59 @@ $$;
 
 revoke all on function public.get_pilot_slots() from public;
 grant execute on function public.get_pilot_slots() to anon, authenticated;
+
+-- Kündigungsanfragen: Kunde stellt die Kündigung selbst, Admin bestätigt/terminiert sie.
+create table if not exists public.subscription_cancellations (
+  id bigint generated always as identity primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  station_id uuid null references public.stations(id) on delete set null,
+  requested_at timestamptz not null default now(),
+  requested_end_date date null,
+  status text not null default 'requested' check (status in ('requested','confirmed','cancelled')),
+  processed_at timestamptz null,
+  note text null
+);
+alter table public.subscription_cancellations enable row level security;
+revoke all on table public.subscription_cancellations from anon, authenticated;
+
+create or replace function public.request_subscription_cancellation()
+returns json language plpgsql security definer set search_path=public as $$
+declare uid uuid:=auth.uid(); sid uuid;
+begin
+ if uid is null then raise exception 'Nicht angemeldet'; end if;
+ select id into sid from public.stations where owner_id=uid order by created_at desc nulls last limit 1;
+ if exists(select 1 from public.subscription_cancellations where user_id=uid and status='requested') then
+   return json_build_object('ok',true,'message','Eine Kündigungsanfrage liegt bereits vor.');
+ end if;
+ insert into public.subscription_cancellations(user_id,station_id) values(uid,sid);
+ return json_build_object('ok',true,'message','Kündigungsanfrage wurde übermittelt.');
+end; $$;
+revoke all on function public.request_subscription_cancellation() from public;
+grant execute on function public.request_subscription_cancellation() to authenticated;
+
+create or replace function public.get_cancellation_requests()
+returns json language plpgsql security definer set search_path=public as $$
+begin
+ if lower(coalesce(auth.jwt()->>'email','')) <> 'svenkrick@gmx.de' then raise exception 'Nicht autorisiert'; end if;
+ return coalesce((select json_agg(x order by requested_at desc) from (
+   select c.id,c.user_id,c.station_id,c.requested_at,c.requested_end_date,c.status,c.processed_at,c.note,u.email,s.station_name
+   from public.subscription_cancellations c left join auth.users u on u.id=c.user_id
+   left join public.stations s on s.id=c.station_id where c.status='requested'
+ ) x),'[]'::json);
+end; $$;
+revoke all on function public.get_cancellation_requests() from public;
+grant execute on function public.get_cancellation_requests() to authenticated;
+
+create or replace function public.confirm_subscription_cancellation(p_id bigint,p_end_date date,p_note text default null)
+returns json language plpgsql security definer set search_path=public as $$
+declare c public.subscription_cancellations;
+begin
+ if lower(coalesce(auth.jwt()->>'email','')) <> 'svenkrick@gmx.de' then raise exception 'Nicht autorisiert'; end if;
+ select * into c from public.subscription_cancellations where id=p_id and status='requested';
+ if c.id is null then raise exception 'Kündigungsanfrage nicht gefunden'; end if;
+ update public.subscription_cancellations set status='confirmed',requested_end_date=p_end_date,processed_at=now(),note=p_note where id=p_id;
+ if c.station_id is not null then update public.stations set subscription_ends_at=(p_end_date + time '23:59:59') where id=c.station_id; end if;
+ return json_build_object('ok',true,'end_date',p_end_date);
+end; $$;
+revoke all on function public.confirm_subscription_cancellation(bigint,date,text) from public;
+grant execute on function public.confirm_subscription_cancellation(bigint,date,text) to authenticated;
