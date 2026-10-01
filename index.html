@@ -236,7 +236,7 @@ boot();
   const close=$('diniStickerClose'), art=sticker.querySelector('.diniStickerArt'), links=sticker.querySelectorAll('a');
   let dragging=false,moved=false,startX=0,startY=0,startLeft=0,startTop=0,pointerId=null;
   const show=()=>{sticker.classList.remove('is-closed');setTimeout(()=>sticker.classList.add('is-visible'),1200)};
-  const closeSticker=()=>{sticker.style.setProperty('display','none','important');sticker.classList.remove('is-visible');sticker.classList.add('is-closed');};close.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();closeSticker();});close.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();closeSticker();});
+  const closeSticker=()=>{sticker.remove();};close.onclick=closeSticker;close.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();closeSticker();});
   sticker.addEventListener('pointerdown',e=>{
     if(e.target.closest('a,button'))return;
     dragging=true;moved=false;pointerId=e.pointerId;
