@@ -162,7 +162,9 @@ async function loadStation(session){
     const factors=await withTimeout(client.auth.mfa.listFactors(),10000,'Admin-Faktoren konnten nicht geladen werden.');
     const verified=(factors.data?.totp||[]).find(x=>x.status==='verified');
     if(!verified){await showAdminMfaSetup();return;}
-    $('adminView').classList.remove('hidden');loadApplicants();
+    $('adminView').classList.remove('hidden');loadApplicants();loadVisitorStats();
+    status('Administrator angemeldet – Besucherstatistik wird geladen.','ok');
+    return;
   }
   status('Konto angemeldet – Stationsdaten werden geladen …','ok');
   const {data:rows,error}=await withTimeout(client.from('stations').select('id,station_name,postcode,city,subscription_status,trial_ends_at,subscription_ends_at,founding_partner_free_until,data_delete_at').eq('owner_id',session.user.id),10000,'Stationsdaten antworten nicht.');
