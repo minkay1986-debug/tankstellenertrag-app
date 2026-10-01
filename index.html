@@ -27,19 +27,19 @@
 <style>.signupField{display:block}.signupField .small{font-size:10px;color:#899298}.rememberRow{display:flex;align-items:center;gap:8px;font-size:13px;color:#899298;margin:4px 0 2px}.rememberRow input{accent-color:#f36f21}.mfaPanel{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.72)}.mfaPanel.hidden{display:none}.mfaBox{width:min(520px,100%);background:#17212b;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:28px;box-shadow:0 24px 80px rgba(0,0,0,.45)}.mfaBox h2{margin:0 0 8px}.mfaQr{background:#fff;border-radius:12px;padding:12px;width:220px;height:220px;display:block;margin:18px auto}.mfaSecret{font-family:monospace;word-break:break-all;background:rgba(255,255,255,.06);padding:10px;border-radius:8px}.mfaCode{width:100%;box-sizing:border-box;font-size:22px;letter-spacing:5px;text-align:center;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:#0e151c;color:#fff}.mfaActions{display:flex;gap:10px;margin-top:14px}.mfaActions button{flex:1}.mfaMsg{margin-top:10px}
 </style>
 <style id="diniloveStickerStyles">
-.diniSticker{position:fixed;right:42px;top:50%;z-index:9999;width:155px;display:flex;flex-direction:column;align-items:center;opacity:1;pointer-events:auto;transform:none;transition:opacity .45s ease,transform .65s cubic-bezier(.2,.9,.2,1);user-select:none}
+.diniSticker{position:fixed;right:34px;top:51%;z-index:9999;width:92px;display:flex;flex-direction:column;align-items:center;opacity:1;pointer-events:auto;transform:none;transition:opacity .45s ease,transform .65s cubic-bezier(.2,.9,.2,1);user-select:none}
 .diniSticker.is-visible{opacity:1;pointer-events:auto;transform:none}
 .diniSticker.is-dragging{transition:none;cursor:grabbing}
-.diniStickerArt{width:112px;height:140px;object-fit:contain;filter:drop-shadow(0 12px 18px rgba(0,0,0,.35));cursor:grab;animation:diniFloat 3.8s ease-in-out infinite}
+.diniStickerArt{width:64px;height:80px;object-fit:contain;filter:drop-shadow(0 12px 18px rgba(0,0,0,.35));cursor:grab;animation:diniFloat 3.8s ease-in-out infinite}
 .diniSticker.is-dragging .diniStickerArt{animation:none;cursor:grabbing}
-.diniStickerLink{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin-top:-4px;padding:9px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.34);background:rgba(13,15,16,.9);box-shadow:0 8px 22px rgba(0,0,0,.32);color:#fff;text-decoration:none;font-size:11px;font-weight:850;white-space:nowrap;backdrop-filter:blur(8px)}
+.diniStickerLink{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin-top:-2px;padding:6px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.34);background:rgba(13,15,16,.9);box-shadow:0 8px 22px rgba(0,0,0,.32);color:#fff;text-decoration:none;font-size:8px;font-weight:850;white-space:nowrap;backdrop-filter:blur(8px)}
 .diniStickerLink:hover{border-color:#ff9b4a;box-shadow:0 10px 26px rgba(244,123,32,.22);transform:translateY(-1px)}
 .diniStickerClose{position:absolute;right:2px;top:0;width:27px;height:27px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(20,22,24,.9);color:#fff;font-size:20px;line-height:22px;cursor:pointer;z-index:2}
 .diniStickerClose:hover{background:#30363a}
 .diniStickerHint{position:absolute;right:145px;top:57px;width:135px;text-align:right;color:#aeb6bc;font-size:10px;line-height:1.35;opacity:0;transform:translateX(8px);transition:.35s ease;pointer-events:none}
 .diniSticker:hover .diniStickerHint{opacity:1;transform:none}
 @keyframes diniFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-7px) rotate(1deg)}}
-@media(max-width:850px){.diniSticker{right:12px;top:auto;bottom:86px;width:145px}.diniStickerArt{width:102px;height:128px}.diniStickerHint{display:none}.diniStickerLink{font-size:10px;padding:8px 11px}}
+@media(max-width:850px){.diniSticker{right:10px;top:auto;bottom:76px;width:92px}.diniStickerArt{width:60px;height:76px}.diniStickerHint{display:none}.diniStickerLink{font-size:10px;padding:8px 11px}}
 @media(prefers-reduced-motion:reduce){.diniSticker,.diniStickerArt,.diniStickerLink{animation:none!important;transition:none!important}}
 </style></head>
 <body>
