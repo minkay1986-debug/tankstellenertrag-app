@@ -26,7 +26,22 @@
 </style>
 <style>.signupField{display:block}.signupField .small{font-size:10px;color:#899298}.rememberRow{display:flex;align-items:center;gap:8px;font-size:13px;color:#899298;margin:4px 0 2px}.rememberRow input{accent-color:#f36f21}.mfaPanel{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.72)}.mfaPanel.hidden{display:none}.mfaBox{width:min(520px,100%);background:#17212b;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:28px;box-shadow:0 24px 80px rgba(0,0,0,.45)}.mfaBox h2{margin:0 0 8px}.mfaQr{background:#fff;border-radius:12px;padding:12px;width:220px;height:220px;display:block;margin:18px auto}.mfaSecret{font-family:monospace;word-break:break-all;background:rgba(255,255,255,.06);padding:10px;border-radius:8px}.mfaCode{width:100%;box-sizing:border-box;font-size:22px;letter-spacing:5px;text-align:center;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:#0e151c;color:#fff}.mfaActions{display:flex;gap:10px;margin-top:14px}.mfaActions button{flex:1}.mfaMsg{margin-top:10px}
 </style>
-</head>
+<style id="diniloveStickerStyles">
+.diniSticker{position:fixed;right:7vw;top:43%;z-index:45;width:185px;display:flex;flex-direction:column;align-items:center;opacity:0;pointer-events:none;transform:translate3d(90px,8px,0) scale(.86);transition:opacity .45s ease,transform .65s cubic-bezier(.2,.9,.2,1);user-select:none}
+.diniSticker.is-visible{opacity:1;pointer-events:auto;transform:translate3d(0,0,0) scale(1)}
+.diniSticker.is-dragging{transition:none;cursor:grabbing}
+.diniStickerArt{width:128px;height:158px;object-fit:contain;filter:drop-shadow(0 12px 18px rgba(0,0,0,.35));cursor:grab;animation:diniFloat 3.8s ease-in-out infinite}
+.diniSticker.is-dragging .diniStickerArt{animation:none;cursor:grabbing}
+.diniStickerLink{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin-top:-4px;padding:9px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.34);background:rgba(13,15,16,.9);box-shadow:0 8px 22px rgba(0,0,0,.32);color:#fff;text-decoration:none;font-size:11px;font-weight:850;white-space:nowrap;backdrop-filter:blur(8px)}
+.diniStickerLink:hover{border-color:#ff9b4a;box-shadow:0 10px 26px rgba(244,123,32,.22);transform:translateY(-1px)}
+.diniStickerClose{position:absolute;right:2px;top:0;width:27px;height:27px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(20,22,24,.9);color:#fff;font-size:20px;line-height:22px;cursor:pointer;z-index:2}
+.diniStickerClose:hover{background:#30363a}
+.diniStickerHint{position:absolute;right:145px;top:57px;width:135px;text-align:right;color:#aeb6bc;font-size:10px;line-height:1.35;opacity:0;transform:translateX(8px);transition:.35s ease;pointer-events:none}
+.diniSticker:hover .diniStickerHint{opacity:1;transform:none}
+@keyframes diniFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-7px) rotate(1deg)}}
+@media(max-width:850px){.diniSticker{right:16px;top:auto;bottom:82px;width:155px}.diniStickerArt{width:108px;height:135px}.diniStickerHint{display:none}.diniStickerLink{font-size:10px;padding:8px 11px}}
+@media(prefers-reduced-motion:reduce){.diniSticker,.diniStickerArt,.diniStickerLink{animation:none!important;transition:none!important}}
+</style></head>
 <body>
 <div class="site">
 <header class="topbar"><div class="wrap navrow"><a class="brand" href="./">Tankstellen<span>Ertrag</span></a><nav><a href="#vorteile">Vorteile</a><a href="#ablauf">So funktioniert's</a><a href="#wissen">Branchenwissen</a><a href="./news.html">News</a><button id="navLogin" class="navbtn">Kundenlogin</button></nav></div></header>
@@ -40,7 +55,14 @@
 <div id="mfaPanel" class="mfaPanel hidden"><div class="mfaBox"><div class="eyebrow">Admin-Sicherheit</div><h2 id="mfaTitle">Zwei-Faktor-Anmeldung</h2><p id="mfaText" class="small">Schütze dein Administrator-Konto mit einer Authenticator-App.</p><div id="mfaSetupContent"><p class="small">1. QR-Code mit Google Authenticator, Microsoft Authenticator oder einer anderen TOTP-App scannen.</p><img id="mfaQr" class="mfaQr" alt="MFA QR-Code"><p class="small">Falls der QR-Code nicht funktioniert, kannst du diesen Schlüssel manuell eingeben:</p><div id="mfaSecret" class="mfaSecret"></div></div><p class="small">2. Den 6-stelligen Code aus der App eingeben:</p><input id="mfaCode" class="mfaCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000"><div class="mfaActions"><button id="mfaVerify" class="btn primary">MFA aktivieren</button><button id="mfaCancel" class="btn secondary">Abbrechen</button></div><div id="mfaMsg" class="status mfaMsg"></div></div></div>
 <section id="adminView" class="dashboard hidden"><div class="wrap"><div class="panel adminPanel"><div class="eyebrow">Administration</div><div class="adminHead"><div id="visitorStats" class="visitorStats"><div class="visitorStat"><span>Besucher heute</span><b id="statToday">–</b></div><div class="visitorStat"><span>Letzte 7 Tage</span><b id="stat7">–</b></div><div class="visitorStat"><span>Diesen Monat</span><b id="statMonth">–</b></div><div class="visitorStat"><span>Pilotbewerbungen</span><b id="statApplications">–</b></div></div><div class="adminHead"><div><h2>Bewerber</h2><p class="small">Pilotanfragen und Zugänge verwalten.</p></div><button id="refreshApplicants" class="btn secondary adminRefresh">Aktualisieren</button></div></div><div id="adminStatus" class="status">Bewerber werden geladen …</div><div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Bewerber</th><th>Station</th><th>E-Mail</th><th>Status</th><th>Zugang</th><th>Bis</th><th></th></tr></thead><tbody id="applicantRows"></tbody></table></div></div></div></section>
 <section id="dashboardView" class="dashboard hidden"><div class="wrap"><div class="panel"><div class="eyebrow">Kundenkonto</div><h2>Kundenkonto</h2><p id="userLine" class="small"></p><div id="stationCards" class="cards"></div><div id="stationStatus" class="status"></div><a id="openApp" class="linkbtn hidden" href="https://app.tankstellenertrag.de/analyse.html">Zur TankstellenErtrag-Plattform</a><button id="logoutBtn" class="btn secondary">Abmelden</button></div></div></section>
-</main>
+<div id="diniSticker" class="diniSticker" aria-label="DiniLove Halloween Sticker">
+<button id="diniStickerClose" class="diniStickerClose" type="button" aria-label="Sticker schließen">×</button>
+<div class="diniStickerHint">Kleiner saisonaler Gruß 🎃<br>Antippen zum Entdecken</div>
+<a id="diniStickerLink" class="diniStickerLink" href="https://www.etsy.com/de/shop/DiniLoveDesign" target="_blank" rel="noopener noreferrer" aria-label="DiniLove Etsy Shop öffnen">
+<img class="diniStickerArt" src="./assets/dinilove-halloween.svg" alt="DiniLove Halloween Sticker">
+</a>
+<a class="diniStickerLink" href="https://www.etsy.com/de/shop/DiniLoveDesign" target="_blank" rel="noopener noreferrer">DiniLove entdecken →</a>
+</div></main>
 <footer><div class="wrap footer"><b>Tankstellen<span>Ertrag</span></b><span>Warenwirtschaftliche Monatsanalyse</span><a href="./impressum.html">Impressum</a><a href="./datenschutz.html">Datenschutz</a><a href="./agb.html">AGB</a></div></footer>
 </div>
 <style>
@@ -184,6 +206,29 @@ $('navLogin').onclick=openAuth;$('heroLogin').onclick=openAuth;$('knowledgeLogin
 
 $('refreshApplicants')?.addEventListener('click',()=>{loadApplicants();loadVisitorStats();});
 boot();
+
+// DiniLove: kleiner saisonaler, verschiebbarer Sticker auf der öffentlichen Startseite.
+(function(){
+  const sticker=$('diniSticker'); if(!sticker)return;
+  const close=$('diniStickerClose'), art=sticker.querySelector('.diniStickerArt'), links=sticker.querySelectorAll('a');
+  let dragging=false,moved=false,startX=0,startY=0,startLeft=0,startTop=0,pointerId=null;
+  const show=()=>{setTimeout(()=>sticker.classList.add('is-visible'),1200)};
+  close.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();sticker.classList.remove('is-visible');});
+  art.addEventListener('pointerdown',e=>{
+    dragging=true;moved=false;pointerId=e.pointerId;art.setPointerCapture?.(pointerId);
+    const r=sticker.getBoundingClientRect();startX=e.clientX;startY=e.clientY;startLeft=r.left;startTop=r.top;sticker.classList.add('is-dragging');e.preventDefault();
+  });
+  art.addEventListener('pointermove',e=>{
+    if(!dragging)return;
+    const dx=e.clientX-startX,dy=e.clientY-startY;if(Math.abs(dx)+Math.abs(dy)>6)moved=true;
+    const maxX=Math.max(8,window.innerWidth-sticker.offsetWidth-8),maxY=Math.max(8,window.innerHeight-sticker.offsetHeight-8);
+    sticker.style.left=Math.min(maxX,Math.max(8,startLeft+dx))+'px';sticker.style.top=Math.min(maxY,Math.max(8,startTop+dy))+'px';sticker.style.right='auto';sticker.style.bottom='auto';
+  });
+  art.addEventListener('pointerup',e=>{if(!dragging)return;dragging=false;sticker.classList.remove('is-dragging');try{art.releasePointerCapture?.(pointerId)}catch(_){}});
+  art.addEventListener('click',e=>{if(moved){e.preventDefault();moved=false;}});
+  links.forEach(a=>a.addEventListener('click',e=>{if(dragging||moved)e.preventDefault();}));
+  show();
+})();
 </script>
 </body>
 </html>
