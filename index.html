@@ -27,7 +27,7 @@
 <style>.signupField{display:block}.signupField .small{font-size:10px;color:#899298}.rememberRow{display:flex;align-items:center;gap:8px;font-size:13px;color:#899298;margin:4px 0 2px}.rememberRow input{accent-color:#f36f21}.mfaPanel{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.72)}.mfaPanel.hidden{display:none}.mfaBox{width:min(520px,100%);background:#17212b;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:28px;box-shadow:0 24px 80px rgba(0,0,0,.45)}.mfaBox h2{margin:0 0 8px}.mfaQr{background:#fff;border-radius:12px;padding:12px;width:220px;height:220px;display:block;margin:18px auto}.mfaSecret{font-family:monospace;word-break:break-all;background:rgba(255,255,255,.06);padding:10px;border-radius:8px}.mfaCode{width:100%;box-sizing:border-box;font-size:22px;letter-spacing:5px;text-align:center;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:#0e151c;color:#fff}.mfaActions{display:flex;gap:10px;margin-top:14px}.mfaActions button{flex:1}.mfaMsg{margin-top:10px}
 </style>
 <style id="diniloveStickerStyles">
-.diniSticker{position:fixed;right:34px;top:51%;z-index:9999;width:120px;display:flex;flex-direction:column;align-items:center;opacity:1;pointer-events:auto;transform:none;transition:opacity .45s ease,transform .65s cubic-bezier(.2,.9,.2,1);user-select:none;touch-action:none}
+.diniSticker{position:fixed;right:34px;top:51%;z-index:9999;width:120px;display:flex;flex-direction:column;align-items:center;opacity:1;pointer-events:auto;transform:none;transition:opacity .45s ease,transform .65s cubic-bezier(.2,.9,.2,1);user-select:none;touch-action:none;cursor:grab}
 .diniSticker.is-visible{opacity:1;pointer-events:auto;transform:none}
 .diniSticker.is-dragging{transition:none;cursor:grabbing}
 .diniStickerArt{width:88px;height:110px;object-fit:contain;filter:drop-shadow(0 12px 18px rgba(0,0,0,.35));cursor:grab;animation:diniFloat 3.8s ease-in-out infinite;touch-action:none}
@@ -231,10 +231,30 @@ boot();
     sticker.style.right='auto';sticker.style.bottom='auto';
   });
   sticker.addEventListener('pointerup',e=>{
-    if(!dragging)return;dragging=false;sticker.classList.remove('is-dragging');
+    if(!dragging)return;
+    dragging=false;sticker.classList.remove('is-dragging');
+    try{sticker.releasePointerCapture?.(pointerId)}catch(_){}
+    if(moved){
+      sessionStorage.setItem('diniStickerPos',JSON.stringify({left:sticker.offsetLeft,top:sticker.offsetTop}));
+      e.preventDefault();e.stopPropagation();
+    }
+  });
+  sticker.addEventListener('pointercancel',e=>{
+    dragging=false;sticker.classList.remove('is-dragging');
     try{sticker.releasePointerCapture?.(pointerId)}catch(_){}
   });
-  links.forEach(a=>a.addEventListener('click',e=>{if(moved){e.preventDefault();e.stopPropagation();moved=false;}}));
+  const savedPos=sessionStorage.getItem('diniStickerPos');
+  if(savedPos){try{
+    const p=JSON.parse(savedPos);
+    if(Number.isFinite(p.left)&&Number.isFinite(p.top)){
+      sticker.style.left=Math.max(8,Math.min(window.innerWidth-sticker.offsetWidth-8,p.left))+'px';
+      sticker.style.top=Math.max(8,Math.min(window.innerHeight-sticker.offsetHeight-8,p.top))+'px';
+      sticker.style.right='auto';sticker.style.bottom='auto';
+    }
+  }catch(_){}}
+  links.forEach(a=>a.addEventListener('click',e=>{
+    if(moved){e.preventDefault();e.stopPropagation();moved=false;}
+  }));
   show();
 })();
 </script>
