@@ -214,19 +214,27 @@ boot();
   let dragging=false,moved=false,startX=0,startY=0,startLeft=0,startTop=0,pointerId=null;
   const show=()=>{setTimeout(()=>sticker.classList.add('is-visible'),1200)};
   close.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();sticker.classList.remove('is-visible');});
-  art.addEventListener('pointerdown',e=>{
-    dragging=true;moved=false;pointerId=e.pointerId;art.setPointerCapture?.(pointerId);
-    const r=sticker.getBoundingClientRect();startX=e.clientX;startY=e.clientY;startLeft=r.left;startTop=r.top;sticker.classList.add('is-dragging');e.preventDefault();
+  sticker.addEventListener('pointerdown',e=>{
+    if(e.target.closest('a,button'))return;
+    dragging=true;moved=false;pointerId=e.pointerId;
+    const r=sticker.getBoundingClientRect();startX=e.clientX;startY=e.clientY;startLeft=r.left;startTop=r.top;
+    sticker.setPointerCapture?.(pointerId);sticker.classList.add('is-dragging');e.preventDefault();e.stopPropagation();
   });
-  art.addEventListener('pointermove',e=>{
+  sticker.addEventListener('pointermove',e=>{
     if(!dragging)return;
-    const dx=e.clientX-startX,dy=e.clientY-startY;if(Math.abs(dx)+Math.abs(dy)>6)moved=true;
+    const dx=e.clientX-startX,dy=e.clientY-startY;
+    if(Math.abs(dx)+Math.abs(dy)>4)moved=true;
+    if(!moved)return;
     const maxX=Math.max(8,window.innerWidth-sticker.offsetWidth-8),maxY=Math.max(8,window.innerHeight-sticker.offsetHeight-8);
-    sticker.style.left=Math.min(maxX,Math.max(8,startLeft+dx))+'px';sticker.style.top=Math.min(maxY,Math.max(8,startTop+dy))+'px';sticker.style.right='auto';sticker.style.bottom='auto';
+    sticker.style.left=Math.min(maxX,Math.max(8,startLeft+dx))+'px';
+    sticker.style.top=Math.min(maxY,Math.max(8,startTop+dy))+'px';
+    sticker.style.right='auto';sticker.style.bottom='auto';
   });
-  art.addEventListener('pointerup',e=>{if(!dragging)return;dragging=false;sticker.classList.remove('is-dragging');try{art.releasePointerCapture?.(pointerId)}catch(_){}});
-  art.addEventListener('click',e=>{if(moved){e.preventDefault();moved=false;}});
-  links.forEach(a=>a.addEventListener('click',e=>{if(dragging||moved)e.preventDefault();}));
+  sticker.addEventListener('pointerup',e=>{
+    if(!dragging)return;dragging=false;sticker.classList.remove('is-dragging');
+    try{sticker.releasePointerCapture?.(pointerId)}catch(_){}
+  });
+  links.forEach(a=>a.addEventListener('click',e=>{if(moved){e.preventDefault();e.stopPropagation();moved=false;}}));
   show();
 })();
 </script>
