@@ -28,7 +28,7 @@
 </style>
 <style id="diniloveStickerStyles">
 .diniSticker{position:fixed;right:34px;top:51%;z-index:9999;width:204px;display:flex;flex-direction:column;align-items:center;opacity:1;pointer-events:auto;transform:none;transition:opacity .45s ease,transform .65s cubic-bezier(.2,.9,.2,1);user-select:none;touch-action:none;cursor:grab}
-.diniSticker.is-visible{opacity:1;pointer-events:auto;transform:none}.diniSticker:not(.is-visible){opacity:0;pointer-events:none;transform:translateY(4px)}
+.diniSticker.is-visible{opacity:1;pointer-events:auto;transform:none}.diniSticker.is-closed{opacity:0;pointer-events:none;transform:translateY(4px)}
 .diniSticker.is-dragging{transition:none;cursor:grabbing}
 .diniStickerArt{width:150px;height:187px;object-fit:contain;filter:drop-shadow(0 12px 18px rgba(0,0,0,.35));cursor:grab;animation:diniFloat 3.8s ease-in-out infinite;touch-action:none}
 .diniSticker.is-dragging .diniStickerArt{animation:none;cursor:grabbing}
@@ -235,8 +235,8 @@ boot();
   const sticker=$('diniSticker'); if(!sticker)return;
   const close=$('diniStickerClose'), art=sticker.querySelector('.diniStickerArt'), links=sticker.querySelectorAll('a');
   let dragging=false,moved=false,startX=0,startY=0,startLeft=0,startTop=0,pointerId=null;
-  const show=()=>{setTimeout(()=>sticker.classList.add('is-visible'),1200)};
-  close.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();sticker.classList.remove('is-visible');});close.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();sticker.classList.remove('is-visible');});
+  const show=()=>{sticker.classList.remove('is-closed');setTimeout(()=>sticker.classList.add('is-visible'),1200)};
+  close.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();sticker.classList.remove('is-visible');sticker.classList.add('is-closed');});close.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();sticker.classList.remove('is-visible');sticker.classList.add('is-closed');});
   sticker.addEventListener('pointerdown',e=>{
     if(e.target.closest('a,button'))return;
     dragging=true;moved=false;pointerId=e.pointerId;
