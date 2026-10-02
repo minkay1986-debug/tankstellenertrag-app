@@ -25,15 +25,9 @@ VERIFIED = [
     },
     {
         "title": "Tankstellenerhebung zum Stichtag 1. Januar 2026",
-        "url": "https://www.uniti.de/tankstellenerhebung",
-        "date": "2026-01-01",
-        "source": "UNITI e.V.",
-        "type": "Branchenhebung",
-        "summary": "Offizielle UNITI-Tankstellenerhebung mit Angaben zur Struktur des Tankstellenmarktes und zur Entwicklung der betriebenen Stationen.",
-    },
     {
         "title": "Handelsgastronomie in Deutschland 2026",
-        "url": "https://www.ehi.org/produkt/whitepaper-handelsgastronomie-in-deutschland/",
+        "url": "https://www.ehi.org/produkt/studie-handelsgastronomie-deutschland-2026-pdf/",
         "date": "2026-06-01",
         "source": "EHI Retail Institute",
         "type": "Handelsstudie",
@@ -108,6 +102,24 @@ def score(title, text, source_priority):
     hay = (title + " " + text).lower()
     return source_priority + sum(weight for key, weight in KEYWORDS.items() if key in hay)
 
+def verify_original(url, source_name):
+    """Verify that the original URL is reachable on the approved institution domain."""
+    try:
+        parsed = urllib.parse.urlparse(url)
+        approved = APPROVED_SOURCES[source_name]["domain"]
+        if parsed.scheme != "https" or not parsed.netloc.endswith(approved):
+            return False
+        req = urllib.request.Request(url, headers={"User-Agent": "TankstellenErtrag-StudyBot/2.1"}, method="HEAD")
+        try:
+            with urllib.request.urlopen(req, timeout=15) as r:
+                return 200 <= r.status < 400 and urllib.parse.urlparse(r.geturl()).netloc.endswith(approved)
+        except Exception:
+            req = urllib.request.Request(url, headers={"User-Agent": "TankstellenErtrag-StudyBot/2.1"})
+            with urllib.request.urlopen(req, timeout=15) as r:
+                return 200 <= r.status < 400 and urllib.parse.urlparse(r.geturl()).netloc.endswith(approved)
+    except Exception:
+        return False
+
 def rss_items(url, source_name):
     result = []
     meta = APPROVED_SOURCES[source_name]
@@ -126,7 +138,7 @@ def rss_items(url, source_name):
             if meta["domain"] not in urllib.parse.urlparse(link).netloc:
                 continue
             s = score(title, desc, meta["priority"])
-            if s >= 16:
+            if s >= 16 and verify_original(link, source_name):
                 result.append({
                     "title": title,
                     "url": link,
@@ -153,6 +165,8 @@ for source_name, query in QUERIES:
 # Verifizierte Anker immer behalten.
 for item in VERIFIED:
     meta = APPROVED_SOURCES[item["source"]]
+    if not verify_original(item["url"], item["source"]):
+        continue
     key = item["url"]
     items[key] = {
         **item,
@@ -219,7 +233,7 @@ a{color:#ff9b4a;text-decoration:none}
 </style></head><body><main>
 <div class="eyebrow">TankstellenErtrag · Branchenwissen</div>
 <h1>Geprüfte Studien, Erhebungen & Kennzahlen</h1>
-<p class="lead">Für die Beratung werden nur nachvollziehbare Primärquellen, etablierte Forschungsinstitute und amtliche Statistik berücksichtigt. Freie News, Blogs und unbelegte Aussagen werden nicht als Studienwissen übernommen.</p>
+<p class="lead">Für die Beratung werden nur erreichbare Originalquellen etablierter Forschungsinstitute, Branchenverbände und amtlicher Statistik berücksichtigt. Freie News, Blogs und unbelegte Aussagen werden nicht als Studienwissen übernommen.</p>
 <div class="grid">''' + "".join(cards) + '''</div>
 <div class="note"><strong>Beratungsregel:</strong> Branchenwissen liefert Vergleichswerte, Trends und Prüffelder. Die konkrete Stationsanalyse basiert auf den Stationsdaten. Eine Studie wird niemals als Beweis für eine konkrete Ursache an einer einzelnen Station verwendet.</div>
 <p style="margin-top:30px"><a href="../">← Zurück zu TankstellenErtrag</a></p>
