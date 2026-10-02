@@ -108,7 +108,7 @@ if(location.hostname==='tankstellenertrag.de'||location.hostname==='www.tankstel
   location.replace('https://app.tankstellenertrag.de'+location.pathname+location.search+location.hash);
 }
 const cfg=window.TANKSTELLENERTRAG_SUPABASE||{};
-const client=(cfg.url&&cfg.publishableKey&&window.supabase)?window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:'tankstellenertrag-auth'}}):null;
+const client=(cfg.url&&cfg.publishableKey&&window.supabase)?window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:'tankstellenertrag-auth',storage:window.localStorage}}):null;
 const $=id=>document.getElementById(id);
 function status(msg,type=''){const el=$('status');if(el){el.className='status '+type;el.textContent=msg;}}
 function withTimeout(promise,ms,message='Die Anfrage an den Anmeldedienst hat zu lange gedauert.'){return Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error(message)),ms))]);}
@@ -122,6 +122,7 @@ async function loadStation(session){
   $('userLine').textContent='Angemeldet als '+(session.user.email||'Kundenkonto');
   const isAdmin=(session.user.email||'').toLowerCase()==='svenkrick@gmx.de';
   if(isAdmin){
+    $('authView').classList.add('hidden');
     $('cancelSubscriptionBtn')?.classList.add('hidden');
     status('Anmeldung erfolgreich – Admin-Sicherheit wird geprüft …','ok');
     const aal=await withTimeout(client.auth.mfa.getAuthenticatorAssuranceLevel(),10000,'Admin-Sicherheitsprüfung antwortet nicht.');
@@ -134,6 +135,8 @@ async function loadStation(session){
     status('Administrator angemeldet – Besucherstatistik wird geladen.','ok');
     return;
   }
+  $('adminView').classList.add('hidden');
+  $('mfaPanel').classList.add('hidden');
   $('cancelSubscriptionBtn')?.classList.remove('hidden');
   status('Konto angemeldet – Stationsdaten werden geladen …','ok');
   const {data:rows,error}=await withTimeout(client.from('stations').select('id,station_name,postcode,city,subscription_status,trial_ends_at,subscription_ends_at,founding_partner_free_until,data_delete_at').eq('owner_id',session.user.id),10000,'Stationsdaten antworten nicht.');
@@ -257,12 +260,36 @@ async function verifyAdminMfa(){
   try{const challenge=await client.auth.mfa.challenge({factorId:adminMfaFactorId});if(challenge.error)throw challenge.error;const verify=await client.auth.mfa.verify({factorId:adminMfaFactorId,challengeId:challenge.data.id,code});if(verify.error)throw verify.error;$('mfaPanel').classList.add('hidden');$('mfaCode').value='';$('mfaVerify').disabled=false;const {data:sessionData}=await client.auth.getSession();if(sessionData.session)await loadStation(sessionData.session);}catch(e){$('mfaMsg').className='status err mfaMsg';$('mfaMsg').textContent=e.message||String(e);$('mfaVerify').disabled=false;}
 }
 $('mfaVerify').onclick=verifyAdminMfa;
-$('logoutBtn').onclick=async()=>{if(client){await client.auth.signOut();location.reload();}};
+$('logoutBtn').onclick=async()=>{if(client){setBusy(false);await client.auth.signOut();}};
 const originalLoadStation=loadStation;
 
+function resetProtectedViews(){
+  $('authView').classList.add('hidden');
+  $('dashboardView').classList.add('hidden');
+  $('adminView').classList.add('hidden');
+  $('mfaPanel').classList.add('hidden');
+  $('openApp')?.classList.add('hidden');
+  $('cancelSubscriptionBtn')?.classList.remove('hidden');
+  $('stationCards').innerHTML='';
+  $('stationStatus').textContent='';
+  $('userLine').textContent='';
+  document.body.style.overflow='';
+}
 function openAuth(){ $('authView').classList.remove('hidden'); document.body.style.overflow='hidden'; setTimeout(()=>document.getElementById('email')?.focus(),50); }
 function closeAuth(){ $('authView').classList.add('hidden'); document.body.style.overflow=''; }
-$('navLogin').onclick=openAuth;$('heroLogin').onclick=openAuth;$('knowledgeLogin').onclick=openAuth;$('heroTest').onclick=openAuth;$('bottomTest').onclick=openAuth;$('monthlyPilotBtn')?.addEventListener('click',openAuth);$('closeAuth').onclick=closeAuth;
+$('navLogin').onclick=openAuth;$('heroLogin').onclick=openAuth;$('knowledgeLogin').onclick=openAuth;$('heroTest').onclick=openAuth;$('bottomTest').onclick=openAuth;$('monthlyPilotBtn')?.addEventListener('click',openAuth);
+$('closeAuth').onclick=closeAuth;
+$('closeAuth').addEventListener('click',closeAuth);
+$('closeAuth').setAttribute('type','button');
+
+if(client){
+  client.auth.onAuthStateChange((event)=>{
+    if(event==='SIGNED_OUT'){
+      resetProtectedViews();
+      status('Abgemeldet. Bitte anmelden oder ein Kundenkonto anlegen.');
+    }
+  });
+}
 
 async function refreshAdminData(){
   const btn=$('refreshApplicants');
