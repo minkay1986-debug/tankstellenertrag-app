@@ -21,10 +21,8 @@ VERIFIED = [
         "date": "2026-01-15",
         "source": "UNITI e.V.",
         "type": "Branchenstudie / Jahreserhebung",
-        "summary": "UNITI berichtet über die aktuelle Jahreserhebung und die wirtschaftliche Bedeutung von Shop & Convenience sowie Carwash im Tankstellenmarkt.",
+        "summary": "Aktuelle UNITI-Jahreserhebung zur Struktur und wirtschaftlichen Entwicklung des deutschen Tankstellenmarktes; mit Fokus auf die zunehmende Bedeutung von Shop & Convenience und Carwash.",
     },
-    {
-        "title": "Tankstellenerhebung zum Stichtag 1. Januar 2026",
     {
         "title": "Handelsgastronomie in Deutschland 2026",
         "url": "https://www.ehi.org/produkt/studie-handelsgastronomie-deutschland-2026-pdf/",
@@ -32,14 +30,6 @@ VERIFIED = [
         "source": "EHI Retail Institute",
         "type": "Handelsstudie",
         "summary": "EHI-Studie zur Entwicklung der Handelsgastronomie mit aktuellen Umsatzzahlen, Erfolgsfaktoren, Herausforderungen sowie Foodtrends und Wachstumstreibern; Tankstellen werden als Best-Practice-Bereich berücksichtigt.",
-    },
-    {
-        "title": "EHI-Laden-Monitor 2026",
-        "url": "https://www.ehi.org/produkt/studie-laden-monitor-2026-pdf/",
-        "date": "2026-01-01",
-        "source": "EHI Retail Institute",
-        "type": "Handelsstudie",
-        "summary": "EHI-Benchmarking-Studie zu Ladenplanung, Formatentwicklung, Investitionskennzahlen, Portfoliomanagement und Digitalstrategien im stationären Handel.",
     },
     {
         "title": "Trend Check Handel Vol. 17",
@@ -50,7 +40,7 @@ VERIFIED = [
         "summary": "IFH-KÖLN-Erhebung zu Konsumstimmung, Konsumtrends und Einkaufsverhalten im deutschen Handel.",
     },
     {
-        "title": "Umsatz im Einzelhandel nach Wirtschaftszweigen – einschließlich Tankstellen",
+        "title": "Umsatz im Einzelhandel nominal – Wirtschaftszweig Motorenkraftstoffe (Tankstellen)",
         "url": "https://www.destatis.de/DE/Themen/Wirtschaft/Konjunkturindikatoren/Einzelhandel/hug220.html",
         "date": "2026-10-01",
         "source": "Statistisches Bundesamt (Destatis)",
