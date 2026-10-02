@@ -56,8 +56,8 @@ Deno.serve(async (req) => {
     if (authDelete.error) {
       // Wenn der Auth-User bereits bei einem vorherigen Lauf gelöscht wurde,
       // darf der Retry trotzdem mit der Stationsbereinigung fortfahren.
-      const status = Number((authDelete as any).status || 0);
-      const code = String((authDelete as any).code || "");
+      const status = Number((authDelete.error as any).status || 0);
+      const code = String((authDelete.error as any).code || "");
       const alreadyGone = status === 404 || code === "user_not_found";
       if (!alreadyGone) {
         errors.push(station.station_name + ": auth.users: " + authDelete.error.message);
