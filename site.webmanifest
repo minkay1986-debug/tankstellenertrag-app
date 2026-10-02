@@ -1,0 +1,16 @@
+{
+  "name": "TankstellenErtrag",
+  "short_name": "TankstellenErtrag",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d1418",
+  "theme_color": "#0d1418",
+  "icons": [
+    {
+      "src": "/assets/tankstellenertrag-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
