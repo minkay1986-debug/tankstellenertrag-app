@@ -1,0 +1,15 @@
+{
+  "packageId": "de.tankstellenertrag.app",
+  "host": "app.tankstellenertrag.de",
+  "name": "TankstellenErtrag",
+  "launcherName": "TankstellenErtrag",
+  "display": "standalone",
+  "startUrl": "/",
+  "iconUrl": "https://app.tankstellenertrag.de/assets/tankstellenertrag-icon.svg",
+  "themeColor": "#0d1418",
+  "navigationColor": "#0d1418",
+  "navigationColorDark": "#0d1418",
+  "backgroundColor": "#0d1418",
+  "enableNotifications": false,
+  "shortcuts": []
+}
