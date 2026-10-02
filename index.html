@@ -138,12 +138,32 @@ async function loadStation(session){
   const active=row.subscription_status==='founding_partner' && row.founding_partner_free_until && new Date(row.founding_partner_free_until)>new Date();
   const activePaid=row.subscription_status==='active';
   const end=row.founding_partner_free_until||row.subscription_ends_at||row.trial_ends_at;
+  let cancellation=null;
+  try{
+    const {data:cancelData,error:cancelError}=await client.rpc('get_subscription_cancellation_status');
+    if(!cancelError && cancelData){
+      cancellation=Array.isArray(cancelData)?cancelData[0]:cancelData;
+      if(typeof cancellation==='string'){try{cancellation=JSON.parse(cancellation)}catch(_){cancellation=null}}
+    }
+  }catch(_){}
   $('stationCards').innerHTML=
     '<div class="card"><div class="label">Station</div><div class="value">'+esc(row.station_name||'—')+'</div><div class="small">'+esc(row.postcode||'')+' '+esc(row.city||'')+'</div></div>'+
     '<div class="card"><div class="label">Zugang</div><div class="value">'+(active?'Gründungspartner':activePaid?'Aktiv':esc(row.subscription_status||'—'))+'</div></div>'+
     '<div class="card"><div class="label">Zugang bis</div><div class="value">'+(end?new Date(end).toLocaleDateString('de-DE'):'—')+'</div></div>';
-  $('stationStatus').className='status '+(active||activePaid?'ok':'');
-  $('stationStatus').textContent=active?'Pilotzugang ist aktiv.':activePaid?'Bezahlzugang ist aktiv.':row.data_delete_at?'Für die Station ist eine Datenlöschung vorgemerkt.':'Station gefunden. Der Zugang muss ggf. noch freigeschaltet werden.';
+  const cancelRequested=cancellation && ['requested','pending'].includes(String(cancellation.status||'').toLowerCase());
+  const cancelConfirmed=cancellation && ['confirmed','approved'].includes(String(cancellation.status||'').toLowerCase());
+  $('stationStatus').className='status '+(cancelConfirmed?'ok':cancelRequested?'':'');
+  if(cancelConfirmed){
+    const cancelEnd=cancellation.requested_end_date||cancellation.subscription_ends_at||row.subscription_ends_at;
+    const deleteAt=cancellation.data_delete_at||row.data_delete_at;
+    $('stationStatus').textContent='Kündigung bestätigt. Ihr Zugang endet am '+(cancelEnd?new Date(cancelEnd).toLocaleDateString('de-DE'):'vereinbarten Termin')+'.'+(deleteAt?' Die Datenlöschung ist für den '+new Date(deleteAt).toLocaleDateString('de-DE')+' vorgemerkt.':'');
+    const btn=$('cancelSubscriptionBtn');if(btn){btn.disabled=true;btn.textContent='Kündigung bestätigt';}
+  }else if(cancelRequested){
+    $('stationStatus').textContent='Kündigungsanfrage eingegangen. Ihre Anfrage wird von TankstellenErtrag geprüft.';
+    const btn=$('cancelSubscriptionBtn');if(btn){btn.disabled=true;btn.textContent='Kündigung angefragt';}
+  }else{
+    $('stationStatus').textContent=active?'Pilotzugang ist aktiv.':activePaid?'Bezahlzugang ist aktiv.':row.data_delete_at?'Für die Station ist eine Datenlöschung vorgemerkt.':'Station gefunden. Der Zugang muss ggf. noch freigeschaltet werden.';
+  }
 }
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 
