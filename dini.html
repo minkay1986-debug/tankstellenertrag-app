@@ -3,27 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DiniLove | Herbstliche Rezepte</title>
-<meta name="description" content="DiniLove – kleine saisonale Rezepte, warme Getränke und süße Herbstideen.">
-<meta name="theme-color" content="#f5efe4">
+<title>DiniLove ❤️ | Außergewöhnliche Rezeptideen für dein Bistro</title>
+<meta name="description" content="DiniLove ❤️ – außergewöhnliche Rezeptideen für dein Bistro: saisonale Getränke, Snacks und kreative Ideen.">
+<meta name="theme-color" content="#6c3a23">
 <style>
 :root{--cream:#fbf7ef;--paper:#fffdf8;--ink:#26231f;--brown:#67361f;--orange:#c95122;--green:#7d8f73;--line:#ded2c0}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#f4f0e7,#fbf7ef 30%,#f1f5e9);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
 .wrap{width:min(1080px,calc(100% - 28px));margin:auto}.top{padding:18px 0;display:flex;justify-content:space-between;align-items:center}.logo{font-size:22px;font-weight:900;color:#201d19;text-decoration:none}.logo span{color:var(--orange)}.back{color:var(--brown);text-decoration:none;font-weight:800;font-size:13px}
-.hero{text-align:center;padding:38px 0 26px}.eyebrow{letter-spacing:.18em;text-transform:uppercase;font-size:11px;color:var(--brown);font-weight:900}.hero h1{font-family:"Segoe Script","Brush Script MT",cursive;font-size:clamp(48px,9vw,88px);font-weight:500;line-height:.95;margin:14px 0 10px;color:#351f17}.hero p{max-width:650px;margin:auto;color:#62594f;line-height:1.65}
+.hero{text-align:center;padding:28px 0 30px}.diniBadge{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;background:#6c3a23;color:#fff;box-shadow:0 8px 22px rgba(108,58,35,.18);font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.diniHeart{font-size:18px;line-height:1}.eyebrow{letter-spacing:.18em;text-transform:uppercase;font-size:11px;color:var(--brown);font-weight:900;margin-top:16px}.hero h1{font-family:"Segoe Script","Brush Script MT",cursive;font-size:clamp(54px,10vw,96px);font-weight:500;line-height:.92;margin:10px 0 8px;color:#351f17;text-shadow:0 3px 0 rgba(255,255,255,.55)}.hero .claim{font-size:clamp(20px,3vw,30px);font-weight:900;color:#6c3a23;margin:0 auto 12px;letter-spacing:-.02em}.hero .intro{max-width:680px;margin:auto;color:#62594f;line-height:1.65}.hero .spark{font-size:22px;margin:14px 0 0}
 .filters{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:22px 0}.filter{border:1px solid #d7c7b1;background:#fffaf1;color:#5c4435;border-radius:999px;padding:8px 13px;font-weight:800;cursor:pointer}.filter.active{background:var(--orange);border-color:var(--orange);color:#fff}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding:12px 0 42px}.recipe{background:rgba(255,253,248,.9);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 10px 35px rgba(84,55,30,.08);display:flex;flex-direction:column}.recipeTop{padding:24px 22px 16px;min-height:150px;position:relative;background:linear-gradient(135deg,#fff7e8,#f6f0df)}.recipeIcon{font-size:45px}.season{position:absolute;right:18px;top:18px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#7c6859;font-weight:900}.recipe h2{font-family:"Segoe Script","Brush Script MT",cursive;font-size:31px;font-weight:500;margin:12px 0 5px;color:#44261b}.type{font-size:11px;color:#8b7867;font-weight:900;text-transform:uppercase;letter-spacing:.1em}.recipeBody{padding:18px 22px}.recipeBody p{color:#665e55;line-height:1.55;font-size:13px}.meta{display:flex;gap:8px;flex-wrap:wrap;margin:13px 0}.meta span{background:#f1eadf;border-radius:999px;padding:6px 9px;font-size:10px;color:#6b5a4c;font-weight:800}.open{width:100%;border:0;border-radius:11px;padding:11px;background:#6c3a23;color:white;font-weight:900;cursor:pointer}.detail{display:none;padding:0 22px 22px}.recipe.opened .detail{display:block}.detail h3{font-size:14px;margin:15px 0 7px;color:#5c2e1c}.detail ul,.detail ol{margin:7px 0 0;padding-left:20px;color:#514a43;font-size:13px;line-height:1.65}.detail li{margin:4px 0}.tip{margin-top:14px;padding:11px 13px;border-left:3px solid var(--orange);background:#fff3e9;color:#77402b;font-size:12px;line-height:1.45}.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}.pair div{height:92px;border-radius:12px;background:linear-gradient(135deg,#eee2cf,#f9f3e8);display:grid;place-items:center;color:#927a65;font-size:10px;text-align:center;padding:10px}.pair b{display:block;color:#69452f;font-size:11px;margin-bottom:3px}
 .note{margin:0 auto 45px;padding:18px 20px;border:1px solid #d8d0c0;border-radius:16px;background:rgba(255,255,255,.58);max-width:760px;text-align:center;color:#655e56;font-size:13px;line-height:1.55}.footer{text-align:center;padding:20px 0 40px;color:#81786f;font-size:11px}.footer b{color:#332b25}
-@media(max-width:820px){.grid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.grid{grid-template-columns:1fr}.top{gap:12px}.hero{padding-top:25px}.recipeTop{min-height:135px}}
+@media(max-width:820px){.grid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.grid{grid-template-columns:1fr}.top{gap:12px}.hero{padding-top:22px}.hero .claim{line-height:1.15}.recipeTop{min-height:135px}}
 </style>
 </head>
 <body>
 <header class="top wrap"><a class="logo" href="./">Tankstellen<span>Ertrag</span></a><a class="back" href="./">← zurück</a></header>
 <main>
 <section class="hero wrap">
-<div class="eyebrow">DiniLove · Herbst</div>
-<h1>Kleine Rezepte.<br>Große Gemütlichkeit.</h1>
-<p>Hier sammelt Dini saisonale Ideen zum Nachmachen – warme Getränke, kleine Snacks und Rezepte, die einfach Spaß machen.</p>
+<div class="diniBadge"><span class="diniHeart">♥</span> DiniLove <span>für dein Bistro</span> <span class="diniHeart">♥</span></div>
+<div class="eyebrow">DiniLove · Herbst · Bistro-Ideen</div>
+<h1>DiniLove ❤️</h1>
+<div class="claim">Außergewöhnliche Rezeptideen für dein Bistro</div>
+<p class="intro">Kreative, saisonale Ideen, die aus einem normalen Bistro-Moment etwas Besonderes machen – von warmen Getränken bis zu kleinen Snacks.</p>
+<div class="spark">🍎 ✦ ☕ ✦ 🎃</div>
 <div class="filters"><button class="filter active" data-filter="all">Alle</button><button class="filter" data-filter="getraenk">Getränke</button><button class="filter" data-filter="snack">Snacks</button><button class="filter" data-filter="zubereitung">Zubereitung</button></div>
 </section>
 <section class="grid wrap">
@@ -43,9 +46,9 @@
 <div class="detail"><h3>Das brauchst du</h3><ul><li>200 ml Milch</li><li>30 ml Espresso</li><li>15 ml Kürbissirup (3 TL)</li><li>1 TL Zucker</li><li>1 Prise Zimt</li></ul><h3>So geht's</h3><ol><li>Espresso zubereiten und mit Kürbissirup und Zucker verrühren.</li><li>Milch bei kleiner Hitze erwärmen, ohne sie zu kochen.</li><li>Milch aufschäumen und zum Espresso gießen.</li><li>Mit Zimt bestreuen und kurz abkühlen lassen.</li></ol><div class="tip">Der Kürbis hat heute keinen Suppendienst. ☕🎃</div><div class="pair"><div><b>Seite 1</b>Zubereitung</div><div><b>Seite 2</b>Kürbis-Zimt-Latte</div></div></div>
 </article>
 </section>
-<div class="note wrap"><b>DiniLove wächst mit.</b><br>Die Rezeptkarten sind bewusst als eigener Bereich angelegt. Neue Rezepte können später saisonal, nach Kategorie und Zeitraum ergänzt werden – ohne Änderungen an der TankstellenErtrag-Kundenplattform.</div>
+<div class="note wrap"><b>DiniLove wächst mit.</b><br>Neue außergewöhnliche Rezeptideen können später saisonal, nach Kategorie und Zeitraum ergänzt werden – als eigener Bereich für dein Bistro.</div>
 </main>
-<footer class="footer">DiniLove ♥ · Kleine Ideen für gemütliche Momente</footer>
+<footer class="footer">DiniLove ❤️ · Außergewöhnliche Rezeptideen für dein Bistro</footer>
 <script>
 document.querySelectorAll('.open').forEach(btn=>btn.addEventListener('click',()=>{const card=btn.closest('.recipe');card.classList.toggle('opened');btn.textContent=card.classList.contains('opened')?'Rezept schließen':'Rezept öffnen'}));
 document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));btn.classList.add('active');const f=btn.dataset.filter;document.querySelectorAll('.recipe').forEach(card=>{card.style.display=f==='all'||card.dataset.cat.split(' ').includes(f)?'flex':'none'})}));
