@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   btn.onclick=e=>{e.stopPropagation();menu.classList.toggle('hidden')};
   document.getElementById('teLogin').onclick=()=>{menu.classList.add('hidden');login.click()};
   document.getElementById('teChoose').onclick=()=>picker.classList.toggle('hidden');
-  document.getElementById('teLogout').onclick=async()=>{await avatarClient.auth.signOut();location.reload()};
+  document.getElementById('teLogout').onclick=async()=>{await avatarClient.auth.signOut({scope:'local'});location.reload()};
   picker.querySelectorAll('button').forEach(b=>b.onclick=async()=>{const {error}=await avatarClient.auth.updateUser({data:{avatar:b.dataset.avatar}});if(error)return;const {data}=await avatarClient.auth.getUser();render({user:data.user});picker.classList.add('hidden')});
   document.addEventListener('click',e=>{if(!menu.contains(e.target)&&e.target!==btn)menu.classList.add('hidden')});
   avatarClient.auth.onAuthStateChange((_event,session)=>render(session));
