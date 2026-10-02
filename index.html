@@ -303,7 +303,7 @@ function resetProtectedViews(){
 }
 function openAuth(){ $('authView').classList.remove('hidden'); document.body.style.overflow='hidden'; setTimeout(()=>document.getElementById('email')?.focus(),50); }
 function closeAuth(){ $('authView').classList.add('hidden'); document.body.style.overflow=''; }
-$('navLogin').onclick=openAuth;$('heroLogin').onclick=openAuth;$('knowledgeLogin').onclick=openAuth;$('heroTest').onclick=openAuth;$('bottomTest').onclick=openAuth;$('monthlyPilotBtn')?.addEventListener('click',openAuth);
+$('navLogin').onclick=openAuth;$('heroLogin').onclick=openAuth;$('knowledgeLogin')?.addEventListener('click',openAuth);$('heroTest').onclick=openAuth;$('bottomTest').onclick=openAuth;$('monthlyPilotBtn')?.addEventListener('click',openAuth);
 $('closeAuth').onclick=closeAuth;
 
 if(client){
