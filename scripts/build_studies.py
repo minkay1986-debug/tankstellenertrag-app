@@ -3,39 +3,72 @@ from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from xml.etree import ElementTree as ET
 
-BASE = "https://app.tankstellenertrag.de"
+# TankstellenErtrag: nur belastbare Primär-/Institutsquellen.
+# Freie News/Blogs/SEO-Seiten werden NICHT als Beratungsstudien übernommen.
+APPROVED_SOURCES = {
+    "UNITI e.V.": {"domain": "uniti.de", "priority": 10, "kind": "Branchenverband / Primärerhebung"},
+    "EHI Retail Institute": {"domain": "ehi.org", "priority": 9, "kind": "Handelsforschungsinstitut"},
+    "IFH KÖLN": {"domain": "ifhkoeln.de", "priority": 8, "kind": "Handelsforschungsinstitut"},
+    "Statistisches Bundesamt (Destatis)": {"domain": "destatis.de", "priority": 10, "kind": "Amtliche Statistik"},
+}
 
-# Official sources receive higher trust. UNITI is explicitly included because
-# its Shop & Convenience work and annual tank-station survey are highly relevant
-# to the target audience.
-SOURCES = [
+# Kuratierte, verifizierte Anker. Diese Datensätze bilden die Mindestqualität,
+# selbst wenn Google News/RSS vorübergehend nichts liefert.
+VERIFIED = [
     {
-        "name": "UNITI e.V.",
-        "domain": "uniti.de",
-        "urls": [
-            "https://www.uniti.de/kommunikation/pressemitteilungen",
-            "https://www.uniti.de/politik/news",
-            "https://www.uniti.de/tankstellenerhebung",
-        ],
-        "priority": 10,
+        "title": "UNITI-Jahreserhebung 2026: Tankstellen stellen sich wirtschaftlich breiter auf",
+        "url": "https://www.uniti.de/kommunikation/pressemitteilungen/artikel/tankstellen-in-deutschland-stellen-sich-wirtschaftlich-immer-breiter-auf",
+        "date": "2026-01-15",
+        "source": "UNITI e.V.",
+        "type": "Branchenstudie / Jahreserhebung",
+        "summary": "UNITI berichtet über die aktuelle Jahreserhebung und die wirtschaftliche Bedeutung von Shop & Convenience sowie Carwash im Tankstellenmarkt.",
     },
     {
-        "name": "EHI Retail Institute",
-        "domain": "ehi.org",
-        "urls": [
-            "https://www.ehi.org/",
-        ],
-        "priority": 8,
+        "title": "Tankstellenerhebung zum Stichtag 1. Januar 2026",
+        "url": "https://www.uniti.de/tankstellenerhebung",
+        "date": "2026-01-01",
+        "source": "UNITI e.V.",
+        "type": "Branchenhebung",
+        "summary": "Offizielle UNITI-Tankstellenerhebung mit Angaben zur Struktur des Tankstellenmarktes und zur Entwicklung der betriebenen Stationen.",
+    },
+    {
+        "title": "Handelsgastronomie in Deutschland 2026",
+        "url": "https://www.ehi.org/produkt/whitepaper-handelsgastronomie-in-deutschland/",
+        "date": "2026-06-01",
+        "source": "EHI Retail Institute",
+        "type": "Handelsstudie",
+        "summary": "EHI-Studie zur Entwicklung der Handelsgastronomie mit Daten zu To-go, Snacks, Take-away, Frühstück und weiteren Foodservice-Themen; Tankstellen werden als Best-Practice-Bereich berücksichtigt.",
+    },
+    {
+        "title": "EHI-Laden-Monitor 2026",
+        "url": "https://www.ehi.org/produkt/studie-laden-monitor-2026-pdf/",
+        "date": "2026-01-01",
+        "source": "EHI Retail Institute",
+        "type": "Handelsstudie",
+        "summary": "EHI-Benchmarking-Studie zu Ladenplanung, Formatentwicklung, Investitionskennzahlen, Portfoliomanagement und Digitalstrategien im stationären Handel.",
+    },
+    {
+        "title": "Trend Check Handel Vol. 17",
+        "url": "https://www.ifhkoeln.de/teilen/trend-check-handel/",
+        "date": "2026-07-01",
+        "source": "IFH KÖLN",
+        "type": "Konsumentenstudie / Erhebung",
+        "summary": "IFH-KÖLN-Erhebung zu Konsumstimmung, Konsumtrends und Einkaufsverhalten im deutschen Handel.",
+    },
+    {
+        "title": "Umsatz im Einzelhandel nach Wirtschaftszweigen – einschließlich Tankstellen",
+        "url": "https://www.destatis.de/DE/Themen/Wirtschaft/Konjunkturindikatoren/Einzelhandel/hug220.html",
+        "date": "2026-01-01",
+        "source": "Statistisches Bundesamt (Destatis)",
+        "type": "Amtliche Statistik",
+        "summary": "Amtliche Konjunkturdaten mit einer eigenen Position für den Einzelhandel mit Motorenkraftstoffen (Tankstellen); Tankstellenumsätze umfassen dabei auch Tankstellenshop-Verkäufe.",
     },
 ]
 
 QUERIES = [
-    ("UNITI", "site:uniti.de Tankstelle Shop Convenience Studie Erhebung Kennzahlen"),
-    ("UNITI", "site:uniti.de Tankstellen Shop Sortiment Foodservice Studie"),
-    ("UNITI", "site:uniti.de Tankstellenerhebung Jahreserhebung"),
-    ("EHI", "site:ehi.org Tankstelle Convenience Shop Studie"),
-    ("Branche", "Tankstelle Shop Convenience Studie Deutschland"),
-    ("Branche", "Tankstellen Warenwirtschaft Sortiment Marge Studie"),
+    ("UNITI e.V.", "site:uniti.de (Studie OR Erhebung OR Jahreserhebung) Tankstelle Shop Convenience"),
+    ("EHI Retail Institute", "site:ehi.org (Studie OR Erhebung) Tankstelle Convenience Shop Foodservice"),
+    ("IFH KÖLN", "site:ifhkoeln.de (Studie OR Erhebung) Convenience Handel Konsum"),
 ]
 
 KEYWORDS = {
@@ -46,8 +79,10 @@ KEYWORDS = {
     "category management": 5, "merchandising": 4, "kundenbindung": 3,
 }
 
+STUDY_TERMS = ("studie", "erhebung", "survey", "monitor", "jahreserhebung", "kennzahl")
+
 def fetch(url):
-    req = urllib.request.Request(url, headers={"User-Agent": "TankstellenErtrag-StudyBot/1.0"})
+    req = urllib.request.Request(url, headers={"User-Agent": "TankstellenErtrag-StudyBot/2.0"})
     with urllib.request.urlopen(req, timeout=25) as r:
         return r.read()
 
@@ -73,8 +108,9 @@ def score(title, text, source_priority):
     hay = (title + " " + text).lower()
     return source_priority + sum(weight for key, weight in KEYWORDS.items() if key in hay)
 
-def rss_items(url, source_name, source_domain, source_priority):
+def rss_items(url, source_name):
     result = []
+    meta = APPROVED_SOURCES[source_name]
     try:
         root = ET.fromstring(fetch(url))
         for item in root.findall(".//item"):
@@ -82,64 +118,69 @@ def rss_items(url, source_name, source_domain, source_priority):
             link = item.findtext("link") or ""
             desc = clean(item.findtext("description"))
             pub = date_of(item.findtext("pubDate") or "")
-            s = score(title, desc, source_priority)
-            if title and link and s >= 12:
+            hay = (title + " " + desc).lower()
+            # Nur echte Studien-/Erhebungsbegriffe und nur freigegebene
+            # Instituts-/Verbandsquellen.
+            if not title or not link or not any(term in hay for term in STUDY_TERMS):
+                continue
+            if meta["domain"] not in urllib.parse.urlparse(link).netloc:
+                continue
+            s = score(title, desc, meta["priority"])
+            if s >= 16:
                 result.append({
                     "title": title,
                     "url": link,
                     "published": pub,
                     "summary": desc[:700],
                     "source": source_name,
-                    "domain": source_domain,
+                    "domain": meta["domain"],
                     "score": s,
+                    "type": "Branchenstudie / Erhebung",
                 })
     except Exception:
         pass
     return result
 
-def google_rss(query, source_name):
-    url = "https://news.google.com/rss/search?q=" + urllib.parse.quote(query) + "&hl=de&gl=DE&ceid=DE:de"
-    priority = next((s["priority"] for s in SOURCES if s["name"] == source_name), 5)
-    domain = next((s["domain"] for s in SOURCES if s["name"] == source_name), "")
-    return rss_items(url, source_name, domain, priority)
-
 items = {}
 
 for source_name, query in QUERIES:
-    for item in google_rss(query, source_name):
-        # Keep the best-scoring representation of the same URL.
+    rss_url = "https://news.google.com/rss/search?q=" + urllib.parse.quote(query) + "&hl=de&gl=DE&ceid=DE:de"
+    for item in rss_items(rss_url, source_name):
         old = items.get(item["url"])
         if old is None or item["score"] > old["score"]:
             items[item["url"]] = item
 
-# Add a direct UNITI source as a permanent anchor. This prevents the knowledge
-# base from depending solely on Google News indexing.
-uniti_anchor = {
-    "title": "UNITI-Jahreserhebung 2026: Tankstellen stellen sich wirtschaftlich breiter auf",
-    "url": "https://www.uniti.de/kommunikation/pressemitteilungen/artikel/tankstellen-in-deutschland-stellen-sich-wirtschaftlich-immer-breiter-auf",
-    "published": "2026-01-15T00:00:00+00:00",
-    "summary": "UNITI berichtet über die Jahreserhebung 2026 und die wachsende Bedeutung von Shop & Convenience sowie Carwash für Umsatz und Ertrag von Tankstellen.",
-    "source": "UNITI e.V.",
-    "domain": "uniti.de",
-    "score": 20,
-}
-items[uniti_anchor["url"]] = uniti_anchor
+# Verifizierte Anker immer behalten.
+for item in VERIFIED:
+    meta = APPROVED_SOURCES[item["source"]]
+    key = item["url"]
+    items[key] = {
+        **item,
+        "domain": meta["domain"],
+        "score": meta["priority"] + 20,
+        "verified": True,
+        "published": item["date"] + "T00:00:00+00:00",
+    }
 
-selected = sorted(items.values(), key=lambda x: (x["score"], x["published"]), reverse=True)[:50]
+selected = sorted(items.values(), key=lambda x: (x.get("verified", False), x["score"], x.get("published", "")), reverse=True)[:50]
 
 os.makedirs("studien", exist_ok=True)
 records = []
 for item in selected:
-    item["date"] = item["published"][:10] if item["published"] else ""
+    item["date"] = item.get("date") or item.get("published", "")[:10]
     item["slug"] = slug(item["title"])
-    item["type"] = "Branchenstudie / Erhebung" if any(k in (item["title"] + " " + item["summary"]).lower() for k in ["studie", "erhebung", "kennzahl", "jahreserhebung"]) else "Branchenwissen"
-    item["use"] = "Kontext"
-    item["evidence_rule"] = "Nicht als Beweis für eine konkrete Ursache der einzelnen Station verwenden."
     records.append({
-        k: item[k] for k in [
-            "title", "url", "date", "source", "domain", "type",
-            "summary", "score", "use", "evidence_rule"
-        ]
+        "title": item["title"],
+        "url": item["url"],
+        "date": item["date"],
+        "source": item["source"],
+        "domain": item["domain"],
+        "type": item["type"],
+        "summary": item["summary"],
+        "verified_source": bool(item.get("verified", False)),
+        "source_kind": APPROVED_SOURCES[item["source"]]["kind"],
+        "use": "Beratungskontext",
+        "evidence_rule": "Nur als Branchen-/Konsumentenkontext verwenden; niemals als Beweis für eine konkrete Ursache der einzelnen Station.",
     })
 
 with open("studien/studien.json", "w", encoding="utf-8") as f:
@@ -147,17 +188,18 @@ with open("studien/studien.json", "w", encoding="utf-8") as f:
 
 cards = []
 for r in records[:30]:
+    badge = "Verifizierte Quelle" if r["verified_source"] else "Geprüfte Institutsquelle"
     cards.append(
         '<article><div class="meta">' + html.escape(r["source"]) + ' · ' + html.escape(r["date"]) +
         '</div><h2>' + html.escape(r["title"]) + '</h2><p>' + html.escape(r["summary"]) +
-        '</p><div class="tag">Kontext – keine Ursachenbeweisführung</div><a href="' +
+        '</p><div class="tag">' + badge + ' · Beratungskontext</div><a href="' +
         html.escape(r["url"]) + '" rel="noopener noreferrer">Originalquelle öffnen →</a></article>'
     )
 
 page = '''<!doctype html><html lang="de"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Branchenstudien & Erhebungen | TankstellenErtrag</title>
-<meta name="description" content="Ausgewählte Branchenstudien, Erhebungen und Kennzahlen für Tankstellen, Shop und Convenience.">
+<meta name="description" content="Geprüfte Branchenstudien, Erhebungen und amtliche Kennzahlen für Tankstellen, Shop und Convenience.">
 <link rel="canonical" href="https://app.tankstellenertrag.de/studien/">
 <style>
 body{margin:0;background:#0d0f10;color:#f5f6f7;font-family:Inter,system-ui,sans-serif}
@@ -176,14 +218,14 @@ a{color:#ff9b4a;text-decoration:none}
 @media(max-width:750px){.grid{grid-template-columns:1fr}h1{font-size:32px}}
 </style></head><body><main>
 <div class="eyebrow">TankstellenErtrag · Branchenwissen</div>
-<h1>Studien, Erhebungen & Kennzahlen</h1>
-<p class="lead">Automatisch recherchierte Branchenquellen für den fachlichen Kontext. Stationsdaten bleiben die Grundlage der konkreten Analyse.</p>
+<h1>Geprüfte Studien, Erhebungen & Kennzahlen</h1>
+<p class="lead">Für die Beratung werden nur nachvollziehbare Primärquellen, etablierte Forschungsinstitute und amtliche Statistik berücksichtigt. Freie News, Blogs und unbelegte Aussagen werden nicht als Studienwissen übernommen.</p>
 <div class="grid">''' + "".join(cards) + '''</div>
-<div class="note"><strong>Wichtig:</strong> Branchenstudien liefern Vergleichswissen, Trends und mögliche Prüffelder. Sie werden nicht als Beweis für eine konkrete Ursache an einer einzelnen Station verwendet.</div>
+<div class="note"><strong>Beratungsregel:</strong> Branchenwissen liefert Vergleichswerte, Trends und Prüffelder. Die konkrete Stationsanalyse basiert auf den Stationsdaten. Eine Studie wird niemals als Beweis für eine konkrete Ursache an einer einzelnen Station verwendet.</div>
 <p style="margin-top:30px"><a href="../">← Zurück zu TankstellenErtrag</a></p>
 </main></body></html>'''
 
 with open("studien/index.html", "w", encoding="utf-8") as f:
     f.write(page)
 
-print(f"Generated {len(records)} study/context records")
+print(f"Generated {len(records)} verified study/context records")
