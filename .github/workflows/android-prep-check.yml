@@ -1,0 +1,47 @@
+name: Android preparation checks
+
+on:
+  push:
+    branches:
+      - android-play-prep
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-pwa-prep:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate web manifest
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path("site.webmanifest").read_text())
+          required = ["name", "short_name", "start_url", "scope", "display", "icons"]
+          missing = [k for k in required if k not in p]
+          assert not missing, f"Missing manifest keys: {missing}"
+          assert p["display"] == "standalone"
+          assert p["start_url"] == "/"
+          print("Manifest OK")
+
+          PY
+
+      - name: Check Android preparation files
+        run: |
+          test -f service-worker.js
+          test -f twa-manifest.json
+          test -f .well-known/assetlinks.json
+          grep -q "service-worker.js" index.html
+          grep -q "de.tankstellenertrag.app" twa-manifest.json
+          echo "Android preparation files OK"
+
+      - name: Validate JSON files
+        run: |
+          python -m json.tool site.webmanifest >/dev/null
+          python -m json.tool twa-manifest.json >/dev/null
+          python -m json.tool .well-known/assetlinks.json >/dev/null
+          echo "JSON OK"
