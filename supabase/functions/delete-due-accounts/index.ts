@@ -47,14 +47,29 @@ Deno.serve(async (req) => {
     const snapshotDelete = await admin.from("station_snapshots").delete().eq("station_id", station.id);
     if (snapshotDelete.error) { errors.push(station.station_name + ": station_snapshots: " + snapshotDelete.error.message); continue; }
 
-    const stationDelete = await admin.from("stations").delete().eq("id", station.id);
-    if (stationDelete.error) { errors.push(station.station_name + ": stations: " + stationDelete.error.message); continue; }
-
+    // Erst die fachlichen Datensätze löschen, die Station selbst bleibt bis zum
+    // erfolgreichen Auth-Löschschritt als Wiederholungsmarker erhalten.
     const pilotDelete = await admin.from("pilot_applications").delete().eq("user_id", uid);
     if (pilotDelete.error) { errors.push(station.station_name + ": pilot_applications: " + pilotDelete.error.message); continue; }
 
     const authDelete = await admin.auth.admin.deleteUser(uid);
-    if (authDelete.error) { errors.push(station.station_name + ": auth.users: " + authDelete.error.message); continue; }
+    if (authDelete.error) {
+      // Wenn der Auth-User bereits bei einem vorherigen Lauf gelöscht wurde,
+      // darf der Retry trotzdem mit der Stationsbereinigung fortfahren.
+      const status = Number((authDelete as any).status || 0);
+      const code = String((authDelete as any).code || "");
+      const alreadyGone = status === 404 || code === "user_not_found";
+      if (!alreadyGone) {
+        errors.push(station.station_name + ": auth.users: " + authDelete.error.message);
+        continue;
+      }
+    }
+
+    const stationDelete = await admin.from("stations").delete().eq("id", station.id);
+    if (stationDelete.error) {
+      errors.push(station.station_name + ": stations: " + stationDelete.error.message);
+      continue;
+    }
 
     deleted++;
   }
