@@ -22,7 +22,7 @@
 <main>
 <section class="hero wrap">
 <div class="diniBadge"><span class="diniHeart">♥</span> DiniLove <span>für dein Bistro</span> <span class="diniHeart">♥</span></div>
-<div class="eyebrow">DiniLove · Herbst · Bistro-Ideen</div>
+<div class="eyebrow" id="seasonLabel">DiniLove · saisonale Bistro-Ideen</div>
 <h1>DiniLove ❤️</h1>
 <div class="claim">Außergewöhnliche Rezeptideen für dein Bistro</div>
 <p class="intro">Kreative, saisonale Ideen, die aus einem normalen Bistro-Moment etwas Besonderes machen – von warmen Getränken bis zu kleinen Snacks.</p>
@@ -30,25 +30,101 @@
 <div class="filters"><button class="filter active" data-filter="all">Alle</button><button class="filter" data-filter="getraenk">Getränke</button><button class="filter" data-filter="snack">Snacks</button><button class="filter" data-filter="zubereitung">Zubereitung</button></div>
 </section>
 <section class="grid wrap">
-<article class="recipe" data-cat="getraenk zubereitung">
+<article class="recipe" data-season="herbst" data-cat="getraenk zubereitung">
   <div class="images"><img src="./dini-apfel-zimt-waermer-zubereitung.jpg" alt="Apfel-Zimt-Wärmer – Zubereitung"><img src="./dini-apfel-zimt-waermer.jpg" alt="Apfel-Zimt-Wärmer"></div>
-  <div class="recipeInfo"><div class="type">Herbst · Getränk</div><h2>Apfel-Zimt-Wärmer</h2><p>Warmer Apfelsaft mit Zimt, Orange und einem kleinen Spritzer Zitrone – gemütlich, saisonal und schnell im Bistro umgesetzt.</p><div class="meta"><span>🍎 Apfel</span><span>☕ warm</span><span>⏱ ca. 10 Min.</span></div></div>
+  <div class="recipeInfo"><div class="type">Herbst · Getränk</div><h2>Apfel-Zimt-Wärmer</h2><p>Warmer Apfelsaft mit Zimt, Orange und einem kleinen Spritzer Zitrone.</p><div class="meta"><span>🍎 Apfel</span><span>☕ warm</span></div></div>
 </article>
-<article class="recipe" data-cat="snack zubereitung">
+<article class="recipe" data-season="herbst" data-cat="snack zubereitung">
   <div class="images"><img src="./dini-apfel-streusel-zubereitung.jpg" alt="Apfel-Streusel im Becher – Zubereitung"><img src="./dini-apfel-streusel.jpg" alt="Apfel-Streusel im Becher"></div>
-  <div class="recipeInfo"><div class="type">Herbst · Snack</div><h2>Apfel-Streusel im Becher</h2><p>Warme Apfelwürfel und goldbraune Streusel im kleinen Förmchen – ein unkomplizierter süßer Bistro-Snack.</p><div class="meta"><span>🍏 Apfel</span><span>🍰 Dessert</span><span>⏱ ca. 30 Min.</span></div></div>
+  <div class="recipeInfo"><div class="type">Herbst · Snack</div><h2>Apfel-Streusel im Becher</h2><p>Warme Apfelwürfel und goldbraune Streusel als unkomplizierter süßer Bistro-Snack.</p><div class="meta"><span>🍏 Apfel</span><span>🍰 Dessert</span></div></div>
 </article>
-<article class="recipe" data-cat="getraenk zubereitung">
+<article class="recipe" data-season="herbst" data-cat="getraenk zubereitung">
   <div class="images"><img src="./dini-kuerbis-zimt-latte-zubereitung.jpg" alt="Kürbis-Zimt-Latte – Zubereitung"><img src="./dini-kuerbis-zimt-latte.jpg" alt="Kürbis-Zimt-Latte"></div>
-  <div class="recipeInfo"><div class="type">Herbst · Getränk</div><h2>Kürbis-Zimt-Latte</h2><p>Espresso, warme Milch, Kürbissirup und Zimt – eine kleine Herbstpause in der Tasse.</p><div class="meta"><span>🎃 Kürbis</span><span>☕ Espresso</span><span>⏱ ca. 8 Min.</span></div></div>
+  <div class="recipeInfo"><div class="type">Herbst · Getränk</div><h2>Kürbis-Zimt-Latte</h2><p>Espresso, warme Milch, Kürbissirup und Zimt – eine kleine Herbstpause in der Tasse.</p><div class="meta"><span>🎃 Kürbis</span><span>☕ Espresso</span></div></div>
+</article>
+
+<article class="recipe" data-season="halloween" data-cat="getraenk zubereitung">
+  <div class="images"><img src="./dini-vampir-kirschpunsch-zubereitung.jpg" alt="Vampir-Kirschpunsch – Zubereitung"><img src="./dini-vampir-kirschpunsch.jpg" alt="Vampir-Kirschpunsch"></div>
+  <div class="recipeInfo"><div class="type">Halloween · Getränk</div><h2>Vampir-Kirschpunsch</h2><p>Fruchtiger Kirschpunsch mit Orange und Zimt – alkoholfrei und herrlich gruselig.</p><div class="meta"><span>👻 Halloween</span><span>☕ warm</span></div></div>
+</article>
+<article class="recipe" data-season="halloween" data-cat="snack zubereitung">
+  <div class="images"><img src="./dini-mumien-toast-zubereitung.jpg" alt="Mumien-Toast – Zubereitung"><img src="./dini-mumien-toast.jpg" alt="Mumien-Toast"></div>
+  <div class="recipeInfo"><div class="type">Halloween · Snack</div><h2>Mumien-Toast</h2><p>Herzhafter Toast mit Schinken, Käse und Oliven – schnell gemacht und perfekt für Halloween.</p><div class="meta"><span>🎃 Snack</span><span>🧀 Käse</span></div></div>
+</article>
+
+<article class="recipe" data-season="winter" data-cat="snack zubereitung">
+  <div class="images"><img src="./dini-schoko-orangen-muffins-zubereitung.jpg" alt="Schoko-Orangen-Muffins – Zubereitung"><img src="./dini-schoko-orangen-muffins.jpg" alt="Schoko-Orangen-Muffins"></div>
+  <div class="recipeInfo"><div class="type">Winter · Snack</div><h2>Schoko-Orangen-Muffins</h2><p>Saftige Muffins mit Orange und Zartbitterschokolade – ideal für die kleine Winterpause.</p><div class="meta"><span>🍊 Orange</span><span>🍫 Schokolade</span></div></div>
+</article>
+
+<article class="recipe" data-season="weihnachten" data-cat="getraenk zubereitung">
+  <div class="images"><img src="./dini-bratapfel-weihnachtspunsch-zubereitung.jpg" alt="Bratapfel-Weihnachtspunsch – Zubereitung"><img src="./dini-bratapfel-weihnachtspunsch.jpg" alt="Bratapfel-Weihnachtspunsch"></div>
+  <div class="recipeInfo"><div class="type">Weihnachten · Getränk</div><h2>Bratapfel-Weihnachtspunsch</h2><p>Warmer Apfelpunsch mit Zimt, Vanille und Zitrone – alkoholfrei und weihnachtlich.</p><div class="meta"><span>🎄 Advent</span><span>☕ warm</span></div></div>
+</article>
+<article class="recipe" data-season="weihnachten" data-cat="snack zubereitung">
+  <div class="images"><img src="./dini-spekulatius-creme-zubereitung.jpg" alt="Spekulatius-Creme im Glas – Zubereitung"><img src="./dini-spekulatius-creme.jpg" alt="Spekulatius-Creme im Glas"></div>
+  <div class="recipeInfo"><div class="type">Weihnachten · Dessert</div><h2>Spekulatius-Creme im Glas</h2><p>Cremiges Dessert mit Quark, Sahne und Spekulatius – unkompliziert für das Bistro.</p><div class="meta"><span>🎄 Advent</span><span>🍨 Dessert</span></div></div>
+</article>
+<article class="recipe" data-season="weihnachten" data-cat="snack zubereitung">
+  <div class="images"><img src="./dini-mini-christstollen-zubereitung.jpg" alt="Mini-Christstollen – Zubereitung"><img src="./dini-mini-christstollen.jpg" alt="Mini-Christstollen"></div>
+  <div class="recipeInfo"><div class="type">Weihnachten · Gebäck</div><h2>Mini-Christstollen</h2><p>Kleine Quarkstollen mit Rosinen, Mandeln und Orangeat – Weihnachten in kleinen Bissen.</p><div class="meta"><span>🎄 Weihnachten</span><span>🥮 Gebäck</span></div></div>
+</article>
+
+<article class="recipe" data-season="silvester" data-cat="getraenk zubereitung">
+  <div class="images"><img src="./dini-goldener-gluecksdrink-zubereitung.jpg" alt="Goldener Glücksdrink – Zubereitung"><img src="./dini-goldener-gluecksdrink.jpg" alt="Goldener Glücksdrink"></div>
+  <div class="recipeInfo"><div class="type">Silvester · Getränk</div><h2>Goldener Glücksdrink</h2><p>Mango, Orange und Zitrone als alkoholfreier Glücksdrink ohne Kohlensäure.</p><div class="meta"><span>🎆 Silvester</span><span>🥭 Mango</span></div></div>
+</article>
+<article class="recipe" data-season="silvester" data-cat="snack zubereitung">
+  <div class="images"><img src="./dini-glueckskeks-dessert-zubereitung.jpg" alt="Glückskeks-Dessert im Glas – Zubereitung"><img src="./dini-glueckskeks-dessert.jpg" alt="Glückskeks-Dessert im Glas"></div>
+  <div class="recipeInfo"><div class="type">Silvester · Dessert</div><h2>Glückskeks-Dessert im Glas</h2><p>Cremiges Dessert mit Quark, Sahne und Glückskeksen – passend zum Jahreswechsel.</p><div class="meta"><span>🎆 Silvester</span><span>🥠 Dessert</span></div></div>
 </article>
 </section>
 
 </main>
 <footer class="footer">DiniLove ❤️ · Außergewöhnliche Rezeptideen für dein Bistro</footer>
 <script>
-document.querySelectorAll('.open').forEach(btn=>btn.addEventListener('click',()=>{const card=btn.closest('.recipe');card.classList.toggle('opened');btn.textContent=card.classList.contains('opened')?'Rezept schließen':'Rezept öffnen'}));
-document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));btn.classList.add('active');const f=btn.dataset.filter;document.querySelectorAll('.recipe').forEach(card=>{const cats=(card.dataset.cat||'').split(' ');card.style.display=f==='all'||cats.includes(f)?'flex':'none'})}));
+const recipes=[...document.querySelectorAll('.recipe')];
+const label=document.getElementById('seasonLabel');
+
+function firstAdvent(year){
+  const d=new Date(year,10,27);
+  while(d.getDay()!==0)d.setDate(d.getDate()+1);
+  return d;
+}
+function getSeason(now=new Date()){
+  const y=now.getFullYear();
+  const halloweenStart=new Date(y,9,10);
+  const halloweenEnd=new Date(y,10,7,23,59,59);
+  const adventStart=new Date(firstAdvent(y));
+  adventStart.setDate(adventStart.getDate()-21);
+  const christmasEnd=new Date(y,11,9,23,59,59);
+  const silvesterStart=new Date(y,11,10);
+  const silvesterEnd=new Date(y,11,31,23,59,59);
+  const winterStart=new Date(y,0,1);
+  const winterEnd=new Date(y,2,20,23,59,59);
+  if(now>=halloweenStart&&now<=halloweenEnd)return 'halloween';
+  if(now>=adventStart&&now<=christmasEnd)return 'weihnachten';
+  if(now>=silvesterStart&&now<=silvesterEnd)return 'silvester';
+  if(now>=winterStart&&now<=winterEnd)return 'winter';
+  return 'herbst';
+}
+const season=getSeason();
+const names={herbst:'Herbst',halloween:'Halloween',winter:'Winter',weihnachten:'Weihnachten · Advent',silvester:'Silvester'};
+label.textContent='DiniLove · '+names[season]+' · Bistro-Ideen';
+
+function applyFilter(filter='all'){
+  recipes.forEach(card=>{
+    const active=card.dataset.season===season;
+    const matches=filter==='all'||(card.dataset.cat||'').split(' ').includes(filter);
+    card.style.display=active&&matches?'flex':'none';
+  });
+}
+document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',()=>{
+  document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilter(btn.dataset.filter);
+}));
+applyFilter();
 </script>
 </body>
 </html>
