@@ -28,10 +28,10 @@ VERIFIED = [
     {
         "title": "Handelsgastronomie in Deutschland 2026",
         "url": "https://www.ehi.org/produkt/studie-handelsgastronomie-deutschland-2026-pdf/",
-        "date": "2026-06-01",
+        "date": "2026-09-09",
         "source": "EHI Retail Institute",
         "type": "Handelsstudie",
-        "summary": "EHI-Studie zur Entwicklung der Handelsgastronomie mit Daten zu To-go, Snacks, Take-away, Frühstück und weiteren Foodservice-Themen; Tankstellen werden als Best-Practice-Bereich berücksichtigt.",
+        "summary": "EHI-Studie zur Entwicklung der Handelsgastronomie mit aktuellen Umsatzzahlen, Erfolgsfaktoren, Herausforderungen sowie Foodtrends und Wachstumstreibern; Tankstellen werden als Best-Practice-Bereich berücksichtigt.",
     },
     {
         "title": "EHI-Laden-Monitor 2026",
@@ -52,10 +52,10 @@ VERIFIED = [
     {
         "title": "Umsatz im Einzelhandel nach Wirtschaftszweigen – einschließlich Tankstellen",
         "url": "https://www.destatis.de/DE/Themen/Wirtschaft/Konjunkturindikatoren/Einzelhandel/hug220.html",
-        "date": "2026-01-01",
+        "date": "2026-10-01",
         "source": "Statistisches Bundesamt (Destatis)",
         "type": "Amtliche Statistik",
-        "summary": "Amtliche Konjunkturdaten mit einer eigenen Position für den Einzelhandel mit Motorenkraftstoffen (Tankstellen); Tankstellenumsätze umfassen dabei auch Tankstellenshop-Verkäufe.",
+        "summary": "Amtliche Konjunkturdaten zum Einzelhandel mit Motorenkraftstoffen (Tankstellen) mit aktuellen Monatswerten und Veränderungsraten.",
     },
 ]
 
