@@ -1,5 +1,18 @@
 [
   {
+    "title": "Umsatz im Einzelhandel nominal – Wirtschaftszweig Motorenkraftstoffe (Tankstellen)",
+    "url": "https://www.destatis.de/DE/Themen/Wirtschaft/Konjunkturindikatoren/Einzelhandel/hug220.html",
+    "date": "2026-10-01",
+    "source": "Statistisches Bundesamt (Destatis)",
+    "domain": "destatis.de",
+    "type": "Amtliche Statistik",
+    "summary": "Amtliche Konjunkturdaten zum Einzelhandel mit Motorenkraftstoffen (Tankstellen) mit aktuellen Monatswerten und Veränderungsraten.",
+    "verified_source": true,
+    "source_kind": "Amtliche Statistik",
+    "use": "Beratungskontext",
+    "evidence_rule": "Nur als Branchen-/Konsumentenkontext verwenden; niemals als Beweis für eine konkrete Ursache der einzelnen Station."
+  },
+  {
     "title": "UNITI-Jahreserhebung 2026: Tankstellen stellen sich wirtschaftlich breiter auf",
     "url": "https://www.uniti.de/kommunikation/pressemitteilungen/artikel/tankstellen-in-deutschland-stellen-sich-wirtschaftlich-immer-breiter-auf",
     "date": "2026-01-15",
@@ -35,19 +48,6 @@
     "summary": "IFH-KÖLN-Erhebung zu Konsumstimmung, Konsumtrends und Einkaufsverhalten im deutschen Handel.",
     "verified_source": true,
     "source_kind": "Handelsforschungsinstitut",
-    "use": "Beratungskontext",
-    "evidence_rule": "Nur als Branchen-/Konsumentenkontext verwenden; niemals als Beweis für eine konkrete Ursache der einzelnen Station."
-  },
-  {
-    "title": "Umsatz im Einzelhandel nominal – Wirtschaftszweig Motorenkraftstoffe (Tankstellen)",
-    "url": "https://www.destatis.de/DE/Themen/Wirtschaft/Konjunkturindikatoren/Einzelhandel/hug220.html",
-    "date": "2026-10-01",
-    "source": "Statistisches Bundesamt (Destatis)",
-    "domain": "destatis.de",
-    "type": "Amtliche Statistik",
-    "summary": "Amtliche Konjunkturdaten zum Einzelhandel mit Motorenkraftstoffen (Tankstellen) einschließlich aktueller Monatswerte und Veränderungsraten.",
-    "verified_source": true,
-    "source_kind": "Amtliche Statistik",
     "use": "Beratungskontext",
     "evidence_rule": "Nur als Branchen-/Konsumentenkontext verwenden; niemals als Beweis für eine konkrete Ursache der einzelnen Station."
   }
