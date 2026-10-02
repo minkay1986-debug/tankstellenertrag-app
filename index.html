@@ -109,6 +109,7 @@ if(location.hostname==='tankstellenertrag.de'||location.hostname==='www.tankstel
 }
 const cfg=window.TANKSTELLENERTRAG_SUPABASE||{};
 const client=(cfg.url&&cfg.publishableKey&&window.supabase)?window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:'tankstellenertrag-auth',storage:window.localStorage}}):null;
+window.TANKSTELLENERTRAG_CLIENT=client;
 const $=id=>document.getElementById(id);
 function status(msg,type=''){const el=$('status');if(el){el.className='status '+type;el.textContent=msg;}}
 function withTimeout(promise,ms,message='Die Anfrage an den Anmeldedienst hat zu lange gedauert.'){return Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error(message)),ms))]);}
