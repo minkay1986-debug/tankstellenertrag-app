@@ -10,10 +10,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const login = document.getElementById('navLogin');
   if (!nav || !login || !window.supabase || !window.TANKSTELLENERTRAG_SUPABASE) return;
 
-  const cfg = window.TANKSTELLENERTRAG_SUPABASE;
-  const avatarClient = window.supabase.createClient(cfg.url, cfg.publishableKey, {
-    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'tankstellenertrag-auth' }
-  });
+  const avatarClient = window.TANKSTELLENERTRAG_CLIENT;
+  if (!avatarClient) return;
 
   const wrap = document.createElement('div');
   wrap.className = 'te-profile';
