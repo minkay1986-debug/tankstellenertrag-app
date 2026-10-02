@@ -233,23 +233,9 @@ async function requestCancellation(){if(!client)return;const btn=$('cancelSubscr
 async function loadVisitorStats(){if(!client)return false;const {data,error}=await client.rpc('get_visitor_stats');if(error||!data)return false;const s=Array.isArray(data)?data[0]:data;if(!s)return false;$('statToday').textContent=Number(s.today||0).toLocaleString('de-DE');$('stat7').textContent=Number(s.last7||0).toLocaleString('de-DE');$('statMonth').textContent=Number(s.month||0).toLocaleString('de-DE');$('statApplications').textContent=Number(s.applications||0).toLocaleString('de-DE');return true}
 async function getStableSession(){
   if(!client)return null;
-  for(let i=0;i<8;i++){
-    const {data,error}=await client.auth.getSession();
-    if(error)throw error;
-    if(data?.session)return data.session;
-    await new Promise(r=>setTimeout(r,250));
-  }
-  try{
-    const raw=localStorage.getItem('tankstellenertrag-auth');
-    if(raw){
-      const stored=JSON.parse(raw);
-      if(stored?.access_token&&stored?.refresh_token){
-        const {data,error}=await client.auth.setSession({access_token:stored.access_token,refresh_token:stored.refresh_token});
-        if(!error&&data?.session)return data.session;
-      }
-    }
-  }catch(_e){}
-  return null;
+  const {data,error}=await client.auth.getSession();
+  if(error)throw error;
+  return data?.session||null;
 }
 async function boot(){
   trackVisitor();
@@ -305,13 +291,14 @@ $('navLogin').onclick=openAuth;$('heroLogin').onclick=openAuth;$('knowledgeLogin
 $('closeAuth').onclick=closeAuth;
 
 if(client){
-  client.auth.onAuthStateChange((event,session)=>{
+  client.auth.onAuthStateChange((event)=>{
     if(event==='SIGNED_OUT'){
       resetProtectedViews();
       status('Abgemeldet. Bitte anmelden oder ein Kundenkonto anlegen.');
-    }else if((event==='INITIAL_SESSION'||event==='SIGNED_IN')&&session){
-      setTimeout(()=>loadStation(session),0);
     }
+    // Keine Supabase-Abfragen innerhalb dieses Callbacks.
+    // Die Initialsitzung wird ausschließlich in boot() geladen; Login/Registrierung
+    // laden die Sitzung direkt nach dem erfolgreichen Auth-Vorgang.
   });
 }
 
