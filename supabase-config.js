@@ -76,6 +76,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     btn.className='te-profile-btn te-top-'+type;
     btn.innerHTML=avatarArt[type]||avatarArt.faucet;
   }
+  let mainSyncInFlight=false;
+  async function syncMainSession(session){
+    if(!session||typeof window.loadStation!=='function')return;
+    const dash=document.getElementById('dashboardView');
+    const admin=document.getElementById('adminView');
+    if(!dash||!dash.classList.contains('hidden')||(admin&&!admin.classList.contains('hidden')))return;
+    if(mainSyncInFlight)return;
+    mainSyncInFlight=true;
+    try{await window.loadStation(session);}catch(error){console.warn('Kundenbereich konnte nicht synchronisiert werden:',error?.message||error);}
+    finally{mainSyncInFlight=false;}
+  }
   function render(session){
     const u=session?.user;
     const type=u?.user_metadata?.avatar||'faucet';
@@ -93,7 +104,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   picker.querySelectorAll('button').forEach(b=>b.onclick=async()=>{const {error}=await avatarClient.auth.updateUser({data:{avatar:b.dataset.avatar}});if(error)return;const {data}=await avatarClient.auth.getUser();render({user:data.user});picker.classList.add('hidden')});
   document.addEventListener('click',e=>{if(!menu.contains(e.target)&&e.target!==btn)menu.classList.add('hidden')});
   avatarClient.auth.onAuthStateChange((_event,session)=>render(session));
-  const {data}=await avatarClient.auth.getSession();render(data?.session||null);
+  const {data}=await avatarClient.auth.getSession();render(data?.session||null);syncMainSession(data?.session||null);
 
   const pilotLabel=document.querySelector('.ctaSection .eyebrow');
   if(pilotLabel)pilotLabel.textContent='Pilotphase · 10 freie Plätze';
