@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#0d0f10"/><stop offset="0.58" stop-color="#171c20"/><stop offset="1" stop-color="#261d16"/>
+  </linearGradient>
+  <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#ff9b22"/><stop offset="1" stop-color="#f06e0a"/>
+  </linearGradient>
+  <filter id="shadow"><feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#000" flood-opacity=".35"/></filter>
+</defs>
+<rect width="1200" height="630" fill="url(#bg)"/>
+<circle cx="1050" cy="90" r="240" fill="#f47b20" opacity=".055"/>
+<circle cx="1100" cy="570" r="280" fill="#f47b20" opacity=".035"/>
+<rect x="74" y="74" width="482" height="482" rx="92" fill="#11171b" stroke="#f47b20" stroke-width="5" filter="url(#shadow)"/>
+<path d="M151 166 Q151 144 174 144 H400 L370 202 H282 L238 392 H170 L214 202 H130 Z" fill="url(#orange)"/>
+<path d="M326 216 H487 L458 268 H297 Z" fill="url(#orange)"/>
+<path d="M294 291 H445 L417 340 H282 Z" fill="#f4f6f7"/>
+<path d="M276 359 H413 L386 407 H264 Z" fill="#cfd5d8"/>
+<text x="620" y="252" fill="#f5f6f7" font-family="Arial,Helvetica,sans-serif" font-size="68" font-weight="800">Tankstellen<tspan fill="#f47b20">Ertrag</tspan></text>
+<text x="624" y="323" fill="#d6dce0" font-family="Arial,Helvetica,sans-serif" font-size="31" font-weight="500">Warenwirtschaft &amp; Ertragsanalyse</text>
+<text x="624" y="367" fill="#aeb6bc" font-family="Arial,Helvetica,sans-serif" font-size="24">für Tankstellen aus der Praxis</text>
+<rect x="624" y="424" width="330" height="2" fill="#f47b20" opacity=".75"/>
+<text x="624" y="468" fill="#f47b20" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700">ÜBERBLICK · ERTRAG · SHOP</text>
+</svg>
