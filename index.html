@@ -231,14 +231,37 @@ async function trackVisitor(){if(!client)return;try{const last=localStorage.getI
 async function loadPilotSlots(){if(!client)return;try{const {data,error}=await client.rpc('get_pilot_slots');if(error||!data)return;const s=Array.isArray(data)?data[0]:data;if(!s)return;const el=$('pilotSlotsText');const btn=$('monthlyPilotBtn');if(!el)return;const remaining=Math.max(0,Number(s.remaining||0));el.textContent=remaining>0?'Noch '+remaining+' Plätze verfügbar':'Pilotphase aktuell voll';if(btn){btn.disabled=remaining===0;btn.textContent=remaining>0?'Pilot werden →':'Pilotplätze vergeben';}}catch(e){}}
 async function requestCancellation(){if(!client)return;const btn=$('cancelSubscriptionBtn');if(!btn)return;if(!confirm('Möchtest du eine Kündigung für dein Kundenkonto anfragen? Die Kündigung wird anschließend von TankstellenErtrag bestätigt und zum vereinbarten Termin umgesetzt.'))return;btn.disabled=true;btn.textContent='Anfrage wird gesendet …';try{const {data,error}=await client.rpc('request_subscription_cancellation');if(error)throw error;status(data?.message||'Kündigungsanfrage wurde übermittelt.','ok');btn.textContent='Kündigung angefragt';}catch(e){status(e.message||String(e),'err');btn.disabled=false;btn.textContent='Kündigung anfragen';}}
 async function loadVisitorStats(){if(!client)return false;const {data,error}=await client.rpc('get_visitor_stats');if(error||!data)return false;const s=Array.isArray(data)?data[0]:data;if(!s)return false;$('statToday').textContent=Number(s.today||0).toLocaleString('de-DE');$('stat7').textContent=Number(s.last7||0).toLocaleString('de-DE');$('statMonth').textContent=Number(s.month||0).toLocaleString('de-DE');$('statApplications').textContent=Number(s.applications||0).toLocaleString('de-DE');return true}
+async function getStableSession(){
+  if(!client)return null;
+  for(let i=0;i<8;i++){
+    const {data,error}=await client.auth.getSession();
+    if(error)throw error;
+    if(data?.session)return data.session;
+    await new Promise(r=>setTimeout(r,250));
+  }
+  try{
+    const raw=localStorage.getItem('tankstellenertrag-auth');
+    if(raw){
+      const stored=JSON.parse(raw);
+      if(stored?.access_token&&stored?.refresh_token){
+        const {data,error}=await client.auth.setSession({access_token:stored.access_token,refresh_token:stored.refresh_token});
+        if(!error&&data?.session)return data.session;
+      }
+    }
+  }catch(_e){}
+  return null;
+}
 async function boot(){
   trackVisitor();
   loadPilotSlots();
   if(!client){status('Supabase ist noch nicht konfiguriert. Zuerst Projekt-URL und Publishable Key eintragen.','err');return;}
-  const {data,error}=await client.auth.getSession();
-  if(error){status(error.message,'err');return;}
-  if(data.session){await loadStation(data.session);return;}
-  status('Bereit. Bitte anmelden oder ein Kundenkonto anlegen.');
+  try{
+    const session=await getStableSession();
+    if(session){await loadStation(session);return;}
+    status('Keine gespeicherte Sitzung erkannt. Bitte anmelden.');
+  }catch(error){
+    status('Sitzung konnte beim Seitenaufruf nicht wiederhergestellt werden: '+(error.message||String(error)),'err');
+  }
 }
 let signupMode=false;
 function setSignupMode(v){signupMode=v;document.querySelectorAll('.signupField').forEach(el=>el.style.display=v?'block':'none');$('passwordHint')?.classList.toggle('hidden',!v);$('formTitle').textContent=v?'Konto registrieren':'Anmelden';$('formHint').textContent=v?'Pilotzugang anfragen und Kundenkonto anlegen.':'Mit Ihrem Kundenkonto anmelden.';if($('password2'))$('password2').value='';}
@@ -261,7 +284,7 @@ async function verifyAdminMfa(){
   try{const challenge=await client.auth.mfa.challenge({factorId:adminMfaFactorId});if(challenge.error)throw challenge.error;const verify=await client.auth.mfa.verify({factorId:adminMfaFactorId,challengeId:challenge.data.id,code});if(verify.error)throw verify.error;$('mfaPanel').classList.add('hidden');$('mfaCode').value='';$('mfaVerify').disabled=false;const {data:sessionData}=await client.auth.getSession();if(sessionData.session)await loadStation(sessionData.session);}catch(e){$('mfaMsg').className='status err mfaMsg';$('mfaMsg').textContent=e.message||String(e);$('mfaVerify').disabled=false;}
 }
 $('mfaVerify').onclick=verifyAdminMfa;
-$('logoutBtn').onclick=async()=>{if(client){setBusy(false);await client.auth.signOut();}};
+$('logoutBtn').onclick=async()=>{if(client){setBusy(false);await client.auth.signOut({scope:'local'});}};
 const originalLoadStation=loadStation;
 
 function resetProtectedViews(){
@@ -282,10 +305,12 @@ $('navLogin').onclick=openAuth;$('heroLogin').onclick=openAuth;$('knowledgeLogin
 $('closeAuth').onclick=closeAuth;
 
 if(client){
-  client.auth.onAuthStateChange((event)=>{
+  client.auth.onAuthStateChange((event,session)=>{
     if(event==='SIGNED_OUT'){
       resetProtectedViews();
       status('Abgemeldet. Bitte anmelden oder ein Kundenkonto anlegen.');
+    }else if((event==='INITIAL_SESSION'||event==='SIGNED_IN')&&session){
+      setTimeout(()=>loadStation(session),0);
     }
   });
 }
