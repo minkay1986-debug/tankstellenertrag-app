@@ -1,10 +1,19 @@
 {
   "name": "TankstellenErtrag",
   "short_name": "TankstellenErtrag",
+  "id": "/",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone"
+  ],
+  "orientation": "portrait-primary",
   "background_color": "#0d1418",
   "theme_color": "#0d1418",
+  "lang": "de-DE",
+  "description": "Warenwirtschaftliche Monatsanalyse für Tankstellenshops.",
   "icons": [
     {
       "src": "/assets/tankstellenertrag-icon.svg",
@@ -13,4 +22,4 @@
       "purpose": "any maskable"
     }
   ]
-}
+}\n
