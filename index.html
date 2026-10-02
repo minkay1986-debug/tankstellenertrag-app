@@ -144,8 +144,10 @@ async function loadStation(session){
     if(!cancelError && cancelData){
       cancellation=Array.isArray(cancelData)?cancelData[0]:cancelData;
       if(typeof cancellation==='string'){try{cancellation=JSON.parse(cancellation)}catch(_){cancellation=null}}
+    }else if(cancelError){
+      console.warn('Kündigungsstatus konnte nicht geladen werden:',cancelError.message||cancelError);
     }
-  }catch(_){}
+  }catch(e){console.warn('Kündigungsstatus konnte nicht geladen werden:',e.message||e)}
   $('stationCards').innerHTML=
     '<div class="card"><div class="label">Station</div><div class="value">'+esc(row.station_name||'—')+'</div><div class="small">'+esc(row.postcode||'')+' '+esc(row.city||'')+'</div></div>'+
     '<div class="card"><div class="label">Zugang</div><div class="value">'+(active?'Gründungspartner':activePaid?'Aktiv':esc(row.subscription_status||'—'))+'</div></div>'+
