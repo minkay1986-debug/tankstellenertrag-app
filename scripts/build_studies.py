@@ -137,6 +137,7 @@ def rss_items(url, source_name):
                     "source": source_name,
                     "domain": meta["domain"],
                     "score": s,
+                    "verified": True,
                     "type": "Branchenstudie / Erhebung",
                 })
     except Exception:
