@@ -233,6 +233,7 @@ async function loadStation(session){
   $('userLine').textContent='Angemeldet als '+(session.user.email||'Kundenkonto');
   const isAdmin=(session.user.email||'').toLowerCase()==='svenkrick@gmx.de';
   if(isAdmin){
+    $('cancelSubscriptionBtn')?.classList.add('hidden');
     status('Anmeldung erfolgreich – Admin-Sicherheit wird geprüft …','ok');
     const aal=await withTimeout(client.auth.mfa.getAuthenticatorAssuranceLevel(),10000,'Admin-Sicherheitsprüfung antwortet nicht.');
     if(aal.error){status('Admin-Sicherheitsprüfung fehlgeschlagen: '+aal.error.message,'err');return;}
@@ -240,7 +241,6 @@ async function loadStation(session){
     const factors=await withTimeout(client.auth.mfa.listFactors(),10000,'Admin-Faktoren konnten nicht geladen werden.');
     const verified=(factors.data?.totp||[]).find(x=>x.status==='verified');
     if(!verified){await showAdminMfaSetup();return;}
-    $('cancelSubscriptionBtn')?.classList.add('hidden');
     $('adminView').classList.remove('hidden');loadApplicants();loadVisitorStats();
     status('Administrator angemeldet – Besucherstatistik wird geladen.','ok');
     return;
