@@ -48,7 +48,7 @@ class MainActivity : Activity() {
         setContentView(webView)
 
         if (savedInstanceState == null) {
-            webView.loadUrl("https://app.tankstellenertrag.de/app.html")
+            webView.loadUrl("https://app.tankstellenertrag.de/")
         } else {
             webView.restoreState(savedInstanceState)
         }
