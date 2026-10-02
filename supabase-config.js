@@ -103,8 +103,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('teLogout').onclick=async()=>{await avatarClient.auth.signOut({scope:'local'});location.reload()};
   picker.querySelectorAll('button').forEach(b=>b.onclick=async()=>{const {error}=await avatarClient.auth.updateUser({data:{avatar:b.dataset.avatar}});if(error)return;const {data}=await avatarClient.auth.getUser();render({user:data.user});picker.classList.add('hidden')});
   document.addEventListener('click',e=>{if(!menu.contains(e.target)&&e.target!==btn)menu.classList.add('hidden')});
-  avatarClient.auth.onAuthStateChange((_event,session)=>{render(session);syncMainSession(session);});
-  const {data}=await avatarClient.auth.getSession();render(data?.session||null);syncMainSession(data?.session||null);
+  avatarClient.auth.onAuthStateChange((_event,session)=>{render(session);});
+  const {data}=await avatarClient.auth.getSession();render(data?.session||null);
 
   const pilotLabel=document.querySelector('.ctaSection .eyebrow');
   if(pilotLabel)pilotLabel.textContent='Pilotphase · 10 freie Plätze';
