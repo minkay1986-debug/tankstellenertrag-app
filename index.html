@@ -150,8 +150,9 @@ async function loadStation(session){
     '<div class="card"><div class="label">Station</div><div class="value">'+esc(row.station_name||'—')+'</div><div class="small">'+esc(row.postcode||'')+' '+esc(row.city||'')+'</div></div>'+
     '<div class="card"><div class="label">Zugang</div><div class="value">'+(active?'Gründungspartner':activePaid?'Aktiv':esc(row.subscription_status||'—'))+'</div></div>'+
     '<div class="card"><div class="label">Zugang bis</div><div class="value">'+(end?new Date(end).toLocaleDateString('de-DE'):'—')+'</div></div>';
-  const cancelRequested=cancellation && ['requested','pending'].includes(String(cancellation.status||'').toLowerCase());
-  const cancelConfirmed=cancellation && ['confirmed','approved'].includes(String(cancellation.status||'').toLowerCase());
+  const cancelStatus=String(cancellation?.status||'').toLowerCase();
+  const cancelRequested=cancellation && ['requested','pending'].includes(cancelStatus);
+  const cancelConfirmed=cancellation && (['confirmed','approved'].includes(cancelStatus) || !!cancellation.requested_end_date);
   $('stationStatus').className='status '+(cancelConfirmed?'ok':cancelRequested?'':'');
   if(cancelConfirmed){
     const cancelEnd=cancellation.requested_end_date||cancellation.subscription_ends_at||row.subscription_ends_at;
