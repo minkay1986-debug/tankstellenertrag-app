@@ -16,6 +16,9 @@
 .note{margin:0 auto 45px;padding:18px 20px;border:1px solid #d8d0c0;border-radius:16px;background:rgba(255,255,255,.58);max-width:760px;text-align:center;color:#655e56;font-size:13px;line-height:1.55}.footer{text-align:center;padding:20px 0 40px;color:#81786f;font-size:11px}.footer b{color:#332b25}
 @media(max-width:820px){.grid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.grid{grid-template-columns:1fr}.top{gap:12px}.hero{padding-top:22px}.hero .claim{line-height:1.15}.recipeTop{min-height:135px}}
 </style>
+<style id="adventStyles">
+.adventCard{margin-bottom:18px}.adventCard>a{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:18px;padding:20px 22px;border:1px solid #d8c4aa;border-radius:20px;background:linear-gradient(135deg,#fffaf1,#f3eadc);color:var(--ink);text-decoration:none;box-shadow:0 12px 30px rgba(84,55,30,.09)}.adventIcon{font-size:46px}.adventEyebrow{font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--orange)}.adventCard h2{margin:4px 0 5px;color:#44261b;font-size:22px}.adventCard p{margin:0;color:#665e55;font-size:13px}.adventArrow{font-size:28px;color:var(--orange);font-weight:900}.adventCard>a:hover{transform:translateY(-1px);box-shadow:0 16px 36px rgba(84,55,30,.13)}.recipeGarage{margin-bottom:35px;border:1px dashed #cbbda9;border-radius:18px;background:rgba(255,255,255,.4);padding:12px}.recipeGarage summary{cursor:pointer;padding:10px 12px;color:#6b5a4c;font-weight:900;font-size:13px}.recipeGarage[open] summary{margin-bottom:8px}.recipeGarage .grid{padding-bottom:15px}@media(max-width:560px){.adventCard>a{grid-template-columns:auto 1fr;gap:12px}.adventArrow{grid-column:2}.adventCard h2{font-size:19px}}
+</style>
 </head>
 <body>
 <header class="top wrap"><a class="logo" href="./">Tankstellen<span>Ertrag</span></a><a class="back" href="./">← zurück</a></header>
@@ -27,9 +30,14 @@
 <div class="claim">Außergewöhnliche Rezeptideen für dein Bistro</div>
 <p class="intro">Kreative, saisonale Ideen, die aus einem normalen Bistro-Moment etwas Besonderes machen – von warmen Getränken bis zu kleinen Snacks.</p>
 <div class="spark">🍎 ✦ ☕ ✦ 🎃</div>
+<section class="adventCard wrap">
+<a href="https://dinilove-rezept-advent.nadine-geller.chatgpt.site/" target="_blank" rel="noopener noreferrer">
+<div class="adventIcon">🎄</div><div><div class="adventEyebrow">Ab Dezember 2026</div><h2>DiniLove Rezept-Adventskalender</h2><p>24 Türchen · 24 Rezepte · jeden Tag eine neue Überraschung.</p></div><span class="adventArrow">→</span>
+</a>
+</section>
 <div class="filters"><button class="filter active" data-filter="all">Alle</button><button class="filter" data-filter="getraenk">Getränke</button><button class="filter" data-filter="snack">Snacks</button><button class="filter" data-filter="zubereitung">Zubereitung</button></div>
 </section>
-<section class="grid wrap">
+<details class="recipeGarage wrap"><summary>🧰 Rezept-Garage · bisherige Rezepte</summary><div class="grid">
 <article class="recipe" data-season="herbst" data-cat="getraenk zubereitung">
   <div class="images"><img src="./dini-apfel-zimt-waermer-zubereitung.jpg" alt="Apfel-Zimt-Wärmer – Zubereitung"><img src="./dini-apfel-zimt-waermer.jpg" alt="Apfel-Zimt-Wärmer"></div>
   <div class="recipeInfo"><div class="type">Herbst · Getränk</div><h2>Apfel-Zimt-Wärmer</h2><p>Warmer Apfelsaft mit Zimt, Orange und einem kleinen Spritzer Zitrone.</p><div class="meta"><span>🍎 Apfel</span><span>☕ warm</span></div></div>
@@ -78,7 +86,7 @@
   <div class="images"><img src="./dini-glueckskeks-dessert-zubereitung.jpg" alt="Glückskeks-Dessert im Glas – Zubereitung"><img src="./dini-glueckskeks-dessert.jpg" alt="Glückskeks-Dessert im Glas"></div>
   <div class="recipeInfo"><div class="type">Silvester · Dessert</div><h2>Glückskeks-Dessert im Glas</h2><p>Cremiges Dessert mit Quark, Sahne und Glückskeksen – passend zum Jahreswechsel.</p><div class="meta"><span>🎆 Silvester</span><span>🥠 Dessert</span></div></div>
 </article>
-</section>
+</div></details>
 
 </main>
 <footer class="footer">DiniLove ❤️ · Außergewöhnliche Rezeptideen für dein Bistro</footer>
