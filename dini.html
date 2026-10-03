@@ -20,10 +20,10 @@
 .adventCard{margin-bottom:18px}.adventCard>a{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:18px;padding:20px 22px;border:1px solid #d8c4aa;border-radius:20px;background:linear-gradient(135deg,#fffaf1,#f3eadc);color:var(--ink);text-decoration:none;box-shadow:0 12px 30px rgba(84,55,30,.09)}.adventIcon{font-size:46px}.adventEyebrow{font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--orange)}.adventCard h2{margin:4px 0 5px;color:#44261b;font-size:22px}.adventCard p{margin:0;color:#665e55;font-size:13px}.adventArrow{font-size:28px;color:var(--orange);font-weight:900}.adventCard>a:hover{transform:translateY(-1px);box-shadow:0 16px 36px rgba(84,55,30,.13)}.recipeGarage{margin-bottom:35px;border:1px dashed #cbbda9;border-radius:18px;background:rgba(255,255,255,.4);padding:12px}.recipeGarage summary{cursor:pointer;padding:10px 12px;color:#6b5a4c;font-weight:900;font-size:13px}.recipeGarage[open] summary{margin-bottom:8px}.recipeGarage .grid{padding-bottom:15px}@media(max-width:560px){.adventCard>a{grid-template-columns:auto 1fr;gap:12px}.adventArrow{grid-column:2}.adventCard h2{font-size:19px}}
 </style>
 <style id="seasonalDiniStyles">
-.seasonalAdvent,.seasonalGarage{display:none}
-body.season-recipes .seasonalGarage{display:block}
+.seasonalAdvent,.seasonalGarage{display:none}.dini-direct-recipes{display:grid}
+body.season-recipes .seasonalGarage{display:none!important}
 body.season-advent .seasonalAdvent{display:block}
-body.season-advent .seasonalGarage{display:none}
+body.season-advent .seasonalGarage{display:none!important}
 .seasonalNotice{margin:0 auto 18px;padding:12px 16px;border-radius:14px;background:#fff3e9;border:1px solid #e2c7b3;color:#77402b;text-align:center;font-size:12px;line-height:1.45}
 .adventLocked{opacity:.72;pointer-events:none;filter:grayscale(.25)}
 </style></head>
@@ -43,6 +43,21 @@ body.season-advent .seasonalGarage{display:none}
 </a>
 </section>
 <div class="filters"><button class="filter active" data-filter="all">Alle</button><button class="filter" data-filter="getraenk">Getränke</button><button class="filter" data-filter="snack">Snacks</button><button class="filter" data-filter="zubereitung">Zubereitung</button></div>
+</section>
+
+<section class="grid wrap dini-direct-recipes" aria-label="DiniLove Rezepte">
+<article class="recipe" data-cat="getraenk zubereitung">
+  <div class="images"><img src="./dini-apfel-zimt-waermer-zubereitung.jpg" alt="Apfel-Zimt-Wärmer – Zubereitung"><img src="./dini-apfel-zimt-waermer.jpg" alt="Apfel-Zimt-Wärmer"></div>
+  <div class="recipeInfo"><div class="type">Herbst · Getränk</div><h2>Apfel-Zimt-Wärmer</h2><p>Warmer Apfelsaft mit Zimt, Orange und einem kleinen Spritzer Zitrone.</p><div class="meta"><span>🍎 Apfel</span><span>☕ warm</span></div></div>
+</article>
+<article class="recipe" data-cat="snack zubereitung">
+  <div class="images"><img src="./dini-apfel-streusel-zubereitung.jpg" alt="Apfel-Streusel im Becher – Zubereitung"><img src="./dini-apfel-streusel.jpg" alt="Apfel-Streusel im Becher"></div>
+  <div class="recipeInfo"><div class="type">Herbst · Snack</div><h2>Apfel-Streusel im Becher</h2><p>Warme Apfelwürfel und goldbraune Streusel als unkomplizierter süßer Bistro-Snack.</p><div class="meta"><span>🍏 Apfel</span><span>🍰 Dessert</span></div></div>
+</article>
+<article class="recipe" data-cat="getraenk zubereitung">
+  <div class="images"><img src="./dini-kuerbis-zimt-latte-zubereitung.jpg" alt="Kürbis-Zimt-Latte – Zubereitung"><img src="./dini-kuerbis-zimt-latte.jpg" alt="Kürbis-Zimt-Latte"></div>
+  <div class="recipeInfo"><div class="type">Herbst · Getränk</div><h2>Kürbis-Zimt-Latte</h2><p>Espresso, warme Milch, Kürbissirup und Zimt – eine kleine Herbstpause in der Tasse.</p><div class="meta"><span>🎃 Kürbis</span><span>☕ Espresso</span></div></div>
+</article>
 </section>
 <details id="recipeGarage" class="recipeGarage wrap seasonalGarage"><summary>🧰 Rezept-Garage · bisherige Rezepte</summary><div class="grid">
 <article class="recipe" data-season="herbst" data-cat="getraenk zubereitung">
@@ -98,7 +113,7 @@ body.season-advent .seasonalGarage{display:none}
 </main>
 <footer class="footer">DiniLove ❤️ · Außergewöhnliche Rezeptideen für dein Bistro</footer>
 <script>
-const recipes=[...document.querySelectorAll('.recipe')];
+const recipes=[...document.querySelectorAll('.seasonalGarage .recipe')];
 const label=document.getElementById('seasonLabel');
 
 function firstAdvent(year){
