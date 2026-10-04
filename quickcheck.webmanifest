@@ -1,0 +1,17 @@
+{
+  "name": "TankstellenErtrag QuickCheck",
+  "short_name": "QuickCheck",
+  "start_url": "/quickcheck.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0d1418",
+  "theme_color": "#f47b20",
+  "icons": [
+    {
+      "src": "/assets/tankstellenertrag-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
