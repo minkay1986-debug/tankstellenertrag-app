@@ -28,7 +28,7 @@
 <div class="field"><label for="shrink">Schwund (€)</label><input id="shrink" type="number" min="0" step="10" placeholder="z. B. 1800"><small>Wenn Sie den Wert nicht kennen, können Sie 0 eingeben.</small></div>
 <div class="field"><label for="writeoff">Abschriften (€)</label><input id="writeoff" type="number" min="0" step="10" placeholder="z. B. 600"></div>
 <div class="field"><label for="stock">Aktueller Lagerbestand EK (€)</label><input id="stock" type="number" min="0" step="100" placeholder="z. B. 24000"></div>
-<button class="btn" id="check" type="button">QuickCheck auswerten</button><div class="testcount" id="testcount">0x getestet</div><div class="privacy">Ihre Eingaben im QuickCheck werden nicht gespeichert und nicht an unseren Server übertragen.</div>
+<button class="btn" type="button" onclick="runCheck()">QuickCheck auswerten</button><div class="privacy">Ihre Eingaben im QuickCheck werden nicht gespeichert und nicht an unseren Server übertragen.</div>
 </div>
 <div class="card result" id="result">
 <div class="eyebrow">Ihr Kurzprofil</div><h2 id="headline">Ergebnis</h2><div class="score"><strong id="score">–</strong><span id="scoreText">–</span></div>
@@ -40,47 +40,30 @@
 </main>
 <footer class="wrap footer">TankstellenErtrag · Warenwirtschaftliche Monatsanalyse · <a href="./impressum.html">Impressum</a> · <a href="./datenschutz.html">Datenschutz</a></footer>
 <script>
-(function(){
-  function byId(id){return document.getElementById(id);}
-  function num(id){var el=byId(id); return Math.max(0, Number(el && el.value) || 0);}
-  function pct(v){return v.toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';}
-  function getCount(){try{return Number(localStorage.getItem('tankstellenertrag_quickcheck_count')||0);}catch(e){return 0;}}
-  function setCount(v){try{localStorage.setItem('tankstellenertrag_quickcheck_count',String(v));}catch(e){}}
-  function runCheck(){
-    var rev=num('rev'), ek=num('ek'), sh=num('shrink'), wo=num('writeoff'), stock=num('stock');
-    setCount(getCount()+1);
-    byId('testcount').textContent=getCount()+'x getestet';
-    var result=byId('result');
-    result.classList.add('show');
-    if(!rev || !ek){
-      byId('headline').textContent='Noch nicht genug Daten';
-      byId('score').textContent='–';
-      byId('scoreText').textContent='Bitte mindestens Umsatz und EK eingeben.';
-      byId('signals').innerHTML='';
-      return;
-    }
-    var margin=(rev-ek)/rev*100, shrinkRate=sh/rev*100, writeRate=wo/rev*100, stockRate=stock/rev*100;
-    var risk=0, signals=[];
-    if(margin<25){risk+=2;signals.push(['critical','Marge deutlich prüfen','Die rechnerische Shop-Marge liegt bei '+pct(margin)+'. Prüfen Sie besonders EK, Verkaufspreise und Sortimentsmix.']);}
-    else if(margin<32){risk++;signals.push(['warn','Marge beobachten','Die rechnerische Shop-Marge liegt bei '+pct(margin)+'. Ein Monatsvergleich kann zeigen, ob sich die Marge verschlechtert.']);}
-    if(shrinkRate>=1.5){risk+=2;signals.push(['critical','Schwund als Prüffeld','Schwund entspricht '+pct(shrinkRate)+' des Shop-Umsatzes. Prüfen Sie Inventur, Buchungen, MHD, Verderb und Eigenverbrauch.']);}
-    else if(shrinkRate>=.8){risk++;signals.push(['warn','Schwund beobachten','Schwund entspricht '+pct(shrinkRate)+' des Shop-Umsatzes. Die Entwicklung über mehrere Monate ist besonders interessant.']);}
-    if(writeRate>=.8){risk++;signals.push(['warn','Abschriften prüfen','Abschriften entsprechen '+pct(writeRate)+' des Shop-Umsatzes. Prüfen Sie MHD, Abschriftenprozesse und Sortiment.']);}
-    if(stockRate>=30){risk++;signals.push(['warn','Kapitalbindung prüfen','Der Lagerbestand entspricht '+pct(stockRate)+' eines Monatsumsatzes. Prüfen Sie Drehung, Sortiment und Bestellmengen.']);}
-    if(!signals.length){signals.push(['good','Aktuell kein starkes Signal','Auf Basis der eingegebenen Werte ergibt sich kein deutliches Prüfsignal. Der Monatsvergleich bleibt trotzdem wichtig.']);}
-    var level=risk>=4?'hoch':risk>=2?'mittel':'niedrig';
-    byId('headline').textContent=level==='hoch'?'Mehrere Prüffelder erkannt':level==='mittel'?'Einige Punkte genauer ansehen':'Aktuell unauffälliges Kurzprofil';
-    byId('score').textContent=level.toUpperCase();
-    byId('scoreText').textContent='Erste Einordnung auf Basis Ihrer Eingaben';
-    byId('signals').innerHTML=signals.map(function(s){return '<div class="signal '+s[0]+'"><b>'+s[1]+'</b><span>'+s[2]+'</span></div>';}).join('');
-    try{result.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){result.scrollIntoView();}
+function runCheck() {
+  var rev = Number(document.getElementById('rev').value) || 0;
+  var ek = Number(document.getElementById('ek').value) || 0;
+  var result = document.getElementById('result');
+  var headline = document.getElementById('headline');
+  var score = document.getElementById('score');
+  var scoreText = document.getElementById('scoreText');
+  var signals = document.getElementById('signals');
+  result.classList.add('show');
+  if (rev <= 0 || ek <= 0) {
+    headline.textContent = 'Noch nicht genug Daten';
+    score.textContent = '–';
+    scoreText.textContent = 'Bitte mindestens Umsatz und EK eingeben.';
+    signals.innerHTML = '';
+    return false;
   }
-  function init(){
-    byId('testcount').textContent=getCount()+'x getestet';
-    byId('check').addEventListener('click',runCheck,false);
-  }
-  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init,false);}else{init();}
-})();
+  var margin = (rev - ek) / rev * 100;
+  var level = margin < 25 ? 'HOCH' : (margin < 32 ? 'MITTEL' : 'NIEDRIG');
+  headline.textContent = 'Erste Einordnung';
+  score.textContent = level;
+  scoreText.textContent = 'Rechnerische Shop-Marge: ' + margin.toFixed(1).replace('.', ',') + ' %';
+  signals.innerHTML = '<div class="signal"><b>Prüfsignal</b><span>Diese erste Einordnung ersetzt keine vollständige Monatsanalyse.</span></div>';
+  return false;
+}
 </script>
 </body>
 </html>
