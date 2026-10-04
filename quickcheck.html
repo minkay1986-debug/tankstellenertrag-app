@@ -42,8 +42,12 @@
 <script>
 const $=id=>document.getElementById(id), n=id=>Math.max(0,Number($(id).value)||0), pct=v=>v.toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %', eur=v=>v.toLocaleString('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0});
 const testKey='tankstellenertrag_quickcheck_count';
-function updateTestCount(){const v=Number(localStorage.getItem(testKey)||0);$('testcount').textContent=v+'x getestet';}\nupdateTestCount();
-$('check').onclick=()=>{\n localStorage.setItem(testKey,String(Number(localStorage.getItem(testKey)||0)+1));\n updateTestCount();
+function getTestCount(){try{return Number(localStorage.getItem(testKey)||0)}catch(e){return 0}}
+function updateTestCount(){try{$('testcount').textContent=getTestCount()+'x getestet'}catch(e){}}
+updateTestCount();
+$('check').onclick=()=>{ 
+ try{localStorage.setItem(testKey,String(getTestCount()+1));updateTestCount()}catch(e){}
+
  const rev=n('rev'),ek=n('ek'),sh=n('shrink'),wo=n('writeoff'),stock=n('stock');
  if(!rev||!ek){$('result').classList.add('show');$('headline').textContent='Noch nicht genug Daten';$('score').textContent='–';$('scoreText').textContent='Bitte mindestens Umsatz und EK eingeben.';$('signals').innerHTML='';return}
  const margin=(rev-ek)/rev*100, shrinkRate=sh/rev*100, writeRate=wo/rev*100, stockRate=stock/rev*100;
