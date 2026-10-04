@@ -47,12 +47,18 @@ create or replace function public.delete_admin_customer_feedback(
 )
 returns boolean
 language plpgsql
-security invoker
+security definer
 set search_path = ''
-as $$
+as $
 declare
   changed integer;
+  caller_email text;
 begin
+  caller_email := lower(coalesce(auth.jwt() ->> 'email', ''));
+  if caller_email <> 'svenkrick@gmx.de' then
+    raise exception 'Nicht autorisiert.';
+  end if;
+
   update public.station_snapshots
   set payload = jsonb_set(
     payload,
@@ -61,7 +67,7 @@ begin
       (
         select jsonb_agg(item)
         from jsonb_array_elements(coalesce(payload->'feedback','[]'::jsonb)) as item
-        where item->>'id' <> p_feedback_id
+        where trim(item->>'id') <> trim(p_feedback_id)
       ),
       '[]'::jsonb
     ),
@@ -69,18 +75,17 @@ begin
   ),
   updated_at = now()
   where station_id = p_station_id
-    and lower(coalesce(auth.jwt() ->> 'email', '')) = 'svenkrick@gmx.de'
     and jsonb_typeof(payload->'feedback') = 'array'
     and exists (
       select 1
       from jsonb_array_elements(payload->'feedback') as item
-      where item->>'id' = p_feedback_id
+      where trim(item->>'id') = trim(p_feedback_id)
     );
 
   get diagnostics changed = row_count;
   return changed = 1;
 end;
-$$;
+$;
 
 revoke execute on function public.get_admin_customer_feedback() from public;
 revoke execute on function public.get_admin_customer_feedback() from anon;
