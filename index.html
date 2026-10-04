@@ -214,16 +214,20 @@ async function loadCustomerFeedback(){
   if(!body||!statusEl||!client)return false;
   statusEl.className='status';statusEl.textContent='Kundenfeedback wird geladen …';body.innerHTML='';
   try{
-    const [snapRes,stationRes]=await Promise.all([
-      client.from('station_snapshots').select('station_id,payload,updated_at').order('updated_at',{ascending:false}),
-      client.from('stations').select('id,station_name,postcode,city')
-    ]);
-    if(snapRes.error)throw snapRes.error;
-    if(stationRes.error)throw stationRes.error;
-    const stations=new Map((stationRes.data||[]).map(s=>[s.id,s]));
+    /* Admin-Feedback wird über eine geschützte DB-Funktion gelesen.
+       Hintergrund: station_snapshots ist per RLS auf die jeweilige Station begrenzt. */
+    const {data:rpcData,error:rpcError}=await client.rpc('get_admin_customer_feedback');
+    if(rpcError)throw rpcError;
+    let snapshots=[];
+    if(Array.isArray(rpcData))snapshots=rpcData;
+    else if(typeof rpcData==='string'){try{snapshots=JSON.parse(rpcData)||[]}catch(_){snapshots=[]}}
+    const {data:stationData,error:stationError}=await client.from('stations').select('id,station_name,postcode,city');
+    if(stationError)throw stationError;
+    const stations=new Map((stationData||[]).map(s=>[s.id,s]));
     const rows=[];
-    (snapRes.data||[]).forEach(s=>{
-      const feedback=Array.isArray(s.payload?.feedback)?s.payload.feedback:[];
+    snapshots.forEach(s=>{
+      const payload=s?.payload||{};
+      const feedback=Array.isArray(payload.feedback)?payload.feedback:[];
       const station=stations.get(s.station_id)||{};
       feedback.forEach(f=>rows.push({station,stationId:s.station_id,...f}));
     });
