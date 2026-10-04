@@ -261,13 +261,15 @@ async function deleteCustomerFeedback(stationId,feedbackId){
       .eq('station_id',stationId)
       .maybeSingle();
     if(readError)throw readError;
-    if(!snapshot)throw new Error('Stationsdaten wurden nicht gefunden.');
+    if(!snapshot)throw new Error('Stationsdaten wurden nicht gefunden. stationId='+stationId);
     const payload=snapshot.payload&&typeof snapshot.payload==='object'?JSON.parse(JSON.stringify(snapshot.payload)):{};
     const feedback=Array.isArray(payload.feedback)?payload.feedback:[];
+    const wanted=String(feedbackId||'').trim();
+    const ids=feedback.map(item=>String(item?.id||'').trim()).filter(Boolean);
     const before=feedback.length;
-    payload.feedback=feedback.filter(item=>String(item?.id||'').trim()!==String(feedbackId).trim());
+    payload.feedback=feedback.filter(item=>String(item?.id||'').trim()!==wanted);
     if(payload.feedback.length===before){
-      throw new Error('Der Feedback-Eintrag wurde in den Stationsdaten nicht gefunden.');
+      throw new Error('Feedback-ID nicht gefunden. stationId='+stationId+' · id='+wanted+' · Einträge im Snapshot='+before+' · vorhandene IDs='+ids.slice(0,10).join(', '));
     }
     const {error:updateError}=await client.from('station_snapshots')
       .update({payload,updated_at:new Date().toISOString()})
