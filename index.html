@@ -261,6 +261,11 @@ async function deleteCustomerFeedback(stationId,feedbackId){
     $('feedbackAdminStatus').textContent='Löschen fehlgeschlagen: '+(error.message||String(error));
     return;
   }
+  if(data!==true){
+    $('feedbackAdminStatus').className='status err';
+    $('feedbackAdminStatus').textContent='Löschen nicht ausgeführt: Der Feedback-Eintrag wurde in der Station nicht gefunden. Bitte erneut versuchen.';
+    return;
+  }
   $('feedbackAdminStatus').className='status ok';
   $('feedbackAdminStatus').textContent='Kundenbewertung wurde gelöscht.';
   await loadCustomerFeedback();
