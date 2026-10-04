@@ -84,7 +84,7 @@ function runCheck() {
   if(shrinkRate>=1.5) risks.push({rank:4,title:'Schwund',text:'Schwund entspricht '+one(shrinkRate)+' des Shop-Umsatzes. Prüfen Sie Inventur, Buchungen, MHD, Verderb und Eigenverbrauch.'});
   else if(shrinkRate>=.8) risks.push({rank:2,title:'Schwund',text:'Schwund entspricht '+one(shrinkRate)+' des Shop-Umsatzes. Besonders die Entwicklung über mehrere Monate ist interessant.'});
   if(writeRate>=.8) risks.push({rank:2,title:'Abschriften',text:'Abschriften entsprechen '+one(writeRate)+' des Shop-Umsatzes. Prüfen Sie MHD, Abschriftenprozesse und Sortiment.'});
-  if(stockRate>=30) risks.push({rank:2,title:'Lagerbestand',text:'Der Lagerbestand entspricht '+one(stockRate)+' eines Monatsumsatzes. Prüfen Sie Drehung, Sortiment und Bestellmengen.'});
+  if(stockRate>=30) risks.push({rank:2,title:'Lagerbestand',text:'Der Lagerbestand entspricht '+one(stockRate)+' des monatlichen Shop-Umsatzes. Das kann auf eine relativ hohe Kapitalbindung im Warenbestand hindeuten. Prüfen Sie Drehung, Sortiment und Bestellmengen.'});
 
   var level = risks.some(function(r){return r.rank===4;}) ? 'HOCH' : (risks.length ? 'MITTEL' : 'NIEDRIG');
   headline.textContent = level==='HOCH' ? 'Mehrere bzw. starke Prüffelder erkannt' : level==='MITTEL' ? 'Einige Punkte genauer ansehen' : 'Aktuell unauffälliges Kurzprofil';
