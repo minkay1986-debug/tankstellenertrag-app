@@ -309,14 +309,10 @@ async function forecastOpenDataEvents(k,city){try{
   box.innerHTML='📍 Freie Veranstaltungsdaten werden geprüft …';
   const start=new Date(k+'-01T00:00:00'); const next=new Date(start); next.setMonth(next.getMonth()+1);
   const cityNorm=String(city||'').trim().toLowerCase();
+  // Nur aktuell lizenzgeprüfte Quellen werden aktiv abgerufen.
+  // Keine Events werden lokal gespeichert oder als historischer Bestand übernommen.
   const sources=[
-    {state:'Bayern',name:'BayernCloud Tourismus',url:null,license:'DATENSATZ_PRUEFEN'},
-    {state:'Baden-Württemberg',name:'Open Data-Pool Baden-Württemberg',url:null,license:'CC0_CC-BY_CC-BY-SA'},
-    {state:'Sachsen',name:'SaTourN / Open Data Finder',url:null,license:'CC_COMMERCIAL'},
-    {state:'Niedersachsen',name:'Niedersachsen-Hub',url:null,license:'DATENSATZ_PRUEFEN'},
-    {state:'Hessen',name:'Content-Hub Hessen',url:null,license:'DATENSATZ_PRUEFEN'},
-    {state:'Rheinland-Pfalz',name:'rlpDirekt',url:'https://open-rlp.egovernor.de/metaData/event/data',license:'DL-DE-ZERO'},
-    {state:'Bundesweit',name:'GovData – freie Veranstaltungsdaten',url:null,license:'FREIE_NUTZUNG'}
+    {state:'Rheinland-Pfalz',name:'rlpDirekt',url:'https://open-rlp.egovernor.de/metaData/event/data',license:'DL-DE-ZERO'}
   ];
   const norm=(e,src)=>{const loc=e.location||e.venue||e.customVenue||{};return {name:e.name||e.DocName||e.title||'Veranstaltung',start:e.startDate||e.Start||e.start||e.date,city:e.city||e.addressLocality||loc.city||loc.addressLocality||e.Ort||src};};
   const all=[];
@@ -330,7 +326,7 @@ async function forecastOpenDataEvents(k,city){try{
   }
   const hits=all.slice(0,8);
   if(!hits.length){box.innerHTML='📍 Keine passenden freien Veranstaltungsdaten für diesen Monat gefunden. <span class="small">Die freien Quellen werden schrittweise erweitert.</span>';return;}
-  box.innerHTML='<b>📍 Regionale Veranstaltungen</b><div class="small" style="margin-top:6px">Mögliche lokale Einflussfaktoren – bitte prüfen:</div>'+hits.map(e=>'<div class="card" style="margin-top:8px"><b>'+String(e.name).replace(/[<>]/g,'')+'</b><div class="small">'+new Date(e.start).toLocaleDateString('de-DE')+'</div></div>').join('')+'<div class="small" style="margin-top:8px">Freie Open-Data-Quellen · BayernCloud-Objekte werden nur verwendet, wenn deren jeweilige Objektlizenz (z. B. CC0/CC BY/CC BY-SA) die Nutzung erlaubt.</div>';
+  box.innerHTML='<b>📍 Regionale Veranstaltungen</b><div class="small" style="margin-top:6px">Mögliche lokale Einflussfaktoren – bitte prüfen:</div>'+hits.map(e=>'<div class="card" style="margin-top:8px"><b>'+String(e.name).replace(/[<>]/g,'')+'</b><div class="small">'+new Date(e.start).toLocaleDateString('de-DE')+'</div></div>').join('')+'<div class="small" style="margin-top:8px">Nur aktuell lizenzgeprüfte Open-Data-Quellen werden abgerufen. Keine Veranstaltungsdaten werden dauerhaft gespeichert.</div>';
 }catch(e){const box=document.getElementById('forecastEvents');if(box)box.innerHTML='📍 Veranstaltungsdaten derzeit nicht abrufbar. Die Prognose funktioniert weiterhin ohne diesen Faktor.';}}
 function forecastCalendarFactors(k,city){
 const y=Number(String(k).slice(0,4)),m=Number(String(k).slice(5,7)),easter=year=>{const a=year%19,b=Math.floor(year/100),cc=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(cc/4),j=cc%4,l=(32+2*e+2*i-h-j)%7,mm=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*mm+114)/31),day=((h+l-7*mm+114)%31)+1;return new Date(Date.UTC(year,mo-1,day))},add=(d,n)=>{const x=new Date(d);x.setUTCDate(x.getUTCDate()+n);return x},inMonth=d=>d.getUTCMonth()+1===m,pc=String(station?.postcode||''),cityL=String(city||'').toLowerCase();
