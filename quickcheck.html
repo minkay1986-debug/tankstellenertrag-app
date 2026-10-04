@@ -91,6 +91,33 @@ function runCheck() {
   score.textContent = level;
   scoreText.textContent = 'Erste Einordnung auf Basis Ihrer Monatswerte';
 
+  // Regelbasierte Ursachenanalyse: mehrere Kennzahlen werden miteinander verknüpft,
+  // damit aus einer Auffälligkeit konkrete, nachvollziehbare Prüfhinweise werden.
+  var causes = [];
+  function addCause(title,text,rank){causes.push({title:title,text:text,rank:rank||1});}
+
+  if(shrinkRate>=1.5 && stockRate>=30 && writeRate>=.8)
+    addCause('Mögliche Ursache: Bestand / Warenrotation','Schwund, Lagerbestand und Abschriften sind gleichzeitig erhöht. Prüfen Sie zuerst MHD, Warenrotation, Bestellmengen und Inventurbuchungen.',4);
+  else if(shrinkRate>=1.5 && stockRate>=30)
+    addCause('Mögliche Ursache: hoher Bestand','Der erhöhte Schwund tritt zusammen mit einem relativ hohen Lagerbestand auf. Prüfen Sie Warenrotation, Bestellmengen, Lagerdisziplin und Inventurbuchungen.',3);
+  else if(shrinkRate>=1.5 && writeRate>=.8)
+    addCause('Mögliche Ursache: MHD / Abschriften','Schwund und Abschriften sind gleichzeitig auffällig. Prüfen Sie MHD, Verderb, Abschriftenprozesse und die betroffenen Warengruppen.',3);
+  else if(shrinkRate>=1.5)
+    addCause('Mögliche Ursache: Bestandsdifferenzen','Der Schwund ist deutlich auffällig. Prüfen Sie Inventur, Buchungen, Eigenverbrauch, Verderb und mögliche Differenzen bei Wareneingang bzw. Bestand.',3);
+
+  if(margin<25 && ek/rev>=.70)
+    addCause('Mögliche Ursache: hoher Wareneinsatz','Die niedrige Shop-Marge geht mit einem hohen Wareneinsatz einher. Prüfen Sie Einkaufspreise, Verkaufspreise, Preisnachlässe und den Sortimentsmix.',4);
+  else if(margin<32 && ek/rev>=.68)
+    addCause('Mögliche Ursache: Wareneinsatz / Sortimentsmix','Die Marge ist eher niedrig und der Wareneinsatz relativ hoch. Prüfen Sie Einkaufskonditionen, Verkaufspreise und margenstarke Warengruppen.',2);
+
+  if(writeRate>=.8 && stockRate>=30)
+    addCause('Mögliche Ursache: zu langsame Warenrotation','Hohe Abschriften treffen auf einen hohen Bestand. Prüfen Sie insbesondere langsam drehende Artikel, Bestellmengen und MHD-gesteuerte Sortimente.',3);
+
+  if(margin<25 && shrinkRate>=1.5)
+    addCause('Mögliche Ursache: Ertrag wird doppelt belastet','Eine niedrige Marge trifft gleichzeitig auf hohen Schwund. Dadurch wird der Rohertrag zusätzlich belastet. Prüfen Sie zuerst die schwundstarken Warengruppen und deren Bestandsführung.',4);
+
+  causes.sort(function(a,b){return b.rank-a.rank;});
+
   var html = '<div class="metrics">';
   html += metric('Shop-Marge',one(margin),clsMargin());
   html += metric('Rohertrag',money(gross),'good');
@@ -108,6 +135,15 @@ function runCheck() {
     var top=risks[0];
     insight.textContent = 'Ihr wichtigstes aktuelles Prüffeld ist '+top.title+'. '+top.text;
   }
+
+  if(causes.length){
+    html += '<div class="insight" style="margin-top:16px"><b>Automatische Ursachenanalyse</b><span>';
+    html += causes.slice(0,3).map(function(c){
+      return '<strong style="display:block;color:#f5f6f7;margin-top:9px">'+c.title+'</strong><span style="display:block;margin-top:3px">'+c.text+'</span>';
+    }).join('');
+    html += '</span></div>';
+  }
+
   signals.innerHTML = html;
   return false;
 }
