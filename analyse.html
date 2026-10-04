@@ -312,7 +312,8 @@ async function forecastOpenDataEvents(k,city){try{
   const sources=[
     {name:'Ingolstadt',url:'https://ingolstadt.live/api/v1/events?startDate='+encodeURIComponent(start.toISOString())+'&endDate='+encodeURIComponent(next.toISOString())},
     {name:'Krefeld',url:'https://www.krefeld.de/www/event.nsf/apijson.xsp/view-event-month?compact=false'},
-    {name:'Geldern',url:'https://www.geldern.de/de/system/-preview-text/%26src1%3Djson-veranstaltung'}
+    {name:'Geldern',url:'https://www.geldern.de/de/system/-preview-text/%26src1%3Djson-veranstaltung'},
+    {name:'Moers',url:'https://www.moers.de/jsonapi/node/event?filter%5Bstatus%5D%5Bvalue%5D=1'}
   ];
   const norm=(e,src)=>{const loc=e.location||e.venue||e.customVenue||{};return {name:e.name||e.DocName||e.title||'Veranstaltung',start:e.startDate||e.Start||e.start||e.date,city:e.city||e.addressLocality||loc.city||loc.addressLocality||e.Ort||src};};
   const all=[];
