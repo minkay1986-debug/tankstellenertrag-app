@@ -86,7 +86,9 @@ function starOptions(name,value){
  return '<div class="stars" role="radiogroup" aria-label="'+esc(name)+'">'+[1,2,3,4,5].map(n=>'<label class="star"><input type="radio" name="'+name+'" value="'+n+'" '+(Number(value)===n?'checked':'')+'><span aria-hidden="true">★</span><span class="sr">'+n+'</span></label>').join('')+'</div>';
 }
 function feedback(){
- const k=month(), existing=(data.feedback||[]).find(x=>x.month===k)||{};
+ const k=month();
+ const all=Array.isArray(data.feedback)?data.feedback:[];
+ const existing=[...all].filter(x=>x&&x.month===k).pop()||{};
  $('feedbackForm').innerHTML=
  '<div class="feedback-grid">'+
  '<div class="field"><label>Gesamtzufriedenheit · 1–5 Sterne</label>'+starOptions('fbOverall',existing.overall)+'</div>'+
@@ -102,11 +104,18 @@ async function saveFeedback(){
  const get=n=>document.querySelector('input[name="'+n+'"]:checked')?.value||'';
  const overall=get('fbOverall'),usability=get('fbUsability'),analysisRating=get('fbAnalysis'),usefulness=get('fbUsefulness');
  if(!overall){$('feedbackMsg').innerHTML='<div class="alert danger"><strong>Bitte Bewertung abgeben</strong>Wählen Sie mindestens die Gesamtzufriedenheit mit 1–5 Sternen.</div>';return}
- const entry={month:month(),overall:Number(overall),usability:usability?Number(usability):null,analysis:analysisRating?Number(analysisRating):null,usefulness:usefulness?Number(usefulness):null,comment:$('fbComment').value.trim(),publishConsent:!!$('fbPublish').checked,updatedAt:new Date().toISOString()};
- data.feedback??=[];
- const idx=data.feedback.findIndex(x=>x.month===entry.month);
- if(idx>=0)data.feedback[idx]={...data.feedback[idx],...entry};else data.feedback.push(entry);
- try{await persist();$('feedbackMsg').innerHTML='<div class="alert ok"><strong>Vielen Dank!</strong>Ihr Feedback wurde gespeichert.</div>';feedback()}catch(e){$('feedbackMsg').innerHTML='<div class="alert danger"><strong>Speichern fehlgeschlagen</strong>'+esc(e.message||String(e))+'</div>'}
+ const updatedAt=new Date().toISOString();
+ const entry={id:'fb-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),month:month(),overall:Number(overall),usability:usability?Number(usability):null,analysis:analysisRating?Number(analysisRating):null,usefulness:usefulness?Number(usefulness):null,comment:$('fbComment').value.trim(),publishConsent:!!$('fbPublish').checked,updatedAt};
+ if(!Array.isArray(data.feedback))data.feedback=[];
+ data.feedback.push(entry);
+ try{
+   saveLocal();
+   await cloudSave();
+   $('feedbackMsg').innerHTML='<div class="alert ok"><strong>Vielen Dank!</strong>Ihr Feedback wurde in der Cloud gespeichert.</div>';
+   feedback();
+ }catch(e){
+   $('feedbackMsg').innerHTML='<div class="alert danger"><strong>Speichern fehlgeschlagen</strong>'+esc(e.message||String(e))+'</div>';
+ }
 }
 function account(){const end=station.founding_partner_free_until||station.subscription_ends_at||station.trial_ends_at;$('accountBody').innerHTML='<p><b>'+esc(station.station_name)+'</b></p><p class="small">'+esc(station.postcode)+' '+esc(station.city)+' · Zugang: '+esc(station.subscription_status)+' · bis '+(end?new Date(end).toLocaleDateString('de-DE'):'–')+'</p><div class="alert ok"><strong>Geschützte Cloud-Auswertung</strong>Die Daten dieser Station werden ausschließlich über das angemeldete Kundenkonto gelesen und gespeichert.</div><div class="actions"><button class="btn secondary" id="logout">Abmelden</button></div>';$('logout').onclick=async()=>{await sb.auth.signOut({scope:'local'});location.href='./'}}
 function renderAll(){dashboard();fill();analysis();insights();radar();yearly();economic();report();feedback();sources();settingsUI();loadSettingsUI();account()}
