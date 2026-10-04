@@ -256,33 +256,14 @@ async function deleteCustomerFeedback(stationId,feedbackId){
   if(!stationId||!feedbackId)return;
   if(!confirm('Diese Kundenbewertung wirklich dauerhaft löschen?'))return;
   try{
-    const {data:snapshot,error:readError}=await client.from('station_snapshots')
-      .select('payload')
-      .eq('station_id',stationId)
-      .maybeSingle();
-    if(readError)throw readError;
-    if(!snapshot)throw new Error('Stationsdaten wurden nicht gefunden. stationId='+stationId);
-    const payload=snapshot.payload&&typeof snapshot.payload==='object'?JSON.parse(JSON.stringify(snapshot.payload)):{};
-    const feedback=Array.isArray(payload.feedback)?payload.feedback:[];
     const wanted=String(feedbackId||'').trim();
-    const ids=feedback.map(item=>String(item?.id||'').trim()).filter(Boolean);
-    const before=feedback.length;
-    payload.feedback=feedback.filter(item=>String(item?.id||'').trim()!==wanted);
-    if(payload.feedback.length===before){
-      throw new Error('Feedback-ID nicht gefunden. stationId='+stationId+' · id='+wanted+' · Einträge im Snapshot='+before+' · vorhandene IDs='+ids.slice(0,10).join(', '));
-    }
-    const {data:updateData,error:updateError}=await client.from('station_snapshots')
-      .update({payload,updated_at:new Date().toISOString()})
-      .eq('station_id',stationId)
-      .select('station_id,payload');
-    if(updateError)throw updateError;
-    if(!Array.isArray(updateData)||updateData.length!==1){
-      throw new Error('Update wurde von Supabase nicht bestätigt. stationId='+stationId+' · betroffene Zeilen='+String(updateData?.length??0));
-    }
-    const savedPayload=updateData[0]?.payload&&typeof updateData[0].payload==='object'?updateData[0].payload:{};
-    const savedFeedback=Array.isArray(savedPayload.feedback)?savedPayload.feedback:[];
-    if(savedFeedback.some(item=>String(item?.id||'').trim()===wanted)){
-      throw new Error('Supabase meldet zwar Erfolg, aber die Bewertung ist weiterhin im Snapshot vorhanden. stationId='+stationId+' · id='+wanted);
+    const {data,error}=await client.rpc('delete_admin_customer_feedback',{
+      p_station_id:stationId,
+      p_feedback_id:wanted
+    });
+    if(error)throw error;
+    if(data!==true){
+      throw new Error('Supabase hat die Löschung nicht bestätigt. stationId='+stationId+' · id='+wanted);
     }
     $('feedbackAdminStatus').className='status ok';
     $('feedbackAdminStatus').textContent='Kundenbewertung wurde gelöscht.';
