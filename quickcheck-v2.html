@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tankstellen QuickCheck | Kostenloser Ertrags-Check</title>
+<meta name="description" content="Kostenloser Tankstellen QuickCheck: Shop-Umsatz, EK, Schwund und Bestand eingeben und erste wirtschaftliche Prüffelder erkennen. Ohne Konto.">
+<link rel="canonical" href="https://app.tankstellenertrag.de/quickcheck.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:title" content="Tankstellen QuickCheck | TankstellenErtrag">
+<meta property="og:description" content="In wenigen Minuten erkennen, welche wirtschaftlichen Bereiche Ihres Tankstellenshops genauer geprüft werden sollten.">
+<meta property="og:url" content="https://app.tankstellenertrag.de/quickcheck.html">
+<style>
+:root{--bg:#0d0f10;--p:#181c1f;--p2:#22272b;--line:#353c41;--t:#f5f6f7;--m:#aeb6bc;--o:#f47b20;--g:#45c477;--r:#ef6461}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#2a2119 0,#111416 38%,#0d0f10 72%);color:var(--t);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.top{padding:22px 0;border-bottom:1px solid var(--line)}.brand{font-weight:900;color:#fff;text-decoration:none;font-size:22px}.brand span{color:var(--o)}.hero{padding:50px 0 28px}.eyebrow{text-transform:uppercase;letter-spacing:.13em;color:#ff9b4a;font-size:11px;font-weight:900}.hero h1{font-size:44px;line-height:1.06;margin:10px 0 14px}.hero p{color:#d1d8dc;font-size:17px;line-height:1.6;max-width:780px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.card{background:rgba(24,28,31,.97);border:1px solid var(--line);border-radius:16px;padding:22px}.field{margin:0 0 14px}.field label{display:block;color:#cbd1d5;font-size:13px;margin-bottom:6px}.field small{display:block;color:#7f898f;font-size:11px;margin-top:4px}.field input{width:100%;padding:13px;border-radius:9px;border:1px solid #d9c1b1;background:#fff1e7;color:#171717;font-size:15px}.btn{border:0;border-radius:9px;padding:13px 18px;background:var(--o);color:#fff;font-weight:850;cursor:pointer;width:100%}.result{display:none}.result.show{display:block}.score{display:flex;align-items:center;gap:14px;padding:15px;border-radius:12px;background:#20262a;border:1px solid #353c41}.score strong{font-size:30px}.signal{margin-top:12px;padding:15px;border-radius:12px;border:1px solid #4a4038;background:#211c18}.signal b{display:block;margin-bottom:4px}.signal span{color:#cbd1d5;font-size:13px;line-height:1.5}.signal.warn{border-color:#76502e}.signal.critical{border-color:#7b3937;background:#251919}.testcount{margin-top:12px;color:#9aa3a9;font-size:11px;text-align:center}.privacy{margin-top:10px;color:#7f898f;font-size:11px;line-height:1.45;text-align:center}.note{margin-top:16px;color:#899298;font-size:11px;line-height:1.5}.actions{display:flex;gap:10px;margin-top:18px}.actions a{display:inline-block;text-decoration:none;text-align:center;padding:11px 14px;border-radius:9px;background:#30363a;color:#fff;font-weight:800;flex:1}.footer{padding:28px 0 45px;color:#737d83;font-size:11px}.footer a{color:#969fa6;text-decoration:none}@media(max-width:700px){.hero h1{font-size:35px}.grid{grid-template-columns:1fr}.actions{flex-direction:column}}
+</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"TankstellenErtrag QuickCheck","applicationCategory":"BusinessApplication","description":"Kostenloser Kurzcheck für wirtschaftliche Prüffelder im Tankstellenshop.","url":"https://app.tankstellenertrag.de/quickcheck.html","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}</script>
+</head>
+<body>
+<header class="top"><div class="wrap"><a class="brand" href="./">Tankstellen<span>Ertrag</span></a></div></header>
+<main class="wrap">
+<section class="hero"><div class="eyebrow">Kostenlos · ohne Konto</div><h1>Wo sollten Sie in Ihrem Shop genauer hinschauen?</h1><p>Der Tankstellen QuickCheck gibt Ihnen anhand weniger Kennzahlen ein erstes neutrales Signal. Er ersetzt keine vollständige Monatsanalyse – er zeigt nur, wo sich ein genauerer Blick lohnen kann.</p></section>
+<section class="grid">
+<div class="card">
+<h2>Ihre Monatswerte</h2>
+<div class="field"><label for="rev">Shop-Umsatz netto (€)</label><input id="rev" type="number" min="0" step="100" placeholder="z. B. 120000"></div>
+<div class="field"><label for="ek">Shop-EK / Wareneinsatz (€)</label><input id="ek" type="number" min="0" step="100" placeholder="z. B. 78000"></div>
+<div class="field"><label for="shrink">Schwund (€)</label><input id="shrink" type="number" min="0" step="10" placeholder="z. B. 1800"><small>Wenn Sie den Wert nicht kennen, können Sie 0 eingeben.</small></div>
+<div class="field"><label for="writeoff">Abschriften (€)</label><input id="writeoff" type="number" min="0" step="10" placeholder="z. B. 600"></div>
+<div class="field"><label for="stock">Aktueller Lagerbestand EK (€)</label><input id="stock" type="number" min="0" step="100" placeholder="z. B. 24000"></div>
+<button class="btn" type="button" onclick="runCheck()">QuickCheck auswerten</button><div class="privacy">Ihre Eingaben im QuickCheck werden nicht gespeichert und nicht an unseren Server übertragen.</div>
+</div>
+<div class="card result" id="result">
+<div class="eyebrow">Ihr Kurzprofil</div><h2 id="headline">Ergebnis</h2><div class="score"><strong id="score">–</strong><span id="scoreText">–</span></div>
+<div id="signals"></div>
+<div class="note">Die Ergebnisse sind bewusst als Prüfsignale formuliert. Ein auffälliger Wert beweist keine Ursache. Saison, Sortiment, Öffnungszeiten, Inventurzeitpunkt und betriebliche Besonderheiten können die Werte beeinflussen.</div>
+<div class="actions"><a href="./">Vollständige Analyse ansehen</a><a href="./warenwirtschaft-tankstelle.html">Mehr über Kennzahlen</a></div>
+</div>
+</section>
+</main>
+<footer class="wrap footer">TankstellenErtrag · Warenwirtschaftliche Monatsanalyse · <a href="./impressum.html">Impressum</a> · <a href="./datenschutz.html">Datenschutz</a></footer>
+<script>
+function runCheck(){
+  function byId(id){return document.getElementById(id);}
+  function num(id){var e=byId(id);return Math.max(0,Number(e&&e.value)||0);}
+  function pct(v){return v.toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1})+" %";}
+  function runCheck(){
+    var rev=num('rev'), ek=num('ek'), sh=num('shrink'), wo=num('writeoff'), stock=num('stock');
+    setCount(getCount()+1);
+    byId('testcount').textContent=getCount()+'x getestet';
+    var result=byId('result');
+    result.classList.add('show');
+    if(!rev || !ek){
+      byId('headline').textContent='Noch nicht genug Daten';
+      byId('score').textContent='–';
+      byId('scoreText').textContent='Bitte mindestens Umsatz und EK eingeben.';
+      byId('signals').innerHTML='';
+      return;
+    }
+    var margin=(rev-ek)/rev*100, shrinkRate=sh/rev*100, writeRate=wo/rev*100, stockRate=stock/rev*100;
+    var risk=0, signals=[];
+    if(margin<25){risk+=2;signals.push(['critical','Marge deutlich prüfen','Die rechnerische Shop-Marge liegt bei '+pct(margin)+'. Prüfen Sie besonders EK, Verkaufspreise und Sortimentsmix.']);}
+    else if(margin<32){risk++;signals.push(['warn','Marge beobachten','Die rechnerische Shop-Marge liegt bei '+pct(margin)+'. Ein Monatsvergleich kann zeigen, ob sich die Marge verschlechtert.']);}
+    if(shrinkRate>=1.5){risk+=2;signals.push(['critical','Schwund als Prüffeld','Schwund entspricht '+pct(shrinkRate)+' des Shop-Umsatzes. Prüfen Sie Inventur, Buchungen, MHD, Verderb und Eigenverbrauch.']);}
+    else if(shrinkRate>=.8){risk++;signals.push(['warn','Schwund beobachten','Schwund entspricht '+pct(shrinkRate)+' des Shop-Umsatzes. Die Entwicklung über mehrere Monate ist besonders interessant.']);}
+    if(writeRate>=.8){risk++;signals.push(['warn','Abschriften prüfen','Abschriften entsprechen '+pct(writeRate)+' des Shop-Umsatzes. Prüfen Sie MHD, Abschriftenprozesse und Sortiment.']);}
+    if(stockRate>=30){risk++;signals.push(['warn','Kapitalbindung prüfen','Der Lagerbestand entspricht '+pct(stockRate)+' eines Monatsumsatzes. Prüfen Sie Drehung, Sortiment und Bestellmengen.']);}
+    if(!signals.length){signals.push(['good','Aktuell kein starkes Signal','Auf Basis der eingegebenen Werte ergibt sich kein deutliches Prüfsignal. Der Monatsvergleich bleibt trotzdem wichtig.']);}
+    var level=risk>=4?'hoch':risk>=2?'mittel':'niedrig';
+    byId('headline').textContent=level==='hoch'?'Mehrere Prüffelder erkannt':level==='mittel'?'Einige Punkte genauer ansehen':'Aktuell unauffälliges Kurzprofil';
+    byId('score').textContent=level.toUpperCase();
+    byId('scoreText').textContent='Erste Einordnung auf Basis Ihrer Eingaben';
+    byId('signals').innerHTML=signals.map(function(s){return '<div class="signal '+s[0]+'"><b>'+s[1]+'</b><span>'+s[2]+'</span></div>';}).join('');
+    try{result.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){result.scrollIntoView();}
+  }
+}
+</script>
+</body>
+</html>
