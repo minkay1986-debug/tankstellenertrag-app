@@ -310,15 +310,18 @@ async function forecastOpenDataEvents(k,city){try{
   const start=new Date(k+'-01T00:00:00'); const next=new Date(start); next.setMonth(next.getMonth()+1);
   const cityNorm=String(city||'').trim().toLowerCase();
   const sources=[
-    {name:'Ingolstadt',url:'https://ingolstadt.live/api/v1/events?startDate='+encodeURIComponent(start.toISOString())+'&endDate='+encodeURIComponent(next.toISOString())},
-    {name:'Krefeld',url:'https://www.krefeld.de/www/event.nsf/apijson.xsp/view-event-month?compact=false'},
-    {name:'Geldern',url:'https://www.geldern.de/de/system/-preview-text/%26src1%3Djson-veranstaltung'},
-    {name:'Moers',url:'https://www.moers.de/jsonapi/node/event?filter%5Bstatus%5D%5Bvalue%5D=1'},
-    {name:'BayernCloud Tourismus',url:'https://data.bayerncloud.digital/api/v4/endpoints/list/current-events'}
+    {state:'Bayern',name:'BayernCloud Tourismus',url:null,license:'DATENSATZ_PRUEFEN'},
+    {state:'Baden-Württemberg',name:'Open Data-Pool Baden-Württemberg',url:null,license:'CC0_CC-BY_CC-BY-SA'},
+    {state:'Sachsen',name:'SaTourN / Open Data Finder',url:null,license:'CC_COMMERCIAL'},
+    {state:'Niedersachsen',name:'Niedersachsen-Hub',url:null,license:'DATENSATZ_PRUEFEN'},
+    {state:'Hessen',name:'Content-Hub Hessen',url:null,license:'DATENSATZ_PRUEFEN'},
+    {state:'Rheinland-Pfalz',name:'rlpDirekt',url:'https://open-rlp.egovernor.de/metaData/event/data',license:'DL-DE-ZERO'},
+    {state:'Bundesweit',name:'GovData – freie Veranstaltungsdaten',url:null,license:'FREIE_NUTZUNG'}
   ];
   const norm=(e,src)=>{const loc=e.location||e.venue||e.customVenue||{};return {name:e.name||e.DocName||e.title||'Veranstaltung',start:e.startDate||e.Start||e.start||e.date,city:e.city||e.addressLocality||loc.city||loc.addressLocality||e.Ort||src};};
   const all=[];
   for(const s of sources){
+    if(!s.url) continue;
     try{
       const res=await fetch(s.url,{cache:'no-store'}); if(!res.ok)continue;
       const raw=await res.json(); const arr=Array.isArray(raw)?raw:(raw.data||raw.events||raw.results||[]);
