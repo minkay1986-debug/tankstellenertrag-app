@@ -285,10 +285,29 @@ async function saveApplicant(id){
   if(error){$('adminStatus').className='status err';$('adminStatus').textContent='Speichern fehlgeschlagen: '+error.message;return;}
   $('adminStatus').className='status ok';$('adminStatus').textContent='Bewerber aktualisiert.';
 }
-async function trackVisitor(){/* Kein clientseitiges Besucher-Tracking. Datenschutzfreundliche Version ohne persistente Besucher-ID. */}
+async function trackVisitor(){
+  if(!client)return;
+  try{
+    const key='te_visit_tracked_session_v1';
+    if(sessionStorage.getItem(key)==='1')return;
+    const params=new URLSearchParams(location.search);
+    const referrer=document.referrer||'';
+    const source=params.get('utm_source')||(
+      /(^|\\.)linkedin\\.com$/i.test(new URL(referrer).hostname||'')||
+      /(^|\\.)lnkd\\.in$/i.test(new URL(referrer).hostname||'')?'linkedin':'direct'
+    );
+    const path=location.pathname||'/';
+    const {error}=await client.from('site_visits').insert({
+      referrer:referrer.slice(0,500)||null,
+      landing_path:path.slice(0,300),
+      source:String(source).slice(0,50)
+    });
+    if(!error)sessionStorage.setItem(key,'1');
+  }catch(_){}
+}
 async function loadPilotSlots(){if(!client)return;try{const {data,error}=await client.rpc('get_pilot_slots');if(error||!data)return;const s=Array.isArray(data)?data[0]:data;if(!s)return;const el=$('pilotSlotsText');const btn=$('monthlyPilotBtn');if(!el)return;const remaining=Math.max(0,Number(s.remaining||0));el.textContent=remaining>0?'Noch '+remaining+' Plätze verfügbar':'Pilotphase aktuell voll';if(btn){btn.disabled=remaining===0;btn.textContent=remaining>0?'Pilot werden →':'Pilotplätze vergeben';}}catch(e){}}
 async function requestCancellation(){if(!client)return;const btn=$('cancelSubscriptionBtn');if(!btn)return;if(!confirm('Möchtest du eine Kündigung für dein Kundenkonto anfragen? Die Kündigung wird anschließend von TankstellenErtrag bestätigt und zum vereinbarten Termin umgesetzt.'))return;btn.disabled=true;btn.textContent='Anfrage wird gesendet …';try{const {data,error}=await client.rpc('request_subscription_cancellation');if(error)throw error;status(data?.message||'Kündigungsanfrage wurde übermittelt.','ok');btn.textContent='Kündigung angefragt';}catch(e){status(e.message||String(e),'err');btn.disabled=false;btn.textContent='Kündigung anfragen';}}
-async function loadVisitorStats(){if(!client)return false;const {data,error}=await client.rpc('get_visitor_stats');if(error||!data)return false;const s=Array.isArray(data)?data[0]:data;if(!s)return false;$('statToday').textContent=Number(s.today||0).toLocaleString('de-DE');$('stat7').textContent=Number(s.last7||0).toLocaleString('de-DE');$('statMonth').textContent=Number(s.month||0).toLocaleString('de-DE');$('statApplications').textContent=Number(s.applications||0).toLocaleString('de-DE');return true}
+async function loadVisitorStats(){if(!client)return false;const {data,error}=await client.rpc('get_site_visitor_stats');if(error||!data)return false;const s=Array.isArray(data)?data[0]:data;if(!s)return false;$('statToday').textContent=Number(s.today||0).toLocaleString('de-DE');$('stat7').textContent=Number(s.last7||0).toLocaleString('de-DE');$('statMonth').textContent=Number(s.month||0).toLocaleString('de-DE');$('statApplications').textContent=Number(s.applications||0).toLocaleString('de-DE');return true}
 async function getStableSession(){
   if(!client)return null;
   const {data,error}=await client.auth.getSession();
