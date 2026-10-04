@@ -285,6 +285,7 @@ async function boot(){
     const session=await getStableSession();
     if(session){await loadStation(session);return;}
     status('Keine gespeicherte Sitzung erkannt. Bitte anmelden.');
+    if(new URLSearchParams(location.search).get('login')==='1') openAuth();
   }catch(error){
     status('Sitzung konnte beim Seitenaufruf nicht wiederhergestellt werden: '+(error.message||String(error)),'err');
   }
