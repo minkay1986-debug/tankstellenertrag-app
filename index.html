@@ -292,9 +292,11 @@ async function trackVisitor(){
     if(sessionStorage.getItem(key)==='1')return;
     const params=new URLSearchParams(location.search);
     const referrer=document.referrer||'';
+    let refHost='';
+    try{if(referrer)refHost=new URL(referrer).hostname||'';}catch(_){}
     const source=params.get('utm_source')||(
-      /(^|\\.)linkedin\\.com$/i.test(new URL(referrer).hostname||'')||
-      /(^|\\.)lnkd\\.in$/i.test(new URL(referrer).hostname||'')?'linkedin':'direct'
+      /(^|\\.)linkedin\\.com$/i.test(refHost)||
+      /(^|\\.)lnkd\\.in$/i.test(refHost)?'linkedin':'direct'
     );
     const path=location.pathname||'/';
     const {error}=await client.from('site_visits').insert({
