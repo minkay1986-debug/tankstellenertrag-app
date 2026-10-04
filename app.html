@@ -64,7 +64,7 @@
   <button class="navItem" id="navAnalysis"><b>◌</b>Analyse</button>
   <button class="navItem" id="navInput"><b>＋</b>Eingabe</button>
   <button class="navItem" id="navReport"><b>▣</b>Berichte</button>
-  <button class="navItem" id="navKnowledge"><b>▤</b>Wissen</button>
+  <button class="navItem" id="navKnowledge"><b>♥</b>DiniLove</button>
 </nav></div>
 <div id="toast" class="toast hidden"></div>
 <script>
@@ -97,7 +97,7 @@ $('website').onclick=()=>go('./');
 ['analysis','navAnalysis'].forEach(id=>$(id).onclick=()=>go('./analyse.html'));
 ['input','navInput'].forEach(id=>$(id).onclick=()=>go('./analyse.html#eingabe'));
 ['report','navReport'].forEach(id=>$(id).onclick=()=>go('./analyse.html#bericht'));
-$('navKnowledge').onclick=()=>toast('Branchenwissen wird als nächster App-Bereich ergänzt.');
+$('navKnowledge').onclick=()=>go('./dini-reste.html');
 if(client){
  client.auth.getSession().then(({data})=>showSession(data.session));
  client.auth.onAuthStateChange((_e,s)=>showSession(s));
