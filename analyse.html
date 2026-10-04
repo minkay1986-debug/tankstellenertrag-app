@@ -59,6 +59,24 @@
   from{background-position:0 0,0 0,0 0,0 0,0 0,0 0,0 0}
   to{background-position:-18px 75px,14px 55px,-10px 90px,20px 68px,-15px 80px,12px 62px,0 0}
 }
+</style><style id="weatherRainRealPhotoFix">
+/* Regen: echtes Foto eines Platzregens in Neu-Ulm (CC0), keine künstlichen Regenstreifen */
+.weather-rain{
+  background-image:linear-gradient(180deg,rgba(8,24,38,.08),rgba(3,13,22,.42)),url("https://upload.wikimedia.org/wikipedia/commons/b/b4/Platzregen_in_Neu-Ulm_184727.jpg")!important;
+  background-size:cover!important;
+  background-position:center 52%!important;
+  filter:saturate(.76) brightness(.78) contrast(1.03)!important;
+}
+.weather-rain:before{
+  inset:0!important;
+  opacity:1!important;
+  background:linear-gradient(180deg,rgba(20,39,53,.02),rgba(5,14,22,.20) 58%,rgba(2,9,15,.38))!important;
+  animation:none!important;
+  mix-blend-mode:normal!important;
+}
+.weather-rain:after{
+  background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(2,10,17,.40))!important;
+}
 </style></head><body><div class="app"><aside class="side"><div class="brand">Tankstellen<span>Ertrag</span></div><div class="tag">Wirtschaftlichkeit · Warenwirtschaft · Ertrag</div><div class="panel" style="margin:0 0 16px;padding:11px;font-size:11px"><b>Aus der Tankstellenpraxis</b><br>für Tankstellen entwickelt.</div><div class="nav"><button class="active" data-v="dashboard">Übersicht</button><button data-v="monthly">Monatsdaten</button><button data-v="analysis">Analyse</button><button data-v="insights">✨ Insights & KI</button><button data-v="forecast">🔮 Prognose & Ausblick</button><button data-v="radar">🎯 Ertragsradar</button><button data-v="yearly">Jahresauswertung</button><button data-v="report">Beratungsbericht</button><button data-v="feedback">⭐ Feedback</button><button data-v="sources">Branchenwissen</button><button data-v="settings">Beratungseinstellungen</button><button data-v="account">👤 Kundenkonto</button></div></aside><main class="main"><div id="gate" class="panel">Verbindung zur Station wird hergestellt …</div><div id="app" style="display:none"><div id="stationInfo" class="panel"></div>
 <section id="dashboard" class="view active"><div class="top"><div><div class="eyebrow">Ihr Überblick</div><div class="h1">Stationsergebnis</div><p class="sub">Shop-Umsatz, Shop-Rohertrag, Shop-Marge, Schwund und Bestandsentwicklung auf einen Blick.<br><span class="small">Kraftstoff und Waschen werden separat betrachtet und nicht in die Shop-Marge einbezogen.</span></p></div><div class="badge">Geschützte Auswertung</div></div><div id="kpis" class="grid cards"></div><div id="dashAlerts" class="panel"></div><div class="panel"><h2>Monatsentwicklung</h2><div id="trend"></div></div></section>
 <section id="forecast" class="view"><div class="top"><div><div class="eyebrow">Vorausschau</div><div class="h1">🔮 Prognose & Ausblick</div><p class="sub">Standort, Saison und eigene Historie – ohne externe KI und ohne Änderung Ihrer Monatsdaten.</p></div></div><div id="forecastBody"></div></section>
