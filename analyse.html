@@ -33,6 +33,32 @@
   from{background-position:0 0,0 0,0 0}
   to{background-position:-30px 54px,22px 72px,0 0}
 }
+</style><style id="weatherSnowRealism">
+.weather-snow{
+  background-image:linear-gradient(180deg,rgba(28,48,63,.04),rgba(18,30,39,.24)),url("https://upload.wikimedia.org/wikipedia/commons/8/8c/Snowy_landscape_from_ICE_train_20170120_150652.jpg")!important;
+  background-size:cover!important;background-position:center 48%!important;
+  filter:saturate(.72) brightness(1.06) contrast(1.02);
+}
+.weather-snow:before{
+  inset:-10%!important;opacity:.9!important;
+  background-image:
+    radial-gradient(circle at 12% 18%,rgba(255,255,255,.95) 0 2px,transparent 3px),
+    radial-gradient(circle at 27% 43%,rgba(255,255,255,.85) 0 1.5px,transparent 3px),
+    radial-gradient(circle at 46% 23%,rgba(255,255,255,.92) 0 2px,transparent 3px),
+    radial-gradient(circle at 67% 38%,rgba(255,255,255,.9) 0 2px,transparent 3px),
+    radial-gradient(circle at 84% 17%,rgba(255,255,255,.82) 0 1.5px,transparent 3px),
+    radial-gradient(circle at 75% 62%,rgba(255,255,255,.78) 0 2px,transparent 3px),
+    linear-gradient(180deg,rgba(228,242,250,.08),rgba(72,91,103,.12))!important;
+  animation:weatherSnowFall 4.5s linear infinite;
+  mix-blend-mode:screen;
+}
+.weather-snow:after{
+  background:linear-gradient(180deg,rgba(232,243,249,.02),rgba(35,55,67,.48) 100%)!important;
+}
+@keyframes weatherSnowFall{
+  from{background-position:0 0,0 0,0 0,0 0,0 0,0 0,0 0}
+  to{background-position:-18px 75px,14px 55px,-10px 90px,20px 68px,-15px 80px,12px 62px,0 0}
+}
 </style></head><body><div class="app"><aside class="side"><div class="brand">Tankstellen<span>Ertrag</span></div><div class="tag">Wirtschaftlichkeit · Warenwirtschaft · Ertrag</div><div class="panel" style="margin:0 0 16px;padding:11px;font-size:11px"><b>Aus der Tankstellenpraxis</b><br>für Tankstellen entwickelt.</div><div class="nav"><button class="active" data-v="dashboard">Übersicht</button><button data-v="monthly">Monatsdaten</button><button data-v="analysis">Analyse</button><button data-v="insights">✨ Insights & KI</button><button data-v="forecast">🔮 Prognose & Ausblick</button><button data-v="radar">🎯 Ertragsradar</button><button data-v="yearly">Jahresauswertung</button><button data-v="report">Beratungsbericht</button><button data-v="feedback">⭐ Feedback</button><button data-v="sources">Branchenwissen</button><button data-v="settings">Beratungseinstellungen</button><button data-v="account">👤 Kundenkonto</button></div></aside><main class="main"><div id="gate" class="panel">Verbindung zur Station wird hergestellt …</div><div id="app" style="display:none"><div id="stationInfo" class="panel"></div>
 <section id="dashboard" class="view active"><div class="top"><div><div class="eyebrow">Ihr Überblick</div><div class="h1">Stationsergebnis</div><p class="sub">Shop-Umsatz, Shop-Rohertrag, Shop-Marge, Schwund und Bestandsentwicklung auf einen Blick.<br><span class="small">Kraftstoff und Waschen werden separat betrachtet und nicht in die Shop-Marge einbezogen.</span></p></div><div class="badge">Geschützte Auswertung</div></div><div id="kpis" class="grid cards"></div><div id="dashAlerts" class="panel"></div><div class="panel"><h2>Monatsentwicklung</h2><div id="trend"></div></div></section>
 <section id="forecast" class="view"><div class="top"><div><div class="eyebrow">Vorausschau</div><div class="h1">🔮 Prognose & Ausblick</div><p class="sub">Standort, Saison und eigene Historie – ohne externe KI und ohne Änderung Ihrer Monatsdaten.</p></div></div><div id="forecastBody"></div></section>
