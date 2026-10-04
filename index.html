@@ -271,10 +271,19 @@ async function deleteCustomerFeedback(stationId,feedbackId){
     if(payload.feedback.length===before){
       throw new Error('Feedback-ID nicht gefunden. stationId='+stationId+' · id='+wanted+' · Einträge im Snapshot='+before+' · vorhandene IDs='+ids.slice(0,10).join(', '));
     }
-    const {error:updateError}=await client.from('station_snapshots')
+    const {data:updateData,error:updateError}=await client.from('station_snapshots')
       .update({payload,updated_at:new Date().toISOString()})
-      .eq('station_id',stationId);
+      .eq('station_id',stationId)
+      .select('station_id,payload');
     if(updateError)throw updateError;
+    if(!Array.isArray(updateData)||updateData.length!==1){
+      throw new Error('Update wurde von Supabase nicht bestätigt. stationId='+stationId+' · betroffene Zeilen='+String(updateData?.length??0));
+    }
+    const savedPayload=updateData[0]?.payload&&typeof updateData[0].payload==='object'?updateData[0].payload:{};
+    const savedFeedback=Array.isArray(savedPayload.feedback)?savedPayload.feedback:[];
+    if(savedFeedback.some(item=>String(item?.id||'').trim()===wanted)){
+      throw new Error('Supabase meldet zwar Erfolg, aber die Bewertung ist weiterhin im Snapshot vorhanden. stationId='+stationId+' · id='+wanted);
+    }
     $('feedbackAdminStatus').className='status ok';
     $('feedbackAdminStatus').textContent='Kundenbewertung wurde gelöscht.';
     await loadCustomerFeedback();
