@@ -313,7 +313,8 @@ async function forecastOpenDataEvents(k,city){try{
     {name:'Ingolstadt',url:'https://ingolstadt.live/api/v1/events?startDate='+encodeURIComponent(start.toISOString())+'&endDate='+encodeURIComponent(next.toISOString())},
     {name:'Krefeld',url:'https://www.krefeld.de/www/event.nsf/apijson.xsp/view-event-month?compact=false'},
     {name:'Geldern',url:'https://www.geldern.de/de/system/-preview-text/%26src1%3Djson-veranstaltung'},
-    {name:'Moers',url:'https://www.moers.de/jsonapi/node/event?filter%5Bstatus%5D%5Bvalue%5D=1'}
+    {name:'Moers',url:'https://www.moers.de/jsonapi/node/event?filter%5Bstatus%5D%5Bvalue%5D=1'},
+    {name:'BayernCloud Tourismus',url:'https://data.bayerncloud.digital/api/v4/endpoints/list/current-events'}
   ];
   const norm=(e,src)=>{const loc=e.location||e.venue||e.customVenue||{};return {name:e.name||e.DocName||e.title||'Veranstaltung',start:e.startDate||e.Start||e.start||e.date,city:e.city||e.addressLocality||loc.city||loc.addressLocality||e.Ort||src};};
   const all=[];
@@ -326,7 +327,7 @@ async function forecastOpenDataEvents(k,city){try{
   }
   const hits=all.slice(0,8);
   if(!hits.length){box.innerHTML='📍 Keine passenden freien Veranstaltungsdaten für diesen Monat gefunden. <span class="small">Die freien Quellen werden schrittweise erweitert.</span>';return;}
-  box.innerHTML='<b>📍 Regionale Veranstaltungen</b><div class="small" style="margin-top:6px">Mögliche lokale Einflussfaktoren – bitte prüfen:</div>'+hits.map(e=>'<div class="card" style="margin-top:8px"><b>'+String(e.name).replace(/[<>]/g,'')+'</b><div class="small">'+new Date(e.start).toLocaleDateString('de-DE')+'</div></div>').join('')+'<div class="small" style="margin-top:8px">Freie Open-Data-Quellen · bevorzugt CC0 / Datenlizenz Deutschland – Zero.</div>';
+  box.innerHTML='<b>📍 Regionale Veranstaltungen</b><div class="small" style="margin-top:6px">Mögliche lokale Einflussfaktoren – bitte prüfen:</div>'+hits.map(e=>'<div class="card" style="margin-top:8px"><b>'+String(e.name).replace(/[<>]/g,'')+'</b><div class="small">'+new Date(e.start).toLocaleDateString('de-DE')+'</div></div>').join('')+'<div class="small" style="margin-top:8px">Freie Open-Data-Quellen · BayernCloud-Objekte werden nur verwendet, wenn deren jeweilige Objektlizenz (z. B. CC0/CC BY/CC BY-SA) die Nutzung erlaubt.</div>';
 }catch(e){const box=document.getElementById('forecastEvents');if(box)box.innerHTML='📍 Veranstaltungsdaten derzeit nicht abrufbar. Die Prognose funktioniert weiterhin ohne diesen Faktor.';}}
 function forecastCalendarFactors(k,city){
 const y=Number(String(k).slice(0,4)),m=Number(String(k).slice(5,7)),easter=year=>{const a=year%19,b=Math.floor(year/100),cc=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(cc/4),j=cc%4,l=(32+2*e+2*i-h-j)%7,mm=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*mm+114)/31),day=((h+l-7*mm+114)%31)+1;return new Date(Date.UTC(year,mo-1,day))},add=(d,n)=>{const x=new Date(d);x.setUTCDate(x.getUTCDate()+n);return x},inMonth=d=>d.getUTCMonth()+1===m,pc=String(station?.postcode||''),cityL=String(city||'').toLowerCase();
