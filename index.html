@@ -280,9 +280,28 @@ async function loadApplicants(){
   el.className='status';el.textContent='Bewerber werden geladen …';body.innerHTML='';
   const {data,error}=await client.from('pilot_applications').select('id,user_id,email,full_name,station_name,postcode,city,phone,status,access_type,access_until,created_at').neq('email','svenkrick@gmx.de').order('created_at',{ascending:false});
   if(error){el.className='status err';el.textContent='Bewerber konnten nicht geladen werden: '+error.message;return false;}
-  if(!data?.length){el.className='status ok';el.textContent='Noch keine Bewerbungen vorhanden.';return true;}
-  el.className='status ok';el.textContent=data.length+' Bewerber gefunden.';
-  body.innerHTML=data.map(a=>{const d=a.access_until?new Date(a.access_until).toISOString().slice(0,10):'';return '<tr><td><div class="adminName">'+esc(a.full_name||'—')+'</div><div class="adminMuted">'+esc(a.phone||'keine Telefonnummer')+'</div></td><td>'+esc(a.station_name||'—')+'<div class="adminMuted">'+esc([a.postcode,a.city].filter(Boolean).join(' '))+'</div></td><td>'+esc(a.email||'—')+'</td><td><select data-field="status" data-id="'+a.id+'"><option value="new" '+(a.status==='new'?'selected':'')+'>Neu</option><option value="reviewed" '+(a.status==='reviewed'?'selected':'')+'>Geprüft</option><option value="approved" '+(a.status==='approved'?'selected':'')+'>Freigeschaltet</option><option value="rejected" '+(a.status==='rejected'?'selected':'')+'>Abgelehnt</option></select></td><td><select data-field="access_type" data-id="'+a.id+'"><option value="pilot" '+(a.access_type==='pilot'?'selected':'')+'>Pilot</option><option value="founding_partner" '+(a.access_type==='founding_partner'?'selected':'')+'>Gründungspartner</option><option value="paid" '+(a.access_type==='paid'?'selected':'')+'>Bezahlt</option></select></td><td><input data-field="access_until" data-id="'+a.id+'" type="date" value="'+d+'"></td><td><button class="btn save" data-save="'+a.id+'">Speichern</button></td></tr>'}).join('');
+  let applicants=Array.isArray(data)?data:[];
+  // Wirksame Kündigungen aus der Bewerberliste ausblenden, aber den Datensatz
+  // selbst nicht löschen. So bleibt die Historie erhalten.
+  try{
+    const {data:cancelData,error:cancelError}=await client.rpc('get_cancellation_requests');
+    if(!cancelError){
+      let cancellations=Array.isArray(cancelData)?cancelData:[];
+      if(typeof cancelData==='string'){try{const parsed=JSON.parse(cancelData);cancellations=Array.isArray(parsed)?parsed:[];}catch(_){cancellations=[];}}
+      const today=new Date(); today.setHours(0,0,0,0);
+      const cancelledEmails=new Set(cancellations.filter(x=>{
+        const status=String(x.status||'').toLowerCase();
+        const confirmed=['confirmed','approved'].includes(status);
+        if(!confirmed||!x.requested_end_date)return false;
+        const end=new Date(x.requested_end_date+'T00:00:00');
+        return !Number.isNaN(end.getTime()) && end<=today;
+      }).map(x=>String(x.email||'').trim().toLowerCase()).filter(Boolean));
+      applicants=applicants.filter(a=>!cancelledEmails.has(String(a.email||'').trim().toLowerCase()));
+    }
+  }catch(_){}
+  if(!applicants.length){el.className='status ok';el.textContent='Noch keine aktiven Bewerbungen vorhanden.';return true;}
+  el.className='status ok';el.textContent=applicants.length+' Bewerber gefunden.';
+  body.innerHTML=applicants.map(a=>{const d=a.access_until?new Date(a.access_until).toISOString().slice(0,10):'';return '<tr><td><div class="adminName">'+esc(a.full_name||'—')+'</div><div class="adminMuted">'+esc(a.phone||'keine Telefonnummer')+'</div></td><td>'+esc(a.station_name||'—')+'<div class="adminMuted">'+esc([a.postcode,a.city].filter(Boolean).join(' '))+'</div></td><td>'+esc(a.email||'—')+'</td><td><select data-field="status" data-id="'+a.id+'"><option value="new" '+(a.status==='new'?'selected':'')+'>Neu</option><option value="reviewed" '+(a.status==='reviewed'?'selected':'')+'>Geprüft</option><option value="approved" '+(a.status==='approved'?'selected':'')+'>Freigeschaltet</option><option value="rejected" '+(a.status==='rejected'?'selected':'')+'>Abgelehnt</option></select></td><td><select data-field="access_type" data-id="'+a.id+'"><option value="pilot" '+(a.access_type==='pilot'?'selected':'')+'>Pilot</option><option value="founding_partner" '+(a.access_type==='founding_partner'?'selected':'')+'>Gründungspartner</option><option value="paid" '+(a.access_type==='paid'?'selected':'')+'>Bezahlt</option></select></td><td><input data-field="access_until" data-id="'+a.id+'" type="date" value="'+d+'"></td><td><button class="btn save" data-save="'+a.id+'">Speichern</button></td></tr>'}).join('');
   body.querySelectorAll('[data-save]').forEach(btn=>btn.onclick=()=>saveApplicant(btn.dataset.save));
   return true;
 }
