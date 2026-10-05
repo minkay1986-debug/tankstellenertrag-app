@@ -3,7 +3,7 @@
 -- Diese Funktion muss im Supabase-Projekt einmal ausgeführt werden.
 
 create or replace function public.approve_pilot_application(
-  p_id bigint,
+  p_id uuid,
   p_status text,
   p_access_type text,
   p_access_until timestamptz
@@ -110,5 +110,5 @@ begin
 end;
 $$;
 
-revoke all on function public.approve_pilot_application(bigint,text,text,timestamptz) from public;
+revoke all on function public.approve_pilot_application(uuid,text,text,timestamptz) from public;
 grant execute on function public.approve_pilot_application(bigint,text,text,timestamptz) to authenticated;
