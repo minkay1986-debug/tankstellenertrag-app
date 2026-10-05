@@ -307,10 +307,34 @@ async function loadApplicants(){
 }
 async function saveApplicant(id){
   const val=field=>document.querySelector('[data-field="'+field+'"][data-id="'+id+'"]')?.value||null;
-  const patch={status:val('status'),access_type:val('access_type'),access_until:val('access_until')?new Date(val('access_until')+'T23:59:59').toISOString():null,updated_at:new Date().toISOString()};
-  const {error}=await client.from('pilot_applications').update(patch).eq('id',id);
-  if(error){$('adminStatus').className='status err';$('adminStatus').textContent='Speichern fehlgeschlagen: '+error.message;return;}
-  $('adminStatus').className='status ok';$('adminStatus').textContent='Bewerber aktualisiert.';
+  const nextStatus=val('status'),nextAccess=val('access_type'),rawUntil=val('access_until');
+  const accessUntil=rawUntil?new Date(rawUntil+'T23:59:59').toISOString():null;
+  if(nextStatus==='approved'&&!accessUntil){
+    $('adminStatus').className='status err';
+    $('adminStatus').textContent='Zum Freischalten bitte ein Zugangsende festlegen.';
+    return;
+  }
+  $('adminStatus').className='status';
+  $('adminStatus').textContent=nextStatus==='approved'?'Freischaltung wird durchgeführt …':'Bewerber wird aktualisiert …';
+  try{
+    const {data,error}=await client.rpc('approve_pilot_application',{
+      p_id:Number(id),
+      p_status:nextStatus,
+      p_access_type:nextAccess,
+      p_access_until:accessUntil
+    });
+    if(error)throw error;
+    const result=Array.isArray(data)?data[0]:data;
+    if(nextStatus==='approved' && result?.success===false)throw new Error(result.message||'Die Station konnte nicht angelegt werden.');
+    $('adminStatus').className='status ok';
+    $('adminStatus').textContent=nextStatus==='approved'
+      ?'Bewerber freigeschaltet – Kundenkonto und Station sind verknüpft.'
+      :'Bewerber aktualisiert.';
+    await Promise.all([loadApplicants(),loadPilotSlots()]);
+  }catch(e){
+    $('adminStatus').className='status err';
+    $('adminStatus').textContent='Speichern/Freischalten fehlgeschlagen: '+(e.message||String(e));
+  }
 }
 async function trackVisitor(){
   if(!client)return;
