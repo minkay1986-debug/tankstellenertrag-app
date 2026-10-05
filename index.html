@@ -318,7 +318,7 @@ async function saveApplicant(id){
   $('adminStatus').textContent=nextStatus==='approved'?'Freischaltung wird durchgeführt …':'Bewerber wird aktualisiert …';
   try{
     const {data,error}=await client.rpc('approve_pilot_application',{
-      p_id:Number(id),
+      p_id:String(id),
       p_status:nextStatus,
       p_access_type:nextAccess,
       p_access_until:accessUntil
