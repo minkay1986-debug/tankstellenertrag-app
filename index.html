@@ -333,7 +333,7 @@ async function saveApplicant(id){
     await Promise.all([loadApplicants(),loadPilotSlots()]);
   }catch(e){
     $('adminStatus').className='status err';
-    $('adminStatus').textContent='Speichern/Freischalten fehlgeschlagen: '+(e.message||String(e));
+    $('adminStatus').textContent='Speichern/Freischalten fehlgeschlagen: '+(e.message||String(e))+' | ID: '+String(id);
   }
 }
 async function trackVisitor(){
