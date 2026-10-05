@@ -114,4 +114,4 @@ end;
 $$;
 
 revoke all on function public.approve_pilot_application(uuid,text,text,timestamptz) from public;
-grant execute on function public.approve_pilot_application(bigint,text,text,timestamptz) to authenticated;
+grant execute on function public.approve_pilot_application(uuid,text,text,timestamptz) to authenticated;
