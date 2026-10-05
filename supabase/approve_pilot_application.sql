@@ -1,4 +1,7 @@
 -- TankstellenErtrag · Admin-Freischaltung
+-- Entfernt die alte BIGINT-Überladung, damit die UUID-Funktion eindeutig aufrufbar ist.
+drop function if exists public.approve_pilot_application(bigint,text,text,timestamptz);
+
 -- Erstellt/verknüpft beim Freischalten automatisch die Kundenstation.
 -- Diese Funktion muss im Supabase-Projekt einmal ausgeführt werden.
 
