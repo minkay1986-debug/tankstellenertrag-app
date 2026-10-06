@@ -378,32 +378,47 @@ async function loadDwdRegionalForecast(st,target){if(!target)return;
   const city=String(st?.city||'').trim();
   if(!pc&&!city){target.innerHTML='📍 Für das Stationskonto ist keine PLZ oder kein Ort hinterlegt.';return}
   const clean=x=>String(x||'').replace(/[<>]/g,'');
+  const fetchJson=async(url,ms=9000)=>{
+    const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),ms);
+    try{const r=await fetch(url,{cache:'no-store',signal:ctrl.signal});if(!r.ok)throw new Error('HTTP '+r.status);return await r.json()}
+    finally{clearTimeout(timer)}
+  };
   try{
-    const q=encodeURIComponent(pc||city);
-    const geoCtrl=new AbortController();const geoTimer=setTimeout(()=>geoCtrl.abort(),5000);
-    const geo=await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+q+'&count=5&language=de&format=json&countryCode=DE',{signal:geoCtrl.signal});
-    clearTimeout(geoTimer);
-    if(!geo.ok)throw new Error('geocoding '+geo.status);
-    const gj=await geo.json();const places=gj.results||[];
-    let place=places.find(x=>pc&&Array.isArray(x.postcodes)&&x.postcodes.includes(pc))||places.find(x=>city&&String(x.name||'').toLowerCase()===city.toLowerCase())||places[0];
-    if(!place||!Number.isFinite(Number(place.latitude))||!Number.isFinite(Number(place.longitude)))throw new Error('no location');
+    // Standort robust ermitteln: erst PLZ, bei fehlendem Treffer zusätzlich Ort.
+    let place=null;
+    const queries=[pc,city].filter(Boolean);
+    for(const qv of queries){
+      try{
+        const gj=await fetchJson('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(qv)+'&count=10&language=de&format=json&countryCode=DE',7000);
+        const places=gj.results||[];
+        place=places.find(x=>pc&&Array.isArray(x.postcodes)&&x.postcodes.includes(pc))
+          ||places.find(x=>city&&String(x.name||'').toLowerCase()===city.toLowerCase())
+          ||places[0];
+        if(place)break;
+      }catch(_){}
+    }
+    if(!place||!Number.isFinite(Number(place.latitude))||!Number.isFinite(Number(place.longitude)))throw new Error('Standort konnte nicht geocodet werden');
     const lat=Number(place.latitude),lon=Number(place.longitude),region=String(place.name||city||'Standort');
-    const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),8000);
-    const url='https://api.open-meteo.com/v1/dwd-icon?latitude='+lat+'&longitude='+lon+'&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,sunshine_duration,wind_speed_10m_max,wind_direction_10m_dominant&timezone=Europe%2FBerlin&forecast_days=7';
-    const res=await fetch(url,{cache:'no-store',signal:ctrl.signal});clearTimeout(timer);
-    if(!res.ok)throw new Error('weather '+res.status);
-    const j=await res.json();const d=j.daily;if(!d?.time?.length)throw new Error('no forecast');
+    const params='latitude='+lat+'&longitude='+lon+'&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,sunshine_duration,wind_speed_10m_max,wind_direction_10m_dominant&timezone=Europe%2FBerlin&forecast_days=7';
+    let j=null;
+    // Primär: DWD ICON. Fallback: allgemeine Open-Meteo-Prognose, damit die Kacheln
+    // nicht verschwinden, wenn der DWD-Endpunkt vorübergehend nicht antwortet.
+    try{j=await fetchJson('https://api.open-meteo.com/v1/dwd-icon?'+params,10000)}
+    catch(_){j=await fetchJson('https://api.open-meteo.com/v1/forecast?'+params,10000)}
+    const d=j?.daily;
+    if(!d?.time?.length)throw new Error('Keine Prognosedaten');
     const weatherText=code=>code===0?'Sonnig':code<=3?'Bewölkt':code<=48?'Nebel':code<=57?'Nieselregen':code<=67?'Regen':code<=77?'Schnee':code<=82?'Schauer':code<=86?'Schneeschauer':code>=95?'Gewitter':'Wechselhaft';
     const iconFor=code=>code===0?'☀️':code<=3?'⛅':code<=48?'🌫️':code<=67?'🌧️':code<=86?'❄️':'⛈️';
     const weatherClass=code=>code===0?'weather-sunny':code<=3?'weather-partly':code<=48?'weather-cloud':code<=67?'weather-rain':'weather-snow';
     const windDir=deg=>{if(!Number.isFinite(Number(deg)))return '';const dirs=['N','NO','O','SO','S','SW','W','NW'];return dirs[Math.round(Number(deg)/45)%8]};
     const dayNames=['So','Mo','Di','Mi','Do','Fr','Sa'];
     const cards=d.time.map((date,i)=>'<div class="card weather-day-card '+weatherClass(Number(d.weather_code?.[i]??-1))+'"><div class="weather-day-head"><b>'+dayNames[new Date(date+'T12:00:00').getDay()]+'</b><div>'+new Date(date+'T12:00:00').toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})+'</div></div><div class="weather-emoji">'+iconFor(Number(d.weather_code?.[i]??-1))+'</div><div class="weather-temp"><b>'+Math.round(Number(d.temperature_2m_max?.[i]??0))+'°</b><span> / '+Math.round(Number(d.temperature_2m_min?.[i]??0))+'°</span></div><div class="weather-condition">'+weatherText(Number(d.weather_code?.[i]??-1))+'</div><div class="weather-detail"><span>💧 '+Math.round(Number(d.precipitation_sum?.[i]??0)*10)/10+' mm</span><span>Niederschlag</span></div><div class="weather-detail"><span>💨 '+Math.round(Number(d.wind_speed_10m_max?.[i]??0))+' km/h</span><span>Wind ('+windDir(d.wind_direction_10m_dominant?.[i])+')</span></div></div>').join('');
-    const warmDays=d.temperature_2m_max.filter(x=>Number(x)>=20).length,rainyDays=d.precipitation_sum.filter(x=>Number(x)>=2).length;
+    const warmDays=(d.temperature_2m_max||[]).filter(x=>Number(x)>=20).length,rainyDays=(d.precipitation_sum||[]).filter(x=>Number(x)>=2).length;
     const impact=warmDays>=3&&rainyDays<=2?'Leicht positiv':rainyDays>=4?'Eher dämpfend':'Neutral';
     const impactHint=impact==='Leicht positiv'?'Mehr Freizeit-/Impulsverkehr möglich – Bestände und Kühlung beobachten.':impact==='Eher dämpfend'?'Regenlastige Tage – Impuls- und Freizeitverkehr eher vorsichtig einplanen.':'Kein eindeutiges Wettersignal – normale Bestandssteuerung beibehalten.';
     target.innerHTML='<div class="weather-dashboard card"><div class="weather-dashboard-head"><div><div class="weather-title">🌦️ Wetter · '+clean(region)+'</div><div class="small">7-Tage-Ausblick · DWD ICON</div></div><div class="weather-status">● Daten verfügbar</div></div><div class="weather-days">'+cards+'</div><div class="weather-impact"><div><div class="weather-impact-title">📊 Einfluss auf die Prognose</div><div class="small" style="margin-top:6px">Wetter ist ein Prüfsignal für mögliche Nachfrageeffekte – keine automatische Umsatzprognose.</div><div class="alert" style="margin-top:10px"><strong>'+impact+'</strong> · '+impactHint+'</div><div class="weather-impact-list" style="margin-top:12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px"><div class="card"><b>☀️ Freizeitverkehr</b><div class="small" style="margin-top:5px">Sonnige Tage können Ausflugs- und Impulsverkehr begünstigen.</div></div><div class="card"><b>🌧️ Niederschlag</b><div class="small" style="margin-top:5px">Mehr Regen kann Freizeitverkehr und bestimmte Impulskäufe dämpfen.</div></div><div class="card"><b>🌡️ Temperaturen</b><div class="small" style="margin-top:5px">Temperaturen helfen bei der saisonalen Einordnung von Getränken, Eis und Heißgetränken.</div></div></div></div></div><div class="weather-source">ⓘ Quelle: Deutscher Wetterdienst (DWD), Open-Meteo DWD ICON. · Fotokulissen: feste TankstellenErtrag-Wetterbilder.<br>Hinweis: Wetterdaten dienen ausschließlich als möglicher Einflussfaktor für die Analyse.</div></div>';
   }catch(e){
+    console.error('TankstellenErtrag Wetter:',e);
     target.innerHTML='<div class="card"><b>🌦️ Wetterdaten konnten gerade nicht geladen werden.</b><div class="small" style="margin-top:6px">Die Analyse bleibt verfügbar. Beim nächsten Aufruf wird die Wetterprognose erneut versucht.</div></div>';
   }
 }
