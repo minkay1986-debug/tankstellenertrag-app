@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny" width="512" height="512" viewBox="0 0 512 512">
+<svg version="1.2" baseProfile="tiny-ps" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>TankstellenErtrag</title>
+<desc>TankstellenErtrag Markenlogo</desc>
 <rect x="18" y="18" width="476" height="476" rx="92" fill="#182126"/>
 <rect x="18" y="18" width="476" height="476" rx="92" fill="none" stroke="#f28a0b" stroke-width="7"/>
 <path d="M94 108 Q94 88 114 88 H337 L307 145 H220 L177 330 H112 L155 145 H75 Z" fill="#ff8a0a"/>
