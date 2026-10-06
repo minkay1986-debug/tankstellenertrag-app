@@ -407,8 +407,8 @@ async function loadDwdRegionalForecast(st,target){if(!target)return;
     catch(_){j=await fetchJson('https://api.open-meteo.com/v1/forecast?'+params,10000)}
     const d=j?.daily;
     if(!d?.time?.length)throw new Error('Keine Prognosedaten');
-    const weatherText=code=>code===0?'Sonnig':code<=3?'Bewölkt':code<=48?'Nebel':code<=57?'Nieselregen':code<=67?'Regen':code<=77?'Schnee':code<=82?'Schauer':code<=86?'Schneeschauer':code>=95?'Gewitter':'Wechselhaft';
-    const iconFor=code=>code===0?'☀️':code<=3?'⛅':code<=48?'🌫️':code<=67?'🌧️':code<=86?'❄️':'⛈️';
+    const weatherText=(code,tmin)=>code===0?'Sonnig':code<=3?'Bewölkt':code<=48?'Nebel':code<=57?'Nieselregen':code<=67?'Regen':code<=77?'Schnee':code<=82?'Schauer':code<=86?(Number(tmin)>2?'Regenschauer':'Schneeschauer'):code>=95?'Gewitter':'Wechselhaft';
+    const iconFor=(code,tmin)=>code===0?'☀️':code<=3?'⛅':code<=48?'🌫️':code<=67?'🌧️':code<=77?'❄️':code<=82?'🌦️':code<=86?(Number(tmin)>2?'🌧️':'❄️'):'⛈️';
     const weatherClass=code=>code===0?'weather-sunny':code<=3?'weather-partly':code<=48?'weather-cloud':code<=67?'weather-rain':'weather-snow';
     const windDir=deg=>{if(!Number.isFinite(Number(deg)))return '';const dirs=['N','NO','O','SO','S','SW','W','NW'];return dirs[Math.round(Number(deg)/45)%8]};
     const dayNames=['So','Mo','Di','Mi','Do','Fr','Sa'];
