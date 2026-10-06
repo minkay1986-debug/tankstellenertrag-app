@@ -338,36 +338,36 @@ async function saveApplicant(id){
   const val=field=>document.querySelector('[data-field="'+field+'"][data-id="'+id+'"]')?.value||null;
   const nextStatus=val('status'),nextAccess=val('access_type'),rawUntil=val('access_until');
   const accessUntil=rawUntil?new Date(rawUntil+'T23:59:59').toISOString():null;
+  const statusEl=$('adminStatus');
+  const btn=document.querySelector('[data-save="'+id+'"]');
   if(nextStatus==='approved'&&!accessUntil){
-    $('adminStatus').className='status err';
-    $('adminStatus').textContent='Zum Freischalten bitte ein Zugangsende festlegen.';
+    statusEl.className='status err';
+    statusEl.textContent='Zum Freischalten bitte ein Zugangsende festlegen.';
     return;
   }
-  $('adminStatus').className='status';
-  $('adminStatus').textContent=nextStatus==='approved'?'Freischaltung wird durchgeführt …':'Bewerber wird aktualisiert …';
+  if(btn){btn.disabled=true;btn.dataset.oldText=btn.textContent;btn.textContent='Speichern …';}
+  statusEl.className='status';
+  statusEl.textContent=nextStatus==='approved'?'Freischaltung wird durchgeführt …':'Bewerber wird aktualisiert …';
   try{
-    // RPC mit hartem Timeout: ein Hänger darf die Admin-Oberfläche nicht blockieren.
     const rpcPromise=client.rpc('approve_pilot_application',{
-      p_id:String(id),
-      p_status:nextStatus,
-      p_access_type:nextAccess,
-      p_access_until:accessUntil
+      p_id:String(id),p_status:nextStatus,p_access_type:nextAccess,p_access_until:accessUntil
     });
     const {data,error}=await withTimeout(rpcPromise,15000,'Die Freischaltung antwortet nicht innerhalb von 15 Sekunden.');
     if(error)throw error;
     const result=Array.isArray(data)?data[0]:data;
-    if(nextStatus==='approved' && result?.success!==true)throw new Error(result?.message||'Die Station konnte nicht angelegt werden.');
-    $('adminStatus').className='status ok';
-    $('adminStatus').textContent=nextStatus==='approved'
-      ?'Bewerber freigeschaltet – Kundenkonto und Station sind verknüpft.'
-      :'Bewerber aktualisiert.';
-    // Die Erfolgsmeldung darf nicht durch nachgeladene Listen überschrieben werden.
-    // Listen im Hintergrund aktualisieren; ein Fehler dort darf die Freischaltung nicht zurückrollen.
+    if(nextStatus==='approved'&&result?.success!==true)throw new Error(result?.message||'Die Station konnte nicht angelegt werden.');
+    statusEl.className='status ok';
+    statusEl.textContent=nextStatus==='approved'
+      ?'✓ Erfolgreich freigeschaltet – Kundenkonto und Station sind verknüpft.'
+      :'✓ Bewerber aktualisiert.';
+    if(btn){btn.textContent='✓ Gespeichert';}
     void Promise.allSettled([loadApplicants(true),loadPilotSlots()]);
+    setTimeout(()=>{if(btn){btn.disabled=false;btn.textContent=btn.dataset.oldText||'Speichern';}},3000);
   }catch(e){
-    $('adminStatus').className='status err';
-    $('adminStatus').textContent='Speichern/Freischalten fehlgeschlagen: '+(e.message||String(e));
+    statusEl.className='status err';
+    statusEl.textContent='Speichern/Freischalten fehlgeschlagen: '+(e.message||String(e));
     await diagnoseAdminFailure(id,{action:nextStatus==='approved'?'Freischalten':'Speichern',email:null,status:nextStatus,accessType:nextAccess,accessUntil:accessUntil,error:e});
+    if(btn){btn.disabled=false;btn.textContent=btn.dataset.oldText||'Speichern';}
   }
 }
 async function trackVisitor(){
