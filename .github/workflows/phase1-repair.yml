@@ -1,0 +1,39 @@
+name: Phase1 isolated repair
+on:
+  push:
+    branches:
+      - feature/mein-monat-phase1
+permissions:
+  contents: write
+jobs:
+  repair:
+    if: "!contains(github.event.head_commit.message, 'Fix Phase 1 HTML section placement')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Repair section placement
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path("analyse.html")
+          c=p.read_text()
+          start=c.find('<div class="panel"><h2>Monatsentwi')
+          end=c.find('<section id="forecast"', start)
+          if start < 0 or end < 0:
+              raise SystemExit("section boundaries not found")
+          bad=c[start:end]
+          ms=bad.find('<section id="meinmonat"')
+          me=bad.find('</section>cklung', ms)
+          if ms < 0 or me < 0:
+              raise SystemExit("meinmonat bounds not found")
+          mein=bad[ms:me+10]
+          fixed='<div class="panel"><h2>Monatsentwicklung</h2><div id="trend"></div></div></section>\n'+mein+'\n'
+          p.write_text(c[:start]+fixed+c[end:])
+          PY
+      - name: Commit repair
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add analyse.html
+          git commit -m "Fix Phase 1 HTML section placement"
+          git push
