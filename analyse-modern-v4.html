@@ -549,6 +549,142 @@ body{
     rgba(1,5,8,.28)!important;
   border-color:rgba(255,255,255,.065)!important;
 }
+</style>
+<style id="te4-reference-v6">
+/* Reference V6 – echtes Glass: weniger Schwarz, klarerer Rim, gerichtete Reflexion, weniger Schatten */
+#teV4Modern{
+  --v6-border:rgba(255,255,255,.26);
+  --v6-shadow:rgba(0,0,0,.28);
+}
+#teV4Modern .te4-hero,
+#teV4Modern .te4-kpi,
+#teV4Modern .te4-card{
+  background:
+    radial-gradient(ellipse 72% 85% at 7% 0%,rgba(255,174,96,.095),transparent 56%),
+    linear-gradient(155deg,
+      rgba(255,255,255,.105) 0%,
+      rgba(255,255,255,.048) 22%,
+      rgba(30,39,46,.27) 54%,
+      rgba(5,10,14,.48) 100%),
+    rgba(7,12,17,.28)!important;
+  border:1px solid var(--v6-border)!important;
+  box-shadow:
+    0 22px 60px var(--v6-shadow),
+    inset 0 1px 0 rgba(255,255,255,.36),
+    inset 1px 0 0 rgba(255,255,255,.09),
+    inset -1px 0 0 rgba(0,0,0,.10),
+    inset 0 -1px 0 rgba(0,0,0,.17)!important;
+  backdrop-filter:blur(19px) saturate(155%) contrast(1.02)!important;
+  -webkit-backdrop-filter:blur(19px) saturate(155%) contrast(1.02)!important;
+}
+#teV4Modern .te4-hero{
+  background:
+    radial-gradient(ellipse 76% 110% at 4% -8%,rgba(255,171,91,.15),transparent 57%),
+    linear-gradient(155deg,
+      rgba(255,255,255,.12) 0%,
+      rgba(255,255,255,.052) 23%,
+      rgba(31,40,47,.28) 55%,
+      rgba(5,10,14,.46) 100%),
+    rgba(7,12,17,.24)!important;
+  box-shadow:
+    0 28px 74px rgba(0,0,0,.30),
+    inset 0 1px 0 rgba(255,255,255,.39),
+    inset 1px 0 0 rgba(255,255,255,.10),
+    inset 0 -1px 0 rgba(0,0,0,.19)!important;
+}
+#teV4Modern .te4-kpi{
+  background:
+    linear-gradient(155deg,
+      rgba(255,255,255,.095) 0%,
+      rgba(255,255,255,.038) 23%,
+      rgba(25,34,41,.25) 57%,
+      rgba(4,9,13,.50) 100%),
+    rgba(7,12,17,.25)!important;
+}
+#teV4Modern .te4-card{
+  background:
+    linear-gradient(155deg,
+      rgba(255,255,255,.085) 0%,
+      rgba(255,255,255,.032) 22%,
+      rgba(24,33,40,.24) 58%,
+      rgba(4,9,13,.52) 100%),
+    rgba(7,12,17,.25)!important;
+}
+/* Precise Fresnel-like rim: bright upper-left, restrained elsewhere */
+#teV4Modern .te4-hero:before,
+#teV4Modern .te4-kpi:before,
+#teV4Modern .te4-card:before{
+  inset:0!important;
+  padding:1px!important;
+  border-radius:inherit!important;
+  background:
+    linear-gradient(132deg,
+      rgba(255,255,255,.68) 0%,
+      rgba(255,255,255,.27) 10%,
+      rgba(255,255,255,.08) 31%,
+      transparent 54%,
+      rgba(255,255,255,.10) 78%,
+      rgba(255,255,255,.23) 100%)!important;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0)!important;
+  -webkit-mask-composite:xor!important;
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0)!important;
+  mask-composite:exclude!important;
+  pointer-events:none!important;
+  opacity:.82!important;
+  z-index:3!important;
+}
+#teV4Modern .te4-hero:after,
+#teV4Modern .te4-kpi:after,
+#teV4Modern .te4-card:after{
+  left:-18%!important;
+  top:-54%!important;
+  width:96%!important;
+  height:150%!important;
+  background:
+    radial-gradient(ellipse 64% 34% at 39% 43%,
+      rgba(255,255,255,.085) 0%,
+      rgba(255,192,126,.052) 31%,
+      rgba(255,255,255,.022) 52%,
+      transparent 74%)!important;
+  filter:blur(18px)!important;
+  opacity:.92!important;
+  transform:rotate(-14deg)!important;
+  z-index:1!important;
+}
+/* Secondary reflection: almost invisible, but gives the surface depth */
+#teV4Modern .te4-hero{
+  overflow:hidden!important;
+}
+#teV4Modern .te4-hero:after{
+  background:
+    radial-gradient(ellipse 70% 38% at 34% 42%,
+      rgba(255,194,132,.105) 0%,
+      rgba(255,255,255,.062) 29%,
+      rgba(255,255,255,.018) 52%,
+      transparent 74%)!important;
+  filter:blur(21px)!important;
+  opacity:.95!important;
+}
+#teV4Modern .te4-chart{
+  background:
+    radial-gradient(ellipse 70% 80% at 15% 0%,rgba(255,155,79,.035),transparent 60%),
+    rgba(2,7,11,.20)!important;
+  border-color:rgba(255,255,255,.10)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.13),
+    inset 0 -1px 0 rgba(0,0,0,.16),
+    0 12px 32px rgba(0,0,0,.18)!important;
+  backdrop-filter:blur(14px) saturate(145%)!important;
+  -webkit-backdrop-filter:blur(14px) saturate(145%)!important;
+}
+#teV4Modern .te4-kpi:hover,
+#teV4Modern .te4-card:hover{
+  box-shadow:
+    0 25px 68px rgba(0,0,0,.31),
+    inset 0 1px 0 rgba(255,255,255,.40),
+    inset 1px 0 0 rgba(255,255,255,.10),
+    inset 0 -1px 0 rgba(0,0,0,.18)!important;
+}
 </style></head><body><div class="app"><aside class="side"><div class="brand">Tankstellen<span>Ertrag</span></div><div class="tag">Wirtschaftlichkeit · Warenwirtschaft · Ertrag</div><div class="panel" style="margin:0 0 16px;padding:11px;font-size:11px"><b>Aus der Tankstellenpraxis</b><br>für Tankstellen entwickelt.</div><div class="nav"><button class="active" data-v="dashboard">Übersicht</button><button data-v="meinmonat">📊 Mein Monat</button><button data-v="monthly">Monatsdaten</button><button data-v="analysis">Analyse</button><button data-v="insights">✨ Insights & KI</button><button data-v="forecast">🔮 Prognose & Ausblick</button><button data-v="radar">🎯 Ertragsradar</button><button data-v="yearly">Jahresauswertung</button><button data-v="report">Beratungsbericht</button><button type="button" id="navDiniLove" class="dini-tab"><span class="dini-label"><span class="dini-icon">🥐</span>DiniLove</span><span class="dini-sub">Reste retten · Bistro</span></button><button data-v="feedback">⭐ Feedback</button><button data-v="sources">Branchenwissen</button><button data-v="settings">Beratungseinstellungen</button><button data-v="account">👤 Kundenkonto</button></div></aside><main class="main"><div id="gate" class="panel">Verbindung zur Station wird hergestellt …</div><div id="app" style="display:none"><div id="stationInfo" class="panel"></div>
 <section id="dashboard" class="view active"><div class="top"><div><div class="eyebrow">Ihr Überblick</div><div class="h1">Stationsergebnis</div><p class="sub">Shop-Umsatz, Shop-Rohertrag, Shop-Marge, Schwund und Bestandsentwicklung auf einen Blick.<br><span class="small">Kraftstoff und Waschen werden separat betrachtet und nicht in die Shop-Marge einbezogen.</span></p></div><div class="badge">Geschützte Auswertung</div></div><div id="kpis" class="grid cards"></div><div id="dashAlerts" class="panel"></div><div class="panel"><h2>Monatsentwicklung</h2><div id="trend"></div></div></section>
 <section id="meinmonat" class="view">
