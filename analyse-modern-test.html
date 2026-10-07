@@ -1001,6 +1001,170 @@
     .premium-hero,.chart-last-ring,.premium-hero:before{animation:none!important}
   }
 
+
+  /* PHASE 2 — turn Radar, Simulation and analytical cards into a real advisory UI */
+  #radar #radarBody>.panel{
+    background:linear-gradient(145deg,rgba(18,26,31,.86),rgba(8,13,16,.78))!important;
+    border:1px solid rgba(255,255,255,.10)!important;
+    border-radius:20px!important;
+    padding:20px!important;
+    backdrop-filter:blur(22px) saturate(160%)!important;
+  }
+  #radar #radarBody>.panel>h2{display:none!important}
+  #radar #radarBody>.panel>.eyebrow{font-size:9px!important;letter-spacing:.16em!important;color:#ff8b32!important}
+  #radar #radarBody>.panel>p{max-width:760px!important;margin-bottom:15px!important}
+  #radar #radarBody .alert{
+    display:grid!important;
+    grid-template-columns:180px 1fr auto!important;
+    grid-template-rows:auto auto!important;
+    column-gap:15px!important;
+    align-items:center!important;
+    margin:8px 0!important;
+    padding:13px 15px!important;
+    min-height:58px!important;
+    border-radius:13px!important;
+    border:1px solid rgba(255,255,255,.07)!important;
+    background:linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.018))!important;
+    box-shadow:none!important;
+    position:relative!important;overflow:hidden!important;
+  }
+  #radar #radarBody .alert:before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
+    background:#f2c35e;box-shadow:0 0 16px rgba(242,195,94,.22);
+  }
+  #radar #radarBody .alert.danger:before{background:#f06b67;box-shadow:0 0 18px rgba(240,107,103,.28)}
+  #radar #radarBody .alert strong{
+    grid-column:1;grid-row:1 / span 2;
+    font-size:13px!important;color:#f4f7f8!important;
+    padding-left:5px!important;
+  }
+  #radar #radarBody .alert .small{
+    font-size:10px!important;color:#829098!important;margin:0!important;
+  }
+  #radar #radarBody .alert .small:nth-of-type(2){
+    grid-column:2;grid-row:1;color:#aeb8bd!important;
+  }
+  #radar #radarBody .alert .small:nth-of-type(3){
+    grid-column:3;grid-row:1 / span 2;
+    justify-self:end;text-align:right;color:#ffb06f!important;
+    max-width:270px;
+  }
+  #radar #radarBody .alert .small:nth-of-type(2):before{
+    content:"KENNZAHL  ·  ";font-size:8px;letter-spacing:.08em;color:#69777e;font-weight:900;
+  }
+  #radar #radarBody .alert .small:nth-of-type(3):before{
+    content:"PRÜFSIGNAL  ·  ";font-size:8px;letter-spacing:.08em;color:#8a6a4e;font-weight:900;
+  }
+  #moneyEgg{
+    margin:10px 0 14px!important;
+    border-radius:999px!important;
+    opacity:.82!important;
+  }
+
+  #radar>.panel:has(#simResult){
+    border-radius:22px!important;
+    background:
+      radial-gradient(520px 220px at 95% 0,rgba(255,122,26,.11),transparent 64%),
+      linear-gradient(145deg,rgba(18,27,32,.90),rgba(8,13,16,.82))!important;
+    border:1px solid rgba(255,255,255,.10)!important;
+    box-shadow:0 20px 60px rgba(0,0,0,.22)!important;
+  }
+  #radar>.panel:has(#simResult)>h2{
+    font-size:21px!important;margin-bottom:5px!important;
+    letter-spacing:-.035em!important;
+  }
+  #radar>.panel:has(#simResult)>p{
+    color:#8e9ba2!important;max-width:760px!important;
+  }
+  #radar>.panel:has(#simResult)>.form{
+    display:grid!important;
+    grid-template-columns:1.35fr 1fr 1fr 1fr!important;
+    gap:10px!important;
+    padding:13px!important;
+    margin:15px 0!important;
+    border-radius:15px!important;
+    background:rgba(0,0,0,.18)!important;
+    border:1px solid rgba(255,255,255,.055)!important;
+  }
+  #radar>.panel:has(#simResult)>.form .field{margin:0!important}
+  #radar>.panel:has(#simResult)>.form label{
+    display:block!important;margin:0 0 6px!important;
+    color:#849198!important;font-size:9px!important;
+    text-transform:uppercase!important;letter-spacing:.08em!important;
+  }
+  #radar #simResult{
+    display:grid!important;
+    grid-template-columns:1.35fr repeat(3,1fr) 1.2fr!important;
+    gap:9px!important;
+    margin-top:12px!important;
+  }
+  #radar #simResult .card{
+    min-height:92px!important;
+    display:flex!important;flex-direction:column!important;justify-content:center!important;
+    padding:14px!important;border-radius:15px!important;
+    background:linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.022))!important;
+    border:1px solid rgba(255,255,255,.08)!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06)!important;
+  }
+  #radar #simResult .card:first-child{
+    background:linear-gradient(145deg,rgba(255,122,26,.18),rgba(255,122,26,.045))!important;
+    border-color:rgba(255,122,26,.28)!important;
+  }
+  #radar #simResult .card:last-child{
+    background:linear-gradient(145deg,rgba(75,212,135,.12),rgba(75,212,135,.025))!important;
+    border-color:rgba(75,212,135,.18)!important;
+  }
+  #radar #simResult .label{
+    font-size:8px!important;letter-spacing:.10em!important;color:#89969d!important;
+  }
+  #radar #simResult .value{
+    font-size:24px!important;line-height:1.05!important;margin-top:8px!important;
+    font-weight:950!important;letter-spacing:-.045em!important;
+  }
+  #radar #simResult .card:first-child .value{color:#ffad6c!important;font-size:29px!important}
+  #radar #simResult .card:last-child .value{color:#73dfa0!important}
+  #radar>.panel:has(#customScenarioInputs){
+    background:linear-gradient(145deg,rgba(18,26,31,.84),rgba(8,13,16,.78))!important;
+  }
+  #radar #customScenarioInputs{
+    display:grid!important;
+    gap:10px!important;
+  }
+  #radar #customScenarioInputs>.panel,
+  #radar #customScenarioInputs>div{
+    border-radius:14px!important;
+  }
+
+  /* Analysis: make prioritisation read like an advisory cockpit */
+  #analysis #analysisBody>.panel,
+  #analysis #analysisBody>.card{
+    border-radius:20px!important;
+  }
+  #analysis #analysisBody .wow-card,
+  #analysis #analysisBody .investigation-card{
+    border-radius:14px!important;
+    background:linear-gradient(100deg,rgba(255,255,255,.045),rgba(255,255,255,.018))!important;
+  }
+  #analysis #analysisBody .wow-card{
+    border-left:3px solid rgba(255,122,26,.55)!important;
+    padding:14px 16px!important;
+  }
+  #analysis #analysisBody .wow-card strong{font-size:13px!important}
+  #analysis #analysisBody .wow-card .small{font-size:10px!important;color:#8c999f!important}
+  #analysis #analysisBody .section-title{
+    margin-top:18px!important;
+    font-size:15px!important;
+  }
+
+  @media(max-width:900px){
+    #radar #radarBody .alert{grid-template-columns:1fr!important;gap:5px!important}
+    #radar #radarBody .alert strong{grid-column:1;grid-row:auto}
+    #radar #radarBody .alert .small:nth-of-type(2),
+    #radar #radarBody .alert .small:nth-of-type(3){grid-column:1;grid-row:auto;justify-self:start;text-align:left;max-width:none}
+    #radar>.panel:has(#simResult)>.form{grid-template-columns:1fr 1fr!important}
+    #radar #simResult{grid-template-columns:1fr 1fr!important}
+    #radar #simResult .card:first-child,#radar #simResult .card:last-child{grid-column:span 2}
+  }
   function esc(s){
     return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   }
