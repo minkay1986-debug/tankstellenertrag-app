@@ -1317,7 +1317,7 @@ function eeMonth(){eeConfetti();eeToast('🏆 Monat geknackt!','Jetzt wird aus Z
  function v(id){const el=document.querySelector('#kpis .card:nth-child('+id+') .value');return el?el.textContent.trim():'—'}
  function te4RenderRealData(){try{
  const raw=localStorage.getItem('tse_current'); if(!raw)return;
- const d=JSON.parse(raw), ms=Array.isArray(d.months)?d.months:[]; if(!ms.length)return;
+ const d=JSON.parse(raw), ms=Object.entries(d.months||{}).map(([key,value])=>({key,...(value||{})})); if(!ms.length)return;
  const fmtMonth=k=>{const s=String(k||'');const m=s.match(/^(\\d{4})-(\\d{2})/);if(!m)return s.slice(0,10)||'Monat';return new Date(Number(m[1]),Number(m[2])-1,1).toLocaleDateString('de-DE',{month:'short'}).replace('.','')+' '+m[1]};
  const rows=ms.map(m=>{const key=m.month||m.key||'';return {key,label:fmtMonth(key),rev:Number(m.revenue||0)}})
    .filter(x=>Number.isFinite(x.rev)&&x.rev>=0)
@@ -1338,9 +1338,8 @@ function eeMonth(){eeConfetti();eeToast('🏆 Monat geknackt!','Jetzt wird aus Z
  }catch(_e){}}
 function te4RenderGroups(){try{
  const raw=localStorage.getItem('tse_current'); if(!raw)return;
- const d=JSON.parse(raw), ms=Array.isArray(d.months)?d.months:[], keys=ms.map(m=>m.month||m.key||'').sort();
- const latestKey=keys.at(-1); if(!latestKey)return;
- const latest=ms.find(m=>(m.month||m.key||'')===latestKey)||{};
+ const d=JSON.parse(raw), ms=Object.entries(d.months||{}).map(([key,value])=>({key,...(value||{})})); if(!ms.length)return;
+ const latest=ms.sort((a,b)=>String(a.key).localeCompare(String(b.key))).at(-1)||{};
  const target=d.settings?.targetMargins||{};
  const groups=latest.groups||{};
  const names={süsswaren:'Süßwaren',getraenke:'Getränke',kaffee:'Kaffee',backshop:'Backwaren'};
