@@ -1390,6 +1390,64 @@
     .view:not(#dashboard):not(#forecast)>h1{font-size:26px!important}
     #yearly .grid.cards,#economic .grid.cards{grid-template-columns:repeat(2,minmax(0,1fr))!important}
   }
+
+  /* V3 GLASS RESTORE — visible premium glass, not matte */
+  .premium-hero,.premium-kpi,.premium-card,.health-card,.premium-actions article,
+  .premium-radar,.radar-card,#insights .month-hero,#insights .panel,#insights .wow-card{
+    position:relative!important;
+    overflow:hidden!important;
+    background:
+      linear-gradient(135deg,
+        rgba(255,255,255,.19) 0%,
+        rgba(255,255,255,.085) 11%,
+        rgba(255,255,255,.028) 32%,
+        rgba(7,14,19,.18) 68%,
+        rgba(255,255,255,.075) 100%)!important;
+    border:1px solid rgba(255,255,255,.24)!important;
+    box-shadow:
+      0 24px 70px rgba(0,0,0,.26),
+      inset 0 1px 0 rgba(255,255,255,.34),
+      inset 1px 0 0 rgba(255,255,255,.12),
+      inset 0 -1px 0 rgba(0,0,0,.12),
+      0 0 24px rgba(255,122,26,.025)!important;
+    backdrop-filter:blur(30px) saturate(180%) contrast(105%)!important;
+    -webkit-backdrop-filter:blur(30px) saturate(180%) contrast(105%)!important;
+  }
+  .premium-hero:after,.premium-kpi:after,.premium-card:after,.health-card:after,
+  .premium-actions article:after,.premium-radar:after,.radar-card:after,
+  #insights .month-hero:after,#insights .panel:after,#insights .wow-card:after{
+    content:""!important;
+    position:absolute!important;inset:0!important;pointer-events:none!important;
+    border-radius:inherit!important;
+    background:linear-gradient(112deg,
+      rgba(255,255,255,.30) 0%,
+      rgba(255,255,255,.14) 7%,
+      rgba(255,255,255,.035) 15%,
+      transparent 27%,
+      transparent 68%,
+      rgba(255,255,255,.08) 84%,
+      transparent 100%)!important;
+    opacity:1!important;
+  }
+  .premium-hero:before{
+    background:linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,.025) 25%,transparent 55%)!important;
+  }
+  .premium-hero>*,.premium-kpi>* ,.premium-card>* ,.health-card>*,
+  .premium-actions article>* ,.premium-radar>* ,.radar-card>*,
+  #insights .month-hero>* ,#insights .panel>* ,#insights .wow-card>*{
+    position:relative!important;z-index:2!important;
+  }
+  .premium-kpi:hover,.premium-card:hover,.premium-actions article:hover{
+    border-color:rgba(255,255,255,.31)!important;
+    box-shadow:
+      0 28px 80px rgba(0,0,0,.29),
+      inset 0 1px 0 rgba(255,255,255,.40),
+      inset 1px 0 0 rgba(255,255,255,.15),
+      0 0 26px rgba(255,122,26,.045)!important;
+    transform:translateY(-1px);
+  }
+  .premium-hero{animation:teGlowPulse 6.5s ease-in-out infinite!important}
+  @media(prefers-reduced-motion:reduce){.premium-hero{animation:none!important}}
   function esc(s){
     return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   }
