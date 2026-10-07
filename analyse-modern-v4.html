@@ -685,6 +685,74 @@ body{
     inset 1px 0 0 rgba(255,255,255,.10),
     inset 0 -1px 0 rgba(0,0,0,.18)!important;
 }
+</style>
+<style id="te4-reference-v7">
+/* V7 – Premium Glass: weniger Rand, mehr Tiefe, ruhigere KPI-Flächen */
+#teV4Modern .te4-hero,
+#teV4Modern .te4-kpi,
+#teV4Modern .te4-card{
+  border-color:rgba(255,255,255,.20)!important;
+  box-shadow:
+    0 22px 62px rgba(0,0,0,.27),
+    inset 0 1px 0 rgba(255,255,255,.31),
+    inset 1px 0 0 rgba(255,255,255,.065),
+    inset -1px 0 0 rgba(0,0,0,.08),
+    inset 0 -1px 0 rgba(0,0,0,.15)!important;
+}
+#teV4Modern .te4-hero:before,
+#teV4Modern .te4-kpi:before,
+#teV4Modern .te4-card:before{
+  background:
+    linear-gradient(132deg,
+      rgba(255,255,255,.50) 0%,
+      rgba(255,255,255,.20) 10%,
+      rgba(255,255,255,.055) 30%,
+      transparent 54%,
+      rgba(255,255,255,.065) 78%,
+      rgba(255,255,255,.16) 100%)!important;
+  opacity:.72!important;
+}
+#teV4Modern .te4-hero:after,
+#teV4Modern .te4-kpi:after,
+#teV4Modern .te4-card:after{
+  background:
+    radial-gradient(ellipse 66% 36% at 38% 43%,
+      rgba(255,255,255,.095) 0%,
+      rgba(255,190,122,.055) 30%,
+      rgba(255,255,255,.018) 52%,
+      transparent 74%)!important;
+  filter:blur(20px)!important;
+  opacity:.95!important;
+}
+#teV4Modern .te4-kpi{
+  background:
+    linear-gradient(155deg,
+      rgba(255,255,255,.09) 0%,
+      rgba(255,255,255,.035) 22%,
+      rgba(25,34,41,.22) 57%,
+      rgba(4,9,13,.45) 100%),
+    rgba(7,12,17,.22)!important;
+  backdrop-filter:blur(18px) saturate(155%) contrast(1.02)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(155%) contrast(1.02)!important;
+}
+#teV4Modern .te4-card{
+  backdrop-filter:blur(18px) saturate(155%) contrast(1.02)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(155%) contrast(1.02)!important;
+}
+#teV4Modern .te4-hero{
+  box-shadow:
+    0 28px 76px rgba(0,0,0,.29),
+    inset 0 1px 0 rgba(255,255,255,.34),
+    inset 1px 0 0 rgba(255,255,255,.075),
+    inset 0 -1px 0 rgba(0,0,0,.17)!important;
+}
+#teV4Modern .te4-chart{
+  border-color:rgba(255,255,255,.075)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    inset 0 -1px 0 rgba(0,0,0,.13),
+    0 12px 32px rgba(0,0,0,.16)!important;
+}
 </style></head><body><div class="app"><aside class="side"><div class="brand">Tankstellen<span>Ertrag</span></div><div class="tag">Wirtschaftlichkeit · Warenwirtschaft · Ertrag</div><div class="panel" style="margin:0 0 16px;padding:11px;font-size:11px"><b>Aus der Tankstellenpraxis</b><br>für Tankstellen entwickelt.</div><div class="nav"><button class="active" data-v="dashboard">Übersicht</button><button data-v="meinmonat">📊 Mein Monat</button><button data-v="monthly">Monatsdaten</button><button data-v="analysis">Analyse</button><button data-v="insights">✨ Insights & KI</button><button data-v="forecast">🔮 Prognose & Ausblick</button><button data-v="radar">🎯 Ertragsradar</button><button data-v="yearly">Jahresauswertung</button><button data-v="report">Beratungsbericht</button><button type="button" id="navDiniLove" class="dini-tab"><span class="dini-label"><span class="dini-icon">🥐</span>DiniLove</span><span class="dini-sub">Reste retten · Bistro</span></button><button data-v="feedback">⭐ Feedback</button><button data-v="sources">Branchenwissen</button><button data-v="settings">Beratungseinstellungen</button><button data-v="account">👤 Kundenkonto</button></div></aside><main class="main"><div id="gate" class="panel">Verbindung zur Station wird hergestellt …</div><div id="app" style="display:none"><div id="stationInfo" class="panel"></div>
 <section id="dashboard" class="view active"><div class="top"><div><div class="eyebrow">Ihr Überblick</div><div class="h1">Stationsergebnis</div><p class="sub">Shop-Umsatz, Shop-Rohertrag, Shop-Marge, Schwund und Bestandsentwicklung auf einen Blick.<br><span class="small">Kraftstoff und Waschen werden separat betrachtet und nicht in die Shop-Marge einbezogen.</span></p></div><div class="badge">Geschützte Auswertung</div></div><div id="kpis" class="grid cards"></div><div id="dashAlerts" class="panel"></div><div class="panel"><h2>Monatsentwicklung</h2><div id="trend"></div></div></section>
 <section id="meinmonat" class="view">
