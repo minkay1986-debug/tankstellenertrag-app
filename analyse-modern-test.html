@@ -82,6 +82,80 @@
   .view.active{animation:modernViewIn .28s ease both}@keyframes modernViewIn{from{opacity:.35;transform:translateY(5px)}to{opacity:1;transform:none}}
   .view>h1,.view>h2{font-weight:950!important;letter-spacing:-.04em!important}
   .view>p{color:#8f9ba2!important}
+
+  /* Unified premium treatment for the functional views — forecast/weather stays original */
+  .view:not(#dashboard):not(#forecast){position:relative}
+  .view:not(#dashboard):not(#forecast)>h1{
+    font-size:30px!important;line-height:1.05!important;margin:8px 0 7px!important
+  }
+  .view:not(#dashboard):not(#forecast)>h1:before{
+    content:"";display:inline-block;width:8px;height:26px;border-radius:5px;background:linear-gradient(180deg,#ff9a45,#ff6d14);margin-right:11px;vertical-align:-3px;box-shadow:0 0 18px rgba(255,122,26,.22)
+  }
+  .view:not(#dashboard):not(#forecast)>p{font-size:12px!important;max-width:900px!important;line-height:1.55!important}
+  .view:not(#dashboard):not(#forecast)>.panel:first-of-type{
+    position:relative;overflow:hidden
+  }
+  .view:not(#dashboard):not(#forecast)>.panel:first-of-type:after{
+    content:"";position:absolute;right:-90px;top:-120px;width:260px;height:260px;border-radius:50%;background:rgba(255,122,26,.06);filter:blur(18px);pointer-events:none
+  }
+  .view:not(#dashboard):not(#forecast) .cards{
+    gap:11px!important
+  }
+  .view:not(#dashboard):not(#forecast) .cards .card{
+    border-radius:15px!important;background:linear-gradient(145deg,#182126,#0e1518)!important
+  }
+  .view:not(#dashboard):not(#forecast) .cards .card:before{
+    background:linear-gradient(90deg,rgba(255,122,26,.9),rgba(255,122,26,0) 78%)!important
+  }
+  .view:not(#dashboard):not(#forecast) .section-title{
+    font-weight:900!important;letter-spacing:-.02em!important
+  }
+  .view:not(#dashboard):not(#forecast) .wow-card,
+  .view:not(#dashboard):not(#forecast) .investigation-card,
+  .view:not(#dashboard):not(#forecast) .alert{
+    position:relative;overflow:hidden
+  }
+  .view:not(#dashboard):not(#forecast) .wow-card:hover,
+  .view:not(#dashboard):not(#forecast) .investigation-card:hover{
+    transform:translateY(-2px);border-color:rgba(255,255,255,.14)!important;box-shadow:0 18px 42px rgba(0,0,0,.24)!important
+  }
+  .view:not(#dashboard):not(#forecast) .grid{
+    gap:12px!important
+  }
+  .view:not(#dashboard):not(#forecast) .grid>.card{
+    min-height:100px
+  }
+  .view:not(#dashboard):not(#forecast) .panel h2{
+    font-size:18px!important;letter-spacing:-.025em!important
+  }
+  .view:not(#dashboard):not(#forecast) .panel h3{
+    font-size:13px!important;color:#f1f4f5!important
+  }
+  .view:not(#dashboard):not(#forecast) .badge,
+  .view:not(#dashboard):not(#forecast) .pill{
+    border-radius:999px!important
+  }
+  .view#meinmonat .month-hero,
+  .view#insights .month-hero,
+  .view#radar .month-hero,
+  .view#economic .month-hero,
+  .view#yearly .month-hero{
+    border-radius:20px!important;box-shadow:0 20px 55px rgba(0,0,0,.22)!important
+  }
+  .view#insights .wow-card,.view#radar .investigation-card{
+    border-left:2px solid rgba(255,122,26,.72)!important
+  }
+  .view#analysis .panel,.view#yearly .panel,.view#economic .panel{
+    box-shadow:0 16px 44px rgba(0,0,0,.20)!important
+  }
+  .view#report .panel{
+    border-radius:20px!important
+  }
+  @media(max-width:800px){
+    .view:not(#dashboard):not(#forecast)>h1{font-size:26px!important}
+    .view:not(#dashboard):not(#forecast)>h1:before{height:22px;width:7px}
+  }
+
   .view>.panel,.view>.card{border-radius:18px!important}
   .grid .card,.wow-grid .wow-card,.investigation-card,.alert{box-shadow:0 10px 30px rgba(0,0,0,.16)!important}
   input,select,textarea{background:#10171b!important;color:#f5f7f8!important;border:1px solid rgba(255,255,255,.10)!important;border-radius:10px!important}
