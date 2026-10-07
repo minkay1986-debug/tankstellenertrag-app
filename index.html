@@ -423,6 +423,12 @@ async function trackVisitor(){
   try{
     const key='te_visit_tracked_session_v1';
     if(sessionStorage.getItem(key)==='1')return;
+    const visitorKey='te_visitor_id_v1';
+    let visitorId=localStorage.getItem(visitorKey);
+    if(!visitorId){
+      visitorId=(crypto?.randomUUID?crypto.randomUUID():'te-'+Date.now()+'-'+Math.random().toString(36).slice(2));
+      localStorage.setItem(visitorKey,visitorId);
+    }
     const params=new URLSearchParams(location.search);
     const referrer=document.referrer||'';
     let refHost='';
@@ -433,6 +439,7 @@ async function trackVisitor(){
     );
     const path=location.pathname||'/';
     const {error}=await client.from('site_visits').insert({
+      visitor_id:visitorId.slice(0,120),
       referrer:referrer.slice(0,500)||null,
       landing_path:path.slice(0,300),
       source:String(source).slice(0,50)
