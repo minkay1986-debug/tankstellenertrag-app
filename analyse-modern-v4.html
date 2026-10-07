@@ -75,6 +75,139 @@ body{background:#070b0f!important}
 .te4-chart{height:205px;margin-top:14px}.te4-chart svg{width:100%;height:100%;display:block}
 .te4-bars{display:grid;gap:11px;margin-top:18px}.te4-bar-row{display:grid;grid-template-columns:92px 1fr 55px;gap:9px;align-items:center;font-size:9px;color:#bdc6ca}.te4-track{height:9px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}.te4-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#ff7a1a,#ffb05c);box-shadow:0 0 14px rgba(255,122,26,.25)}
 @media(max-width:1000px){.te4-hero{grid-template-columns:1fr}.te4-kpis{grid-template-columns:repeat(2,1fr)}.te4-grid{grid-template-columns:1fr}}
+</style><style id="te4-glass-material">
+/* TankstellenErtrag V4 · Premium Glass Material System */
+:root{
+ --te-glass-hero:rgba(255,255,255,.155);
+ --te-glass-card:rgba(255,255,255,.105);
+ --te-glass-data:rgba(255,255,255,.065);
+ --te-glass-border:rgba(255,255,255,.22);
+ --te-glass-highlight:rgba(255,255,255,.28);
+ --te-orange-soft:rgba(244,123,32,.075);
+}
+body{
+ background:
+   radial-gradient(circle at 12% 8%,rgba(244,123,32,.055),transparent 28%),
+   radial-gradient(circle at 88% 20%,rgba(255,255,255,.035),transparent 30%),
+   #0b0e10!important;
+}
+.te4-hero,.te4-kpi,.te4-card{
+ position:relative;
+ overflow:hidden;
+ isolation:isolate;
+ border:1px solid var(--te-glass-border)!important;
+ background:
+   linear-gradient(135deg,rgba(255,255,255,.105),rgba(255,255,255,.035) 48%,rgba(244,123,32,.035)),
+   var(--te-glass-card)!important;
+ backdrop-filter:blur(24px) saturate(145%);
+ -webkit-backdrop-filter:blur(24px) saturate(145%);
+ box-shadow:
+   0 22px 65px rgba(0,0,0,.24),
+   inset 0 1px 0 rgba(255,255,255,.30),
+   inset 1px 0 0 rgba(255,255,255,.10),
+   inset 0 -1px 0 rgba(0,0,0,.12)!important;
+}
+.te4-hero{
+ background:
+   linear-gradient(118deg,rgba(255,255,255,.16),rgba(255,255,255,.055) 34%,rgba(244,123,32,.055) 100%),
+   var(--te-glass-hero)!important;
+ backdrop-filter:blur(30px) saturate(155%);
+ -webkit-backdrop-filter:blur(30px) saturate(155%);
+ box-shadow:
+   0 30px 85px rgba(0,0,0,.28),
+   inset 0 1px 0 rgba(255,255,255,.34),
+   inset 1px 0 0 rgba(255,255,255,.13),
+   inset 0 -1px 0 rgba(0,0,0,.13)!important;
+}
+.te4-hero:before,.te4-kpi:before,.te4-card:before{
+ content:"";
+ position:absolute;
+ inset:0;
+ z-index:-1;
+ pointer-events:none;
+ background:
+   linear-gradient(112deg,
+     rgba(255,255,255,.28) 0%,
+     rgba(255,255,255,.13) 6%,
+     rgba(255,255,255,.035) 14%,
+     transparent 25%,
+     transparent 72%,
+     rgba(255,255,255,.055) 86%,
+     transparent 100%);
+ opacity:.92;
+}
+.te4-hero:after,.te4-kpi:after,.te4-card:after{
+ content:"";
+ position:absolute;
+ left:0;right:0;top:0;height:1px;
+ background:linear-gradient(90deg,transparent,rgba(255,255,255,.42) 16%,rgba(255,255,255,.18) 72%,transparent);
+ opacity:.8;
+ pointer-events:none;
+}
+.te4-kpi{
+ backdrop-filter:blur(22px) saturate(140%);
+ -webkit-backdrop-filter:blur(22px) saturate(140%);
+}
+.te4-card{
+ background:
+   linear-gradient(135deg,rgba(255,255,255,.075),rgba(255,255,255,.025) 55%,rgba(244,123,32,.025)),
+   var(--te-glass-data)!important;
+ backdrop-filter:blur(17px) saturate(135%);
+ -webkit-backdrop-filter:blur(17px) saturate(135%);
+ box-shadow:
+   0 16px 45px rgba(0,0,0,.20),
+   inset 0 1px 0 rgba(255,255,255,.22),
+   inset 1px 0 0 rgba(255,255,255,.07),
+   inset 0 -1px 0 rgba(0,0,0,.10)!important;
+}
+.te4-kpi:hover,.te4-card:hover{
+ transform:translateY(-2px);
+ border-color:rgba(255,255,255,.28)!important;
+ box-shadow:
+   0 25px 65px rgba(0,0,0,.26),
+   inset 0 1px 0 rgba(255,255,255,.34),
+   0 0 24px rgba(255,255,255,.018)!important;
+ transition:.28s ease;
+}
+.te4-health{
+ background:rgba(255,255,255,.055)!important;
+ border:1px solid rgba(255,255,255,.18)!important;
+ backdrop-filter:blur(18px) saturate(140%);
+ -webkit-backdrop-filter:blur(18px) saturate(140%);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 18px 45px rgba(0,0,0,.18)!important;
+}
+.te4-ring{
+ box-shadow:
+   0 0 0 1px rgba(255,255,255,.16),
+   0 10px 35px rgba(244,123,32,.12),
+   inset 0 1px 0 rgba(255,255,255,.24)!important;
+}
+.te4-status{
+ background:rgba(255,255,255,.045)!important;
+ border:1px solid rgba(255,255,255,.13)!important;
+ backdrop-filter:blur(12px);
+ -webkit-backdrop-filter:blur(12px);
+}
+.te4-track{
+ background:rgba(255,255,255,.07)!important;
+ border:1px solid rgba(255,255,255,.10);
+ box-shadow:inset 0 1px 3px rgba(0,0,0,.20);
+}
+.te4-fill{
+ box-shadow:0 0 14px rgba(244,123,32,.14),inset 0 1px rgba(255,255,255,.28)!important;
+}
+.te4-chart{
+ background:rgba(0,0,0,.075)!important;
+ border:1px solid rgba(255,255,255,.08)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.06)!important;
+}
+@media(prefers-reduced-motion:no-preference){
+ .te4-hero{animation:teGlassBreath 7s ease-in-out infinite}
+}
+@keyframes teGlassBreath{
+ 0%,100%{box-shadow:0 30px 85px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.34),inset 1px 0 0 rgba(255,255,255,.13),inset 0 -1px 0 rgba(0,0,0,.13)}
+ 50%{box-shadow:0 34px 92px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.38),inset 1px 0 0 rgba(255,255,255,.15),inset 0 -1px 0 rgba(0,0,0,.13)}
+}
 </style></head><body><div class="app"><aside class="side"><div class="brand">Tankstellen<span>Ertrag</span></div><div class="tag">Wirtschaftlichkeit · Warenwirtschaft · Ertrag</div><div class="panel" style="margin:0 0 16px;padding:11px;font-size:11px"><b>Aus der Tankstellenpraxis</b><br>für Tankstellen entwickelt.</div><div class="nav"><button class="active" data-v="dashboard">Übersicht</button><button data-v="meinmonat">📊 Mein Monat</button><button data-v="monthly">Monatsdaten</button><button data-v="analysis">Analyse</button><button data-v="insights">✨ Insights & KI</button><button data-v="forecast">🔮 Prognose & Ausblick</button><button data-v="radar">🎯 Ertragsradar</button><button data-v="yearly">Jahresauswertung</button><button data-v="report">Beratungsbericht</button><button type="button" id="navDiniLove" class="dini-tab"><span class="dini-label"><span class="dini-icon">🥐</span>DiniLove</span><span class="dini-sub">Reste retten · Bistro</span></button><button data-v="feedback">⭐ Feedback</button><button data-v="sources">Branchenwissen</button><button data-v="settings">Beratungseinstellungen</button><button data-v="account">👤 Kundenkonto</button></div></aside><main class="main"><div id="gate" class="panel">Verbindung zur Station wird hergestellt …</div><div id="app" style="display:none"><div id="stationInfo" class="panel"></div>
 <section id="dashboard" class="view active"><div class="top"><div><div class="eyebrow">Ihr Überblick</div><div class="h1">Stationsergebnis</div><p class="sub">Shop-Umsatz, Shop-Rohertrag, Shop-Marge, Schwund und Bestandsentwicklung auf einen Blick.<br><span class="small">Kraftstoff und Waschen werden separat betrachtet und nicht in die Shop-Marge einbezogen.</span></p></div><div class="badge">Geschützte Auswertung</div></div><div id="kpis" class="grid cards"></div><div id="dashAlerts" class="panel"></div><div class="panel"><h2>Monatsentwicklung</h2><div id="trend"></div></div></section>
 <section id="meinmonat" class="view">
