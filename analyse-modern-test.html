@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TankstellenErtrag · Modernes Design · Test</title>
+<style>
+  html,body{margin:0;background:#070a0d;color:#fff;font-family:Inter,system-ui,sans-serif}
+  .testbar{position:fixed;z-index:10000;top:0;left:0;right:0;height:34px;display:flex;align-items:center;justify-content:center;gap:12px;background:rgba(9,12,15,.94);border-bottom:1px solid rgba(255,122,26,.28);font-size:12px;font-weight:800;color:#e9edf0;backdrop-filter:blur(14px)}
+  .testbar span{color:#ff8a2d}
+  .frame{padding-top:34px}
+  iframe{display:block;width:100%;height:calc(100vh - 34px);min-height:760px;border:0;background:#070a0d}
+</style>
+</head>
+<body>
+<div class="testbar"><span>TESTVERSION</span> TankstellenErtrag · Modernes Dashboard · Live-Stand unverändert</div>
+<div class="frame"><iframe id="appFrame" title="TankstellenErtrag moderne Testversion" src="./analyse.html?modern-test=1"></iframe></div>
+<script>
+(function(){
+  const frame=document.getElementById('appFrame');
+
+  const modernCSS = `
+  :root{
+    --bg:#070a0d;--p:#11171b;--p2:#171f24;--line:rgba(255,255,255,.075);
+    --line2:rgba(255,255,255,.14);--t:#f7f9fa;--m:#98a4ab;
+    --o:#ff7a1a;--g:#4bd487;--y:#f2c35e;--r:#f06b67
+  }
+  body{
+    background:
+      radial-gradient(850px 520px at 76% -8%,rgba(255,122,26,.10),transparent 62%),
+      radial-gradient(650px 420px at 12% 35%,rgba(35,105,125,.06),transparent 65%),
+      #070a0d!important;
+  }
+  .app{grid-template-columns:248px 1fr!important}
+  .side{
+    background:rgba(11,15,18,.88)!important;
+    border-right:1px solid rgba(255,255,255,.08)!important;
+    box-shadow:16px 0 48px rgba(0,0,0,.20)!important;
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)
+  }
+  .brand{font-size:23px!important;letter-spacing:-.03em}
+  .tag{color:#849098!important}
+  .nav button{
+    color:#aeb8be!important;border:1px solid transparent!important;
+    transition:all .18s ease!important;border-radius:11px!important
+  }
+  .nav button:hover{background:rgba(255,255,255,.045)!important;border-color:var(--line)!important}
+  .nav button.active{
+    background:linear-gradient(90deg,rgba(255,122,26,.17),rgba(255,122,26,.035))!important;
+    color:#fff!important;border-left:2px solid var(--o)!important;
+    box-shadow:0 8px 25px rgba(0,0,0,.18)!important
+  }
+  .main{max-width:1540px!important;padding:30px!important}
+  .card,.panel{
+    background:linear-gradient(145deg,rgba(24,31,36,.97),rgba(12,17,20,.97))!important;
+    border:1px solid var(--line)!important;border-radius:16px!important;
+    box-shadow:0 14px 42px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.025)!important
+  }
+  .card{transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+  .cards .card{position:relative;overflow:hidden;min-height:116px}
+  .cards .card:before{
+    content:"";position:absolute;left:0;right:0;top:0;height:2px;
+    background:linear-gradient(90deg,rgba(255,122,26,.82),transparent 72%)
+  }
+  .cards .card:hover{transform:translateY(-2px);border-color:var(--line2)!important;box-shadow:0 18px 44px rgba(0,0,0,.26)!important}
+  .label{text-transform:uppercase;letter-spacing:.06em;font-size:11px!important;color:#8e9aa1!important;font-weight:800!important}
+  .value{font-size:30px!important;letter-spacing:-.035em}
+  .panel{padding:20px!important}
+  .btn{border-radius:10px!important}
+  .primary{background:linear-gradient(135deg,#ff8b30,#eb6910)!important;box-shadow:0 9px 24px rgba(244,123,32,.18)!important}
+  .secondary{background:#252d32!important;border:1px solid var(--line2)!important}
+  .wow-card,.investigation-card{
+    background:linear-gradient(145deg,#151d21,#0e1417)!important;
+    border-color:var(--line)!important;border-radius:14px!important
+  }
+  .month-hero{
+    background:radial-gradient(500px 220px at 100% 0,rgba(255,122,26,.14),transparent 65%),linear-gradient(145deg,#171f23,#0d1316)!important;
+    border-color:rgba(255,122,26,.18)!important
+  }
+  #dashboard>.top{display:none!important}
+  #dashboard>.panel:has(#trend){margin-top:18px!important}
+  #dashboard>.panel:has(#trend) h2{display:none}
+  #trend .cause-row{padding:10px 2px!important;border-color:rgba(255,255,255,.06)!important}
+  .modern-hero{
+    position:relative;overflow:hidden;display:grid;grid-template-columns:1.35fr .65fr;gap:18px;
+    margin-bottom:18px;padding:26px;border-radius:20px;
+    background:
+      radial-gradient(520px 240px at 92% 5%,rgba(255,122,26,.20),transparent 65%),
+      linear-gradient(145deg,#182126,#0c1114);
+    border:1px solid rgba(255,122,26,.16);
+    box-shadow:0 22px 55px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.035)
+  }
+  .modern-hero:after{
+    content:"";position:absolute;right:-90px;bottom:-130px;width:300px;height:300px;border-radius:50%;
+    background:rgba(255,122,26,.08);filter:blur(45px);pointer-events:none
+  }
+  .modern-kicker{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--o);font-weight:900}
+  .modern-title{font-size:35px;line-height:1.05;letter-spacing:-.045em;font-weight:950;margin:7px 0 10px}
+  .modern-sub{color:#aab5bb;line-height:1.55;max-width:690px}
+  .modern-month{
+    align-self:stretch;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;text-align:right
+  }
+  .modern-month .month-label{font-size:11px;color:#87939a;text-transform:uppercase;letter-spacing:.1em;font-weight:800}
+  .modern-month .month-value{font-size:25px;font-weight:900;margin-top:5px}
+  .modern-pill{display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:7px 10px;border-radius:999px;background:rgba(75,212,135,.09);border:1px solid rgba(75,212,135,.18);color:#79e0a4;font-size:11px;font-weight:800}
+  .modern-kpi-wrap{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+  .modern-kpi{
+    position:relative;overflow:hidden;padding:17px;border-radius:15px;
+    background:linear-gradient(145deg,#151c20,#0f1417);border:1px solid var(--line);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.025)
+  }
+  .modern-kpi:before{content:"";position:absolute;left:0;top:0;width:58px;height:2px;background:var(--accent,var(--o))}
+  .modern-kpi .mk-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#8f9ba2;font-weight:900}
+  .modern-kpi .mk-value{font-size:28px;font-weight:950;letter-spacing:-.04em;margin-top:8px}
+  .modern-kpi .mk-note{font-size:11px;color:#78858c;margin-top:5px}
+  .modern-grid{display:grid;grid-template-columns:1.45fr .85fr;gap:14px;margin-bottom:14px}
+  .modern-chart-card{padding:19px;border-radius:16px;background:linear-gradient(145deg,#141b1f,#0d1316);border:1px solid var(--line);box-shadow:0 12px 36px rgba(0,0,0,.16)}
+  .modern-chart-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+  .modern-chart-title{font-size:16px;font-weight:900}
+  .modern-chart-sub{font-size:11px;color:#7f8b92;margin-top:4px}
+  .modern-chart-badge{font-size:10px;color:#aeb8be;border:1px solid var(--line);padding:5px 8px;border-radius:999px}
+  .modern-svg{width:100%;height:245px;display:block}
+  .modern-empty{height:245px;display:flex;align-items:center;justify-content:center;color:#69757c;font-size:12px;text-align:center;border:1px dashed rgba(255,255,255,.08);border-radius:12px}
+  .modern-radar{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px
+  }
+  .modern-signal{padding:12px;border-radius:12px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06)}
+  .modern-signal b{display:block;font-size:12px}
+  .modern-signal span{display:block;color:#87939a;font-size:10px;margin-top:5px;line-height:1.4}
+  .modern-signal.warn{border-color:rgba(242,195,94,.20);background:rgba(242,195,94,.045)}
+  .modern-signal.good{border-color:rgba(75,212,135,.18);background:rgba(75,212,135,.035)}
+  .modern-section-note{font-size:11px;color:#758188;margin-top:10px}
+  @media(max-width:1100px){
+    .modern-hero{grid-template-columns:1fr}.modern-month{align-items:flex-start;text-align:left}
+    .modern-grid{grid-template-columns:1fr}.modern-kpi-wrap{grid-template-columns:repeat(2,1fr)}
+  }
+  @media(max-width:700px){
+    .main{padding:16px!important}.modern-title{font-size:27px}.modern-hero{padding:19px;border-radius:16px}
+    .modern-kpi-wrap{grid-template-columns:1fr 1fr}.modern-kpi{padding:14px}.modern-kpi .mk-value{font-size:23px}
+    .modern-radar{grid-template-columns:1fr}
+  }
+  @media(max-width:390px){
+    .modern-kpi-wrap{grid-template-columns:1fr}.modern-title{font-size:25px}
+  }
+  `;
+
+  function esc(s){
+    return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+  function euro(n){
+    return Number(n||0).toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:0})+' €';
+  }
+  function pct(n){
+    return Number(n||0).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
+  }
+  function getData(w){
+    try{return JSON.parse(w.localStorage.getItem('tse_current')||'null')}catch(e){return null}
+  }
+  function months(data){
+    return Object.keys(data?.months||{}).sort().filter(k=>{
+      const x=data.months[k]||{};
+      return Number(x.revenue||0)>0 || Number(x.ek||0)>0 || Number(x.shrink||0)>0 ||
+        Number(x.writeoff||0)>0 || Object.values(x.groups||{}).some(g=>Number(g?.revenue||0)>0);
+    }).slice(-12);
+  }
+  function monthLabel(k){
+    const p=String(k).split('-'); if(p.length<2)return k;
+    return new Date(Number(p[0]),Number(p[1])-1,1).toLocaleDateString('de-DE',{month:'short'}).replace('.','');
+  }
+  function calcMonth(data,k){
+    const x=data?.months?.[k]||{};
+    const revenue=Number(x.revenue||0);
+    const ek=Number(x.ek||0);
+    return {revenue,ek,gross:revenue-ek,margin:revenue?(revenue-ek)/revenue*100:0,shrink:Number(x.shrink||0),writeoff:Number(x.writeoff||0),stock:Number(x.stock||0)};
+  }
+  function pathFor(vals,w,h,pad, max){
+    if(!vals.length)return '';
+    const iw=w-pad.l-pad.r,ih=h-pad.t-pad.b;
+    return vals.map((v,i)=>{
+      const x=pad.l+(vals.length===1?iw/2:iw*i/(vals.length-1));
+      const y=pad.t+ih-(Number(v||0)/max)*ih;
+      return (i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);
+    }).join(' ');
+  }
+  function lineChart(data){
+    const ms=months(data), vals=ms.map(k=>calcMonth(data,k).revenue), max=Math.max(...vals,1)*1.12,w=720,h=245,pad={l:8,r:8,t:18,b:28};
+    if(!ms.length)return '<div class="modern-empty">Noch keine Monatsdaten vorhanden.<br>Sobald Daten vorliegen, erscheint hier die Umsatzentwicklung.</div>';
+    const path=pathFor(vals,w,h,pad,max), ih=h-pad.t-pad.b;
+    const points=vals.map((v,i)=>{const x=pad.l+(vals.length===1?(w-pad.l-pad.r)/2:(w-pad.l-pad.r)*i/(vals.length-1));const y=pad.t+ih-(v/max)*ih;return [x,y,v]});
+    const grid=[0.25,.5,.75,1].map(r=>{const y=pad.t+ih-(ih*r);return '<line x1="'+pad.l+'" y1="'+y+'" x2="'+(w-pad.r)+'" y2="'+y+'" stroke="rgba(255,255,255,.055)" />'}).join('');
+    const dots=points.map(p=>'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3.2" fill="#ff7a1a" stroke="#0d1316" stroke-width="2"><title>'+euro(p[2])+'</title></circle>').join('');
+    const labels=ms.map((k,i)=>{const x=points[i][0];return '<text x="'+x+'" y="'+(h-7)+'" text-anchor="middle" fill="#6f7b82" font-size="10">'+esc(monthLabel(k))+'</text>'}).join('');
+    return '<svg class="modern-svg" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><defs><linearGradient id="teLineFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ff7a1a" stop-opacity=".22"/><stop offset="1" stop-color="#ff7a1a" stop-opacity="0"/></linearGradient></defs>'+grid+'<path d="'+path+' L '+points[points.length-1][0]+' '+(pad.t+ih)+' L '+points[0][0]+' '+(pad.t+ih)+' Z" fill="url(#teLineFill)"/><path d="'+path+'" fill="none" stroke="#ff7a1a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'+dots+labels+'</svg>';
+  }
+  function groupChart(data){
+    const k=Object.keys(data?.months||{}).sort().slice(-1)[0];
+    const x=data?.months?.[k]||{}, groups=x.groups||{}, settings=data?.settings||{};
+    const defs=[['süsswaren','Süßwaren',50],['backshop','Backshop',59.2],['kaffee','Kaffee',55],['drogerie','Drogerie',50],['lebensmittel','Lebensmittel',50],['spielzeug','Spielzeug',45],['waschen','Waschen',0],['getraenke','Getränke',50],['eis','Eis',56.8]];
+    const items=defs.filter(g=>Number(groups[g[0]]?.revenue||0)>0).slice(0,6).map(g=>{
+      const q=groups[g[0]]||{}, rev=Number(q.revenue||0), ek=Number(q.ek||0), actual=rev>0&&ek>0?(rev-ek)/rev*100:null;
+      const target=Number(settings?.targetMargins?.[g[0]]??g[2]);
+      return {name:g[1],actual,target};
+    });
+    if(!items.length)return '<div class="modern-empty">Für die aktuelle Monatsauswertung sind noch keine<br>Warengruppen-Umsätze hinterlegt.</div>';
+    const w=720,h=245,left=128,right=20,top=20,bottom=22,iw=w-left-right,ih=h-top-bottom,max=100,bw=Math.min(34,iw/items.length/2.8),gap=iw/items.length;
+    const bars=items.map((it,i)=>{
+      const cx=left+gap*i+gap/2, ty=top+ih-(it.target/max)*ih;
+      const targetH=(it.target/max)*ih, actualH=it.actual==null?0:(it.actual/max)*ih;
+      const actualY=top+ih-actualH;
+      const good=it.actual!=null&&it.actual>=it.target;
+      return '<text x="'+(left-8)+'" y="'+(top+ih-(it.target/max)*ih+4)+'" text-anchor="end" fill="#9aa5ab" font-size="10">'+esc(it.name)+'</text><rect x="'+(cx-bw-4)+'" y="'+(top+ih-targetH)+'" width="'+bw+'" height="'+targetH+'" rx="5" fill="rgba(255,255,255,.10)"/>'+(it.actual==null?'':'<rect x="'+(cx+4)+'" y="'+actualY+'" width="'+bw+'" height="'+actualH+'" rx="5" fill="'+(good?'#4bd487':'#f06b67')+'"/><text x="'+(cx+bw/2+4)+'" y="'+Math.max(12,actualY-5)+'" text-anchor="middle" fill="'+(good?'#75dfa2':'#ff8b87')+'" font-size="9">'+Number(it.actual).toFixed(1)+'%</text>')+'<text x="'+(cx-bw/2-4)+'" y="'+Math.max(12,ty-5)+'" text-anchor="middle" fill="#7d898f" font-size="9">'+Number(it.target).toFixed(1)+'%</text>';
+    }).join('');
+    return '<svg class="modern-svg" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><line x1="'+left+'" y1="'+(top+ih)+'" x2="'+(w-right)+'" y2="'+(top+ih)+'" stroke="rgba(255,255,255,.08)"/>'+bars+'</svg>';
+  }
+  function radarSignals(data){
+    const k=Object.keys(data?.months||{}).sort().slice(-1)[0],d=calcMonth(data,k),out=[];
+    if(d.revenue&&d.shrink/d.revenue*100>=1)out.push('<div class="modern-signal warn"><b>Schwundquote prüfen</b><span>'+pct(d.shrink/d.revenue*100)+' · Bestandsdifferenz genauer untersuchen</span></div>');
+    if(d.writeoff>0)out.push('<div class="modern-signal warn"><b>Abschriften / MHD</b><span>'+euro(d.writeoff)+' · Ursachen und Artikel prüfen</span></div>');
+    if(d.stock&&d.revenue&&d.stock/d.revenue*100>20)out.push('<div class="modern-signal warn"><b>Lagerbestand prüfen</b><span>'+pct(d.stock/d.revenue*100)+' Bestandsquote · Überbestand ausschließen</span></div>');
+    if(!out.length)out.push('<div class="modern-signal good"><b>Aktuell keine auffällige Kennzahl</b><span>Die vorhandenen Daten zeigen derzeit keinen priorisierten Warnhinweis.</span></div>');
+    return out.slice(0,4).join('');
+  }
+  function buildModern(doc,w){
+    if(doc.getElementById('modernDesignLayer'))return;
+    const dash=doc.getElementById('dashboard'); if(!dash)return;
+    const data=getData(w);
+    const latest=Object.keys(data?.months||{}).sort().slice(-1)[0];
+    const d=latest?calcMonth(data,latest):{revenue:0,margin:0,shrink:0,writeoff:0};
+    const layer=doc.createElement('div');layer.id='modernDesignLayer';
+    layer.innerHTML=
+      '<div class="modern-hero"><div><div class="modern-kicker">TankstellenErtrag · Übersicht</div><div class="modern-title">Auf einen Blick.<br>Ohne Rätselraten.</div><div class="modern-sub">Ihre wichtigsten Ertragskennzahlen, Entwicklungen und Prüffelder – klar strukturiert und direkt aus Ihren Stationsdaten.</div><div class="modern-pill">● Auswertung aus vorhandenen Stationsdaten</div></div><div class="modern-month"><div class="month-label">Aktueller Datenstand</div><div class="month-value">'+esc(latest||'Noch kein Monat')+'</div><div class="small">Keine Daten werden durch das Design verändert.</div></div></div>'+
+      '<div class="modern-kpi-wrap">'+
+      '<div class="modern-kpi" style="--accent:#ff7a1a"><div class="mk-label">Shop-Umsatz</div><div class="mk-value">'+euro(d.revenue)+'</div><div class="mk-note">aktueller Datenstand</div></div>'+
+      '<div class="modern-kpi" style="--accent:#4bd487"><div class="mk-label">Shop-Marge</div><div class="mk-value">'+pct(d.margin)+'</div><div class="mk-note">Umsatz minus Wareneinsatz</div></div>'+
+      '<div class="modern-kpi" style="--accent:#f2c35e"><div class="mk-label">Schwund</div><div class="mk-value">'+euro(d.shrink)+'</div><div class="mk-note">aktueller Monatswert</div></div>'+
+      '<div class="modern-kpi" style="--accent:#f06b67"><div class="mk-label">Abschriften</div><div class="mk-value">'+euro(d.writeoff)+'</div><div class="mk-note">aktueller Monatswert</div></div>'+
+      '</div>'+
+      '<div class="modern-grid">'+
+      '<div class="modern-chart-card"><div class="modern-chart-head"><div><div class="modern-chart-title">Umsatzentwicklung</div><div class="modern-chart-sub">Letzte verfügbare Monate · echte Stationsdaten</div></div><div class="modern-chart-badge">bis 12 Monate</div></div>'+lineChart(data)+'</div>'+
+      '<div class="modern-chart-card"><div class="modern-chart-head"><div><div class="modern-chart-title">Marge nach Warengruppe</div><div class="modern-chart-sub">Zielmarge vs. Ist-Marge</div></div></div>'+groupChart(data)+'</div>'+
+      '</div>'+
+      '<div class="modern-chart-card" style="margin-bottom:14px"><div class="modern-chart-head"><div><div class="modern-chart-title">Ertragsradar</div><div class="modern-chart-sub">Signale statt pauschaler Behauptungen · mögliche Ursachen werden geprüft</div></div><div class="modern-chart-badge">Prüfen · nicht beweisen</div></div><div class="modern-radar">'+radarSignals(data)+'</div></div>';
+    dash.insertBefore(layer,dash.firstChild);
+  }
+  function inject(){
+    const doc=frame.contentDocument,w=frame.contentWindow;
+    if(!doc||!doc.head)return;
+    if(!doc.getElementById('modernTestCSS')){
+      const s=doc.createElement('style');s.id='modernTestCSS';s.textContent=modernCSS;doc.head.appendChild(s);
+    }
+    const start=Date.now();
+    const timer=setInterval(()=>{
+      buildModern(doc,w);
+      const app=doc.getElementById('app');
+      if(app&&app.style.display!=='none')clearInterval(timer);
+      if(Date.now()-start>15000)clearInterval(timer);
+    },350);
+    try{
+      const ro=new w.ResizeObserver(()=>{frame.style.height=Math.max(doc.documentElement.scrollHeight+10,760)+'px'});
+      ro.observe(doc.documentElement);
+    }catch(e){}
+    w.addEventListener('click',()=>setTimeout(()=>buildModern(doc,w),250),true);
+    w.addEventListener('storage',()=>setTimeout(()=>{const old=doc.getElementById('modernDesignLayer');if(old)old.remove();buildModern(doc,w)},250));
+  }
+  frame.addEventListener('load',inject);
+})();
+</script>
+</body>
+</html>
