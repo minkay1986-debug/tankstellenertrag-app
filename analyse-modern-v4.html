@@ -753,6 +753,14 @@ body{
     inset 0 -1px 0 rgba(0,0,0,.13),
     0 12px 32px rgba(0,0,0,.16)!important;
 }
+</style><style id="te4-chart-v8">
+#teV4Modern .te4-chart{position:relative;padding-top:4px}
+#teV4Modern .te4-chart-grid{opacity:.42}
+#teV4Modern .te4-chart-grid i{border-top-color:rgba(255,255,255,.10)!important}
+#teV4Modern .te4-chart-labels{font-size:9px!important;color:#9ba7ad!important}
+#teV4Modern .te4-live-dot{filter:drop-shadow(0 0 8px rgba(255,145,60,.55))}
+#teV4Modern .te4-fill{transition:width .5s ease}
+#teV4Modern .te4-bar-row b{color:#e6edf0}
 </style></head><body><div class="app"><aside class="side"><div class="brand">Tankstellen<span>Ertrag</span></div><div class="tag">Wirtschaftlichkeit · Warenwirtschaft · Ertrag</div><div class="panel" style="margin:0 0 16px;padding:11px;font-size:11px"><b>Aus der Tankstellenpraxis</b><br>für Tankstellen entwickelt.</div><div class="nav"><button class="active" data-v="dashboard">Übersicht</button><button data-v="meinmonat">📊 Mein Monat</button><button data-v="monthly">Monatsdaten</button><button data-v="analysis">Analyse</button><button data-v="insights">✨ Insights & KI</button><button data-v="forecast">🔮 Prognose & Ausblick</button><button data-v="radar">🎯 Ertragsradar</button><button data-v="yearly">Jahresauswertung</button><button data-v="report">Beratungsbericht</button><button type="button" id="navDiniLove" class="dini-tab"><span class="dini-label"><span class="dini-icon">🥐</span>DiniLove</span><span class="dini-sub">Reste retten · Bistro</span></button><button data-v="feedback">⭐ Feedback</button><button data-v="sources">Branchenwissen</button><button data-v="settings">Beratungseinstellungen</button><button data-v="account">👤 Kundenkonto</button></div></aside><main class="main"><div id="gate" class="panel">Verbindung zur Station wird hergestellt …</div><div id="app" style="display:none"><div id="stationInfo" class="panel"></div>
 <section id="dashboard" class="view active"><div class="top"><div><div class="eyebrow">Ihr Überblick</div><div class="h1">Stationsergebnis</div><p class="sub">Shop-Umsatz, Shop-Rohertrag, Shop-Marge, Schwund und Bestandsentwicklung auf einen Blick.<br><span class="small">Kraftstoff und Waschen werden separat betrachtet und nicht in die Shop-Marge einbezogen.</span></p></div><div class="badge">Geschützte Auswertung</div></div><div id="kpis" class="grid cards"></div><div id="dashAlerts" class="panel"></div><div class="panel"><h2>Monatsentwicklung</h2><div id="trend"></div></div></section>
 <section id="meinmonat" class="view">
@@ -1309,18 +1317,43 @@ function eeMonth(){eeConfetti();eeToast('🏆 Monat geknackt!','Jetzt wird aus Z
  function v(id){const el=document.querySelector('#kpis .card:nth-child('+id+') .value');return el?el.textContent.trim():'—'}
  function te4RenderRealData(){try{
  const raw=localStorage.getItem('tse_current'); if(!raw)return;
- const d=JSON.parse(raw), ms=Array.isArray(d.months)?d.months:[]; if(ms.length<2)return;
- const rows=ms.slice(-8).map(m=>{const rev=Number(m.revenue||0);return {label:String(m.month||m.key||'').slice(5,7),rev}}).filter(x=>x.rev>=0);
- if(rows.length<2)return;
- const max=Math.max(...rows.map(x=>x.rev),1), min=Math.min(...rows.map(x=>x.rev),0), span=Math.max(max-min,1);
- const pts=rows.map((x,i)=>{const px=25+(710*i/(rows.length-1));const py=160-((x.rev-min)/span)*105;return [px,py]});
+ const d=JSON.parse(raw), ms=Array.isArray(d.months)?d.months:[]; if(!ms.length)return;
+ const fmtMonth=k=>{const s=String(k||'');const m=s.match(/^(\\d{4})-(\\d{2})/);if(!m)return s.slice(0,10)||'Monat';return new Date(Number(m[1]),Number(m[2])-1,1).toLocaleDateString('de-DE',{month:'short'}).replace('.','')+' '+m[1]};
+ const rows=ms.map(m=>{const key=m.month||m.key||'';return {key,label:fmtMonth(key),rev:Number(m.revenue||0)}})
+   .filter(x=>Number.isFinite(x.rev)&&x.rev>=0)
+   .sort((a,b)=>String(a.key).localeCompare(String(b.key)))
+   .slice(-8);
+ if(!rows.length)return;
+ const max=Math.max(...rows.map(x=>x.rev),0), min=Math.min(...rows.map(x=>x.rev),0);
+ const spread=Math.max(max-min,max*.08,1000);
+ const lo=Math.max(0,min-spread*.12), hi=Math.max(lo+1,max+spread*.12), span=hi-lo;
+ const pts=rows.map((x,i)=>{const px=25+(710*Math.max(i,0)/Math.max(rows.length-1,1));const py=160-((x.rev-lo)/span)*112;return [px,Math.max(32,Math.min(160,py))]});
  let line='M '+pts.map(p=>p.join(' ')).join(' L ');
- let area=line+' L 735 185 L 25 185 Z';
+ let area=line+' L '+pts.at(-1)[0]+' 185 L 25 185 Z';
  const lineEl=document.getElementById('te4Line'),areaEl=document.getElementById('te4Area'),dot=document.getElementById('te4Dot');
  if(lineEl)lineEl.setAttribute('d',line); if(areaEl)areaEl.setAttribute('d',area);
  if(dot){dot.setAttribute('cx',pts.at(-1)[0]);dot.setAttribute('cy',pts.at(-1)[1])}
- const labels=document.querySelectorAll('#te4RevenueChart .te4-chart-labels span'); if(labels.length){labels[0].textContent=rows[0].label||'Historie';labels[1].textContent=rows.at(-1).label||'Aktuell'}
+ const labels=document.querySelectorAll('#te4RevenueChart .te4-chart-labels span');
+ if(labels.length){labels[0].textContent=rows[0].label||'Historie';labels[1].textContent=rows.at(-1).label||'Aktuell'}
  }catch(_e){}}
+function te4RenderGroups(){try{
+ const raw=localStorage.getItem('tse_current'); if(!raw)return;
+ const d=JSON.parse(raw), ms=Array.isArray(d.months)?d.months:[], keys=ms.map(m=>m.month||m.key||'').sort();
+ const latestKey=keys.at(-1); if(!latestKey)return;
+ const latest=ms.find(m=>(m.month||m.key||'')===latestKey)||{};
+ const target=d.settings?.targetMargins||{};
+ const groups=latest.groups||{};
+ const names={süsswaren:'Süßwaren',getraenke:'Getränke',kaffee:'Kaffee',backshop:'Backwaren'};
+ const rows=Object.keys(names).map(id=>{
+   const q=groups[id]||{}, revenue=Number(q.revenue||0), ek=Number(q.ek||0);
+   const actual=revenue>0&&ek>0?(revenue-ek)/revenue*100:null;
+   const value=Number.isFinite(actual)?actual:Number(target[id]||0);
+   return {id,name:names[id],value,revenue,actual};
+ }).filter(x=>x.revenue>0||x.value>0).sort((a,b)=>b.value-a.value).slice(0,4);
+ const box=document.querySelector('#teV4Modern .te4-bars'); if(!box||!rows.length)return;
+ const max=Math.max(60,...rows.map(x=>x.value));
+ box.innerHTML=rows.map(x=>'<div class="te4-bar-row"><span>'+x.name+'</span><div class="te4-track"><div class="te4-fill" style="width:'+Math.max(4,Math.min(100,x.value/max*100))+'%"></div></div><b>'+x.value.toFixed(0).replace('.',',')+' %</b></div>').join('');
+}catch(_e){}}
 function modernize(){
    const dash=document.getElementById('dashboard'), app=document.getElementById('app');
    if(!dash||!app||getComputedStyle(app).display==='none')return false;
@@ -1333,6 +1366,8 @@ function modernize(){
     '<section class="te4-grid"><article class="te4-card"><div class="te4-eyebrow">ENTWICKLUNG</div><h2>Umsatz im Zeitverlauf</h2><p>Monatliche Entwicklung Ihrer Station</p><div class="te4-chart" id="te4RevenueChart"><div class="te4-chart-grid"><i></i><i></i><i></i><i></i></div><div class="te4-chart-labels"><span>Historie</span><span>Aktuell</span></div><svg viewBox="0 0 760 205" preserveAspectRatio="none"><defs><linearGradient id="v4fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ff8b32" stop-opacity=".24"/><stop offset="1" stop-color="#ff8b32" stop-opacity="0"/></linearGradient></defs><path id="te4Area" d="M25 156 L735 156 L735 185 L25 185 Z" fill="url(#v4fill)"/><path id="te4Line" d="M25 156 L735 156" fill="none" stroke="#ff913c" stroke-width="3.5" stroke-linecap="round"/><circle id="te4Dot" class="te4-live-dot" cx="735" cy="156" r="6" fill="#ff913c"/></svg></div></article>'+
     '<article class="te4-card"><div class="te4-eyebrow">WARENGRUPPEN</div><h2>Marge im Vergleich</h2><p>Ist-Werte visuell priorisiert</p><div class="te4-bars"><div class="te4-bar-row"><span>Süßwaren</span><div class="te4-track"><div class="te4-fill" style="width:72%"></div></div><b>36 %</b></div><div class="te4-bar-row"><span>Getränke</span><div class="te4-track"><div class="te4-fill" style="width:61%"></div></div><b>31 %</b></div><div class="te4-bar-row"><span>Kaffee</span><div class="te4-track"><div class="te4-fill" style="width:84%"></div></div><b>42 %</b></div><div class="te4-bar-row"><span>Backwaren</span><div class="te4-track"><div class="te4-fill" style="width:49%"></div></div><b>25 %</b></div></div></article></section>';
    dash.insertBefore(layer,dash.firstChild);
+   te4RenderRealData();te4RenderGroups();
+   setTimeout(()=>{te4RenderRealData();te4RenderGroups()},900);
    return true;
  }
  const t=setInterval(()=>{if(modernize())clearInterval(t)},500);
