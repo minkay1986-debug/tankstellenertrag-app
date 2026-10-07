@@ -78,6 +78,24 @@
     border-color:rgba(255,122,26,.18)!important
   }
   #dashboard>.top{display:none!important}
+  #dashboard{background:transparent!important}
+  #dashboard>.panel:not(#modernDesignLayer),#dashboard>.card:not(#modernDesignLayer){display:none!important}
+  #modernDesignLayer{display:block!important;position:relative;z-index:2;max-width:1500px}
+  .premium-hero{display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:stretch;padding:30px;border-radius:24px;margin-bottom:16px;background:radial-gradient(700px 300px at 100% 0,rgba(255,122,26,.19),transparent 62%),linear-gradient(135deg,#182228 0%,#0d1215 68%);border:1px solid rgba(255,255,255,.09);box-shadow:0 24px 70px rgba(0,0,0,.30),inset 0 1px rgba(255,255,255,.05);overflow:hidden;position:relative}
+  .premium-hero:after{content:"";position:absolute;width:360px;height:360px;right:-160px;bottom:-230px;border-radius:50%;background:rgba(255,122,26,.12);filter:blur(30px);pointer-events:none}
+  .hero-copy{position:relative;z-index:1}.modern-kicker,.eyebrow{font-size:10px;letter-spacing:.16em;color:#ff8b32;font-weight:950}
+  .premium-hero h1{font-size:42px;line-height:1.0;letter-spacing:-.055em;margin:9px 0 12px;font-weight:950}.premium-hero h1 span{color:#fff}
+  .premium-hero p{max-width:720px;color:#a9b4ba;margin:0;line-height:1.55;font-size:13px}.hero-meta{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:18px;color:#839097;font-size:10px}.hero-meta b{color:#cbd3d7}.hero-sep{opacity:.4}.live-dot{width:7px;height:7px;border-radius:50%;background:#4bd487;box-shadow:0 0 14px rgba(75,212,135,.8)}
+  .health-card{display:flex;align-items:center;gap:14px;padding:18px;border-radius:18px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);position:relative;z-index:1}.health-ring{width:92px;height:92px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#4bd487 0 76%,rgba(255,255,255,.08) 76%);position:relative;flex:none}.health-ring:after{content:"";position:absolute;inset:8px;border-radius:50%;background:#12191d}.health-ring span{position:relative;z-index:1;font-size:24px;font-weight:950}.health-ring small{font-size:11px}.health-label{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:#7f8b92;font-weight:900}.health-card strong{display:block;font-size:20px;margin-top:4px}.health-card p{font-size:10px!important;color:#7f8b92!important;margin:3px 0 0!important}.health-card.mid .health-ring{background:conic-gradient(#f2c35e 0 58%,rgba(255,255,255,.08) 58%)}.health-card.bad .health-ring{background:conic-gradient(#f06b67 0 40%,rgba(255,255,255,.08) 40%)}
+  .premium-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.premium-kpi{padding:17px 18px;border-radius:17px;background:linear-gradient(145deg,#151d22,#0e1417);border:1px solid rgba(255,255,255,.08);box-shadow:0 14px 40px rgba(0,0,0,.18),inset 0 1px rgba(255,255,255,.025);position:relative;overflow:hidden}.premium-kpi:before{content:"";position:absolute;left:0;top:0;right:40%;height:2px;background:var(--accent)}.accent-orange{--accent:#ff7a1a}.accent-green{--accent:#4bd487}.accent-yellow{--accent:#f2c35e}.accent-red{--accent:#f06b67}.kpi-top{display:flex;justify-content:space-between;align-items:center;color:#8d999f;font-size:9px;text-transform:uppercase;letter-spacing:.08em;font-weight:900}.kpi-icon{display:grid;place-items:center;width:23px;height:23px;border-radius:7px;background:rgba(255,255,255,.045);color:var(--accent);font-size:11px}.premium-kpi strong{display:block;font-size:28px;letter-spacing:-.04em;margin:10px 0 7px}.kpi-bottom{display:flex;justify-content:space-between;gap:8px;color:#68757c;font-size:9px}.positive{color:#67d99a}.negative{color:#ff7772}.neutral{color:#9aa5ab}
+  .premium-grid{display:grid;grid-template-columns:1.55fr 1fr;gap:14px;margin-bottom:14px}.premium-card{padding:20px;border-radius:19px;background:linear-gradient(145deg,#151d22,#0d1316);border:1px solid rgba(255,255,255,.08);box-shadow:0 16px 45px rgba(0,0,0,.20)}.premium-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:13px}.premium-head h2{font-size:17px;margin:5px 0 3px;font-weight:950;letter-spacing:-.02em}.premium-head p{font-size:10px;color:#748188;margin:0}.chart-chip,.radar-chip{font-size:9px;color:#b3bdc2;border:1px solid rgba(255,255,255,.09);padding:6px 9px;border-radius:999px;white-space:nowrap}.radar-chip{color:#ffb070;border-color:rgba(255,122,26,.25);background:rgba(255,122,26,.05)}
+  .premium-grid .modern-svg{height:250px}.chart-side .modern-svg{height:250px}.radar-card{margin-bottom:14px}.premium-radar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.premium-radar .modern-signal{min-height:70px;padding:14px;border-radius:14px}.premium-radar .modern-signal b{font-size:12px}.premium-radar .modern-signal span{font-size:10px}
+  .premium-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.premium-actions article{display:flex;gap:13px;padding:16px;border-radius:16px;background:linear-gradient(145deg,#12191d,#0c1114);border:1px solid rgba(255,255,255,.07)}.premium-actions article>span{font-size:11px;color:#ff8b32;font-weight:950}.premium-actions b{font-size:12px}.premium-actions p{font-size:10px;color:#758188;line-height:1.45;margin:5px 0 0}
+  .group-legend{margin-top:2px!important}
+  @media(max-width:1100px){.premium-hero{grid-template-columns:1fr}.premium-kpis{grid-template-columns:repeat(2,1fr)}.premium-grid{grid-template-columns:1fr}.premium-radar{grid-template-columns:1fr 1fr}}
+  @media(max-width:700px){.premium-hero{padding:21px;border-radius:18px}.premium-hero h1{font-size:31px}.premium-kpis{grid-template-columns:1fr 1fr}.premium-kpi strong{font-size:23px}.premium-actions{grid-template-columns:1fr}.premium-radar{grid-template-columns:1fr}.premium-head{flex-direction:column}}
+  @media(max-width:420px){.premium-kpis{grid-template-columns:1fr}}
+
   #dashboard>.panel:not(#modernDesignLayer),#dashboard>.card:not(#modernDesignLayer){display:none!important}
   #modernDesignLayer{display:block!important;position:relative;z-index:2}
   .modern-grid{align-items:stretch}
@@ -236,22 +254,38 @@
     if(doc.getElementById('modernDesignLayer'))return;
     const dash=doc.getElementById('dashboard'); if(!dash)return;
     const data=getData(w);
-    const latest=Object.keys(data?.months||{}).sort().slice(-1)[0];
-    const d=latest?calcMonth(data,latest):{revenue:0,margin:0,shrink:0,writeoff:0};
+    const ms=months(data);
+    const latest=ms.at(-1);
+    const previous=ms.length>1?ms.at(-2):null;
+    const d=latest?calcMonth(data,latest):{revenue:0,margin:0,shrink:0,writeoff:0,stock:0,gross:0};
+    const p=previous?calcMonth(data,previous):null;
+    const delta=(a,b)=>b&&b!==0?(a-b)/b*100:null;
+    const revDelta=delta(d.revenue,p?.revenue), grossDelta=delta(d.gross,p?.gross);
     const layer=doc.createElement('div');layer.id='modernDesignLayer';
+    const deltaHtml=(v)=>v==null?'—':(v>=0?'▲ ':'▼ ')+Math.abs(v).toLocaleString('de-DE',{maximumFractionDigits:1})+' %';
+    const deltaClass=(v)=>v==null?'neutral':v>=0?'positive':'negative';
+    const health=d.margin>=30?'Sehr gut':d.margin>=20?'Stabil':'Prüfen';
+    const healthClass=d.margin>=30?'good':d.margin>=20?'mid':'bad';
     layer.innerHTML=
-      '<div class="modern-hero"><div><div class="modern-kicker">TankstellenErtrag · Übersicht</div><div class="modern-title">Auf einen Blick.<br>Ohne Rätselraten.</div><div class="modern-sub">Ihre wichtigsten Ertragskennzahlen, Entwicklungen und Prüffelder – klar strukturiert und direkt aus Ihren Stationsdaten.</div><div class="modern-pill">● Auswertung aus vorhandenen Stationsdaten</div></div><div class="modern-month"><div class="month-label">Aktueller Datenstand</div><div class="month-value">'+esc(latest||'Noch kein Monat')+'</div><div class="small">Keine Daten werden durch das Design verändert.</div></div></div>'+
-      '<div class="modern-kpi-wrap">'+
-      '<div class="modern-kpi" style="--accent:#ff7a1a"><div class="mk-label">Shop-Umsatz</div><div class="mk-value">'+euro(d.revenue)+'</div><div class="mk-note">aktueller Datenstand</div></div>'+
-      '<div class="modern-kpi" style="--accent:#4bd487"><div class="mk-label">Shop-Marge</div><div class="mk-value">'+pct(d.margin)+'</div><div class="mk-note">Umsatz minus Wareneinsatz</div></div>'+
-      '<div class="modern-kpi" style="--accent:#f2c35e"><div class="mk-label">Schwund</div><div class="mk-value">'+euro(d.shrink)+'</div><div class="mk-note">aktueller Monatswert</div></div>'+
-      '<div class="modern-kpi" style="--accent:#f06b67"><div class="mk-label">Abschriften</div><div class="mk-value">'+euro(d.writeoff)+'</div><div class="mk-note">aktueller Monatswert</div></div>'+
-      '</div>'+
-      '<div class="modern-grid">'+
-      '<div class="modern-chart-card"><div class="modern-chart-head"><div><div class="modern-chart-title">Umsatzentwicklung</div><div class="modern-chart-sub">Letzte verfügbare Monate · echte Stationsdaten</div></div><div class="modern-chart-badge">bis 12 Monate</div></div>'+lineChart(data)+'</div>'+
-      '<div class="modern-chart-card"><div class="modern-chart-head"><div><div class="modern-chart-title">Marge nach Warengruppe</div><div class="modern-chart-sub">Zielmarge vs. Ist-Marge</div></div></div>'+groupChart(data)+'</div>'+
-      '</div>'+
-      '<div class="modern-chart-card" style="margin-bottom:14px"><div class="modern-chart-head"><div><div class="modern-chart-title">Ertragsradar</div><div class="modern-chart-sub">Signale statt pauschaler Behauptungen · mögliche Ursachen werden geprüft</div></div><div class="modern-chart-badge">Prüfen · nicht beweisen</div></div><div class="modern-radar">'+radarSignals(data)+'</div></div>';
+      '<section class="premium-hero">'+
+        '<div class="hero-copy"><div class="modern-kicker">TankstellenErtrag · Executive Dashboard</div>'+
+        '<h1>Ihr Ertrag.<br><span>Auf einen Blick.</span></h1>'+
+        '<p>Die wichtigsten Entwicklungen Ihrer Station – klar priorisiert, visuell aufbereitet und direkt aus den vorhandenen Stationsdaten.</p>'+
+        '<div class="hero-meta"><span class="live-dot"></span><b>Aktueller Datenstand</b><span>'+esc(latest||'Noch kein Monat')+'</span><span class="hero-sep">•</span><span>keine neuen Eingaben erforderlich</span></div></div>'+
+        '<div class="health-card '+healthClass+'"><div class="health-ring"><span>'+Number(d.margin||0).toFixed(0)+'<small>%</small></span></div><div><div class="health-label">Ertragsstatus</div><strong>'+health+'</strong><p>Shop-Marge aktuell</p></div></div>'+
+      '</section>'+
+      '<section class="premium-kpis">'+
+        '<article class="premium-kpi accent-orange"><div class="kpi-top"><span>Shop-Umsatz</span><span class="kpi-icon">↗</span></div><strong>'+euro(d.revenue)+'</strong><div class="kpi-bottom"><span class="'+deltaClass(revDelta)+'">'+deltaHtml(revDelta)+'</span><span>zum Vormonat</span></div></article>'+
+        '<article class="premium-kpi accent-green"><div class="kpi-top"><span>Rohertrag</span><span class="kpi-icon">€</span></div><strong>'+euro(d.gross)+'</strong><div class="kpi-bottom"><span class="'+deltaClass(grossDelta)+'">'+deltaHtml(grossDelta)+'</span><span>zum Vormonat</span></div></article>'+
+        '<article class="premium-kpi accent-yellow"><div class="kpi-top"><span>Shop-Marge</span><span class="kpi-icon">%</span></div><strong>'+pct(d.margin)+'</strong><div class="kpi-bottom"><span class="neutral">Warenergebnis</span><span>Umsatz minus EK</span></div></article>'+
+        '<article class="premium-kpi accent-red"><div class="kpi-top"><span>Schwund</span><span class="kpi-icon">!</span></div><strong>'+euro(d.shrink)+'</strong><div class="kpi-bottom"><span class="neutral">'+(d.revenue?pct(d.shrink/d.revenue*100):'0 %')+'</span><span>vom Umsatz</span></div></article>'+
+      '</section>'+
+      '<section class="premium-grid">'+
+        '<article class="premium-card chart-main"><div class="premium-head"><div><span class="eyebrow">ENTWICKLUNG</span><h2>Umsatz im Zeitverlauf</h2><p>Letzte verfügbare Monate · echte Stationsdaten</p></div><span class="chart-chip">12 Monate</span></div>'+lineChart(data)+'</article>'+
+        '<article class="premium-card chart-side"><div class="premium-head"><div><span class="eyebrow">WARENGRUPPEN</span><h2>Marge im Vergleich</h2><p>Ist-Marge gegenüber Zielmarge</p></div></div>'+groupChart(data)+'</article>'+
+      '</section>'+
+      '<section class="premium-card radar-card"><div class="premium-head"><div><span class="eyebrow">ERTRAGSRADAR</span><h2>Was sollten Sie sich ansehen?</h2><p>Priorisierte Signale aus den vorhandenen Daten – Hinweise, keine erfundenen Ursachen.</p></div><span class="radar-chip">PRÜFEN · NICHT BEWEISEN</span></div><div class="premium-radar">'+radarSignals(data)+'</div></section>'+
+      '<section class="premium-actions"><article><span>01</span><div><b>Erkennen</b><p>Abweichungen zuerst dort prüfen, wo Umsatz, Marge oder Schwund auffällig sind.</p></div></article><article><span>02</span><div><b>Einordnen</b><p>Warengruppe und Entwicklung gemeinsam betrachten – nicht nur eine einzelne Kennzahl.</p></div></article><article><span>03</span><div><b>Handeln</b><p>Konkrete Maßnahmen erst nach der Ursachenprüfung ableiten.</p></div></article></section>';
     dash.insertBefore(layer,dash.firstChild);
   }
   function inject(){
