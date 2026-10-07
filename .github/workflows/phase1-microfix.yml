@@ -7,7 +7,7 @@ permissions:
   contents: write
 jobs:
   fix:
-    if: "!contains(github.event.head_commit.message, 'Phase 1 microfix')"
+    if: github.event.head_commit.message != 'Phase 1 microfix: mobile KPI and margin display'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
