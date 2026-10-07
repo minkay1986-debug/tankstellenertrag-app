@@ -80,9 +80,9 @@
   #dashboard>.top{display:none!important}
   /* INSIGHTS PREMIUM TEST */
   #insights .top{display:none!important}
-  #insights #insightsBody{display:grid;grid-template-columns:1.5fr .8fr;gap:14px;align-items:start!important}
+  #insights #insightsBody{display:grid;grid-template-columns:1.5fr .8fr;grid-auto-rows:max-content;gap:14px;align-items:start!important}
   #insights #insightsBody>*{min-width:0;align-self:start}
-  #insights #insightsBody .month-hero{height:auto!important;min-height:0!important;max-height:none!important;align-self:start!important}
+  #insights #insightsBody .month-hero{height:auto!important;min-height:0!important;max-height:none!important;align-self:start!important;grid-column:1!important;grid-row:auto!important}
   #insights .panel,#insights .card{border-radius:19px!important;background:linear-gradient(145deg,#151e23,#0d1316)!important;border:1px solid rgba(255,255,255,.08)!important;box-shadow:0 16px 45px rgba(0,0,0,.18)!important}
   #insights #insightsBody:before{content:"✨ INSIGHTS & KI";grid-column:1/-1;font-size:10px;letter-spacing:.16em;color:#ff8b32;font-weight:950}
   #insights #insightsBody:after{content:"Fakten → Einordnung → nächste Prüffrage";grid-column:1/-1;font-size:30px;line-height:1.05;letter-spacing:-.05em;font-weight:950;margin-top:-9px;margin-bottom:3px;color:#f7f9fa}
