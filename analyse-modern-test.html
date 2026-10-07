@@ -1165,6 +1165,118 @@
     #radar #simResult{grid-template-columns:1fr 1fr!important}
     #radar #simResult .card:first-child,#radar #simResult .card:last-child{grid-column:span 2}
   }
+
+  /* PHASE 2B — ANALYSE PAGE: use the same premium visual language as the dashboard */
+  #analysis>.top{margin-bottom:18px!important}
+  #analysis>.top .h1{font-size:30px!important;letter-spacing:-.045em!important}
+  #analysis>.top .sub{color:#8d9aa1!important}
+  #analysis #analysisBody{
+    display:grid!important;
+    gap:14px!important;
+  }
+  #analysis #analysisBody>.panel{
+    margin:0!important;
+    padding:19px!important;
+    border-radius:20px!important;
+    background:
+      linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018))!important;
+    border:1px solid rgba(255,255,255,.09)!important;
+    box-shadow:0 18px 55px rgba(0,0,0,.17),inset 0 1px 0 rgba(255,255,255,.12)!important;
+    backdrop-filter:blur(24px) saturate(165%)!important;
+  }
+  #analysis #analysisBody>.panel:first-child{
+    background:
+      radial-gradient(500px 180px at 100% 0,rgba(255,122,26,.10),transparent 65%),
+      linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.018))!important;
+  }
+  #analysis #analysisBody>.grid.cards{
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+  #analysis #analysisBody>.grid.cards>.card{
+    min-height:82px!important;
+    padding:14px 15px!important;
+    border-radius:15px!important;
+    background:linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.022))!important;
+    border:1px solid rgba(255,255,255,.075)!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07)!important;
+  }
+  #analysis #analysisBody>.grid.cards>.card:nth-child(1){border-top:2px solid rgba(255,139,50,.72)!important}
+  #analysis #analysisBody>.grid.cards>.card:nth-child(3){border-top:2px solid rgba(115,223,160,.62)!important}
+  #analysis #analysisBody>.grid.cards>.card:nth-child(4){border-top:2px solid rgba(242,195,94,.60)!important}
+  #analysis #analysisBody>.grid.cards>.card:nth-child(5){border-top:2px solid rgba(240,107,103,.60)!important}
+  #analysis #analysisBody>.grid.cards .label{
+    font-size:8px!important;letter-spacing:.10em!important;text-transform:uppercase!important;
+    color:#839097!important;font-weight:900!important;
+  }
+  #analysis #analysisBody>.grid.cards .value{
+    margin-top:8px!important;font-size:22px!important;letter-spacing:-.035em!important;
+    font-weight:950!important;color:#f1f5f6!important;
+  }
+  #analysis #analysisBody .eyebrow{
+    color:#ff923c!important;font-size:9px!important;letter-spacing:.14em!important;
+  }
+  #analysis #analysisBody h2{
+    font-size:18px!important;letter-spacing:-.025em!important;
+    color:#f1f4f5!important;
+  }
+  #analysis #analysisBody .small{color:#8b989f!important;font-size:10px!important;line-height:1.5!important}
+  #analysis #analysisBody .alert{
+    border-radius:12px!important;padding:11px 13px!important;
+    background:rgba(240,107,103,.075)!important;
+    border:1px solid rgba(240,107,103,.16)!important;
+  }
+  #analysis #analysisBody .wow-grid{
+    display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:10px!important;margin-top:13px!important;
+  }
+  #analysis #analysisBody .wow-grid>*{
+    min-height:125px!important;
+    margin:0!important;
+    padding:15px!important;
+    border-radius:15px!important;
+    background:linear-gradient(145deg,rgba(255,255,255,.052),rgba(255,255,255,.018))!important;
+    border:1px solid rgba(255,255,255,.075)!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07)!important;
+  }
+  #analysis #analysisBody .wow-grid>*:first-child{
+    border-left:3px solid #ef6c67!important;
+    background:linear-gradient(145deg,rgba(240,107,103,.10),rgba(255,255,255,.018))!important;
+  }
+  #analysis #analysisBody .wow-grid>*:nth-child(2){border-left:3px solid #f2c35e!important}
+  #analysis #analysisBody .wow-grid>*:nth-child(3){border-left:3px solid #73dfa0!important}
+  #analysis #analysisBody table{
+    margin-top:13px!important;
+    border-spacing:0 4px!important;
+  }
+  #analysis #analysisBody table th{
+    background:rgba(6,11,14,.72)!important;
+    color:#829097!important;
+  }
+  #analysis #analysisBody table td{
+    padding:10px 11px!important;
+    font-size:10px!important;
+  }
+  #analysis #analysisBody table tbody tr td:first-child,
+  #analysis #analysisBody table tr td:first-child{
+    color:#f0f4f5!important;
+  }
+  #analysis #analysisBody .stockFlag{
+    display:inline-flex!important;
+    align-items:center!important;
+    min-height:22px!important;
+    padding:3px 8px!important;
+    border-radius:999px!important;
+    background:rgba(255,255,255,.06)!important;
+    border:1px solid rgba(255,255,255,.08)!important;
+    font-size:8px!important;font-weight:900!important;
+    color:#c1cbd0!important;
+  }
+  @media(max-width:900px){
+    #analysis #analysisBody>.grid.cards{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+    #analysis #analysisBody .wow-grid{grid-template-columns:1fr!important}
+  }
   function esc(s){
     return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   }
