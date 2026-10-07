@@ -187,7 +187,7 @@ async function loadStation(session){
     $('stationStatus').className='status '+(active?'ok':'err');
     $('stationStatus').textContent=active?'Zugang ist aktiv.':'Station vorhanden, aber Zugang aktuell nicht aktiv.';
   }
-  if(active){$('openApp').classList.remove('hidden');$('openApp').onclick=async(e)=>{e.preventDefault();try{const {data:s}=await withTimeout(client.auth.getSession(),10000,'Die Sitzung konnte nicht gelesen werden.');if(!s.session)throw new Error('Die Anmeldung ist abgelaufen.');location.href='https://app.tankstellenertrag.de/analyse.html';}catch(err){status(err.message||String(err),'err')}};}
+  if(active){$('openApp').classList.remove('hidden');$('openApp').onclick=async(e)=>{e.preventDefault();try{const {data:s}=await withTimeout(client.auth.getSession(),10000,'Die Sitzung konnte nicht gelesen werden.');if(!s.session)throw new Error('Die Anmeldung ist abgelaufen.');try{localStorage.setItem('tankstellenertrag-session-handoff',JSON.stringify({access_token:s.session.access_token,refresh_token:s.session.refresh_token,created_at:Date.now()}));}catch(storageError){throw new Error('Die Anmeldung konnte nicht an die Plattform übergeben werden: '+(storageError.message||storageError));}location.href='https://app.tankstellenertrag.de/analyse.html';}catch(err){status(err.message||String(err),'err')}};}
 }
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 
