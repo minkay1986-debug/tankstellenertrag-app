@@ -1532,10 +1532,14 @@
     }
     const start=Date.now();
     const timer=setInterval(()=>{
-      buildModern(doc,w);
-      const app=doc.getElementById('app');
-      if(app&&app.style.display!=='none')clearInterval(timer);
-      if(Date.now()-start>15000)clearInterval(timer);
+      try{
+        buildModern(doc,w);
+      }catch(err){
+        // Keep retrying until the modern layer actually exists.
+        console.warn('Modern test layer retry:',err);
+      }
+      if(doc.getElementById('modernDesignLayer'))clearInterval(timer);
+      if(Date.now()-start>30000)clearInterval(timer);
     },350);
     try{
       // Kein dynamisches Hochsetzen der iframe-Höhe: verhindert das kontinuierliche Verschieben der Testseite.
