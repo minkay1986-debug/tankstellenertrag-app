@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TankstellenErtrag · Desktop-Test</title>
+<style>
+html,body{margin:0;min-height:100%;background:#0d0f10;color:#fff;font-family:system-ui,sans-serif}
+#status{padding:18px;text-align:center;color:#aeb6bc}
+#status strong{color:#f47b20}
+</style>
+</head>
+<body>
+<div id="status"><strong>TESTVERSION</strong><br>Desktop-Test wird geladen …</div>
+<script>
+(async()=>{
+  const raw='https://raw.githubusercontent.com/minkay1986-debug/tankstellenertrag-app/test-desktop-stabilisierung-20261007/analyse.html?test=20261007';
+  try{
+    const r=await fetch(raw,{cache:'no-store'});
+    if(!r.ok) throw new Error('Testversion konnte nicht geladen werden ('+r.status+').');
+    const html=await r.text();
+    document.open();
+    document.write(html);
+    document.close();
+  }catch(e){
+    document.getElementById('status').innerHTML='<strong>Testversion konnte nicht geladen werden</strong><br>'+String(e.message||e);
+  }
+})();
+</script>
+</body>
+</html>
