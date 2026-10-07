@@ -1,0 +1,38 @@
+name: phase1-mobile-fix
+on:
+  push:
+    branches:
+      - feature/mein-monat-phase1
+jobs:
+  fix:
+    if: ${{ github.event.head_commit.message != 'Phase 1: Mobile-Layout robust machen' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch mobile layout
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('analyse.html')
+          s=p.read_text(encoding='utf-8')
+          old='body{margin:0;background:#0d0f10;color:var(--t);font-family:Inter,system-ui,sans-serif}.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}'
+          new='body{margin:0;background:#0d0f10;color:var(--t);font-family:Inter,system-ui,sans-serif;max-width:100%;overflow-x:hidden}.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh;min-width:0}'
+          if old not in s: raise SystemExit('base CSS pattern not found')
+          s=s.replace(old,new,1)
+          old2='.main{padding:28px;max-width:1450px;width:100%;margin:auto}'
+          new2='.main{padding:28px;max-width:1450px;width:100%;margin:auto;min-width:0}'
+          if old2 not in s: raise SystemExit('main CSS pattern not found')
+          s=s.replace(old2,new2,1)
+          marker='@media(max-width:800px){.wow-grid{grid-template-columns:1fr}}'
+          mobile='@media(max-width:800px){.wow-grid{grid-template-columns:1fr}.main{width:100%;min-width:0;padding:16px 12px}.top{min-width:0}.top>*{min-width:0;max-width:100%}.panel,.card{min-width:0;max-width:100%}.meinmonat-kpis{grid-template-columns:1fr!important}.weather-days{grid-template-columns:repeat(2,minmax(0,1fr))}.weather-impact-list{grid-template-columns:1fr!important}}'
+          if marker not in s: raise SystemExit('mobile marker not found')
+          s=s.replace(marker,mobile,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add analyse.html
+          git commit -m "Phase 1: Mobile-Layout robust machen"
+          git push
