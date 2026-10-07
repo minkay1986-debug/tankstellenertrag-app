@@ -256,8 +256,9 @@
       if(Date.now()-start>15000)clearInterval(timer);
     },350);
     try{
-      const ro=new w.ResizeObserver(()=>{frame.style.height=Math.max(doc.documentElement.scrollHeight+10,760)+'px'});
-      ro.observe(doc.documentElement);
+      // Kein dynamisches Hochsetzen der iframe-Höhe: verhindert das kontinuierliche Verschieben der Testseite.
+      frame.style.height='calc(100vh - 34px)';
+      frame.style.minHeight='760px';
     }catch(e){}
     w.addEventListener('click',()=>setTimeout(()=>buildModern(doc,w),250),true);
     w.addEventListener('storage',()=>setTimeout(()=>{const old=doc.getElementById('modernDesignLayer');if(old)old.remove();buildModern(doc,w)},250));
