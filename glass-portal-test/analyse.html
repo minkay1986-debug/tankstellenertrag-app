@@ -102,6 +102,59 @@ input,select,textarea{background:rgba(5,15,25,.58)!important;color:#eef7ff!impor
 .data-quality-title:before{content:"";width:9px;height:9px;border-radius:50%;background:#79d6a0;box-shadow:0 0 10px rgba(121,214,160,.45)}
 .data-quality-title.check:before{background:#e7bd63;box-shadow:0 0 10px rgba(231,189,99,.45)}
 .data-quality-title.critical:before{background:#ff6d68;box-shadow:0 0 10px rgba(255,109,104,.45)}
+</style><style id="glass-prueffelder-2026">
+/* Prüffelder: one coherent 2026 glass material, with safe text wrapping */
+.wow-card{
+ background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(7,17,29,.16) 55%,rgba(0,0,0,.12))!important;
+ border:1px solid rgba(225,244,255,.15)!important;
+ border-radius:16px!important;
+ padding:15px!important;
+ box-shadow:0 20px 48px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.18),inset 0 -16px 35px rgba(0,0,0,.10)!important;
+ backdrop-filter:blur(28px) saturate(175%)!important;
+ -webkit-backdrop-filter:blur(28px) saturate(175%)!important;
+ min-width:0!important;
+}
+.wow-card:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.025) 28%,transparent 62%,rgba(120,190,235,.045))}
+.wow-card>*{position:relative;z-index:1}
+.wow-card.risk-watch,.wow-card.risk-critical,.wow-card.risk-severe{
+ border-color:rgba(225,244,255,.15)!important;
+ box-shadow:0 20px 48px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.18)!important;
+ animation:none!important;
+}
+.risk-strip{width:3px!important;opacity:.9}
+.risk-status{
+ display:flex!important;
+ flex-direction:column!important;
+ align-items:flex-start!important;
+ justify-content:flex-start!important;
+ gap:7px!important;
+ min-width:0!important;
+}
+.wow-title{
+ font-size:14px!important;
+ line-height:1.25!important;
+ white-space:normal!important;
+ overflow-wrap:anywhere!important;
+ max-width:100%!important;
+}
+.wow-kicker{font-size:11px!important;line-height:1.45!important;overflow-wrap:anywhere}
+.wow-num{font-size:9px!important;letter-spacing:.10em!important}
+.risk-badge{
+ flex:0 0 auto!important;
+ max-width:100%!important;
+ white-space:normal!important;
+}
+#dashAlerts .panel:nth-child(2) h2{
+ display:flex;align-items:center;gap:9px;
+}
+#dashAlerts .panel:nth-child(2) h2:before{
+ content:"";width:8px;height:8px;border-radius:50%;background:#ff9a3d;
+ box-shadow:0 0 10px rgba(255,154,61,.45);flex:0 0 auto;
+}
+@media(max-width:800px){
+ .wow-grid{grid-template-columns:1fr!important}
+ .wow-card{padding:14px!important}
+}
 </style></head><body><div class="app"><aside class="side"><div class="brand">Tankstellen<span>Ertrag</span></div><div class="tag">Wirtschaftlichkeit · Warenwirtschaft · Ertrag</div><div class="panel" style="margin:0 0 16px;padding:11px;font-size:11px"><b>Aus der Tankstellenpraxis</b><br>für Tankstellen entwickelt.</div><div class="nav"><button class="active" data-v="dashboard">Übersicht</button><button data-v="meinmonat">📊 Mein Monat</button><button data-v="monthly">Monatsdaten</button><button data-v="analysis">Analyse</button><button data-v="insights">✨ Insights & KI</button><button data-v="forecast">🔮 Prognose & Ausblick</button><button data-v="radar">🎯 Ertragsradar</button><button data-v="yearly">Jahresauswertung</button><button data-v="report">Beratungsbericht</button><button type="button" id="navDiniLove" class="dini-tab"><span class="dini-label"><span class="dini-icon">🥐</span>DiniLove</span><span class="dini-sub">Reste retten · Bistro</span></button><button data-v="feedback">⭐ Feedback</button><button data-v="sources">Branchenwissen</button><button data-v="settings">Beratungseinstellungen</button><button data-v="account">👤 Kundenkonto</button></div></aside><main class="main"><div id="gate" class="panel">Verbindung zur Station wird hergestellt …</div><div id="app" style="display:none"><div id="stationInfo" class="panel"></div>
 <section id="dashboard" class="view active"><div class="top"><div><div class="eyebrow">Ihr Überblick</div><div class="h1">Stationsergebnis</div><p class="sub">Shop-Umsatz, Shop-Rohertrag, Shop-Marge, Schwund und Bestandsentwicklung auf einen Blick.<br><span class="small">Kraftstoff und Waschen werden separat betrachtet und nicht in die Shop-Marge einbezogen.</span></p></div><div class="badge">Geschützte Auswertung</div></div><div id="kpis" class="grid cards"></div><div id="roundCharts" class="roundCharts" aria-label="Visuelle Kennzahlen"></div><div class="dashboardSplit"><div id="dashAlerts" class="panel"></div><div class="panel trendChart"><div class="eyebrow">Entwicklung</div><h2 style="margin:4px 0 0">Ertragskurve</h2><div class="small">Rohertrag · aktueller Monat im Vergleich zu Vormonat und Vorjahr</div><div id="grossTrend"></div><div class="trendLegend"><span><i></i>Aktuell</span><span><i class="prev"></i>Vormonat</span><span><i class="year"></i>Vorjahr</span></div><div class="trendHint">Vergleiche werden nur angezeigt, wenn entsprechende Monatsdaten vorhanden sind.</div></div></div><div class="panel"><h2>Monatsentwicklung</h2><div id="trend"></div></div></section>
 <section id="meinmonat" class="view">
@@ -180,7 +233,7 @@ function renderGrossTrend(){
  el.insertAdjacentHTML('beforeend',leg);
 }
 
-function dashboard(){const k=month(),d=calc(k),available=hasData(k);$('kpis').innerHTML=[['Shop-Umsatz',eur(d.revenue)],['Rohertrag',eur(d.gross)],['Rohertragsmarge',pct(d.margin)],['Schwund',eur(d.shrink)],['Schwundquote',pct(d.revenue?d.shrink/d.revenue*100:0)],['Bestandsquote',pct(d.revenue?d.stock/d.revenue*100:0)]].map(x=>'<div class="card"><div class="label">'+x[0]+'</div><div class="value">'+x[1]+'</div></div>').join('');renderRoundCharts(d);renderGrossTrend();if(!available){$('dashAlerts').innerHTML='<div class="alert ok"><strong>Noch keine Monatsdaten</strong>Für '+k+' wurden noch keine Monatswerte gespeichert. Sobald Daten vorliegen, zeigt TankstellenErtrag automatisch die wichtigsten Prüffelder.</div>'}else{const rows=wowPriority(k);const cards=rows.length?rows.slice(0,3).map((r,i)=>wowCard(r,i)).join(''):'<div class="alert ok"><strong>Aktuell kein priorisiertes Prüffeld</strong>Die vorhandenen Daten zeigen derzeit keinen besonderen Klärungsbedarf.</div>';$('dashAlerts').innerHTML=riskStatusPanel(k)+'<div class="panel" style="margin-top:14px"><div class="eyebrow">Ihr Monatsfokus</div><h2 style="margin:4px 0 10px">🎯 Die 3 wichtigsten Prüffelder</h2><p class="small">Nicht alles muss gleichzeitig geprüft werden. Beginnen Sie mit den Punkten, bei denen die aktuellen Stationsdaten den größten Klärungsbedarf zeigen.</p><div class="wow-grid">'+cards+'</div></div>'}let trend=keys().filter(k=>{const x=data.months[k]||{};return [x.revenue,x.ek,x.shrink,x.writeoff,x.stock].some(v=>Number(v)>0)||Object.values(x.groups||{}).some(g=>Number(g?.revenue)>0||Number(g?.shrink)>0||Number(g?.writeoff)>0)}).slice(-12).map(k=>{const x=calc(k);return '<div class="cause-row" style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><span>'+k+'</span><b>'+eur(x.revenue)+' · '+pct(x.margin)+'</b></div>'}).join('');$('trend').innerHTML=trend||'<p class="small">Noch keine Monatsdaten.</p>'}function renderMeinMonat(){
+function dashboard(){const k=month(),d=calc(k),available=hasData(k);$('kpis').innerHTML=[['Shop-Umsatz',eur(d.revenue)],['Rohertrag',eur(d.gross)],['Rohertragsmarge',pct(d.margin)],['Schwund',eur(d.shrink)],['Schwundquote',pct(d.revenue?d.shrink/d.revenue*100:0)],['Bestandsquote',pct(d.revenue?d.stock/d.revenue*100:0)]].map(x=>'<div class="card"><div class="label">'+x[0]+'</div><div class="value">'+x[1]+'</div></div>').join('');renderRoundCharts(d);renderGrossTrend();if(!available){$('dashAlerts').innerHTML='<div class="alert ok"><strong>Noch keine Monatsdaten</strong>Für '+k+' wurden noch keine Monatswerte gespeichert. Sobald Daten vorliegen, zeigt TankstellenErtrag automatisch die wichtigsten Prüffelder.</div>'}else{const rows=wowPriority(k);const cards=rows.length?rows.slice(0,3).map((r,i)=>wowCard(r,i)).join(''):'<div class="alert ok"><strong>Aktuell kein priorisiertes Prüffeld</strong>Die vorhandenen Daten zeigen derzeit keinen besonderen Klärungsbedarf.</div>';$('dashAlerts').innerHTML=riskStatusPanel(k)+'<div class="panel" style="margin-top:14px"><div class="eyebrow">Ihr Monatsfokus</div><h2 style="margin:4px 0 10px">Die 3 wichtigsten Prüffelder</h2><p class="small">Nicht alles muss gleichzeitig geprüft werden. Beginnen Sie mit den Punkten, bei denen die aktuellen Stationsdaten den größten Klärungsbedarf zeigen.</p><div class="wow-grid">'+cards+'</div></div>'}let trend=keys().filter(k=>{const x=data.months[k]||{};return [x.revenue,x.ek,x.shrink,x.writeoff,x.stock].some(v=>Number(v)>0)||Object.values(x.groups||{}).some(g=>Number(g?.revenue)>0||Number(g?.shrink)>0||Number(g?.writeoff)>0)}).slice(-12).map(k=>{const x=calc(k);return '<div class="cause-row" style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><span>'+k+'</span><b>'+eur(x.revenue)+' · '+pct(x.margin)+'</b></div>'}).join('');$('trend').innerHTML=trend||'<p class="small">Noch keine Monatsdaten.</p>'}function renderMeinMonat(){
  const k=month(),d=calc(k),p=prev(k)?calc(prev(k)):null,dq=dataQuality(k),rows=wowPriority(k),has=hasData(k);
  const change=(a,b)=>b&&a!==null?((a/b)-1)*100:null;
  const revChange=p&&p.revenue>0?change(d.revenue,p.revenue):null;
