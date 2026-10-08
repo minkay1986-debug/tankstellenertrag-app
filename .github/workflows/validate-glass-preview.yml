@@ -1,0 +1,21 @@
+name: Validate glass preview
+on:
+  push:
+    paths:
+      - 'glass-portal-test/analyse-stable-full-preview-debug.html'
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract and syntax-check inline JavaScript
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          s=Path('glass-portal-test/analyse-stable-full-preview-debug.html').read_text()
+          blocks=re.findall(r'<script(?:\s[^>]*)?>([\\s\\S]*?)</script>',s,re.I)
+          Path('/tmp/main.js').write_text(blocks[-1])
+          print('inline scripts:',len(blocks))
+          PY
+          node --check /tmp/main.js
