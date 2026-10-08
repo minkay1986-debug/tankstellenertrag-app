@@ -61,7 +61,28 @@ input,select,textarea{background:rgba(5,15,25,.58)!important;color:#eef7ff!impor
 .homeTilesTitle{display:flex;justify-content:space-between;align-items:end;margin:24px 2px 10px}.homeTilesTitle h2{margin:0;font-size:18px}.homeTilesTitle span{font-size:10px;color:#91a9bc}
 @media(max-width:700px){.homeTiles{grid-template-columns:1fr 1fr;gap:9px}.homeTile{padding:14px}.homeTileIcon{width:34px;height:34px;font-size:17px}.homeTile p{font-size:10px}}
 @media(max-width:430px){.homeTiles{grid-template-columns:1fr}}
-</style></head>
+</style><style id="glass-material-refinement-v2">
+/* Material refinement only: transparent neutral glass, blue remains in the environment */
+.homeTile,.card,.panel,.month-hero,.wow-card,.investigation-card,.alert{
+ background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(7,17,29,.16) 55%,rgba(0,0,0,.12))!important;
+ border-color:rgba(225,244,255,.15)!important;
+ box-shadow:0 24px 58px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.20),inset 0 -20px 44px rgba(0,0,0,.10)!important;
+ backdrop-filter:blur(30px) saturate(180%)!important;
+ -webkit-backdrop-filter:blur(30px) saturate(180%)!important;
+}
+.homeTile:before,.card:before,.panel:before,.month-hero:before,.wow-card:before,.investigation-card:before{
+ background:linear-gradient(135deg,rgba(255,255,255,.30),rgba(255,255,255,.035) 25%,transparent 56%,rgba(120,190,235,.055) 82%,rgba(0,0,0,.08))!important;
+}
+.homeTileIcon{
+ background:rgba(255,255,255,.035)!important;
+ border-color:rgba(225,244,255,.15)!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.14)!important;
+}
+.badge,.chip,.pill{
+ background:rgba(255,255,255,.045)!important;
+ border-color:rgba(225,244,255,.16)!important;
+}
+</head>
 <body>
 <div id="loginScreen" class="app login">
   <div class="loginBox">
