@@ -163,41 +163,6 @@ input,select,textarea{background:rgba(5,15,25,.58)!important;color:#eef7ff!impor
 .radar-ring{position:absolute;border:1px solid rgba(120,195,235,.22);border-radius:50%;aspect-ratio:1}.r1{width:46px}.r2{width:82px}.r3{width:118px}.radar-dot{width:9px;height:9px;border-radius:50%;background:#8fd7ff;box-shadow:0 0 16px rgba(143,215,255,.7);z-index:2}.radar-sweep{position:absolute;width:58px;height:1px;background:linear-gradient(90deg,rgba(143,215,255,.75),transparent);transform:rotate(-32deg);transform-origin:left center;left:50%;top:50%;opacity:.7}
 .risk-badge,.risk-pill{background:rgba(255,255,255,.045)!important;border-color:rgba(225,244,255,.14)!important}.risk-badge{color:#ffd1ae!important}.risk-badge:before{background:#ff9a52!important;box-shadow:0 0 8px rgba(255,154,82,.42)!important}.risk-pill.critical{color:#ffd1ae!important}.risk-pill.severe{color:#ffc1bd!important}.risk-pill.critical:before{background:#ff9a52!important}.risk-pill.severe:before{background:#ff7770!important}
 @media(max-width:700px){.regional-context-card{grid-template-columns:1fr}.regional-visual{height:105px}}
-</style><style id="glass-severe-red-2026">
-/* 2026 semantic severity: STARKE ABWEICHUNG gets a restrained red glass tint */
-.wow-card.risk-severe{
-  background:linear-gradient(145deg,rgba(72,25,31,.30),rgba(10,20,31,.24))!important;
-  border-color:rgba(255,112,112,.38)!important;
-  box-shadow:0 22px 55px rgba(0,0,0,.22),inset 0 1px rgba(255,235,235,.16),inset 0 -18px 40px rgba(90,15,20,.10),0 0 24px rgba(255,82,82,.08)!important;
-}
-.wow-card.risk-severe:before,
-.wow-card.risk-severe:after{
-  background:linear-gradient(135deg,rgba(255,205,205,.18),rgba(255,255,255,.025) 30%,transparent 62%,rgba(255,80,80,.07))!important;
-}
-.wow-card.risk-severe .risk-strip{
-  background:linear-gradient(180deg,#ff9a92,#e95f63)!important;
-  box-shadow:0 0 10px rgba(255,92,92,.32);
-}
-.wow-card.risk-severe .risk-badge{
-  background:rgba(110,34,40,.38)!important;
-  border-color:rgba(255,125,125,.30)!important;
-  color:#ffc5c2!important;
-}
-.wow-card.risk-severe .risk-badge:before{
-  background:#ff7770!important;
-  box-shadow:0 0 9px rgba(255,100,95,.48)!important;
-}
-.wow-card.risk-severe .wow-num{
-  color:#ffab91!important;
-}
-.risk-pill.severe{
-  background:rgba(105,31,37,.34)!important;
-  border-color:rgba(255,125,125,.28)!important;
-  color:#ffc5c2!important;
-}
-@media(prefers-reduced-transparency:reduce){
-  .wow-card.risk-severe{background:rgba(72,25,31,.72)!important}
-}
 </style></head><body><div class="app"><aside class="side"><div class="brand">Tankstellen<span>Ertrag</span></div><div class="tag">Wirtschaftlichkeit · Warenwirtschaft · Ertrag</div><div class="panel" style="margin:0 0 16px;padding:11px;font-size:11px"><b>Aus der Tankstellenpraxis</b><br>für Tankstellen entwickelt.</div><div class="nav"><button class="active" data-v="dashboard">Übersicht</button><button data-v="meinmonat">📊 Mein Monat</button><button data-v="monthly">Monatsdaten</button><button data-v="analysis">Analyse</button><button data-v="insights">✨ Insights & KI</button><button data-v="forecast">🔮 Prognose & Ausblick</button><button data-v="radar">🎯 Ertragsradar</button><button data-v="yearly">Jahresauswertung</button><button data-v="report">Beratungsbericht</button><button type="button" id="navDiniLove" class="dini-tab"><span class="dini-label"><span class="dini-icon">🥐</span>DiniLove</span><span class="dini-sub">Reste retten · Bistro</span></button><button data-v="feedback">⭐ Feedback</button><button data-v="sources">Branchenwissen</button><button data-v="settings">Beratungseinstellungen</button><button data-v="account">👤 Kundenkonto</button></div></aside><main class="main"><div id="gate" class="panel">Verbindung zur Station wird hergestellt …</div><div id="app" style="display:none"><div id="stationInfo" class="panel"></div>
 <section id="dashboard" class="view active"><div class="top"><div><div class="eyebrow">Ihr Überblick</div><div class="h1">Stationsergebnis</div><p class="sub">Shop-Umsatz, Shop-Rohertrag, Shop-Marge, Schwund und Bestandsentwicklung auf einen Blick.<br><span class="small">Kraftstoff und Waschen werden separat betrachtet und nicht in die Shop-Marge einbezogen.</span></p></div><div class="badge">Geschützte Auswertung</div></div><div id="kpis" class="grid cards"></div><div id="roundCharts" class="roundCharts" aria-label="Visuelle Kennzahlen"></div><div class="dashboardSplit"><div id="dashAlerts" class="panel"></div><div class="panel trendChart"><div class="eyebrow">Entwicklung</div><h2 style="margin:4px 0 0">Ertragskurve</h2><div class="small">Rohertrag · aktueller Monat im Vergleich zu Vormonat und Vorjahr</div><div id="grossTrend"></div><div class="trendLegend"><span><i></i>Aktuell</span><span><i class="prev"></i>Vormonat</span><span><i class="year"></i>Vorjahr</span></div><div class="trendHint">Vergleiche werden nur angezeigt, wenn entsprechende Monatsdaten vorhanden sind.</div></div></div><div class="panel"><h2>Monatsentwicklung</h2><div id="trend"></div></div></section>
 <section id="meinmonat" class="view">
@@ -646,37 +611,7 @@ function rehydrateSources(){
  return changed;
 }
 function cleanupLegacyHuthData(){let changed=false;for(const k of Object.keys(data.months||{})){const r=data.months[k];if(!r)continue;const legacy=!!(r.sourceTexts||r.sourceMonthly||r.sourceEK||r.sourceShrink||r.sourceInventory||r.huth||r.shrinkReportTotal||r.inventoryAsOfMonth);if(!legacy)continue;r.revenue=0;r.ek=0;r.shrink=0;r.writeoff=0;r.stock=0;r.groups=r.groups||{};GROUPS.forEach(g=>{r.groups[g[0]]??={revenue:0,margin:g[2],shrink:0,writeoff:0};r.groups[g[0]].revenue=0;r.groups[g[0]].shrink=0;r.groups[g[0]].writeoff=0});delete r.fuel;delete r.wash;delete r.other;delete r.costs;delete r.sourceMonthly;delete r.sourceEK;delete r.sourceShrink;delete r.sourceInventory;delete r.sourceTexts;delete r.sources;delete r.huth;delete r.shrinkReportTotal;delete r.inventoryAsOfMonth;changed=true}if(changed)data.appVersion='43.20-manual';return changed}
-async function boot(){
-  /* ISOLATED DESIGN PREVIEW ONLY — production login/Supabase flow remains unchanged */
-  if(new URLSearchParams(location.search).has('preview')){
-    station={station_name:'Demo-Tankstelle',postcode:'86150',city:'Augsburg',subscription_status:'active'};
-    data=empty();
-    data.months={
-      '2026-08':{revenue:118000,ek:83000,shrink:850,writeoff:620,stock:18400,groups:{}},
-      '2026-09':{revenue:121500,ek:85000,shrink:980,writeoff:710,stock:19600,groups:{}},
-      '2026-10':{revenue:120000,ek:84000,shrink:1350,writeoff:780,stock:21100,groups:{}}
-    };
-    GROUPS.forEach(g=>Object.keys(data.months).forEach(k=>{
-      data.months[k].groups[g[0]]={revenue:0,ek:0,margin:g[2],shrink:0,writeoff:0,stock:0};
-    }));
-    data.months['2026-10'].groups.getraenke.revenue=24000;
-    data.months['2026-10'].groups.getraenke.ek=16000;
-    data.months['2026-10'].groups.getraenke.shrink=620;
-    data.months['2026-10'].groups.backwaren.revenue=8500;
-    data.months['2026-10'].groups.backwaren.ek=6000;
-    data.months['2026-10'].groups.backwaren.shrink=410;
-    data.months['2026-10'].groups.suesswaren.revenue=7600;
-    data.months['2026-10'].groups.suesswaren.ek=5100;
-    data.months['2026-10'].groups.suesswaren.shrink=320;
-    data.settings=empty().settings;
-    $('month').value='2026-10';
-    $('stationInfo').innerHTML='<b>Demo-Tankstelle</b><div class="small">86150 Augsburg · Design-Preview · keine echten Kundendaten</div>';
-    $('gate').style.display='none';
-    $('app').style.display='block';
-    renderAll();
-    return;
-  }
-  const session=await getStableSession();if(!session){const handoff=localStorage.getItem('tankstellenertrag-session-handoff');$('gate').className='panel danger';$('gate').innerHTML='<strong>Plattform-Anmeldung konnte nicht übernommen werden.</strong><br>Origin: '+esc(location.origin)+'<br>Session-Speicher: '+(localStorage.getItem('tankstellenertrag-auth')?'vorhanden':'nicht vorhanden')+'<br>Übergabe: '+(handoff?'vorhanden':'nicht vorhanden')+'<br><br><button class="btn primary" onclick="location.href=\'./\'">Zur Anmeldung</button>';return}const {data:st,error:se}=await sb.from('stations').select('*').eq('owner_id',session.user.id).maybeSingle();if(se)throw se;if(!st)throw new Error('Für dieses Kundenkonto ist noch keine Station verknüpft.');const active=st.subscription_status==='active'||(st.subscription_status==='trial'&&new Date(st.trial_ends_at)>new Date())||(st.subscription_status==='founding_partner'&&new Date(st.founding_partner_free_until)>new Date());if(!active)throw new Error('Der Zugang ist aktuell nicht aktiv.');station=st;const {data:snap,error:xe}=await sb.from('station_snapshots').select('payload,updated_at').eq('station_id',st.id).maybeSingle();if(xe)throw xe;data=snap?.payload&&typeof snap.payload==='object'?snap.payload:empty();data.months??={};data.settings??=empty().settings;const rehydrated=rehydrateSources();if(rehydrated)await cloudSave();$('month').value=Object.keys(data.months).sort().slice(-1)[0]||new Date().toISOString().slice(0,7);$('stationInfo').innerHTML='<b>'+esc(st.station_name)+'</b><div class="small">'+esc(st.postcode)+' '+esc(st.city)+' · Zugang: '+esc(st.subscription_status)+' · bis '+((st.founding_partner_free_until||st.subscription_ends_at||st.trial_ends_at)?new Date(st.founding_partner_free_until||st.subscription_ends_at||st.trial_ends_at).toLocaleDateString('de-DE'):'–')+'</div>';$('gate').style.display='none';$('app').style.display='block';renderAll()}
+async function boot(){const session=await getStableSession();if(!session){const handoff=localStorage.getItem('tankstellenertrag-session-handoff');$('gate').className='panel danger';$('gate').innerHTML='<strong>Plattform-Anmeldung konnte nicht übernommen werden.</strong><br>Origin: '+esc(location.origin)+'<br>Session-Speicher: '+(localStorage.getItem('tankstellenertrag-auth')?'vorhanden':'nicht vorhanden')+'<br>Übergabe: '+(handoff?'vorhanden':'nicht vorhanden')+'<br><br><button class="btn primary" onclick="location.href=\'./\'">Zur Anmeldung</button>';return}const {data:st,error:se}=await sb.from('stations').select('*').eq('owner_id',session.user.id).maybeSingle();if(se)throw se;if(!st)throw new Error('Für dieses Kundenkonto ist noch keine Station verknüpft.');const active=st.subscription_status==='active'||(st.subscription_status==='trial'&&new Date(st.trial_ends_at)>new Date())||(st.subscription_status==='founding_partner'&&new Date(st.founding_partner_free_until)>new Date());if(!active)throw new Error('Der Zugang ist aktuell nicht aktiv.');station=st;const {data:snap,error:xe}=await sb.from('station_snapshots').select('payload,updated_at').eq('station_id',st.id).maybeSingle();if(xe)throw xe;data=snap?.payload&&typeof snap.payload==='object'?snap.payload:empty();data.months??={};data.settings??=empty().settings;const rehydrated=rehydrateSources();if(rehydrated)await cloudSave();$('month').value=Object.keys(data.months).sort().slice(-1)[0]||new Date().toISOString().slice(0,7);$('stationInfo').innerHTML='<b>'+esc(st.station_name)+'</b><div class="small">'+esc(st.postcode)+' '+esc(st.city)+' · Zugang: '+esc(st.subscription_status)+' · bis '+((st.founding_partner_free_until||st.subscription_ends_at||st.trial_ends_at)?new Date(st.founding_partner_free_until||st.subscription_ends_at||st.trial_ends_at).toLocaleDateString('de-DE'):'–')+'</div>';$('gate').style.display='none';$('app').style.display='block';renderAll()}
 function forecastCalendarFactors(k,city){
 const y=Number(String(k).slice(0,4)),m=Number(String(k).slice(5,7)),easter=year=>{const a=year%19,b=Math.floor(year/100),cc=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(cc/4),j=cc%4,l=(32+2*e+2*i-h-j)%7,mm=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*mm+114)/31),day=((h+l-7*mm+114)%31)+1;return new Date(Date.UTC(year,mo-1,day))},add=(d,n)=>{const x=new Date(d);x.setUTCDate(x.getUTCDate()+n);return x},inMonth=d=>d.getUTCMonth()+1===m,pc=String(station?.postcode||''),cityL=String(city||'').toLowerCase();
 let st=null;if(/hamburg/.test(cityL)||/^2(0|1)/.test(pc))st='HH';else if(/bremen/.test(cityL)||/^2[7-8]/.test(pc))st='HB';else if(/berlin/.test(cityL)||/^1[0-4]/.test(pc))st='BE';else if(/brandenburg/.test(cityL)||/^1[5-9]/.test(pc))st='BB';else if(/mecklenburg|vorpommern/.test(cityL)||/^17|^18|^19/.test(pc))st='MV';else if(/niedersachsen|hannover|göttingen|oldenburg|osnabrück/.test(cityL)||/^2[6-9]|^3/.test(pc))st='NI';else if(/schleswig|kiel|lübeck|holstein/.test(cityL)||/^2[2-5]/.test(pc))st='SH';else if(/sachsen-anhalt|magdeburg|halle/.test(cityL)||/^06/.test(pc))st='ST';else if(/sachsen|dresden|leipzig|chemnitz/.test(cityL)||/^0[1-9]/.test(pc))st='SN';else if(/thüringen|erfurt|jena|weimar/.test(cityL)||/^98|^99/.test(pc))st='TH';else if(/hessen|frankfurt|kassel|wiesbaden/.test(cityL)||/^6[0-9]/.test(pc))st='HE';else if(/nordrhein|westfalen|köln|dortmund|düsseldorf|essen|münster|bielefeld|bonn/.test(cityL)||/^4[0-9]|^5[0-9]/.test(pc))st='NW';else if(/rheinland-pfalz|mainz|koblenz|trier|ludwigshafen/.test(cityL))st='RP';else if(/saarland|saarbrücken/.test(cityL))st='SL';else if(/baden-württemberg|stuttgart|karlsruhe|freiburg|mannheim|ulm/.test(cityL)||/^7/.test(pc))st='BW';else if(/bayern|augsburg|münchen|nürnberg|regensburg|würzburg|heilsbronn/.test(cityL)||/^8|^9/.test(pc))st='BY';
