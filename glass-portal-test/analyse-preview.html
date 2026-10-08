@@ -810,4 +810,35 @@ function eeDetective(){eeToast('🕵️ Warenwirtschaftsdetektiv','Fall aufgenom
 function eeRoadtrip(){eeToast('🏁 Route gefunden','Ziel: mehr Ertrag. Weiter geht’s.')}
 function eeMonth(){eeConfetti();eeToast('🏆 Monat geknackt!','Jetzt wird aus Zahlen eine Geschichte.')}
 (function initEasterEggs(){let analyseClicks=0,analyseTimer=null,road='';document.addEventListener('click',e=>{const b=e.target.closest?.('[data-v="analysis"]');if(b){analyseClicks++;clearTimeout(analyseTimer);analyseTimer=setTimeout(()=>analyseClicks=0,1200);if(analyseClicks>=5){analyseClicks=0;eeDetective()}}if(e.target.closest?.('#moneyEgg'))eeMoney()});document.addEventListener('keydown',e=>{if(e.key.length===1){road+=e.key.toLowerCase();road=road.slice(-10);if(road.endsWith('tankstelle')){road='';eeRoadtrip()}}});document.addEventListener('click',e=>{if(e.target.closest?.('#saveMonth'))setTimeout(()=>{const vals=['rev','ek','shrink','writeoff','stock'].map(id=>Number($(id)?.value||0));if(vals.every(Number.isFinite)&&vals.every(v=>v>0)){sessionStorage.setItem('te_month_egg','1');eeMonth()}},350)})})();
+</script><script>
+/* HARD VISUAL PREVIEW FALLBACK — isolated file only */
+(function(){
+  function showPreview(){
+    const gate=document.getElementById('gate'), app=document.getElementById('app'), dash=document.getElementById('dashboard'), alerts=document.getElementById('dashAlerts');
+    if(!gate||!app||!dash||!alerts)return;
+    gate.style.display='none';
+    app.style.display='block';
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    dash.classList.add('active');
+    alerts.innerHTML=`
+      <div class="panel">
+        <div class="eyebrow">ERTRAGSSTATUS</div>
+        <div class="risk-status-title">STARKE ABWEICHUNG</div>
+        <div class="risk-status-bar"><span class="risk-pill severe">STARKE ABWEICHUNG · 3</span></div>
+        <div class="small" style="margin-top:8px">Rein visuelle Preview – keine echten Kundendaten.</div>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <div class="eyebrow">MONATSAUSWERTUNG</div>
+        <h2 style="margin:4px 0 10px">Die 3 wichtigsten Prüffelder</h2>
+        <p class="small">Nicht alles muss gleichzeitig geprüft werden. Beginnen Sie mit den Punkten, bei denen die aktuellen Stationsdaten den größten Klärungsbedarf zeigen.</p>
+        <div class="wow-grid">
+          <div class="wow-card risk-severe"><div class="risk-strip"></div><div class="wow-num">PRÜFFELD 01</div><div class="risk-status"><div class="wow-title">Schwundquote</div><span class="risk-badge">STARKE ABWEICHUNG</span></div><div class="wow-kicker">Umsatz 24.000 € · Zielmarge 33,3 %</div><div class="margin-compare"><span class="margin-state neutral">Ist-Marge –</span></div><div class="small">Signal: Schwund auffällig · Prüffeld – keine bewiesene Ursache.</div></div>
+          <div class="wow-card risk-severe"><div class="risk-strip"></div><div class="wow-num">PRÜFFELD 02</div><div class="risk-status"><div class="wow-title">Backwaren</div><span class="risk-badge">STARKE ABWEICHUNG</span></div><div class="wow-kicker">Umsatz 8.500 € · Zielmarge 29,0 %</div><div class="margin-compare"><span class="margin-state neutral">Ist-Marge –</span></div><div class="small">Signal: Schwund auffällig · Prüffeld – keine bewiesene Ursache.</div></div>
+          <div class="wow-card risk-severe"><div class="risk-strip"></div><div class="wow-num">PRÜFFELD 03</div><div class="risk-status"><div class="wow-title">Getränke</div><span class="risk-badge">STARKE ABWEICHUNG</span></div><div class="wow-kicker">Umsatz 7.600 € · Zielmarge 31,0 %</div><div class="margin-compare"><span class="margin-state neutral">Ist-Marge –</span></div><div class="small">Signal: Umsatz rückläufig · Prüffeld – keine bewiesene Ursache.</div></div>
+        </div>
+      </div>`;
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(showPreview,120));
+  else setTimeout(showPreview,120);
+})();
 </script></body></html>
