@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b0d0f">
+<title>Icon-Test – TankstellenErtrag</title>
+<style>
+:root{color-scheme:dark;--bg:#090d11;--panel:rgba(22,30,37,.84);--line:rgba(107,202,225,.22);--cyan:#68d8ee;--orange:#ff8a35;--text:#f4f8fa;--muted:#9cabb5}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#17303a 0,transparent 42%),var(--bg);color:var(--text);font:16px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+main{width:min(1040px,100%);margin:auto;padding:28px 18px 54px}.eyebrow{color:var(--cyan);font-size:.76rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+h1{font-size:clamp(1.8rem,5vw,3rem);line-height:1.08;margin:.5rem 0 1rem;letter-spacing:-.04em}p{color:var(--muted);max-width:700px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:26px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 16px 50px #0003;backdrop-filter:blur(18px);min-width:0}
+.label{font-size:.74rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.sample{display:flex;align-items:center;gap:14px;padding:15px;border-radius:16px;background:#ffffff06;border:1px solid #ffffff0d;margin:12px 0}
+.icon{width:44px;height:44px;display:grid;place-items:center;flex:0 0 44px;border:1px solid #68d8ee55;border-radius:14px;background:linear-gradient(145deg,#68d8ee18,#ff8a350b);color:var(--cyan);position:relative}
+.icon:after{content:"";position:absolute;right:5px;top:5px;width:4px;height:4px;border-radius:50%;background:var(--orange);box-shadow:0 0 9px #ff8a35aa}
+svg{width:23px;height:23px;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.sample strong{display:block;font-size:.98rem}.sample small{display:block;color:var(--muted);font-size:.82rem;margin-top:2px}
+.pill{display:inline-flex;align-items:center;gap:9px;border:1px solid #68d8ee40;border-radius:999px;padding:9px 13px;margin:5px 4px 5px 0;color:#dcebf0;background:#68d8ee0b;font-size:.88rem}.pill svg{width:17px;height:17px;color:var(--cyan)}
+.note{margin-top:22px;border-left:3px solid var(--orange);padding:12px 15px;background:#ff8a350c;border-radius:0 12px 12px 0;color:#d8e0e5;font-size:.9rem}
+footer{margin-top:24px;color:#7e909b;font-size:.8rem}
+@media(max-width:650px){main{padding:23px 14px 38px}.grid{grid-template-columns:1fr;gap:12px}.card{padding:17px;border-radius:18px}.sample{padding:12px}.icon{width:40px;height:40px;flex-basis:40px}}
+</style>
+</head>
+<body>
+<main>
+<div class="eyebrow">Isolierter Design-Test · keine Live-Funktionen geändert</div>
+<h1>Neue SVG-Icons für<br>TankstellenErtrag</h1>
+<p>Erster Stiltest für dekorative Symbole im Portal und QuickCheck: klare cyanfarbene Linien, dezente orange Akzente und ruhige Glas-Kacheln. Beschriftungen bleiben deutsch und gut lesbar.</p>
+<div class="grid">
+<section class="card">
+<div class="label">Portal · Handlungsempfehlung</div>
+<div class="sample">
+<div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 22h4M8.5 14.5a7 7 0 1 1 7 0c-.9.6-1.5 1.5-1.5 2.5h-4c0-1-.6-1.9-1.5-2.5Z"/><path d="M12 3v2M5.6 5.6 7 7M18.4 5.6 17 7"/></svg></div>
+<div><strong>Handlungsempfehlung</strong><small>Icon statt Emoji · ruhig, modern, präzise</small></div>
+</div>
+<div class="sample">
+<div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-6"/><path d="M16 7h3v3"/></svg></div>
+<div><strong>Entwicklung im Blick</strong><small>Einheitliche Linienoptik für Analyse-Kacheln</small></div>
+</div>
+<div class="sample">
+<div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+<div><strong>Zeitsparend prüfen</strong><small>Auch bei kleiner Bildschirmbreite gut erkennbar</small></div>
+</div>
+</section>
+<section class="card">
+<div class="label">QuickCheck · Info-Pills</div>
+<div class="sample" style="display:block">
+<strong style="margin-bottom:12px">Prüfung in wenigen Schritten</strong>
+<span class="pill"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Kurzer Zeitaufwand</span>
+<span class="pill"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4 4M8 11h5M10.5 8.5v5"/></svg>Erste Einschätzung</span>
+</div>
+<div class="sample">
+<div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19V5h10l4 4v10Z"/><path d="M15 5v4h4M8 13h8M8 16h5"/></svg></div>
+<div><strong>Ergebnis verständlich erklärt</strong><small>Icons unterstützen die Aussage – sie ersetzen keinen Text.</small></div>
+</div>
+</section>
+</div>
+<div class="note"><strong>Bewusst nicht Teil dieses Tests:</strong> Wetter-Symbole, Ampel-/Statusanzeigen, Sperren, Löschen, Erfolgsmeldungen, Login-/Speicherlogik und sämtliche DiniLove-Inhalte. Diese haben Bedeutung oder Funktionen und werden nicht pauschal ersetzt.</div>
+<footer>Nur diese eigenständige Vorschauseite. app.html, quickcheck.html, Supabase und bestehende Daten bleiben unverändert.</footer>
+</main>
+</body>
+</html>
