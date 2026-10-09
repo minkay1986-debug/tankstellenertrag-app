@@ -21,7 +21,8 @@
     }
   });
   window.addEventListener('error',function(e){
-    var msg=e.error&&e.error.stack ? e.error.stack : (e.message||'Unbekannter JavaScript-Fehler');
+    var msg='Meldung: '+(e.message||'Unbekannter JavaScript-Fehler');
+    if(e.error&&e.error.stack) msg+='\nStack:\n'+e.error.stack;
     if(e.filename) msg+='\nDatei: '+e.filename;
     if(e.lineno) msg+='\nZeile: '+e.lineno+':'+(e.colno||0);
     show(msg);
