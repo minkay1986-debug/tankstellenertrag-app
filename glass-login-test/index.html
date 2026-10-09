@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TankstellenErtrag | Warenwirtschaft & Ertragsanalyse für Tankstellen</title>
+<meta name="description" content="TankstellenErtrag macht Umsatz, Marge, Warengruppen, Schwund und Ertrag im Tankstellenshop verständlich sichtbar – als monatliche wirtschaftliche Analyse für Tankstellenbetreiber.">
+<link rel="canonical" href="https://app.tankstellenertrag.de/">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="google-site-verification" content="79T8IElesOAt3QpTrZah6iQ_yCNhmV6WeSn8ZeKq1so">
+<meta property="og:type" content="website">
+<meta property="og:title" content="TankstellenErtrag | Warenwirtschaft & Ertragsanalyse für Tankstellen">
+<meta property="og:description" content="Monatliche wirtschaftliche Analyse für Tankstellenshops: Umsatz, Marge, Warengruppen, Schwund und konkrete Prüffelder verständlich aufbereitet.">
+<meta property="og:url" content="https://app.tankstellenertrag.de/">
+<meta property="og:site_name" content="TankstellenErtrag">
+<meta property="og:image" content="https://app.tankstellenertrag.de/assets/tankstellenertrag-og.svg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TankstellenErtrag | Warenwirtschaft & Ertragsanalyse für Tankstellen">
+<meta name="twitter:description" content="Warenwirtschaft und Ertragsanalyse für Tankstellenshops aus der Praxis.">
+<link rel="icon" href="../assets/tankstellenertrag-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/tankstellenertrag-icon.svg">
+<link rel="manifest" href="../site.webmanifest">
+<meta name="theme-color" content="#0d1418">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"TankstellenErtrag","url":"https://app.tankstellenertrag.de/","description":"Warenwirtschaftliche Monatsanalyse für Tankstellenshops."}</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../supabase-config.js?v=20261002-2227"></script>
+<style>
+:root{--bg:#0d0f10;--panel:#181c1f;--panel2:#22272b;--line:#353c41;--text:#f5f6f7;--muted:#aeb6bc;--orange:#f47b20;--orange2:#ff9b4a;--green:#45c477;--red:#ef6461;--input:#fff1e7}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 10%,#2a2119 0,#111416 35%,#0d0f10 70%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
+.wrap{width:min(1120px,calc(100% - 32px));margin:auto;padding:28px 0 50px}.brand{font-weight:900;font-size:22px}.brand span{color:var(--orange)}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:34px}.pill{border:1px solid #4b3a2b;background:#211b16;color:#ffc08b;padding:7px 10px;border-radius:999px;font-size:12px}
+.hero{display:grid;grid-template-columns:1.25fr .75fr;gap:20px;align-items:stretch}.panel{background:rgba(24,28,31,.96);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:0 18px 60px rgba(0,0,0,.2)}h1{font-size:42px;line-height:1.05;margin:10px 0 14px}.lead{font-size:17px;line-height:1.6;color:#d6dce0}.badges{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}.badge{background:#22282c;border:1px solid #3b4348;border-radius:999px;padding:7px 10px;font-size:12px}.feature{padding:12px 0;border-bottom:1px solid var(--line)}.feature:last-child{border-bottom:0}.feature b{display:block;margin-bottom:3px}.small{font-size:12px;color:var(--muted);line-height:1.55}
+.form{display:grid;gap:12px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}.field input{width:100%;padding:12px;border-radius:9px;border:1px solid #d9c1b1;background:var(--input);color:#1a1a1a;font-size:14px}.btn{width:100%;padding:12px 14px;border:0;border-radius:9px;font-weight:800;cursor:pointer}.primary{background:var(--orange);color:#fff}.secondary{background:#30363a;color:#fff}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}.status{margin-top:14px;padding:13px;border-radius:10px;background:#20262a;border:1px solid var(--line);font-size:13px;line-height:1.5}.status.ok{background:#17271f;border-color:#285c42}.status.err{background:#2b1c1c;border-color:#673535}.hidden{display:none}.site.authenticated .publicOnly{display:none!important}.site.authenticated footer{display:none!important}.site.authenticated #diniSticker{display:none!important}.dashboard{margin-top:20px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}.card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:15px}.card .label{font-size:11px;color:var(--muted)}.card .value{font-size:20px;font-weight:800;margin-top:6px}.linkbtn{display:inline-block;text-decoration:none;text-align:center;margin-top:14px;padding:12px 16px;border-radius:9px;background:var(--orange);color:#fff;font-weight:800}.footer{margin-top:28px;color:#6f777d;font-size:11px;display:flex;gap:14px;flex-wrap:wrap}.footer a{color:#969fa6;text-decoration:none}.footerLinkedIn{display:inline-flex!important;align-items:center;gap:6px;color:#dfe4e7!important;font-weight:700}.linkedinIcon{width:18px;height:18px;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;background:#0a66c2;color:#fff;font-size:12px;font-weight:900;line-height:1}.footerLinkedIn:hover{color:#fff!important}.footerLinkedIn:hover .linkedinIcon{filter:brightness(1.12)}
+.adminDiagnostics{margin-top:12px;padding:15px 16px;border:1px solid #67443a;border-radius:12px;background:#241b19}.adminDiagHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.adminDiagHead strong{display:block;color:#ffb07a;font-size:14px}.adminDiagHead span{display:block;color:#aeb6bc;font-size:11px;margin-top:3px}.adminDiagCopy{width:auto;padding:8px 11px;font-size:11px}.adminDiagGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.adminDiagItem{padding:9px 10px;border:1px solid #3b3431;border-radius:9px;background:#17191b;min-width:0}.adminDiagItem b{display:block;color:#aeb6bc;font-size:10px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}.adminDiagItem code,.adminDiagItem span{display:block;color:#f5f6f7;font-size:12px;line-height:1.4;word-break:break-word}.adminDiagItem.error{border-color:#7a3e3e}.adminDiagItem.ok{border-color:#315d45}.adminDiagItem.warn{border-color:#725b32}@media(max-width:850px){.adminDiagGrid{grid-template-columns:1fr}.adminDiagHead{align-items:flex-start;flex-direction:column}.adminDiagCopy{width:100%}}@media(max-width:850px){.hero{grid-template-columns:1fr}h1{font-size:34px}.cards{grid-template-columns:1fr}.actions{grid-template-columns:1fr}.top{align-items:flex-start;gap:12px;flex-direction:column}}
+.signupLegal{display:grid;gap:9px;margin:12px 0}.signupLegal.hidden{display:none}.legalCheck{display:flex;gap:9px;align-items:flex-start;font-size:12px;line-height:1.45;color:#cbd1d5}.legalCheck input{margin-top:3px;flex:0 0 auto}.legalCheck a{color:#f47b20;text-decoration:none}.legalCheck a:hover{text-decoration:underline}</style>
+<style>.signupField{display:block}.signupField .small{font-size:10px;color:#899298}.rememberRow{display:flex;align-items:center;gap:8px;font-size:13px;color:#899298;margin:4px 0 2px}.rememberRow input{accent-color:#f36f21}.mfaPanel{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.72)}.mfaPanel.hidden{display:none}.mfaBox{width:min(520px,100%);background:#17212b;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:28px;box-shadow:0 24px 80px rgba(0,0,0,.45)}.mfaBox h2{margin:0 0 8px}.mfaQr{background:#fff;border-radius:12px;padding:12px;width:220px;height:220px;display:block;margin:18px auto}.mfaSecret{font-family:monospace;word-break:break-all;background:rgba(255,255,255,.06);padding:10px;border-radius:8px}.mfaCode{width:100%;box-sizing:border-box;font-size:22px;letter-spacing:5px;text-align:center;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:#0e151c;color:#fff}.mfaActions{display:flex;gap:10px;margin-top:14px}.mfaActions button{flex:1}.mfaMsg{margin-top:10px}
+</style>
+<style id="diniloveStickerStyles">
+.diniSticker{position:fixed;right:34px;top:51%;z-index:9999;width:204px;display:flex!important;flex-direction:column;align-items:center;opacity:1!important;visibility:visible!important;pointer-events:auto;transform:none;transition:opacity .45s ease,transform .65s cubic-bezier(.2,.9,.2,1);user-select:none;touch-action:none;cursor:grab}
+.diniSticker.is-visible{opacity:1;pointer-events:auto;transform:none}.diniSticker.is-closed{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+.diniSticker.is-dragging{transition:none;cursor:grabbing}
+.diniStickerArt{width:150px;height:187px;object-fit:contain;filter:drop-shadow(0 12px 18px rgba(0,0,0,.35));cursor:grab;animation:diniFloat 3.8s ease-in-out infinite;touch-action:none}
+.diniSticker.is-dragging .diniStickerArt{animation:none;cursor:grabbing}
+.diniStickerLink{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin-top:-2px;padding:6px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.34);background:rgba(13,15,16,.9);box-shadow:0 8px 22px rgba(0,0,0,.32);color:#fff;text-decoration:none;font-size:8px;font-weight:850;white-space:nowrap;backdrop-filter:blur(8px)}
+.diniStickerLink:hover{border-color:#ff9b4a;box-shadow:0 10px 26px rgba(244,123,32,.22);transform:translateY(-1px)}
+.diniStickerClose{position:absolute;right:2px;top:0;width:27px;height:27px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(20,22,24,.9);color:#fff;font-size:20px;line-height:22px;cursor:pointer;z-index:99999;pointer-events:auto;touch-action:manipulation}
+.diniStickerClose:hover{background:#30363a}
+.diniStickerHint{position:absolute;right:190px;top:57px;width:180px;text-align:right;color:#aeb6bc;font-size:10px;line-height:1.35;opacity:0;transform:translateX(8px);transition:.35s ease;pointer-events:none}
+.diniSticker:hover .diniStickerHint{opacity:1;transform:none}
+@keyframes diniFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-7px) rotate(1deg)}}
+@media(max-width:850px){.diniSticker{right:10px;top:auto;bottom:76px;width:131px}.diniStickerArt{width:93px;height:117px}.diniStickerHint{display:none}.diniStickerLink{font-size:7px;padding:6px 8px}}
+@media(prefers-reduced-motion:reduce){.diniSticker,.diniStickerArt,.diniStickerLink{animation:none!important;transition:none!important}}
+</style><style id="monthlyLearningStyles">
+.monthlyLearning{background:#111416}
+.monthlyGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}
+.monthlyCard{background:#181c1f;border:1px solid #353c41;border-radius:14px;padding:20px}
+.monthlyIcon{font-size:25px;margin-bottom:10px}
+.monthlyCard h3{margin:0 0 7px;font-size:18px}
+.monthlyCard p{margin:0;color:#aeb6bc;font-size:14px;line-height:1.55}
+.monthlyFlow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;align-items:center;gap:10px;margin-top:18px;padding:16px;border:1px solid #353c41;border-radius:14px;background:#181c1f}
+.monthlyFlow div{display:flex;flex-direction:column;gap:3px}
+.monthlyFlow b{font-size:13px}
+.monthlyFlow span{font-size:12px;color:#aeb6bc}
+.monthlyFlow i{font-style:normal;color:#f47b20;font-size:20px;text-align:center}
+.monthlyNote{margin-top:14px;padding:14px 16px;border-left:3px solid #f47b20;background:#181c1f;border-radius:8px;color:#cbd1d5;font-size:13px;line-height:1.55}
+.monthlyNote b{color:#f5f6f7}
+.monthlyPilot{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:16px;padding:16px 18px;border:1px solid #353c41;border-radius:14px;background:rgba(24,28,31,.72)}
+.monthlyPilot>div{display:flex;flex-direction:column;gap:4px}
+.monthlyPilot b{font-size:15px}.monthlyPilot span{font-size:12px;color:#aeb6bc;line-height:1.45}.monthlyPilot #pilotSlotsText{color:#f47b20;font-weight:800}
+.monthlyPilot .ghost{width:auto;white-space:nowrap;padding:10px 15px}
+@media(max-width:850px){.monthlyPilot{align-items:flex-start;flex-direction:column}.monthlyPilot .ghost{width:100%}}
+@media(max-width:850px){.monthlyGrid{grid-template-columns:1fr}.monthlyFlow{grid-template-columns:1fr;gap:12px}.monthlyFlow i{transform:rotate(90deg)}}
+</style>
+
+<style id="appHintStyles">.appHint{padding:0 0 26px}.appHintBox{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;padding:22px 24px;background:linear-gradient(135deg,#181c1f,#211c18);border:1px solid #4a4038;border-radius:18px;box-shadow:0 14px 45px rgba(0,0,0,.18)}.appHintIcon{font-size:42px}.appHintContent h2{margin:4px 0 14px;font-size:24px}.appHintSteps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.appHintSteps>div{display:flex;gap:10px;align-items:flex-start;padding:12px;background:#111416;border:1px solid #353c41;border-radius:12px}.appHintSteps b{font-size:20px}.appHintSteps span{display:flex;flex-direction:column;gap:3px}.appHintSteps strong{font-size:13px}.appHintSteps small{font-size:11px;color:#aeb6bc;line-height:1.35}.appHintContent>p{margin:13px 0 0;color:#aeb6bc;font-size:12px}.appHintContent>p strong{color:#f5f6f7}@media(max-width:850px){.appHintBox{grid-template-columns:1fr;gap:8px;padding:18px}.appHintIcon{font-size:34px}.appHintContent h2{font-size:21px}.appHintSteps{grid-template-columns:1fr}.appHintSteps>div{align-items:center}}</style>
+<style id="blue-glass-auth-theme">
+/* Isolated UI-only restyle: auth, registration and app shell. No JavaScript/auth logic changed. */
+:root{--bg:#071426;--panel:rgba(10,27,49,.88);--panel2:rgba(18,39,65,.92);--line:rgba(154,197,241,.22);--text:#f2f7ff;--muted:#b6c7db;--orange:#4a9cff;--orange2:#9bcaff;--input:#edf5ff;--green:#45c477;--red:#ef6461}
+body{background:radial-gradient(ellipse at 15% 0%,rgba(44,104,190,.24),transparent 42%),radial-gradient(ellipse at 90% 20%,rgba(57,142,238,.12),transparent 38%),linear-gradient(155deg,#071426 0%,#091a31 52%,#061020 100%)!important;color:var(--text)}
+.topbar{background:rgba(5,16,34,.84)!important;border-bottom:1px solid rgba(151,202,245,.2)!important;backdrop-filter:blur(20px) saturate(145%)}
+.brand span,footer span,.eyebrow{color:#8fc4ff!important}
+.panel,.authBox,.monthlyCard,.monthlyFlow,.monthlyNote,.monthlyPilot,.appHintBox,.appHintSteps>div,.metric,.heroVisual,.heroSide,.card{background:linear-gradient(145deg,rgba(26,55,88,.66),rgba(8,24,44,.88))!important;border:1px solid rgba(166,207,255,.2)!important;box-shadow:inset 0 1px 0 rgba(226,242,255,.08),0 18px 55px rgba(0,0,0,.23)!important;backdrop-filter:blur(16px)}
+.auth{background:rgba(3,10,22,.72)!important;backdrop-filter:blur(14px)}
+.authBox{border-radius:24px!important;background:linear-gradient(145deg,rgba(17,39,65,.96),rgba(8,22,40,.97))!important;border-color:rgba(166,207,255,.28)!important}
+.field input{background:#edf5ff!important;color:#142238!important;border:1px solid #c1d9f6!important;border-radius:12px!important}
+.field input:focus{outline:2px solid rgba(74,156,255,.42)!important;outline-offset:1px}
+.primary,.cta,.navbtn,.btn.primary{background:linear-gradient(135deg,#4a9cff,#327ed5)!important;color:#fff!important;box-shadow:0 8px 25px rgba(50,126,213,.22)}
+.secondary,.ghost,.pill,.badge{background:rgba(130,174,222,.12)!important;border:1px solid rgba(166,207,255,.22)!important;color:#edf6ff!important}
+.status{background:rgba(112,157,208,.12)!important;border-color:rgba(166,207,255,.18)!important;color:#e7f2ff}
+.rememberRow input,.legalCheck input{accent-color:#4a9cff!important}
+.monthlyFlow i,.monthlyPilot #pilotSlotsText,.monthlyPilot .ghost{color:#9bcaff!important}
+.diniSticker,#diniSticker,.diniStickerLink,[class*="diniSticker"],[class*="dinilove-sticker"],[class*="dinilove-widget"],iframe[src*="dinilove" i]{display:none!important;visibility:hidden!important;pointer-events:none!important}
+@media(max-width:850px){.auth{padding:18px 12px!important}.auth .wrap{width:100%!important;padding:16px 0!important}.authBox{padding:24px 20px!important;border-radius:22px!important;max-width:100%!important}.field input{font-size:16px!important}.actions{gap:8px!important}.actions .btn{min-width:0!important;padding:12px 8px!important}}
+</style>
+
+<style id="blue-glass-login-preview">
+:root{--bg:#071426;--panel:rgba(12,31,58,.78);--panel2:rgba(15,43,78,.74);--line:rgba(145,198,255,.24);--text:#eff7ff;--muted:#b6cce4;--orange:#4a9cff;--orange2:#85c4ff;--input:#f5faff}
+html{background:#061225!important}
+body{background:radial-gradient(ellipse at 18% 8%,rgba(36,119,220,.30),transparent 38%),radial-gradient(ellipse at 86% 18%,rgba(54,157,255,.19),transparent 33%),linear-gradient(145deg,#061225 0%,#0a1d38 48%,#071426 100%)!important;color:#eff7ff!important}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% 100%,rgba(27,99,180,.12),transparent 52%);opacity:.95}
+.wrap,.site,.app,.main,.hero,.panel,.authBox,.modal,.authModal{position:relative}
+.wrap{z-index:1}
+.panel,.authBox,.modal,.authModal{background:linear-gradient(145deg,rgba(16,43,78,.83),rgba(8,26,51,.88))!important;border:1px solid rgba(145,198,255,.25)!important;box-shadow:0 24px 80px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.07)!important;backdrop-filter:blur(22px) saturate(140%);-webkit-backdrop-filter:blur(22px) saturate(140%)}
+.brand span,.eyebrow,.pill{color:#8fc9ff!important}
+.pill{border-color:rgba(145,198,255,.3)!important;background:rgba(41,106,178,.16)!important}
+.badge,.feature,.status{border-color:rgba(145,198,255,.2)!important;background:rgba(13,38,70,.62)!important}
+.field input,input,textarea,select{border-color:rgba(145,198,255,.45)!important;background:rgba(245,250,255,.97)!important;color:#0a1a2d!important}
+.btn.primary,.primary,.linkbtn{background:linear-gradient(135deg,#53b5ff,#367ee6)!important;color:#fff!important;box-shadow:0 8px 24px rgba(45,135,232,.24)}
+.btn.secondary,.secondary{background:rgba(83,145,207,.19)!important;color:#edf7ff!important;border:1px solid rgba(145,198,255,.26)!important}
+a{color:#a9d7ff}
+#diniSticker,.diniSticker,.dini-sticker,.dinilove-sticker,.dinilove-widget,[id*="diniSticker"],[class*="dinilove-sticker"],[class*="dinilove-widget"]{display:none!important;visibility:hidden!important;pointer-events:none!important}
+@media(max-width:850px){.panel,.authBox,.modal,.authModal{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}}
+</style>
+</head>
+<body>
+<div class="site">
+<header class="topbar"><div class="wrap navrow"><a class="brand" href="./">Tankstellen<span>Ertrag</span></a><nav><a href="#vorteile">Vorteile</a><a href="#ablauf">So funktioniert's</a><a href="#wissen">Branchenwissen</a><a href="./news.html">News</a><a href="./dini.html">DiniLove ♥</a><button id="navLogin" class="navbtn">Kundenlogin</button></nav></div></header>
+<main>
+<section class="hero publicOnly"><div class="wrap heroGrid"><div><div class="eyebrow">Warenwirtschaft für Tankstellenshops</div><h1>Ihre Warenwirtschaft.<br><span>Ihr Überblick.</span><br>Ihr Ertrag.</h1><p class="lead">TankstellenErtrag macht sichtbar, wo Umsatz, Marge und Schwund im Shop wirtschaftlich auffällig sind – verständlich, praxisnah und ohne komplizierte Warenwirtschaftssoftware.</p><div class="actions"><a id="heroTest" class="cta" href="./quickcheck.html">Kostenlosen QuickCheck starten</a><button id="heroLogin" class="ghost">Kundenlogin</button></div><div class="trust"><span>✓ Aus der Tankstellenpraxis</span><span>✓ Manuelle Monatsanalyse</span><span>✓ Beratungsbericht</span></div></div><div class="heroVisual"><div class="visualHead"><span>Stationsergebnis</span><b>09/2026</b></div><div class="metric big"><span>Shop-Umsatz</span><strong>210.000 €</strong></div><div class="metricRow"><div class="metric"><span>Rohertrag</span><strong>100.000 €</strong></div><div class="metric"><span>Marge</span><strong class="green">47,6 %</strong></div></div><div class="signal"><span class="dot"></span><div><b>Prüfsignal erkannt</b><small>Schwundquote 3,8 % · Prüfen</small></div></div><div class="radarTitle"><span>Ertragsradar</span><small>Wichtige Prüffelder</small></div><div class="radarGrid"><div class="radarCard warn"><b>Getränke</b><span>Marge 43,0 %</span><strong>Potenzial</strong></div><div class="radarCard check"><b>Backshop</b><span>Marge 55,1 %</span><strong>Prüfen</strong></div><div class="radarCard good"><b>Süßwaren</b><span>Marge 51,2 %</span><strong>Stabil</strong></div><div class="radarCard check"><b>Schwund</b><span>3,8 %</span><strong>Auffällig</strong></div></div><div class="visualFoot"><span>Monatsanalyse</span><b>Umsatz · Marge · Schwund</b></div></div><aside class="heroSide"><div class="heroSideEyebrow">Jeden Monat im Blick</div><h3>Vom Zahlenchaos zur klaren Maßnahme.</h3><p>TankstellenErtrag zeigt die wichtigsten wirtschaftlichen Signale Ihres Shops – kompakt und verständlich.</p><div class="heroSideList"><div><span>✓</span><b>Umsatz &amp; Rohertrag</b></div><div><span>✓</span><b>Margen je Warengruppe</b></div><div><span>✓</span><b>Schwund &amp; Abschriften</b></div><div><span>✓</span><b>Ertragsradar &amp; Potenziale</b></div><div><span>✓</span><b>Konkrete Handlungsempfehlungen</b></div></div><div class="heroSideFoot">Monat für Monat · verständlich · praxisnah</div><div class="praxisNote"><b>Aus der Tankstellenpraxis.</b><br>Für die Praxis. Und mit ihr weiterentwickelt.<span>Gemeinsam mit Tankstellenbetreibern entsteht ein Werkzeug, das sich an den tatsächlichen Herausforderungen im Shop orientiert.</span></div></aside></div></section>
+<section class="publicOnly appHint"><div class="wrap"><div class="appHintBox"><div class="appHintIcon">📱</div><div class="appHintContent"><div class="eyebrow">TankstellenErtrag auf dem Smartphone</div><h2>Wie eine App – ohne App-Store.</h2><div class="appHintSteps"><div><b>🌐</b><span><strong>Link öffnen</strong><small>TankstellenErtrag im Browser öffnen</small></span></div><div><b>📲</b><span><strong>„Zum Home-Bildschirm“ auswählen</strong><small>Direkt auf dem Smartphone ablegen</small></span></div><div><b>🚀</b><span><strong>TankstellenErtrag wie eine App starten</strong><small>Beim nächsten Mal direkt über das App-Symbol öffnen</small></span></div></div><p>Funktioniert auf <strong>iPhone und Android</strong> – ohne App-Store-Download.</p></div></div></div></section>
+<section id="quickcheckCTA" class="publicOnly section" style="padding-top:0"><div class="wrap"><div class="panel" style="display:flex;justify-content:space-between;align-items:center;gap:20px;background:linear-gradient(135deg,#211c18,#181c1f);border-color:#4a4038"><div><div class="eyebrow">Kostenloser Einstieg</div><h2 style="margin:6px 0 8px">In wenigen Minuten sehen, wo sich ein genauerer Blick lohnt.</h2><p style="margin:0;color:#aeb6bc;line-height:1.5">Testen Sie Shop-Marge, Rohertrag, Schwund, Abschriften und Lagerquote – kostenlos und ohne Konto.</p></div><a class="cta" href="./quickcheck.html" style="white-space:nowrap;text-decoration:none">QuickCheck starten</a></div></div></section><section id="vorteile" class="publicOnly section"><div class="wrap"><div class="sectionHead"><div><div class="eyebrow">Warum TankstellenErtrag?</div><h2>Vom Zahlenchaos zur klaren Handlung.</h2></div><p>Die Software verbindet Monatsdaten, Warengruppen, Zielmargen und Prüfsignale zu einer verständlichen Beratungsanalyse.</p></div><div class="cards"><article><div class="icon">📊</div><h3>Monatsanalyse</h3><p>Umsatz, EK, Rohertrag, Marge, Schwund und Bestand auf einen Blick.</p></article><article><div class="icon">🎯</div><h3>Ertragsradar</h3><p>Erkennt relevante Warengruppen und zeigt rechnerische Ertragspotenziale.</p></article><article><div class="icon">💡</div><h3>Beratung statt Bauchgefühl</h3><p>Prüfsignale führen zu konkreten Fragen und Maßnahmen – ohne Ursachen zu erfinden.</p></article><article><div class="icon">📄</div><h3>Beratungsbericht</h3><p>Druckfähige Zusammenfassung für die monatliche Beratung vor Ort.</p></article></div></div></section>
+<section id="ablauf" class="publicOnly section dark"><div class="wrap"><div class="eyebrow">So funktioniert's</div><h2>Vier Schritte. Ein klares Ziel.</h2><div class="steps"><div><b>01</b><strong>Daten eingeben</strong><span>Monatliche Shopdaten und Warengruppen erfassen.</span></div><div><b>02</b><strong>Auffälligkeiten erkennen</strong><span>Abweichungen bei Marge, Schwund und Entwicklung sichtbar machen.</span></div><div><b>03</b><strong>Maßnahmen ableiten</strong><span>Prüffelder priorisieren und wirtschaftliche Hebel simulieren.</span></div><div><b>04</b><strong>Wirkung kontrollieren</strong><span>Monate vergleichen und sehen, ob Maßnahmen Wirkung zeigen.</span></div></div></div></section>
+<section id="monatscheck" class="publicOnly section monthlyLearning"><div class="wrap"><div class="sectionHead"><div><div class="eyebrow">Monat für Monat</div><h2>Mit jedem Monat wird Ihr eigener Shop verständlicher.</h2></div><p>Am Anfang sehen Sie eine Momentaufnahme. Mit jeder weiteren Monatsanalyse wächst Ihre eigene Datenhistorie – und damit die Vergleichsbasis für Ihre Tankstelle.</p></div><div class="monthlyGrid"><article class="monthlyCard"><div class="monthlyIcon">⏱️</div><h3>Ca. 10–15 Minuten</h3><p>Einmal im Monat die wichtigsten Shopdaten erfassen. Danach übernimmt TankstellenErtrag die Auswertung.</p></article><article class="monthlyCard"><div class="monthlyIcon">📈</div><h3>Ihre eigene Historie</h3><p>Aktuelle Werte lassen sich mit Ihren vergangenen Monaten vergleichen. So werden Veränderungen und wiederkehrende Muster sichtbar.</p></article><article class="monthlyCard"><div class="monthlyIcon">🧠</div><h3>Der Shop wird verständlicher</h3><p>Mit der Zeit entsteht ein individuelles Bild Ihrer Station – statt jeden Monat wieder bei null anzufangen.</p></article></div><div class="monthlyFlow"><div><b>Heute</b><span>Daten erfassen</span></div><i>→</i><div><b>Nächster Monat</b><span>Veränderungen sehen</span></div><i>→</i><div><b>Mit der Zeit</b><span>Eigene Muster erkennen</span></div><i>→</i><div><b>Langfristig</b><span>Gezielter prüfen &amp; handeln</span></div></div><div class="monthlyNote"><b>Kein zusätzlicher Verwaltungsaufwand.</b> Ziel ist eine kurze monatliche Routine, aus der mit der Zeit eine immer aussagekräftigere wirtschaftliche Historie Ihres Shops entsteht.</div><div class="monthlyPilot"><div><b>Gemeinsam etwas Großes erschaffen?</b><span>TankstellenErtrag wird gemeinsam mit Tankstellenbetreibern weiterentwickelt.</span><span id="pilotSlotsText">Pilotphase · 10 Plätze</span></div><button id="monthlyPilotBtn" class="ghost" type="button">Pilot werden →</button></div></div></section>
+<section id="wissen" class="publicOnly section"><div class="wrap split"><div><div class="eyebrow">Branchenwissen</div><h2>Stationsdaten zuerst.<br>Branchenwissen als Kontext.</h2><p>TankstellenErtrag kombiniert die eigenen Stationsdaten mit ausgewählten Branchenstudien und Quellen. Studien liefern Vergleichswissen und mögliche Prüffelder – sie ersetzen niemals die Prüfung der konkreten Station.</p><a class="ghost darkBtn" href="./studien/">Geprüfte Studien & Erhebungen</a><a class="ghost darkBtn" href="./warenwirtschaft-tankstelle.html">Warenwirtschaft für Tankstellen</a><a class="ghost darkBtn" href="./wissen/shop-umsatz-nicht-gleich-ertrag.html">Warum Umsatz nicht gleich Ertrag ist</a><a class="ghost darkBtn" href="./wissen/kennzahlen-tankstellenshop.html">Wichtige Kennzahlen im Tankstellenshop</a><a class="ghost darkBtn" href="./wissen/schwund-tankstellenshop.html">Schwund im Tankstellenshop</a><a class="ghost darkBtn" href="./wissen/warengruppen-ertrag-tankstellenshop.html">Warengruppen & Ertrag</a></div><div class="quote"><span>„Nicht jede Abweichung braucht eine Vermutung. Sie braucht die richtige Prüffrage.“</span><small>TankstellenErtrag · Warenwirtschaftliche Monatsanalyse</small></div></div></section>
+<section class="ctaSection publicOnly"><div class="wrap"><div><div class="eyebrow">Pilotphase</div><h2>Erkennen, wo Geld im Shop liegen bleibt.</h2><p>Teste TankstellenErtrag mit deinen Monatsdaten und erhalte eine klare wirtschaftliche Auswertung.</p></div><button id="bottomTest" class="cta">Jetzt kostenlos testen</button></div></section>
+<section id="authView" class="auth hidden"><div class="wrap"><div class="authBox"><button id="closeAuth" type="button" class="close" aria-label="Anmeldefenster schließen" onclick="document.getElementById('authView').classList.add('hidden');document.body.style.overflow='';return false;">×</button><div class="eyebrow">Geschützter Kundenbereich</div><h2 id="formTitle">Anmelden</h2><p id="formHint" class="small">Mit Ihrem Kundenkonto anmelden.</p><div class="form"><div class="field signupField"><label>Name / Ansprechpartner</label><input id="fullName" type="text" autocomplete="name" placeholder="Vor- und Nachname"></div><div class="field signupField"><label>Tankstellenname</label><input id="stationName" type="text" autocomplete="organization" placeholder="Name der Tankstelle"></div><div class="field signupField"><label>PLZ / Ort</label><input id="location" type="text" autocomplete="address-level2" placeholder="z. B. 86150 Augsburg"></div><div class="field signupField"><label>Telefon <span class="small">(optional)</span></label><input id="phone" type="tel" autocomplete="tel" placeholder="Telefonnummer"></div><div class="field"><label>E-Mail</label><input id="email" type="email" autocomplete="email" placeholder="name@unternehmen.de"></div><div class="field"><label>Passwort</label><input id="password" type="password" autocomplete="new-password" placeholder="Mindestens 10 Zeichen"><div id="passwordHint" class="small hidden">Mindestens 10 Zeichen, Groß- und Kleinbuchstabe, Zahl und Sonderzeichen.</div></div><div class="field signupField"><label>Passwort wiederholen</label><div style="position:absolute;left:-9999px;top:-9999px;height:1px;width:1px;overflow:hidden" aria-hidden="true"><label for="website_hp">Website</label><input id="website_hp" name="website_hp" type="text" tabindex="-1" autocomplete="off"></div><input id="password2" type="password" autocomplete="new-password" placeholder="Passwort erneut eingeben"></div><div id="signupLegal" class="signupLegal hidden"><label class="legalCheck"><input id="businessConfirm" type="checkbox"> <span>Ich bestätige, dass ich TankstellenErtrag als Unternehmer im Sinne des § 14 BGB nutze.</span></label><label class="legalCheck"><input id="agbConfirm" type="checkbox"> <span>Ich akzeptiere die <a href="./agb.html" target="_blank" rel="noopener noreferrer">AGB</a> und habe die <a href="./datenschutz.html" target="_blank" rel="noopener noreferrer">Datenschutzerklärung</a> gelesen.</span></label></div><label class="rememberRow"><input id="rememberMe" type="checkbox" checked> <span>Angemeldet bleiben</span></label><div class="actions"><button class="btn primary" id="loginBtn">Anmelden</button><button class="btn secondary" id="signupBtn">Konto registrieren</button></div></div><div id="status" class="status">Verbindung wird geprüft …</div></div></div></section>
+<div id="mfaPanel" class="mfaPanel hidden"><div class="mfaBox"><div class="eyebrow">Admin-Sicherheit</div><h2 id="mfaTitle">Zwei-Faktor-Anmeldung</h2><p id="mfaText" class="small">Schütze dein Administrator-Konto mit einer Authenticator-App.</p><div id="mfaSetupContent"><p class="small">1. QR-Code mit Google Authenticator, Microsoft Authenticator oder einer anderen TOTP-App scannen.</p><img id="mfaQr" class="mfaQr" alt="MFA QR-Code"><p class="small">Falls der QR-Code nicht funktioniert, kannst du diesen Schlüssel manuell eingeben:</p><div id="mfaSecret" class="mfaSecret"></div></div><p class="small">2. Den 6-stelligen Code aus der App eingeben:</p><input id="mfaCode" class="mfaCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000"><div class="mfaActions"><button id="mfaVerify" class="btn primary">MFA aktivieren</button><button id="mfaCancel" class="btn secondary">Abbrechen</button></div><div id="mfaMsg" class="status mfaMsg"></div></div></div>
+<section id="adminView" class="dashboard hidden"><div class="wrap"><div class="panel adminPanel"><div class="eyebrow">Administration</div><div class="adminHead"><div id="visitorStats" class="visitorStats"><div class="visitorStat"><span>Besucher heute</span><b id="statToday">–</b></div><div class="visitorStat"><span>Letzte 7 Tage</span><b id="stat7">–</b></div><div class="visitorStat"><span>Diesen Monat</span><b id="statMonth">–</b></div><div class="visitorStat"><span>Pilotbewerbungen</span><b id="statApplications">–</b></div></div><div class="adminActions"><div><h2>Bewerber</h2><p class="small">Pilotanfragen und Zugänge verwalten.</p></div><button id="refreshApplicants" type="button" class="btn secondary adminRefresh" onclick="refreshAdminData(); return false;">Aktualisieren</button><button id="runDeletionJob" type="button" class="btn secondary adminRefresh" onclick="runDeletionJob(); return false;">Löschungen prüfen</button></div></div><div id="adminStatus" class="status">Bewerber werden geladen …</div><div id="adminDiagnostics" class="adminDiagnostics hidden" aria-live="polite"><div class="adminDiagHead"><div><strong>🔧 Technische Diagnose</strong><span id="adminDiagSummary">Nur sichtbar für den Administrator.</span></div><button id="adminDiagCopy" type="button" class="btn secondary adminDiagCopy">Details kopieren</button></div><div id="adminDiagGrid" class="adminDiagGrid"></div></div><div id="cancellationPanel" class="card hidden" style="margin-top:16px"><div class="adminHead"><div><h3 style="margin:0">Kündigungsanfragen</h3><p class="small">Kündigungen werden hier bestätigt und mit dem tatsächlichen Enddatum hinterlegt.</p></div></div><div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Kunde</th><th>Station</th><th>Angefragt</th><th>Vertragsende</th><th>Datenlöschung</th><th></th></tr></thead><tbody id="cancellationRows"></tbody></table></div></div><div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Bewerber</th><th>Station</th><th>E-Mail</th><th>Account</th><th>Zugang</th><th>Bis</th><th>Aktionen</th></tr></thead><tbody id="applicantRows"></tbody></table></div><div class="card" id="feedbackAdminPanel" style="margin-top:16px"><div class="adminHead"><div><h3 style="margin:0">Kundenfeedback</h3><p class="small">Bewertungen aus den geschützten Stationskonten. Nur mit ausdrücklicher Freigabe darf eine Kundenstimme veröffentlicht werden.</p></div><button id="refreshFeedback" type="button" class="btn secondary adminRefresh" onclick="loadCustomerFeedback(); return false;">Aktualisieren</button></div><div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Station</th><th>Monat</th><th>Gesamt</th><th>Bedienung</th><th>Analyse</th><th>Nutzen</th><th>Kommentar</th><th>Veröffentlichung</th><th></th></tr></thead><tbody id="feedbackRows"></tbody></table></div><div id="feedbackAdminStatus" class="status">Feedback wird geladen …</div></div></div></div></section>
+<section id="dashboardView" class="dashboard hidden"><div class="wrap"><div class="panel"><div class="eyebrow">Kundenkonto</div><h2>Kundenkonto</h2><p id="userLine" class="small"></p><div id="stationCards" class="cards"></div><div id="stationStatus" class="status"></div><a id="openApp" class="linkbtn hidden" href="https://app.tankstellenertrag.de/analyse.html">Zur TankstellenErtrag-Plattform</a><button id="cancelSubscriptionBtn" type="button" class="btn secondary" onclick="requestCancellation(); return false;">Kündigung anfragen</button><button id="logoutBtn" class="btn secondary">Abmelden</button></div></div></section>
+<div id="diniSticker" class="diniSticker" aria-label="DiniLove Halloween Sticker">
+<button id="diniStickerClose" class="diniStickerClose" type="button" aria-label="Sticker schließen" onclick="this.parentElement.remove(); return false;">×</button>
+<div class="diniStickerHint">Kleiner saisonaler Gruß 🎃<br>Antippen zum Entdecken</div>
+<a id="diniStickerLink" class="diniStickerLink" href="./dini.html" target="_blank" rel="noopener noreferrer" aria-label="DiniLove Rezept-Adventskalender öffnen">
+<img class="diniStickerArt" src="../assets/dinilove-halloween.webp" alt="DiniLove Halloween Sticker">
+</a>
+<a class="diniStickerLink" href="./dini.html" target="_blank" rel="noopener noreferrer">🎄 Adventskalender öffnen →</a>
+</div></main>
+<footer><div class="wrap footer"><b>Tankstellen<span>Ertrag</span></b><span>Warenwirtschaftliche Monatsanalyse</span><a href="./impressum.html">Impressum</a><a href="./datenschutz.html">Datenschutz</a><a href="./agb.html">AGB</a><a href="./avv.html">AVV</a><a class="footerLinkedIn" href="https://www.linkedin.com/company/tankstellenertrag/" target="_blank" rel="noopener noreferrer" aria-label="TankstellenErtrag auf LinkedIn"><span class="linkedinIcon">in</span><span>LinkedIn</span></a></div></footer>
+</div>
+<style>
+:root{--bg:#0b0d0f;--panel:#171b1e;--panel2:#20262a;--line:#343b40;--text:#f5f6f7;--muted:#aeb6bc;--orange:#f47b20;--orange2:#ff9b4a;--green:#45c477}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1160px,calc(100% - 36px));margin:auto}.topbar{position:sticky;top:0;z-index:10;background:rgba(11,13,15,.88);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.06)}.navrow{height:70px;display:flex;align-items:center;justify-content:space-between}.brand{font-size:23px;font-weight:900;color:#fff;text-decoration:none}.brand span,footer span{color:var(--orange)}nav{display:flex;gap:22px;align-items:center}nav a{color:#bfc6ca;text-decoration:none;font-size:13px}nav a:hover{color:#fff}.navbtn{border:1px solid #4a5155;background:#20262a;color:#fff;border-radius:9px;padding:10px 15px;font-weight:800;cursor:pointer}.hero{padding:78px 0 86px;background:radial-gradient(circle at 78% 35%,#352216 0,#171310 20%,#0b0d0f 58%)}.heroGrid{display:grid;grid-template-columns:1fr 1.02fr .72fr;gap:24px;align-items:center}.heroSide{background:rgba(23,27,30,.78);border:1px solid #343c41;border-radius:18px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.24)}.heroSideEyebrow{color:var(--orange2);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.13em}.heroSide h3{font-size:22px;line-height:1.15;margin:10px 0 10px}.heroSide p{color:#aeb6bc;font-size:13px;line-height:1.55;margin:0 0 16px}.heroSideList{display:grid;gap:9px}.heroSideList div{display:flex;gap:9px;align-items:center;padding:8px 9px;background:#191e21;border:1px solid #2e363a;border-radius:9px}.heroSideList span{color:var(--green);font-weight:900}.heroSideList b{font-size:11px}.heroSideFoot{margin-top:15px;padding-top:12px;border-top:1px solid #30373c;color:#7f898f;font-size:10px}.praxisNote{margin-top:14px;padding-top:13px;border-top:1px solid #30373c;color:#fff;font-size:12px;line-height:1.45}.praxisNote b{color:var(--orange2);font-size:12px}.praxisNote span{display:block;color:#8f999f;font-size:10px;line-height:1.5;margin-top:6px}.eyebrow{color:var(--orange2);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.15em}.hero h1{font-size:58px;line-height:1.01;margin:14px 0 22px;letter-spacing:-.035em}.hero h1 span{color:var(--orange)}.lead{font-size:18px;line-height:1.65;color:#d0d6da;max-width:650px}.actions{display:flex;gap:10px;margin-top:26px}.cta,.ghost{padding:13px 19px;border-radius:9px;font-weight:850;cursor:pointer;font-size:14px}.cta{background:var(--orange);border:1px solid var(--orange);color:#fff}.cta:hover{background:#ff8a32}.ghost{background:transparent;border:1px solid #4a5155;color:#fff}.trust{display:flex;flex-wrap:wrap;gap:14px;margin-top:22px;color:#8f999f;font-size:11px}.heroVisual{background:linear-gradient(145deg,#20262a,#131719);border:1px solid #3b4348;border-radius:20px;padding:22px;box-shadow:0 30px 90px rgba(0,0,0,.4);transform:perspective(1000px) rotateY(-3deg)}.visualHead,.visualFoot{display:flex;justify-content:space-between;color:#aeb6bc;font-size:12px}.visualHead b{color:#fff}.metric{background:#191e21;border:1px solid #30373c;border-radius:12px;padding:15px;margin-top:12px}.metric span{display:block;color:#8f999f;font-size:11px}.metric strong{display:block;font-size:26px;margin-top:5px}.metric.big strong{font-size:35px}.metricRow{display:grid;grid-template-columns:1fr 1fr;gap:12px}.green{color:var(--green)}.signal{display:flex;gap:12px;align-items:center;margin-top:12px;padding:14px;border:1px solid #5a482b;background:#24201a;border-radius:12px}.signal .dot{width:10px;height:10px;border-radius:50%;background:var(--orange);box-shadow:0 0 12px var(--orange)}.signal b,.signal small{display:block}.signal small{color:#b5bdc2;margin-top:3px}.miniBars{display:flex;gap:8px;align-items:flex-end;height:62px;padding:12px 3px}.miniBars i{display:block;height:100%;background:linear-gradient(var(--orange2),var(--orange));border-radius:5px;opacity:.9}.miniBars i:nth-child(2){height:72%}.miniBars i:nth-child(3){height:54%}.miniBars i:nth-child(4){height:39%}.visualFoot{border-top:1px solid #30373c;padding-top:13px}.visualFoot b{color:#fff}.radarTitle{display:flex;justify-content:space-between;align-items:end;margin-top:15px;padding:0 2px}.radarTitle span{font-size:12px;font-weight:850;color:#fff}.radarTitle small{font-size:10px;color:#7f898f}.radarGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.radarCard{min-width:0;background:#191e21;border:1px solid #30373c;border-radius:10px;padding:10px 11px}.radarCard b{display:block;font-size:12px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.radarCard span{display:block;font-size:10px;color:#9aa3a8;margin-top:3px}.radarCard strong{display:inline-block;margin-top:6px;font-size:10px;font-weight:850;padding:3px 6px;border-radius:999px}.radarCard.warn{border-color:#6a4b2c}.radarCard.warn strong{color:#ffc08b;background:#3a2a1c}.radarCard.check{border-color:#4c4540}.radarCard.check strong{color:#ffd29e;background:#30271f}.radarCard.good{border-color:#2d5942}.radarCard.good strong{color:#8be0ae;background:#193024}.section{padding:92px 0}.section.dark{background:#111517;border-top:1px solid #1f2528;border-bottom:1px solid #1f2528}.sectionHead{display:flex;justify-content:space-between;gap:50px;align-items:end;margin-bottom:30px}.section h2,.ctaSection h2{font-size:37px;line-height:1.1;margin:8px 0 0}.sectionHead>p{max-width:460px;color:var(--muted);line-height:1.6}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.section .cards article{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:22px}.icon{font-size:25px}.cards h3{margin:16px 0 8px}.cards p{color:var(--muted);line-height:1.55;font-size:13px}.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:35px;background:#30373c;border:1px solid #30373c;border-radius:15px;overflow:hidden}.steps>div{background:#181d20;padding:25px;min-height:170px}.steps b{display:block;color:var(--orange);font-size:12px}.steps strong{display:block;font-size:18px;margin:32px 0 9px}.steps span{color:var(--muted);font-size:13px;line-height:1.5}.split{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}.split p{color:var(--muted);line-height:1.7}.quote{padding:35px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,#1c2225,#121618)}.quote span{font-size:25px;line-height:1.35;font-weight:800}.quote small{display:block;color:#7f898f;margin-top:22px}.darkBtn{display:block;width:fit-content;max-width:100%;margin-top:10px;line-height:1.35;white-space:normal}.ctaSection{padding:55px 0;background:linear-gradient(100deg,#24170e,#121618)}.ctaSection .wrap{display:flex;justify-content:space-between;align-items:center;gap:25px}.ctaSection p{color:var(--muted)}footer{border-top:1px solid #202529}.footer{min-height:75px;display:flex;align-items:center;gap:20px;color:#687177;font-size:11px}.footer a{color:#899298;text-decoration:none;margin-left:auto}.footer a+a{margin-left:0}.auth{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);padding:8vh 0;overflow:auto}.authBox{width:min(470px,100%);margin:auto;background:#171b1e;border:1px solid #41494e;border-radius:18px;padding:28px;position:relative;box-shadow:0 30px 100px rgba(0,0,0,.55)}.close{position:absolute;right:16px;top:13px;border:0;background:none;color:#aeb6bc;font-size:28px;cursor:pointer}.form{display:grid;gap:12px;margin-top:18px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}.field input{width:100%;padding:12px;border-radius:9px;border:1px solid #d9c1b1;background:#fff1e7;color:#171717}.btn{padding:12px 14px;border:0;border-radius:9px;font-weight:800;cursor:pointer}.primary{background:var(--orange);color:#fff}.secondary{background:#30363a;color:#fff}.form .actions{display:grid;grid-template-columns:1fr 1fr;margin-top:2px}.status{margin-top:14px;padding:13px;border-radius:10px;background:#20262a;border:1px solid var(--line);font-size:13px}.status.ok{background:#17271f;border-color:#285c42}.status.err{background:#2b1c1c;border-color:#673535}.hidden{display:none!important}.dashboard{padding:60px 0;background:#101416;min-height:60vh}.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:25px}.dashboard .cards{margin:20px 0}.dashboard .card{background:var(--panel2);padding:18px;border:1px solid var(--line);border-radius:12px}.dashboard .label{color:var(--muted);font-size:11px}.dashboard .value{font-size:20px;font-weight:800;margin-top:6px}.linkbtn{display:inline-block;text-decoration:none;padding:12px 18px;background:var(--orange);color:#fff;border-radius:9px;font-weight:800;margin:8px 8px 0 0}.dashboard .btn{margin-top:8px}@media(max-width:1100px){.heroGrid{grid-template-columns:1fr 1fr}.heroSide{grid-column:1/-1;display:grid;grid-template-columns:1fr 1.6fr;gap:14px;align-items:center}.heroSideList{grid-column:2;grid-row:1 / span 3}.heroSideFoot{grid-column:1;grid-row:3}}@media(max-width:900px){.heroGrid,.split{grid-template-columns:1fr}.hero h1{font-size:45px}.cards{grid-template-columns:1fr 1fr}.steps{grid-template-columns:1fr 1fr}.sectionHead{display:block}.heroVisual{transform:none}}.diniMobilePromo{display:none}.diniMobileCard{display:flex;align-items:center;gap:13px;text-decoration:none;color:#fff;background:linear-gradient(135deg,#211812,#171b1e);border:1px solid #5a3926;border-radius:15px;padding:14px 16px;box-shadow:0 12px 35px rgba(0,0,0,.2)}.diniMobileHeart{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#f47b20;color:#fff;font-size:20px;flex:0 0 auto}.diniMobileTitle{font-weight:900;font-size:16px}.diniMobileText{margin-top:3px;color:#c6cdd1;font-size:11px;line-height:1.35}.diniMobileArrow{margin-left:auto;color:#ff9b4a;font-size:20px;font-weight:800}@media(max-width:600px){.diniMobilePromo{display:block;padding:0 0 28px}.diniMobileCard{max-width:100%}nav a{display:none}.hero{padding-top:55px}.hero h1{font-size:39px}.cards,.steps{grid-template-columns:1fr}.ctaSection .wrap{display:block}.footer{flex-wrap:wrap;padding:18px 0}.footer a{margin-left:0}.actions{flex-wrap:wrap}}
+</style>
+<style>.visitorStats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0 8px}.visitorStat{background:#191e21;border:1px solid #30373c;border-radius:11px;padding:13px}.visitorStat span{display:block;color:#8f999f;font-size:10px}.visitorStat b{display:block;font-size:24px;margin-top:5px;color:#fff}.visitorStat:first-child{border-color:#5b432b}.visitorStat:first-child b{color:var(--orange2)}.adminPanel{margin-top:20px}.adminHead{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}.adminActions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}.adminActions .adminRefresh{width:auto;white-space:nowrap}.adminTableWrap{overflow:auto;margin-top:16px}.adminTable{width:100%;border-collapse:collapse;min-width:900px}.adminTable th,.adminTable td{padding:11px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle;font-size:12px}.adminTable th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}.adminTable select,.adminTable input{background:#fff1e7;color:#171717;border:1px solid #d9c1b1;border-radius:7px;padding:7px;font-size:12px}.adminTable .save{width:auto;padding:8px 10px;background:var(--orange);color:#fff}.adminStatusPill{display:inline-flex;align-items:center;gap:7px;min-width:108px;padding:7px 10px;border-radius:999px;font-size:11px;font-weight:900;white-space:nowrap}.adminStatusDot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}.adminStatusPill.green{background:#17271f;border:1px solid #285c42;color:#8ee0ad}.adminStatusPill.green .adminStatusDot{background:#45c477;box-shadow:0 0 8px rgba(69,196,119,.55)}.adminStatusPill.yellow{background:#2a2418;border:1px solid #6a5428;color:#ffd27f}.adminStatusPill.yellow .adminStatusDot{background:#f0b84b;box-shadow:0 0 8px rgba(240,184,75,.5)}.adminStatusPill.red{background:#2b1c1c;border:1px solid #673535;color:#ff9b9b}.adminStatusPill.red .adminStatusDot{background:#ef6461;box-shadow:0 0 8px rgba(239,100,97,.5)}.adminActionRow{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.adminActionRow .btn{width:auto}.adminTable .save{width:auto;padding:8px 10px;background:var(--orange);color:#fff}.adminTable .suspendBtn{width:auto;padding:8px 10px;background:#30363a;color:#fff}.adminTable .deleteBtn{width:auto;padding:8px 10px;background:#3a2525;color:#ffb0b0;border:1px solid #6b3a3a}.adminTable .deleteBtn:hover{background:#4a2929}.adminName{font-weight:800}.adminMuted{color:var(--muted);font-size:11px;margin-top:3px}@media(max-width:700px){.adminHead{align-items:flex-start;flex-direction:column}.visitorStats{grid-template-columns:1fr 1fr}}</style></body>
+<script>
+// Kanonische App-Domain: Login und Plattform müssen auf derselben Origin laufen, damit die Supabase-Session erhalten bleibt.
+if(location.hostname==='tankstellenertrag.de'||location.hostname==='www.tankstellenertrag.de'){
+  location.replace('https://app.tankstellenertrag.de'+location.pathname+location.search+location.hash);
+}
+const cfg=window.TANKSTELLENERTRAG_SUPABASE||{};
+const client=(cfg.url&&cfg.publishableKey&&window.supabase)?window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:'tankstellenertrag-auth',storage:window.localStorage}}):null;
+window.TANKSTELLENERTRAG_CLIENT=client;
+const $=id=>document.getElementById(id);
+function status(msg,type=''){const el=$('status');if(el){el.className='status '+type;el.textContent=msg;}}
+function withTimeout(promise,ms,message='Die Anfrage an den Anmeldedienst hat zu lange gedauert.'){return Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error(message)),ms))]);}
+function setBusy(v){$('loginBtn').disabled=v;$('signupBtn').disabled=v;}
+async function loadStation(session){
+  if(!client||!session)return;
+  setAuthenticatedPage(true);
+  status('Anmeldung erfolgreich – Kundenkonto wird geladen …','ok');
+  $('authView').classList.add('hidden');
+  $('dashboardView').classList.remove('hidden');
+  document.body.style.overflow='';
+  $('userLine').textContent='Angemeldet als '+(session.user.email||'Kundenkonto');
+  const isAdmin=(session.user.email||'').toLowerCase()==='svenkrick@gmx.de';
+  if(isAdmin){
+    $('authView').classList.add('hidden');
+    $('cancelSubscriptionBtn')?.classList.add('hidden');
+    status('Anmeldung erfolgreich – Admin-Sicherheit wird geprüft …','ok');
+    const aal=await withTimeout(client.auth.mfa.getAuthenticatorAssuranceLevel(),10000,'Admin-Sicherheitsprüfung antwortet nicht.');
+    if(aal.error){status('Admin-Sicherheitsprüfung fehlgeschlagen: '+aal.error.message,'err');return;}
+    if(aal.data.nextLevel==='aal2'&&aal.data.currentLevel!=='aal2'){await showAdminMfaChallenge();return;}
+    const factors=await withTimeout(client.auth.mfa.listFactors(),10000,'Admin-Faktoren konnten nicht geladen werden.');
+    const verified=(factors.data?.totp||[]).find(x=>x.status==='verified');
+    if(!verified){await showAdminMfaSetup();return;}
+    $('adminView').classList.remove('hidden');loadApplicants();loadCancellationRequests();loadVisitorStats();loadCustomerFeedback();
+    status('Administrator angemeldet – Besucherstatistik wird geladen.','ok');
+    return;
+  }
+  $('adminView').classList.add('hidden');
+  $('mfaPanel').classList.add('hidden');
+  $('cancelSubscriptionBtn')?.classList.remove('hidden');
+  status('Konto angemeldet – Stationsdaten werden geladen …','ok');
+  const {data:rows,error}=await withTimeout(client.from('stations').select('id,station_name,postcode,city,subscription_status,trial_ends_at,subscription_ends_at,founding_partner_free_until,data_delete_at,is_suspended,suspension_reason').eq('owner_id',session.user.id),10000,'Stationsdaten antworten nicht.');
+  if(error){$('stationStatus').className='status err';$('stationStatus').textContent='Konto aktiv, Stationsstatus konnte nicht gelesen werden: '+error.message;status('Stationsdaten konnten nicht geladen werden.','err');return;}
+  const row=rows&&rows[0];
+  if(!row){
+    $('stationCards').innerHTML='<div class="card"><div class="label">Pilotstation</div><div class="value">Noch nicht verknüpft</div></div>';
+    $('stationStatus').textContent='Ihr Kundenkonto ist angelegt. Die Pilotstation wird separat freigeschaltet.';
+    status('Anmeldung erfolgreich. Keine Station verknüpft.','ok');
+    return;
+  }
+  const end=row.founding_partner_free_until||row.subscription_ends_at||row.trial_ends_at;
+  const suspended=!!row.is_suspended;
+  const active=!suspended&&(row.subscription_status==='active'||(row.subscription_status==='founding_partner'&&end&&new Date(end)>new Date())||(row.subscription_status==='trial'&&end&&new Date(end)>new Date()));
+  if(suspended){$('stationStatus').className='status err';$('stationStatus').textContent='Kundenkonto ist vorübergehend gesperrt. Bitte wenden Sie sich an TankstellenErtrag.';$('stationCards').innerHTML='<div class="card"><div class="label">Station</div><div class="value">'+esc(row.station_name||'—')+'</div><div class="small">'+esc(row.postcode||'')+' '+esc(row.city||'')+'</div></div><div class="card"><div class="label">Zugang</div><div class="value">Gesperrt</div></div><div class="card"><div class="label">Grund</div><div class="value">Zahlungs-/Vertragsprüfung</div></div>';$('openApp').classList.add('hidden');return;}
+
+  let cancellation=null;
+  try{
+    const {data:cancelData,error:cancelError}=await client.rpc('get_subscription_cancellation_status');
+    if(!cancelError&&cancelData){
+      cancellation=Array.isArray(cancelData)?cancelData[0]:cancelData;
+      if(typeof cancellation==='string'){try{cancellation=JSON.parse(cancellation)}catch(_){cancellation=null}}
+    }
+    if(cancelError) console.warn('Kündigungsstatus konnte nicht geladen werden:',cancelError.message||cancelError);
+  }catch(e){console.warn('Kündigungsstatus konnte nicht geladen werden:',e.message||e)}
+
+  $('stationCards').innerHTML='<div class="card"><div class="label">Station</div><div class="value">'+esc(row.station_name||'—')+'</div><div class="small">'+esc(row.postcode||'')+' '+esc(row.city||'')+'</div></div><div class="card"><div class="label">Zugang</div><div class="value">'+esc(row.subscription_status||'—')+'</div></div><div class="card"><div class="label">Zugang bis</div><div class="value">'+(end?new Date(end).toLocaleDateString('de-DE'):'—')+'</div></div>';
+
+  const cancelStatus=String(cancellation?.status||'').toLowerCase();
+  const cancelRequested=cancellation&&['requested','pending'].includes(cancelStatus);
+  const cancelConfirmed=cancellation&&(['confirmed','approved'].includes(cancelStatus)||!!cancellation.requested_end_date);
+
+  if(cancelConfirmed){
+    const cancelEnd=cancellation.requested_end_date||cancellation.subscription_ends_at||row.subscription_ends_at;
+    const deleteAt=cancellation.data_delete_at||row.data_delete_at;
+    $('stationStatus').className='status ok';
+    $('stationStatus').textContent='Kündigung bestätigt. Ihr Zugang endet am '+(cancelEnd?new Date(cancelEnd).toLocaleDateString('de-DE'):'vereinbarten Termin')+'.'+(deleteAt?' Die Datenlöschung ist für den '+new Date(deleteAt).toLocaleDateString('de-DE')+' vorgemerkt.':'');
+    const btn=$('cancelSubscriptionBtn');if(btn){btn.disabled=true;btn.textContent='Kündigung bestätigt';}
+  }else if(cancelRequested){
+    $('stationStatus').className='status';
+    $('stationStatus').textContent='Kündigungsanfrage eingegangen. Ihre Anfrage wird von TankstellenErtrag geprüft.';
+    const btn=$('cancelSubscriptionBtn');if(btn){btn.disabled=true;btn.textContent='Kündigung angefragt';}
+  }else{
+    $('stationStatus').className='status '+(active?'ok':'err');
+    $('stationStatus').textContent=active?'Zugang ist aktiv.':'Station vorhanden, aber Zugang aktuell nicht aktiv.';
+  }
+  if(active){$('openApp').classList.remove('hidden');$('openApp').onclick=async(e)=>{e.preventDefault();try{const {data:s}=await withTimeout(client.auth.getSession(),10000,'Die Sitzung konnte nicht gelesen werden.');if(!s.session)throw new Error('Die Anmeldung ist abgelaufen.');location.href='https://app.tankstellenertrag.de/analyse.html';}catch(err){status(err.message||String(err),'err')}};}
+}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+
+async function runDeletionJob(){
+  if(!client)return;
+  const btn=$('runDeletionJob');
+  if(btn){btn.disabled=true;btn.textContent='Löschungen werden geprüft …';}
+  try{
+    const {data,error}=await client.functions.invoke('delete-due-accounts');
+    if(error)throw error;
+    const count=Number(data?.deleted||0);
+    $('adminStatus').className='status ok';
+    $('adminStatus').textContent=count?count+' Konto/Konten wurden endgültig gelöscht.':'Keine fälligen Löschungen vorhanden.';
+    await loadCancellationRequests();
+    await loadApplicants();
+    await loadVisitorStats();
+  }catch(e){
+    $('adminStatus').className='status err';
+    $('adminStatus').textContent='Löschprüfung fehlgeschlagen: '+(e.message||String(e));
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='Löschungen prüfen';}
+  }
+}
+async function loadCustomerFeedback(){
+  const body=$('feedbackRows'),statusEl=$('feedbackAdminStatus');
+  if(!body||!statusEl||!client)return false;
+  statusEl.className='status';statusEl.textContent='Kundenfeedback wird geladen …';body.innerHTML='';
+  try{
+    /* Admin-Feedback wird über eine geschützte DB-Funktion gelesen.
+       Hintergrund: station_snapshots ist per RLS auf die jeweilige Station begrenzt. */
+    const {data:rpcData,error:rpcError}=await client.rpc('get_admin_customer_feedback');
+    if(rpcError)throw rpcError;
+    let snapshots=[];
+    if(Array.isArray(rpcData))snapshots=rpcData;
+    else if(typeof rpcData==='string'){try{snapshots=JSON.parse(rpcData)||[]}catch(_){snapshots=[]}}
+    const {data:stationData,error:stationError}=await client.from('stations').select('id,station_name,postcode,city');
+    if(stationError)throw stationError;
+    const stations=new Map((stationData||[]).map(s=>[s.id,s]));
+    const rows=[];
+    snapshots.forEach(s=>{
+      const payload=s?.payload||{};
+      const feedback=Array.isArray(payload.feedback)?payload.feedback:[];
+      const station=stations.get(s.station_id)||{};
+      feedback.forEach(f=>rows.push({station,stationId:s.station_id,...f}));
+    });
+    rows.sort((a,b)=>String(b.updatedAt||'').localeCompare(String(a.updatedAt||'')));
+    if(!rows.length){
+      body.innerHTML='<tr><td colspan="8">Noch kein Kundenfeedback vorhanden.</td></tr>';
+      statusEl.className='status ok';statusEl.textContent='Noch keine Kundenbewertungen gefunden.';
+      return true;
+    }
+    body.innerHTML=rows.map(f=>{
+      const stars=n=>n==null?'–':'★'.repeat(Math.max(0,Math.min(5,Number(n))))+' '+Number(n)+'/5';
+      const stationName=f.station.station_name||('Station '+String(f.stationId||'').slice(0,8));
+      const place=[f.station.postcode,f.station.city].filter(Boolean).join(' ');
+      return '<tr><td><div class="adminName">'+esc(stationName)+'</div><div class="adminMuted">'+esc(place)+'</div></td><td>'+esc(f.month||'–')+'</td><td>'+stars(f.overall)+'</td><td>'+stars(f.usability)+'</td><td>'+stars(f.analysis)+'</td><td>'+stars(f.usefulness)+'</td><td style="max-width:260px;white-space:normal">'+esc(f.comment||'–')+'</td><td>'+(f.publishConsent?'<span class="status ok">Freigegeben</span>':'<span class="status">Nicht freigegeben</span>')+'</td><td><button type="button" class="btn secondary" data-feedback-delete="'+esc(String(f.stationId))+'" data-feedback-id="'+esc(String(f.id||''))+'" style="padding:6px 9px;font-size:11px">🗑️ Löschen</button></td></tr>';
+    }).join('');
+    body.querySelectorAll('[data-feedback-delete]').forEach(btn=>btn.onclick=()=>deleteCustomerFeedback(btn.dataset.feedbackDelete,btn.dataset.feedbackId));
+    statusEl.className='status ok';statusEl.textContent=rows.length+' Feedback-Einträge gefunden.';
+    return true;
+  }catch(e){
+    body.innerHTML='<tr><td colspan="8" style="color:#ef6461">Feedback konnte nicht geladen werden.</td></tr>';
+    statusEl.className='status err';statusEl.textContent='Feedback konnte nicht geladen werden: '+(e.message||String(e));
+    return false;
+  }
+}
+async function deleteCustomerFeedback(stationId,feedbackId){
+  if(!stationId||!feedbackId)return;
+  if(!confirm('Diese Kundenbewertung wirklich dauerhaft löschen?'))return;
+  try{
+    const wanted=String(feedbackId||'').trim();
+    const {data,error}=await client.rpc('delete_admin_customer_feedback',{
+      p_station_id:stationId,
+      p_feedback_id:wanted
+    });
+    if(error)throw error;
+    if(data!==true){
+      throw new Error('Supabase hat die Löschung nicht bestätigt. stationId='+stationId+' · id='+wanted);
+    }
+    $('feedbackAdminStatus').className='status ok';
+    $('feedbackAdminStatus').textContent='Kundenbewertung wurde gelöscht.';
+    await loadCustomerFeedback();
+  }catch(e){
+    $('feedbackAdminStatus').className='status err';
+    $('feedbackAdminStatus').textContent='Löschen fehlgeschlagen: '+(e.message||String(e));
+  }
+}
+async function loadCancellationRequests(){const panel=$('cancellationPanel'),body=$('cancellationRows');if(!panel||!body||!client)return false;const {data,error}=await client.rpc('get_cancellation_requests');if(error){panel.classList.remove('hidden');body.innerHTML='<tr><td colspan="6" style="color:#ef6461">Kündigungsanfragen konnten nicht geladen werden: '+esc(error.message||String(error))+'</td></tr>';return false;}if(!data){panel.classList.add('hidden');return true;}let rows=Array.isArray(data)?data:[];if(typeof data==='string'){try{const parsed=JSON.parse(data);rows=Array.isArray(parsed)?parsed:[];}catch(_){rows=[];}}if(!rows.length){panel.classList.add('hidden');return true;}panel.classList.remove('hidden');body.innerHTML=rows.map(x=>{const d=new Date(x.requested_at).toLocaleDateString('de-DE');const del=x.requested_end_date?new Date(x.requested_end_date+'T00:00:00'):null;const delText=del&&!Number.isNaN(del.getTime())?new Date(del.getTime()+30*86400000).toLocaleDateString('de-DE'):'—';return '<tr><td>'+esc(x.email||'—')+'</td><td>'+esc(x.station_name||'—')+'</td><td>'+d+'</td><td><input type="date" data-cancel-date="'+x.id+'" value="'+(x.requested_end_date||'')+'"></td><td>'+delText+'</td><td><button class="btn save" data-cancel-save="'+x.id+'">Kündigung bestätigen</button></td></tr>'}).join('');body.querySelectorAll('[data-cancel-save]').forEach(btn=>btn.onclick=()=>confirmCancellation(btn.dataset.cancelSave));return true;}
+async function confirmCancellation(id){const date=document.querySelector('[data-cancel-date="'+id+'"]')?.value;if(!date){$('adminStatus').className='status err';$('adminStatus').textContent='Bitte ein Enddatum auswählen.';return;}const {data,error}=await client.rpc('confirm_subscription_cancellation',{p_id:id,p_end_date:date,p_note:null});if(error){$('adminStatus').className='status err';$('adminStatus').textContent='Kündigung konnte nicht bestätigt werden: '+error.message;return;}$('adminStatus').className='status ok';$('adminStatus').textContent='Kündigung zum '+new Date(date+'T00:00:00').toLocaleDateString('de-DE')+' bestätigt.';loadCancellationRequests();loadApplicants();loadPilotSlots();}
+async function loadApplicants(silent=false){
+  const el=$('adminStatus'),body=$('applicantRows'); if(!el||!body||!client)return false;
+  if(!silent){el.className='status';el.textContent='Bewerber werden geladen …';}
+  body.innerHTML='';
+  const {data,error}=await client.from('pilot_applications').select('id,user_id,email,full_name,station_name,postcode,city,phone,status,access_type,access_until,created_at').neq('email','svenkrick@gmx.de').order('created_at',{ascending:false});
+  const {data:stationRows}=await client.from('stations').select('owner_id,subscription_status,trial_ends_at,subscription_ends_at,founding_partner_free_until,is_suspended,suspension_reason');
+  const stationByOwner=new Map((stationRows||[]).map(s=>[String(s.owner_id),s]));
+  if(error){el.className='status err';el.textContent='Bewerber konnten nicht geladen werden: '+error.message;return false;}
+  let applicants=Array.isArray(data)?data:[];
+  // Wirksame Kündigungen aus der Bewerberliste ausblenden, aber den Datensatz
+  // selbst nicht löschen. So bleibt die Historie erhalten.
+  try{
+    const {data:cancelData,error:cancelError}=await client.rpc('get_cancellation_requests');
+    if(!cancelError){
+      let cancellations=Array.isArray(cancelData)?cancelData:[];
+      if(typeof cancelData==='string'){try{const parsed=JSON.parse(cancelData);cancellations=Array.isArray(parsed)?parsed:[];}catch(_){cancellations=[];}}
+      const today=new Date(); today.setHours(0,0,0,0);
+      const cancelledEmails=new Set(cancellations.filter(x=>{
+        const status=String(x.status||'').toLowerCase();
+        const confirmed=['confirmed','approved'].includes(status);
+        if(!confirmed||!x.requested_end_date)return false;
+        const end=new Date(x.requested_end_date+'T00:00:00');
+        return !Number.isNaN(end.getTime()) && end<=today;
+      }).map(x=>String(x.email||'').trim().toLowerCase()).filter(Boolean));
+      applicants=applicants.filter(a=>!cancelledEmails.has(String(a.email||'').trim().toLowerCase()));
+    }
+  }catch(_){}
+  if(!applicants.length){el.className='status ok';el.textContent='Noch keine aktiven Bewerbungen vorhanden.';return true;}
+  el.className='status ok';el.textContent=applicants.length+' Bewerber gefunden.';
+  const today=new Date(); today.setHours(0,0,0,0);
+  const accountState=(a)=>{
+    const s=stationByOwner.get(String(a.user_id));
+    const end=s?.founding_partner_free_until||s?.subscription_ends_at||s?.trial_ends_at||a.access_until;
+    const days=end?Math.ceil((new Date(end)-today)/86400000):null;
+    if(s?.is_suspended)return {cls:'red',label:'GESPERRT',action:'entsperren'};
+    if(a.status!=='approved')return {cls:'red',label:'NICHT AKTIV',action:'sperren'};
+    if(!s)return {cls:'red',label:'FEHLER',action:'sperren'};
+    if(!end||days<0)return {cls:'red',label:'ABGELAUFEN',action:'sperren'};
+    if(days<=30)return {cls:'yellow',label:'LÄUFT AUS',action:'sperren'};
+    return {cls:'green',label:'AKTIV',action:'sperren'};
+  };
+  body.innerHTML=applicants.map(a=>{
+    const d=a.access_until?new Date(a.access_until).toISOString().slice(0,10):'';
+    const st=accountState(a),s=stationByOwner.get(String(a.user_id));
+    const suspendLabel=st.action==='entsperren'?'🔓 Entsperren':'🔒 Sperren';
+    return '<tr><td><div class="adminName">'+esc(a.full_name||'—')+'</div><div class="adminMuted">'+esc(a.phone||'keine Telefonnummer')+'</div></td><td>'+esc(a.station_name||'—')+'<div class="adminMuted">'+esc([a.postcode,a.city].filter(Boolean).join(' '))+'</div></td><td>'+esc(a.email||'—')+'</td><td><div><span class="adminStatusPill '+st.cls+'"><span class="adminStatusDot"></span>'+st.label+'</span><select data-field="status" data-id="'+a.id+'" style="margin-top:6px;width:100%"><option value="new" '+(a.status==='new'?'selected':'')+'>Neu</option><option value="reviewed" '+(a.status==='reviewed'?'selected':'')+'>Geprüft</option><option value="approved" '+(a.status==='approved'?'selected':'')+'>Freigeschaltet</option><option value="rejected" '+(a.status==='rejected'?'selected':'')+'>Abgelehnt</option></select></div></td><td><select data-field="access_type" data-id="'+a.id+'"><option value="pilot" '+(a.access_type==='pilot'?'selected':'')+'>Pilot</option><option value="founding_partner" '+(a.access_type==='founding_partner'?'selected':'')+'>Gründungspartner</option><option value="paid" '+(a.access_type==='paid'?'selected':'')+'>Bezahlt</option></select></td><td><input data-field="access_until" data-id="'+a.id+'" type="date" value="'+d+'"></td><td><div class="adminActionRow"><button class="btn save" data-save="'+a.id+'">Speichern</button><button class="btn suspendBtn" data-suspend="'+a.id+'" data-suspended="'+(s?.is_suspended?'1':'0')+'">'+suspendLabel+'</button><button class="btn deleteBtn" data-delete="'+a.id+'">🗑 Löschen</button></div></td></tr>'
+  }).join('');
+  body.querySelectorAll('[data-save]').forEach(btn=>btn.onclick=()=>saveApplicant(btn.dataset.save));
+  body.querySelectorAll('[data-suspend]').forEach(btn=>btn.onclick=()=>toggleApplicantSuspension(btn.dataset.suspend,btn.dataset.suspended==='1',btn));
+  body.querySelectorAll('[data-delete]').forEach(btn=>btn.onclick=()=>deleteApplicant(btn.dataset.delete,btn));
+  return true;
+}
+function setAdminDiagnosis(info){
+  const box=$('adminDiagnostics'),grid=$('adminDiagGrid'),summary=$('adminDiagSummary');
+  if(!box||!grid)return;
+  const escv=v=>esc(v===null||v===undefined||v===''?'—':String(v));
+  const items=[
+    ['Aktion',info.action,''],['Bewerbungs-ID',info.id,''],['E-Mail',info.email,''],['Benutzer-ID',info.userId,''],
+    ['Status',info.status,''],['Zugang',info.accessType,''],['Zugangsende',info.accessUntil,''],['Admin-Konto',info.adminEmail,''],
+    ['DB-Datensatz gefunden',info.recordFound?'JA':'NEIN',info.recordFound?'ok':'error'],['RPC',info.rpc,''],
+    ['Fehlercode',info.errorCode,'error'],['Fehlermeldung',info.errorMessage,'error'],['Fehlerdetails',info.errorDetails,'warn'],['Fehlerhinweis',info.errorHint,'warn']
+  ];
+  grid.innerHTML=items.map(([k,v,c])=>'<div class="adminDiagItem '+c+'"><b>'+escv(k)+'</b><span>'+escv(v)+'</span></div>').join('');
+  summary.textContent=info.recordFound===false?'Die Bewerbungs-ID wurde bei der Diagnose nicht gefunden.':(info.errorMessage?'Der letzte Fehler wurde technisch aufgeschlüsselt.':'Diagnoseinformationen zum letzten Vorgang.');
+  box.classList.remove('hidden');
+  const copy=$('adminDiagCopy');
+  if(copy){copy.onclick=async()=>{const lines=items.map(([k,v])=>k+': '+(v===null||v===undefined||v===''?'—':String(v)));try{await navigator.clipboard.writeText(lines.join('\\n'));copy.textContent='Kopiert ✓';setTimeout(()=>copy.textContent='Details kopieren',1400);}catch(_){copy.textContent='Kopieren nicht möglich';setTimeout(()=>copy.textContent='Details kopieren',1600);}};}
+}
+
+async function diagnoseAdminFailure(id, context){
+  const info={action:context.action||'Speichern',id:String(id),email:context.email||null,userId:null,status:context.status||null,accessType:context.accessType||null,accessUntil:context.accessUntil||null,adminEmail:null,recordFound:null,rpc:'approve_pilot_application',errorCode:context.error?.code||null,errorMessage:context.error?.message||null,errorDetails:context.error?.details||null,errorHint:context.error?.hint||null};
+  try{
+    const {data:{session}}=await client.auth.getSession();
+    info.adminEmail=session?.user?.email||null;
+    const {data:row,error}=await client.from('pilot_applications').select('id,user_id,email,status,access_type,access_until').eq('id',String(id)).maybeSingle();
+    if(error){info.recordFound='Abfragefehler: '+error.message;}else if(row){info.recordFound=true;info.email=row.email||info.email;info.userId=row.user_id||null;info.status=row.status||info.status;info.accessType=row.access_type||info.accessType;info.accessUntil=row.access_until||info.accessUntil;}else{info.recordFound=false;}
+  }catch(e){info.errorDetails=(info.errorDetails?info.errorDetails+' | ':'')+'Diagnosefehler: '+(e.message||String(e));}
+  setAdminDiagnosis(info);
+}
+
+async function toggleApplicantSuspension(id,isSuspended,btn){
+  const action=isSuspended?'entsperren':'sperren';
+  if(!confirm(isSuspended?'Nutzer wieder freischalten? Der Kunde kann danach wieder auf seine Station zugreifen.':'Nutzer sperren? Der Kunde kann sich danach nicht mehr anmelden. Station und Daten bleiben erhalten.'))return;
+  if(btn){btn.disabled=true;btn.textContent=isSuspended?'Entsperren …':'Sperren …';}
+  try{
+    const {data,error}=await withTimeout(client.rpc('set_customer_suspension',{p_application_id:String(id),p_suspended:!isSuspended,p_reason:isSuspended?null:'Zahlungs-/Vertragsprüfung'}),15000,'Die Sperrung antwortet nicht innerhalb von 15 Sekunden.');
+    if(error)throw error;if(!data?.success)throw new Error('Die Kontosperre konnte nicht geändert werden.');
+    $('adminStatus').className='status ok';$('adminStatus').textContent=isSuspended?'✓ Nutzer wurde wieder entsperrt.':'✓ Nutzer wurde gesperrt. Station und Daten bleiben erhalten.';
+    await loadApplicants(true);
+  }catch(e){$('adminStatus').className='status err';$('adminStatus').textContent='Sperren/Entsperren fehlgeschlagen: '+(e.message||String(e));}
+}
+async function deleteApplicant(id,btn){
+  if(!confirm('⚠️ Bewerber/Kundenkonto wirklich löschen?\n\nDabei werden das Kundenkonto, die verknüpfte Station und die Bewerbung entfernt. Dieser Vorgang kann nicht rückgängig gemacht werden.'))return;
+  const typed=prompt('Upsi-Schutz: Bitte LÖSCHEN eingeben, um die endgültige Löschung zu bestätigen.');
+  if(typed!=='LÖSCHEN'){$('adminStatus').className='status';$('adminStatus').textContent='Löschung abgebrochen.';return;}
+  if(btn){btn.disabled=true;btn.textContent='Löschen …';}
+  try{
+    const {data,error}=await withTimeout(client.rpc('delete_pilot_application',{p_application_id:String(id)}),15000,'Die Löschung antwortet nicht innerhalb von 15 Sekunden.');
+    if(error)throw error;if(!data?.success)throw new Error('Das Kundenkonto konnte nicht vollständig gelöscht werden.');
+    $('adminStatus').className='status ok';$('adminStatus').textContent='✓ Kundenkonto, Station und Bewerbung wurden endgültig gelöscht.';
+    await loadApplicants(true);
+  }catch(e){$('adminStatus').className='status err';$('adminStatus').textContent='Löschen fehlgeschlagen: '+(e.message||String(e));}
+  finally{if(btn){btn.disabled=false;btn.textContent='🗑 Löschen';}}
+}
+
+async function saveApplicant(id){
+  const val=field=>document.querySelector('[data-field="'+field+'"][data-id="'+id+'"]')?.value||null;
+  const nextStatus=val('status'),nextAccess=val('access_type'),rawUntil=val('access_until');
+  const accessUntil=rawUntil?new Date(rawUntil+'T23:59:59').toISOString():null;
+  const statusEl=$('adminStatus');
+  const btn=document.querySelector('[data-save="'+id+'"]');
+  if(nextStatus==='approved'&&!accessUntil){
+    statusEl.className='status err';
+    statusEl.textContent='Zum Freischalten bitte ein Zugangsende festlegen.';
+    return;
+  }
+  if(btn){btn.disabled=true;btn.dataset.oldText=btn.textContent;btn.textContent='Speichern …';}
+  statusEl.className='status';
+  statusEl.textContent=nextStatus==='approved'?'Freischaltung wird durchgeführt …':'Bewerber wird aktualisiert …';
+  try{
+    const rpcPromise=client.rpc('approve_pilot_application',{
+      p_id:String(id),p_status:nextStatus,p_access_type:nextAccess,p_access_until:accessUntil
+    });
+    const {data,error}=await withTimeout(rpcPromise,15000,'Die Freischaltung antwortet nicht innerhalb von 15 Sekunden.');
+    if(error)throw error;
+    const result=Array.isArray(data)?data[0]:data;
+    if(nextStatus==='approved'&&result?.success!==true)throw new Error(result?.message||'Die Station konnte nicht angelegt werden.');
+    statusEl.className='status ok';
+    statusEl.textContent=nextStatus==='approved'
+      ?'✓ Erfolgreich freigeschaltet – Kundenkonto und Station sind verknüpft.'
+      :'✓ Bewerber aktualisiert.';
+    if(btn){btn.textContent='✓ Gespeichert';}
+    setTimeout(()=>{void Promise.allSettled([loadApplicants(true),loadPilotSlots()]);},2500);
+    setTimeout(()=>{if(btn){btn.disabled=false;btn.textContent=btn.dataset.oldText||'Speichern';}},3000);
+  }catch(e){
+    statusEl.className='status err';
+    statusEl.textContent='Speichern/Freischalten fehlgeschlagen: '+(e.message||String(e));
+    await diagnoseAdminFailure(id,{action:nextStatus==='approved'?'Freischalten':'Speichern',email:null,status:nextStatus,accessType:nextAccess,accessUntil:accessUntil,error:e});
+    if(btn){btn.disabled=false;btn.textContent=btn.dataset.oldText||'Speichern';}
+  }
+}
+async function trackVisitor(){
+  if(!client)return;
+  try{
+    const key='te_visit_tracked_session_v1';
+    if(sessionStorage.getItem(key)==='1')return;
+    const visitorKey='te_visitor_id_v1';
+    let visitorId=localStorage.getItem(visitorKey);
+    if(!visitorId){
+      visitorId=(crypto?.randomUUID?crypto.randomUUID():'te-'+Date.now()+'-'+Math.random().toString(36).slice(2));
+      localStorage.setItem(visitorKey,visitorId);
+    }
+    const params=new URLSearchParams(location.search);
+    const referrer=document.referrer||'';
+    let refHost='';
+    try{if(referrer)refHost=new URL(referrer).hostname||'';}catch(_){}
+    const source=params.get('utm_source')||(
+      /(^|\\.)linkedin\\.com$/i.test(refHost)||
+      /(^|\\.)lnkd\\.in$/i.test(refHost)?'linkedin':'direct'
+    );
+    const path=location.pathname||'/';
+    const {error}=await client.from('site_visits').insert({
+      visitor_id:visitorId.slice(0,120),
+      referrer:referrer.slice(0,500)||null,
+      landing_path:path.slice(0,300),
+      source:String(source).slice(0,50)
+    });
+    if(!error)sessionStorage.setItem(key,'1');
+  }catch(_){}
+}
+async function loadPilotSlots(){if(!client)return;try{const {data,error}=await client.rpc('get_pilot_slots');if(error||!data)return;const s=Array.isArray(data)?data[0]:data;if(!s)return;const el=$('pilotSlotsText');const btn=$('monthlyPilotBtn');if(!el)return;const remaining=Math.max(0,Number(s.remaining||0));el.textContent=remaining>0?'Noch '+remaining+' Plätze verfügbar':'Pilotphase aktuell voll';if(btn){btn.disabled=remaining===0;btn.textContent=remaining>0?'Pilot werden →':'Pilotplätze vergeben';}}catch(e){}}
+async function requestCancellation(){if(!client)return;const btn=$('cancelSubscriptionBtn');if(!btn)return;if(!confirm('Möchtest du eine Kündigung für dein Kundenkonto anfragen? Die Kündigung wird anschließend von TankstellenErtrag bestätigt und zum vereinbarten Termin umgesetzt.'))return;btn.disabled=true;btn.textContent='Anfrage wird gesendet …';try{const {data,error}=await client.rpc('request_subscription_cancellation');if(error)throw error;status(data?.message||'Kündigungsanfrage wurde übermittelt.','ok');btn.textContent='Kündigung angefragt';}catch(e){status(e.message||String(e),'err');btn.disabled=false;btn.textContent='Kündigung anfragen';}}
+async function loadVisitorStats(){if(!client)return false;const {data,error}=await client.rpc('get_site_visitor_stats');if(error||!data)return false;const s=Array.isArray(data)?data[0]:data;if(!s)return false;$('statToday').textContent=Number(s.today||0).toLocaleString('de-DE');$('stat7').textContent=Number(s.last7||0).toLocaleString('de-DE');$('statMonth').textContent=Number(s.month||0).toLocaleString('de-DE');$('statApplications').textContent=Number(s.applications||0).toLocaleString('de-DE');return true}
+async function getStableSession(){
+  if(!client)return null;
+  const {data,error}=await client.auth.getSession();
+  if(error)throw error;
+  return data?.session||null;
+}
+async function boot(){
+  trackVisitor();
+  loadPilotSlots();
+  if(!client){status('Supabase ist noch nicht konfiguriert. Zuerst Projekt-URL und Publishable Key eintragen.','err');return;}
+  try{
+    const session=await getStableSession();
+    if(session){await loadStation(session);return;}
+    status('Keine gespeicherte Sitzung erkannt. Bitte anmelden.');
+    const authParams=new URLSearchParams(location.search);if(authParams.get('signup')==='1'){openAuth();setSignupMode(true);}else if(authParams.get('login')==='1')openAuth();
+  }catch(error){
+    status('Sitzung konnte beim Seitenaufruf nicht wiederhergestellt werden: '+(error.message||String(error)),'err');
+  }
+}
+let signupMode=false;
+function setSignupMode(v){signupMode=v;document.querySelectorAll('.signupField').forEach(el=>el.style.display=v?'block':'none');$('passwordHint')?.classList.toggle('hidden',!v);$('signupLegal')?.classList.toggle('hidden',!v);$('formTitle').textContent=v?'Konto registrieren':'Anmelden';$('formHint').textContent=v?'Pilotzugang anfragen und Kundenkonto anlegen.':'Mit Ihrem Kundenkonto anmelden.';const loginBtn=$('loginBtn'),signupBtn=$('signupBtn');if(loginBtn&&signupBtn){loginBtn.textContent=v?'Bereits registriert? Anmelden':'Anmelden';signupBtn.textContent=v?'Konto registrieren':'Neu registrieren';loginBtn.classList.toggle('primary',!v);loginBtn.classList.toggle('secondary',v);signupBtn.classList.toggle('primary',v);signupBtn.classList.toggle('secondary',!v);}if($('password2'))$('password2').value='';if(!v){if($('businessConfirm'))$('businessConfirm').checked=false;if($('agbConfirm'))$('agbConfirm').checked=false;}}
+setSignupMode(false);
+$('loginBtn').onclick=async(e)=>{e?.preventDefault();if(signupMode){setSignupMode(false);return;}if(!client)return;setBusy(true);status('Anmeldung läuft …');try{const {data,error}=await withTimeout(client.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value}),15000,'Supabase antwortet nicht. Bitte Internetverbindung prüfen und erneut versuchen.');if(error)throw error;if(!data?.session)throw new Error('Anmeldung wurde bestätigt, aber keine Sitzung zurückgegeben.');await loadStation(data.session);}catch(e){status(e.message||String(e),'err')}finally{setBusy(false)}};
+$('signupBtn').onclick=async(e)=>{e?.preventDefault();if(!signupMode){setSignupMode(true);return;} if(!client)return;setBusy(true);status('Konto wird angelegt …');try{const email=$('email').value.trim(),password=$('password').value,fullName=$('fullName').value.trim(),stationName=$('stationName').value.trim(),location=$('location').value.trim(),phone=$('phone').value.trim();const password2=$('password2').value,honeypot=$('website_hp')?.value.trim();if(honeypot)throw new Error('Registrierung konnte nicht verarbeitet werden.');if(!email||!fullName||!stationName||!location)throw new Error('Bitte Name, Tankstellenname, PLZ/Ort und E-Mail vollständig eingeben.');if(!$('businessConfirm')?.checked)throw new Error('Bitte bestätigen, dass du TankstellenErtrag als Unternehmer nutzt.');if(!$('agbConfirm')?.checked)throw new Error('Bitte AGB und Datenschutzerklärung bestätigen.');if(password.length<10||!/[a-z]/.test(password)||!/[A-Z]/.test(password)||!/[0-9]/.test(password)||! /[^A-Za-z0-9]/.test(password))throw new Error('Das Passwort muss mindestens 10 Zeichen sowie Groß- und Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten.');if(password!==password2)throw new Error('Die Passwörter stimmen nicht überein.');const parts=location.split(/\s+/,2),postcode=/^\d{5}$/.test(parts[0])?parts[0]:null,city=postcode?location.slice(parts[0].length).trim():location;const {data,error}=await client.auth.signUp({email,password,options:{data:{full_name:fullName,station_name:stationName,postcode,city,phone:phone||null}}});if(error)throw error;
+if(!data?.user?.id)throw new Error('Konto wurde nicht angelegt: Supabase hat keine Benutzer-ID zurückgegeben.');
+if(data.session){await loadStation(data.session);loadPilotSlots()}else{status('Konto angelegt. Bitte bestätige gegebenenfalls die E-Mail-Adresse. Die Pilotbewerbung wird automatisch im Adminbereich angelegt.','ok');loadPilotSlots()}}catch(e){status(e.message||String(e),'err')}finally{setBusy(false)}};
+
+let adminMfaFactorId=null;
+async function showAdminMfaSetup(){
+  $('adminView').classList.add('hidden');$('dashboardView').classList.remove('hidden');$('mfaPanel').classList.remove('hidden');$('mfaTitle').textContent='Administrator schützen';$('mfaText').textContent='Bevor du die Administration nutzt, richte einmal eine Authenticator-App ein.';$('mfaSetupContent').style.display='block';$('mfaVerify').textContent='MFA aktivieren';$('mfaCancel').classList.add('hidden');$('mfaCode').value='';$('mfaMsg').textContent='MFA wird eingerichtet …';
+  const {data,error}=await client.auth.mfa.enroll({factorType:'totp',friendlyName:'TankstellenErtrag Admin'});
+  if(error){$('mfaMsg').className='status err mfaMsg';$('mfaMsg').textContent='MFA-Einrichtung fehlgeschlagen: '+error.message;return;}
+  adminMfaFactorId=data.id;$('mfaQr').src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(data.totp.qr_code);$('mfaSecret').textContent=data.totp.secret;$('mfaMsg').className='status mfaMsg';$('mfaMsg').textContent='QR-Code scannen und danach den 6-stelligen Code eingeben.';
+}
+async function showAdminMfaChallenge(){
+  $('adminView').classList.add('hidden');$('mfaPanel').classList.remove('hidden');$('mfaTitle').textContent='Admin-Anmeldung bestätigen';$('mfaText').textContent='Gib den aktuellen 6-stelligen Code deiner Authenticator-App ein.';$('mfaSetupContent').style.display='none';$('mfaVerify').textContent='Anmeldung bestätigen';$('mfaCancel').classList.add('hidden');$('mfaCode').value='';$('mfaMsg').className='status mfaMsg';$('mfaMsg').textContent='';const factors=await client.auth.mfa.listFactors();const factor=(factors.data?.totp||[]).find(x=>x.status==='verified');adminMfaFactorId=factor?.id||null;if(!adminMfaFactorId){await showAdminMfaSetup();}
+}
+async function verifyAdminMfa(){
+  const code=$('mfaCode').value.replace(/\D/g,'');if(code.length!==6){$('mfaMsg').className='status err mfaMsg';$('mfaMsg').textContent='Bitte den 6-stelligen Code eingeben.';return;}$('mfaVerify').disabled=true;$('mfaMsg').className='status mfaMsg';$('mfaMsg').textContent='Code wird geprüft …';
+  try{const challenge=await client.auth.mfa.challenge({factorId:adminMfaFactorId});if(challenge.error)throw challenge.error;const verify=await client.auth.mfa.verify({factorId:adminMfaFactorId,challengeId:challenge.data.id,code});if(verify.error)throw verify.error;$('mfaPanel').classList.add('hidden');$('mfaCode').value='';$('mfaVerify').disabled=false;const {data:sessionData}=await client.auth.getSession();if(sessionData.session)await loadStation(sessionData.session);}catch(e){$('mfaMsg').className='status err mfaMsg';$('mfaMsg').textContent=e.message||String(e);$('mfaVerify').disabled=false;}
+}
+$('mfaVerify').onclick=verifyAdminMfa;
+$('logoutBtn').onclick=async()=>{if(client){setBusy(false);await client.auth.signOut({scope:'local'});}};
+const originalLoadStation=loadStation;
+
+function setAuthenticatedPage(active){
+  document.querySelector('.site')?.classList.toggle('authenticated',!!active);
+}
+function resetProtectedViews(){
+  setAuthenticatedPage(false);
+  $('authView').classList.add('hidden');
+  $('dashboardView').classList.add('hidden');
+  $('adminView').classList.add('hidden');
+  $('mfaPanel').classList.add('hidden');
+  $('openApp')?.classList.add('hidden');
+  $('cancelSubscriptionBtn')?.classList.remove('hidden');
+  $('stationCards').innerHTML='';
+  $('stationStatus').textContent='';
+  $('userLine').textContent='';
+  document.body.style.overflow='';
+}
+function openAuth(){ $('authView').classList.remove('hidden'); document.body.style.overflow='hidden'; setTimeout(()=>document.getElementById('email')?.focus(),50); }
+function closeAuth(){ $('authView').classList.add('hidden'); document.body.style.overflow=''; }
+$('navLogin').onclick=openAuth;$('heroLogin').onclick=openAuth;$('knowledgeLogin')?.addEventListener('click',openAuth);$('heroTest').onclick=openAuth;$('bottomTest').onclick=openAuth;$('monthlyPilotBtn')?.addEventListener('click',openAuth);
+$('closeAuth').onclick=closeAuth;
+
+if(client){
+  client.auth.onAuthStateChange((event)=>{
+    if(event==='SIGNED_OUT'){
+      resetProtectedViews();
+      status('Abgemeldet. Bitte anmelden oder ein Kundenkonto anlegen.');
+    }
+    // Keine Supabase-Abfragen innerhalb dieses Callbacks.
+    // Die Initialsitzung wird ausschließlich in boot() geladen; Login/Registrierung
+    // laden die Sitzung direkt nach dem erfolgreichen Auth-Vorgang.
+  });
+}
+
+async function refreshAdminData(){
+  const btn=$('refreshApplicants');
+  if(btn){btn.disabled=true;btn.textContent='Aktualisiere …';}
+  $('adminStatus').className='status';$('adminStatus').textContent='Bewerber & Besucher werden aktualisiert …';
+  try{
+    const results=await Promise.all([loadApplicants(),loadVisitorStats(),loadCancellationRequests(),loadPilotSlots()]);
+    const applicantsOk=results[0]!==false,visitorsOk=results[1]!==false;
+    if(!applicantsOk||!visitorsOk){
+      $('adminStatus').className='status err';
+      $('adminStatus').textContent='Aktualisierung teilweise fehlgeschlagen. Bitte erneut versuchen.';
+      return;
+    }
+    $('adminStatus').className='status ok';
+    $('adminStatus').textContent='Bewerber & Besucher aktualisiert · '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  }catch(e){
+    $('adminStatus').className='status err';
+    $('adminStatus').textContent='Aktualisierung fehlgeschlagen: '+(e.message||String(e));
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='Aktualisieren';}
+  }
+}
+$('refreshApplicants')?.addEventListener('click',refreshAdminData);$('cancelSubscriptionBtn')?.addEventListener('click',requestCancellation);
+boot();
+
+// DiniLove: kleiner saisonaler, verschiebbarer Sticker auf der öffentlichen Startseite.
+(function(){
+  const sticker=$('diniSticker'); if(!sticker)return;
+  const close=$('diniStickerClose'), art=sticker.querySelector('.diniStickerArt'), links=sticker.querySelectorAll('a');
+  let dragging=false,moved=false,startX=0,startY=0,startLeft=0,startTop=0,pointerId=null;
+  const show=()=>{sticker.classList.remove('is-closed');setTimeout(()=>sticker.classList.add('is-visible'),1200)};
+  const closeSticker=()=>{sticker.remove();};close.onclick=closeSticker;close.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();closeSticker();});
+  sticker.addEventListener('pointerdown',e=>{
+    if(e.target.closest('a,button'))return;
+    dragging=true;moved=false;pointerId=e.pointerId;
+    const r=sticker.getBoundingClientRect();startX=e.clientX;startY=e.clientY;startLeft=r.left;startTop=r.top;
+    sticker.setPointerCapture?.(pointerId);sticker.classList.add('is-dragging');e.preventDefault();e.stopPropagation();
+  });
+  sticker.addEventListener('pointermove',e=>{
+    if(!dragging)return;
+    const dx=e.clientX-startX,dy=e.clientY-startY;
+    if(Math.abs(dx)+Math.abs(dy)>4)moved=true;
+    if(!moved)return;
+    const maxX=Math.max(8,window.innerWidth-sticker.offsetWidth-8),maxY=Math.max(8,window.innerHeight-sticker.offsetHeight-8);
+    sticker.style.left=Math.min(maxX,Math.max(8,startLeft+dx))+'px';
+    sticker.style.top=Math.min(maxY,Math.max(8,startTop+dy))+'px';
+    sticker.style.right='auto';sticker.style.bottom='auto';
+  });
+  sticker.addEventListener('pointerup',e=>{
+    if(!dragging)return;
+    dragging=false;sticker.classList.remove('is-dragging');
+    try{sticker.releasePointerCapture?.(pointerId)}catch(_){}
+    if(moved){
+      sessionStorage.setItem('diniStickerPos',JSON.stringify({left:sticker.offsetLeft,top:sticker.offsetTop}));
+      e.preventDefault();e.stopPropagation();
+    }
+  });
+  sticker.addEventListener('pointercancel',e=>{
+    dragging=false;sticker.classList.remove('is-dragging');
+    try{sticker.releasePointerCapture?.(pointerId)}catch(_){}
+  });
+  const savedPos=sessionStorage.getItem('diniStickerPos');
+  if(savedPos){try{
+    const p=JSON.parse(savedPos);
+    if(Number.isFinite(p.left)&&Number.isFinite(p.top)){
+      sticker.style.left=Math.max(8,Math.min(window.innerWidth-sticker.offsetWidth-8,p.left))+'px';
+      sticker.style.top=Math.max(8,Math.min(window.innerHeight-sticker.offsetHeight-8,p.top))+'px';
+      sticker.style.right='auto';sticker.style.bottom='auto';
+    }
+  }catch(_){}}  links.forEach(a=>a.addEventListener('click',e=>{
+    if(moved){e.preventDefault();e.stopPropagation();moved=false;}
+  }));
+  show();
+})();
+</script>
+</body>
+</html>
+
+<!-- pages-deploy-refresh-2026-10-05 -->
