@@ -195,7 +195,26 @@ function dashboard(){
  const W=820,H=270,L=50,R=20,T=22,B=42,iw=W-L-R,ih=H-T-B;
  const x=m=>L+(m-1)*iw/11;
  const y=v=>T+ih-(Math.max(0,v)/maxGross)*ih;
- const pathFor=rows=>{const pts=[];let active=false;rows.forEach(row=>{if(!row){active=false;return}pts.push((active?'L ':'M ')+x(row.month).toFixed(1)+' '+y(row.d.gross).toFixed(1));active=true});return pts.join(' ')};
+ const pathFor=rows=>{
+  const parts=[];let run=[];
+  const flush=()=>{
+   if(!run.length)return;
+   const px=p=>x(p.month),py=p=>y(p.d.gross),fmt=n=>Number(n).toFixed(2);
+   parts.push('M '+fmt(px(run[0]))+' '+fmt(py(run[0])));
+   for(let i=0;i<run.length-1;i++){
+    const p0=run[Math.max(0,i-1)],p1=run[i],p2=run[i+1],p3=run[Math.min(run.length-1,i+2)];
+    const x1=px(p1),y1=py(p1),x2=px(p2),y2=py(p2);
+    const span=x2-x1;
+    const prevSpan=x2-px(p0),nextSpan=px(p3)-x1;
+    const c1x=x1+span/3,c2x=x2-span/3;
+    const c1y=y1+(py(p2)-py(p0))*(span/(prevSpan||span))/6;
+    const c2y=y2-(py(p3)-py(p1))*(span/(nextSpan||span))/6;
+    parts.push('C '+fmt(c1x)+' '+fmt(c1y)+', '+fmt(c2x)+' '+fmt(c2y)+', '+fmt(x2)+' '+fmt(y2));
+   }
+   run=[];
+  };
+  rows.forEach(row=>{if(!row){flush();return}run.push(row)});flush();return parts.join(' ')
+ };
  const currentPath=pathFor(currentYearRows),priorPath=pathFor(priorYearRows);
  const dotsFor=(rows,color)=>rows.filter(Boolean).map(row=>'<circle cx="'+x(row.month).toFixed(1)+'" cy="'+y(row.d.gross).toFixed(1)+'" r="'+(row.key===selectedKey?5:3.5)+'" fill="'+color+'" stroke="#102238" stroke-width="1.5"><title>'+esc(row.key)+' · Rohertrag '+eur(row.d.gross)+'</title></circle>').join('');
  const monthLabels=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'].map((label,i)=>'<text x="'+x(i+1).toFixed(1)+'" y="'+(H-13)+'" text-anchor="middle" fill="#9fb8d0" font-size="11">'+label+'</text>').join('');
