@@ -73,7 +73,27 @@
 @media(max-width:850px){.monthlyGrid{grid-template-columns:1fr}.monthlyFlow{grid-template-columns:1fr;gap:12px}.monthlyFlow i{transform:rotate(90deg)}}
 </style>
 
-<style id="appHintStyles">.appHint{padding:0 0 26px}.appHintBox{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;padding:22px 24px;background:linear-gradient(135deg,#181c1f,#211c18);border:1px solid #4a4038;border-radius:18px;box-shadow:0 14px 45px rgba(0,0,0,.18)}.appHintIcon{font-size:42px}.appHintContent h2{margin:4px 0 14px;font-size:24px}.appHintSteps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.appHintSteps>div{display:flex;gap:10px;align-items:flex-start;padding:12px;background:#111416;border:1px solid #353c41;border-radius:12px}.appHintSteps b{font-size:20px}.appHintSteps span{display:flex;flex-direction:column;gap:3px}.appHintSteps strong{font-size:13px}.appHintSteps small{font-size:11px;color:#aeb6bc;line-height:1.35}.appHintContent>p{margin:13px 0 0;color:#aeb6bc;font-size:12px}.appHintContent>p strong{color:#f5f6f7}@media(max-width:850px){.appHintBox{grid-template-columns:1fr;gap:8px;padding:18px}.appHintIcon{font-size:34px}.appHintContent h2{font-size:21px}.appHintSteps{grid-template-columns:1fr}.appHintSteps>div{align-items:center}}</style></head>
+<style id="appHintStyles">.appHint{padding:0 0 26px}.appHintBox{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;padding:22px 24px;background:linear-gradient(135deg,#181c1f,#211c18);border:1px solid #4a4038;border-radius:18px;box-shadow:0 14px 45px rgba(0,0,0,.18)}.appHintIcon{font-size:42px}.appHintContent h2{margin:4px 0 14px;font-size:24px}.appHintSteps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.appHintSteps>div{display:flex;gap:10px;align-items:flex-start;padding:12px;background:#111416;border:1px solid #353c41;border-radius:12px}.appHintSteps b{font-size:20px}.appHintSteps span{display:flex;flex-direction:column;gap:3px}.appHintSteps strong{font-size:13px}.appHintSteps small{font-size:11px;color:#aeb6bc;line-height:1.35}.appHintContent>p{margin:13px 0 0;color:#aeb6bc;font-size:12px}.appHintContent>p strong{color:#f5f6f7}@media(max-width:850px){.appHintBox{grid-template-columns:1fr;gap:8px;padding:18px}.appHintIcon{font-size:34px}.appHintContent h2{font-size:21px}.appHintSteps{grid-template-columns:1fr}.appHintSteps>div{align-items:center}}</style>
+<style id="blue-glass-auth-theme">
+/* Isolated UI-only restyle: auth, registration and app shell. No JavaScript/auth logic changed. */
+:root{--bg:#071426;--panel:rgba(10,27,49,.88);--panel2:rgba(18,39,65,.92);--line:rgba(154,197,241,.22);--text:#f2f7ff;--muted:#b6c7db;--orange:#4a9cff;--orange2:#9bcaff;--input:#edf5ff;--green:#45c477;--red:#ef6461}
+body{background:radial-gradient(ellipse at 15% 0%,rgba(44,104,190,.24),transparent 42%),radial-gradient(ellipse at 90% 20%,rgba(57,142,238,.12),transparent 38%),linear-gradient(155deg,#071426 0%,#091a31 52%,#061020 100%)!important;color:var(--text)}
+.topbar{background:rgba(5,16,34,.84)!important;border-bottom:1px solid rgba(151,202,245,.2)!important;backdrop-filter:blur(20px) saturate(145%)}
+.brand span,footer span,.eyebrow{color:#8fc4ff!important}
+.panel,.authBox,.monthlyCard,.monthlyFlow,.monthlyNote,.monthlyPilot,.appHintBox,.appHintSteps>div,.metric,.heroVisual,.heroSide,.card{background:linear-gradient(145deg,rgba(26,55,88,.66),rgba(8,24,44,.88))!important;border:1px solid rgba(166,207,255,.2)!important;box-shadow:inset 0 1px 0 rgba(226,242,255,.08),0 18px 55px rgba(0,0,0,.23)!important;backdrop-filter:blur(16px)}
+.auth{background:rgba(3,10,22,.72)!important;backdrop-filter:blur(14px)}
+.authBox{border-radius:24px!important;background:linear-gradient(145deg,rgba(17,39,65,.96),rgba(8,22,40,.97))!important;border-color:rgba(166,207,255,.28)!important}
+.field input{background:#edf5ff!important;color:#142238!important;border:1px solid #c1d9f6!important;border-radius:12px!important}
+.field input:focus{outline:2px solid rgba(74,156,255,.42)!important;outline-offset:1px}
+.primary,.cta,.navbtn,.btn.primary{background:linear-gradient(135deg,#4a9cff,#327ed5)!important;color:#fff!important;box-shadow:0 8px 25px rgba(50,126,213,.22)}
+.secondary,.ghost,.pill,.badge{background:rgba(130,174,222,.12)!important;border:1px solid rgba(166,207,255,.22)!important;color:#edf6ff!important}
+.status{background:rgba(112,157,208,.12)!important;border-color:rgba(166,207,255,.18)!important;color:#e7f2ff}
+.rememberRow input,.legalCheck input{accent-color:#4a9cff!important}
+.monthlyFlow i,.monthlyPilot #pilotSlotsText,.monthlyPilot .ghost{color:#9bcaff!important}
+.diniSticker,#diniSticker,.diniStickerLink,[class*="diniSticker"],[class*="dinilove-sticker"],[class*="dinilove-widget"],iframe[src*="dinilove" i]{display:none!important;visibility:hidden!important;pointer-events:none!important}
+@media(max-width:850px){.auth{padding:18px 12px!important}.auth .wrap{width:100%!important;padding:16px 0!important}.authBox{padding:24px 20px!important;border-radius:22px!important;max-width:100%!important}.field input{font-size:16px!important}.actions{gap:8px!important}.actions .btn{min-width:0!important;padding:12px 8px!important}}
+</style>
+</head>
 <body>
 <div class="site">
 <header class="topbar"><div class="wrap navrow"><a class="brand" href="./">Tankstellen<span>Ertrag</span></a><nav><a href="#vorteile">Vorteile</a><a href="#ablauf">So funktioniert's</a><a href="#wissen">Branchenwissen</a><a href="./news.html">News</a><a href="./dini.html">DiniLove ♥</a><button id="navLogin" class="navbtn">Kundenlogin</button></nav></div></header>
