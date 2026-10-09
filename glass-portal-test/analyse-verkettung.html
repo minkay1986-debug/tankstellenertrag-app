@@ -221,9 +221,13 @@ button:hover,a:hover{border-color:rgba(121,183,255,.55)}
 </style>
 
 <style id="trend-series-colors-test">
-.trendLegend span:first-child i{background:#4a9cff!important;border-color:#4a9cff!important}
-.trendLegend .year i,.trendLegend i.year{background:#ffad55!important;border-color:#ffad55!important}
-.trendLegend .prev i,.trendLegend i.prev{background:#7ad7a0!important;border-color:#7ad7a0!important}
+/* Isolierter Test: Diagrammfarben eindeutig auf Blau festlegen */
+#grossTrend svg path[stroke="#4cc9ff"]{stroke:#4cc9ff!important}
+#grossTrend svg path[stroke="#8fb9ed"]{stroke:#8fb9ed!important}
+#grossTrend svg circle{fill:#4cc9ff!important}
+.trendLegend span:first-child i{background:#4cc9ff!important;border-color:#4cc9ff!important}
+.trendLegend .year i,.trendLegend i.year{background:#8fb9ed!important;border-color:#8fb9ed!important}
+.trendLegend .prev i,.trendLegend i.prev{background:#8fb9ed!important;border-color:#8fb9ed!important}
 </style></head><body><style id="tse-flow-nav-style">
 .tse-flow-nav{position:sticky;top:0;z-index:99999;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px clamp(12px,3vw,28px);background:rgba(5,16,30,.88);border-bottom:1px solid rgba(151,202,245,.22);backdrop-filter:blur(18px) saturate(145%);-webkit-backdrop-filter:blur(18px) saturate(145%);color:#eef7ff;font:600 13px/1.3 Inter,system-ui,sans-serif}
 .tse-flow-brand{color:#f2f8ff;font-weight:850;white-space:nowrap;letter-spacing:.01em}.tse-flow-brand span{color:#8fc9ff}
