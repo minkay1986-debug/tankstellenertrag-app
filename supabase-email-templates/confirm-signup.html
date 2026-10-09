@@ -1,0 +1,39 @@
+<!-- TankstellenErtrag · Supabase Auth: Confirm signup
+     Copy this complete HTML into Supabase > Authentication > Emails > Templates > Confirm signup.
+     The existing public TE icon is used as the logo. -->
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bitte bestätige deine E-Mail-Adresse – TankstellenErtrag</title>
+</head>
+<body style="margin:0;padding:0;background:#071426;font-family:Arial,Helvetica,sans-serif;color:#f2f7ff;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">Bestätige deine E-Mail-Adresse, um dein TankstellenErtrag-Konto zu aktivieren.</div>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#071426;padding:28px 12px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;background:#0b1a2b;border:1px solid #244b70;border-radius:20px;overflow:hidden;">
+        <tr><td align="center" style="padding:30px 24px 24px;background:linear-gradient(135deg,#102f4d,#091727);border-bottom:1px solid #1b5689;">
+          <img src="https://app.tankstellenertrag.de/assets/tankstellenertrag-icon.svg" width="92" height="92" alt="TankstellenErtrag TE-Logo" style="display:block;width:92px;height:92px;border:0;margin:0 auto 12px;">
+          <div style="font-size:28px;font-weight:800;letter-spacing:-.5px;color:#f5f7fa;">Tankstellen<span style="color:#ff8a16;">Ertrag</span></div>
+          <div style="margin-top:7px;font-size:14px;color:#a9c5e5;">Warenwirtschaft. Klarer im Blick.</div>
+        </td></tr>
+        <tr><td style="padding:32px 30px 24px;">
+          <h1 style="margin:0 0 20px;font-size:27px;line-height:1.25;color:#f5f7fa;">Bitte bestätige deine E-Mail-Adresse</h1>
+          <p style="margin:0 0 12px;font-size:16px;line-height:1.65;color:#dce9f8;">Hallo,</p>
+          <p style="margin:0 0 26px;font-size:16px;line-height:1.65;color:#dce9f8;">vielen Dank für deine Registrierung bei TankstellenErtrag. Bitte bestätige deine E-Mail-Adresse, damit wir dein Konto aktivieren können.</p>
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto 26px;"><tr><td align="center" bgcolor="#f47b20" style="border-radius:10px;box-shadow:0 6px 20px rgba(244,123,32,.18);">
+            <a href="{{{{ .ConfirmationURL }}}}" style="display:inline-block;padding:16px 28px;font-size:16px;line-height:1.2;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px;">E-Mail-Adresse bestätigen&nbsp; →</a>
+          </td></tr></table>
+          <p style="margin:0 0 8px;font-size:13px;line-height:1.6;color:#a9c5e5;">Falls der Button nicht funktioniert, öffne bitte diesen Link in deinem Browser:</p>
+          <p style="margin:0 0 26px;font-size:13px;line-height:1.6;word-break:break-all;"><a href="{{{{ .ConfirmationURL }}}}" style="color:#63b6ff;text-decoration:underline;">{{{{ .ConfirmationURL }}}}</a></p>
+          <div style="height:1px;background:#263d54;margin:0 0 22px;"></div>
+          <p style="margin:0;font-size:15px;line-height:1.7;color:#e5eef8;">Viele Grüße<br><strong style="color:#ffffff;">Dein TankstellenErtrag-Team</strong></p>
+        </td></tr>
+        <tr><td style="padding:17px 24px 22px;border-top:1px solid #20364d;text-align:center;font-size:12px;line-height:1.8;color:#8eabc9;">Warenwirtschaft &nbsp;·&nbsp; Mehr Transparenz &nbsp;·&nbsp; Bessere Entscheidungen<br><span style="color:#6f89a5;">Wenn du dich nicht registriert hast, kannst du diese E-Mail ignorieren.</span></td></tr>
+      </table>
+      <div style="max-width:560px;padding:16px 8px 0;font-size:11px;line-height:1.5;text-align:center;color:#7188a2;">TankstellenErtrag · <a href="https://app.tankstellenertrag.de/" style="color:#8cbbe8;text-decoration:none;">app.tankstellenertrag.de</a></div>
+    </td></tr>
+  </table>
+</body>
+</html>
