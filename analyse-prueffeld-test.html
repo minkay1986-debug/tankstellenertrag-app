@@ -128,6 +128,64 @@ body{
   .nav button[data-v="report"]{border:0!important;box-shadow:none!important}
 }
 
+
+/* ===== VISUELLER KONTRAST-BOOST · isolierter Prüffeld-Test ===== */
+body{
+ background:
+  radial-gradient(ellipse at 8% 4%,rgba(0,133,255,.24),transparent 34%),
+  radial-gradient(ellipse at 88% 20%,rgba(255,126,28,.12),transparent 28%),
+  linear-gradient(145deg,#061326 0%,#0a1b31 48%,#07111f 100%)!important;
+}
+.side{background:linear-gradient(180deg,#050e1b 0%,#081a2d 100%)!important;border-right:1px solid rgba(89,164,232,.3)!important}
+.main{max-width:1540px!important}
+.card,.panel{
+ background:linear-gradient(145deg,rgba(18,53,88,.94),rgba(8,26,47,.98))!important;
+ border:1px solid rgba(104,178,238,.34)!important;
+ border-radius:18px!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 14px 32px rgba(0,0,0,.27)!important;
+}
+.wow-card,.investigation-card{
+ background:
+  radial-gradient(ellipse at 100% 0%,rgba(255,140,42,.13),transparent 43%),
+  linear-gradient(135deg,#153b61 0%,#0c2744 52%,#091c32 100%)!important;
+ border:1px solid rgba(111,184,245,.46)!important;
+ border-radius:20px!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 18px 38px rgba(0,0,0,.34)!important;
+}
+.wow-card:before,.investigation-card:before{
+ content:"";position:absolute;left:0;right:0;top:0;height:3px;
+ background:linear-gradient(90deg,#ff8b2b,#ffb35d 42%,rgba(255,179,93,0));
+ pointer-events:none;
+}
+.wow-card.risk-watch,.wow-card.risk-critical,.wow-card.risk-severe{
+ background:
+  radial-gradient(ellipse at 100% 0%,rgba(255,139,43,.15),transparent 45%),
+  linear-gradient(135deg,#153b61 0%,#0c2744 52%,#091c32 100%)!important;
+ border-color:rgba(111,184,245,.46)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 18px 38px rgba(0,0,0,.34)!important;
+ animation:none!important;
+}
+.risk-strip{width:5px!important;background:#ff9a3d!important}
+.risk-watch .risk-strip{background:#ffd166!important}
+.risk-critical .risk-strip,.risk-severe .risk-strip{background:#ff6470!important}
+.risk-badge,.risk-pill{
+ border:1px solid rgba(255,255,255,.09)!important;
+ padding:6px 11px!important;font-size:11px!important;
+ box-shadow:0 4px 12px rgba(0,0,0,.2)!important;
+}
+.nav button.active{background:linear-gradient(100deg,rgba(255,139,43,.22),rgba(27,91,145,.42))!important;box-shadow:inset 0 0 0 1px rgba(255,151,57,.22)}
+.nav button[data-v="report"]{border:0!important;box-shadow:none!important}
+.value{letter-spacing:-.035em}
+@media(max-width:700px){
+ .wow-card,.investigation-card,.card,.panel{border-radius:15px!important}
+ .wow-card:before,.investigation-card:before{height:3px}
+}
+@media print{
+ body{background:#fff!important}
+ .card,.panel,.wow-card,.investigation-card{background:#fff!important;color:#111!important;border:1px solid #bbb!important;box-shadow:none!important}
+ .wow-card:before,.investigation-card:before{display:none!important}
+}
+
 </style><style id="studyContextStyles">.study-context-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.study-context-card{background:#151a1d;border:1px solid var(--line);border-radius:12px;padding:13px}.study-context-card h4{margin:6px 0 7px;font-size:14px;line-height:1.3}.study-context-card p{margin:0;color:var(--m);font-size:11px;line-height:1.45}.study-context-meta{color:var(--o);font-size:10px;font-weight:800}.study-context-rule{display:inline-block;margin-top:9px;padding:4px 7px;border-radius:999px;background:#22282c;color:#aeb6bc;font-size:9px}.study-context-card a{display:block;margin-top:9px;color:var(--o);font-size:11px;font-weight:800;text-decoration:none}.study-report-context{margin-top:24px;padding-top:10px;border-top:1px solid #aaa}.study-report-context .study-context-grid{grid-template-columns:1fr 1fr}.study-report-context .study-context-card{border-color:#ccc;background:#fff}.stockGroupPanel{margin-top:18px;border:1px solid #3b4348;background:#151a1d;border-radius:13px;padding:16px}.stockGroupPanel h3{margin:0 0 6px}.stockGroupPanel .form{margin-top:12px}.stockHint{margin:0;color:var(--m);font-size:11px;line-height:1.5}.stockFlag{font-weight:800}.stockTable td,.stockTable th{vertical-align:top}.study-report-context .study-context-meta{color:#8a4b17}.study-report-context .study-context-card a{color:#8a4b17}.study-report-context .study-context-rule{background:#eee;color:#444}@media(max-width:900px){.study-context-grid,.study-report-context .study-context-grid{grid-template-columns:1fr}}.investigation-guidance{margin-top:8px;padding:10px 12px;border:1px solid rgba(127,137,143,.2);border-radius:10px;background:rgba(127,137,143,.06);font-size:.9em;line-height:1.45}.investigation-guidance>div+div{margin-top:5px}.investigation-guidance b{font-weight:700}.investigation-guidance .small{color:#68747a}.investigation-card.active .investigation-guidance{box-shadow:inset 3px 0 0 rgba(31,143,77,.35)}
 </style>
 <style id="tse-glass-live-2026">
