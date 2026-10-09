@@ -742,4 +742,5 @@ function eeDetective(){eeToast('🕵️ Warenwirtschaftsdetektiv','Fall aufgenom
 function eeRoadtrip(){eeToast('🏁 Route gefunden','Ziel: mehr Ertrag. Weiter geht’s.')}
 function eeMonth(){eeConfetti();eeToast('🏆 Monat geknackt!','Jetzt wird aus Zahlen eine Geschichte.')}
 (function initEasterEggs(){let analyseClicks=0,analyseTimer=null,road='';document.addEventListener('click',e=>{const b=e.target.closest?.('[data-v="analysis"]');if(b){analyseClicks++;clearTimeout(analyseTimer);analyseTimer=setTimeout(()=>analyseClicks=0,1200);if(analyseClicks>=5){analyseClicks=0;eeDetective()}}if(e.target.closest?.('#moneyEgg'))eeMoney()});document.addEventListener('keydown',e=>{if(e.key.length===1){road+=e.key.toLowerCase();road=road.slice(-10);if(road.endsWith('tankstelle')){road='';eeRoadtrip()}}});document.addEventListener('click',e=>{if(e.target.closest?.('#saveMonth'))setTimeout(()=>{const vals=['rev','ek','shrink','writeoff','stock'].map(id=>Number($(id)?.value||0));if(vals.every(Number.isFinite)&&vals.every(v=>v>0)){sessionStorage.setItem('te_month_egg','1');eeMonth()}},350)})})();
-</script></body></html>
+</script><script src="./assets/premium-icons.js" defer></script>
+</body></html>
