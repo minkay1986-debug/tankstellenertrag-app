@@ -6,10 +6,20 @@
       var g=document.getElementById('gate');
       if(g){
         g.className='panel danger';
-        g.innerHTML='<strong>Dashboard-Fehler erkannt</strong><br><code style="white-space:pre-wrap;word-break:break-word;font-size:12px">'+String(msg).replace(/[&<>]/g,function(x){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[x]})+'</code>';
+        g.innerHTML='<strong>Dashboard-Fehler erkannt · Diagnose 09.10.2026</strong><br><code style="white-space:pre-wrap;word-break:break-word;font-size:12px">'+String(msg).replace(/[&<>]/g,function(x){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[x]})+'</code>';
       }
     }catch(_e){}
   }
+  document.addEventListener('DOMContentLoaded',function(){
+    var g=document.getElementById('gate');
+    if(g){
+      var mark=document.createElement('div');
+      mark.id='diagnostic-version-marker';
+      mark.style.cssText='font-size:11px;opacity:.8;margin-top:5px;color:#b9d9ff';
+      mark.textContent='Diagnose-Version 09.10.2026 aktiv';
+      g.appendChild(mark);
+    }
+  });
   window.addEventListener('error',function(e){
     var msg=e.error&&e.error.stack ? e.error.stack : (e.message||'Unbekannter JavaScript-Fehler');
     if(e.filename) msg+='\nDatei: '+e.filename;
