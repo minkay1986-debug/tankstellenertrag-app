@@ -195,7 +195,7 @@ function dashboard(){
  const W=820,H=270,L=50,R=20,T=22,B=42,iw=W-L-R,ih=H-T-B;
  const x=m=>L+(m-1)*iw/11;
  const y=v=>T+ih-(Math.max(0,v)/maxGross)*ih;
- const pathFor=rows=>{const pts=[];let run=[];const flush=()=>{if(!run.length)return;if(run.length===1){pts.push('M '+x(run[0].month).toFixed(1)+' '+y(run[0].d.gross).toFixed(1));run=[];return}pts.push('M '+x(run[0].month).toFixed(1)+' '+y(run[0].d.gross).toFixed(1));for(let j=1;j<run.length;j++){const a=run[j-1],b=run[j],mx=(x(a.month)+x(b.month))/2;pts.push('C '+mx.toFixed(1)+' '+y(a.d.gross).toFixed(1)+', '+mx.toFixed(1)+' '+y(b.d.gross).toFixed(1)+', '+x(b.month).toFixed(1)+' '+y(b.d.gross).toFixed(1))}run=[]};rows.forEach(row=>{if(!row){flush();return}run.push(row)});flush();return pts.join(' ')};
+ const pathFor=rows=>{const pts=[];let active=false;rows.forEach(row=>{if(!row){active=false;return}pts.push((active?'L ':'M ')+x(row.month).toFixed(1)+' '+y(row.d.gross).toFixed(1));active=true});return pts.join(' ')};
  const currentPath=pathFor(currentYearRows),priorPath=pathFor(priorYearRows);
  const dotsFor=(rows,color)=>rows.filter(Boolean).map(row=>'<circle cx="'+x(row.month).toFixed(1)+'" cy="'+y(row.d.gross).toFixed(1)+'" r="'+(row.key===selectedKey?5:3.5)+'" fill="'+color+'" stroke="#102238" stroke-width="1.5"><title>'+esc(row.key)+' · Rohertrag '+eur(row.d.gross)+'</title></circle>').join('');
  const monthLabels=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'].map((label,i)=>'<text x="'+x(i+1).toFixed(1)+'" y="'+(H-13)+'" text-anchor="middle" fill="#9fb8d0" font-size="11">'+label+'</text>').join('');
