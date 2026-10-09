@@ -558,8 +558,8 @@ $('closeAuth').onclick=closeAuth;
 if(client){
   client.auth.onAuthStateChange((event)=>{
     if(event==='SIGNED_OUT'){
-      resetProtectedViews();
-      status('Abgemeldet. Bitte anmelden oder ein Kundenkonto anlegen.');
+      window.location.replace('https://minkay1986-debug.github.io/tankstellenertrag/');
+      return;
     }
     // Keine Supabase-Abfragen innerhalb dieses Callbacks.
     // Die Initialsitzung wird ausschließlich in boot() geladen; Login/Registrierung
