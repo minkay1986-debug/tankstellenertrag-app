@@ -147,15 +147,15 @@ function runCheck() {
     {label:'nach Abschriften', value:rev-ek-sh-wo},
     {label:'verbleibend', value:rev-ek-sh-wo}
   ];
-  var chartW=620, chartH=210, left=38, right=14, top=22, bottom=48;
+  var chartW=620, chartH=210, left=38, right=14, chartTop=22, bottom=48;
   var maxVal=Math.max(1,rev);
-  var plotH=chartH-top-bottom, plotW=chartW-left-right;
+  var plotH=chartH-chartTop-bottom, plotW=chartW-left-right;
   var pts=chartValues.map(function(p,i){
-    return {x:left+(plotW/(chartValues.length-1))*i,y:top+plotH-(Math.max(0,p.value)/maxVal)*plotH,p:p};
+    return {x:left+(plotW/(chartValues.length-1))*i,y:chartTop+plotH-(Math.max(0,p.value)/maxVal)*plotH,p:p};
   });
   var path=pts.map(function(p,i){return (i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)}).join(' ');
   var chart='<div class="quickChart"><h3>Ertragskurve · Wertentwicklung im Shop</h3><p>Vom Umsatz zum verbleibenden Ertrag nach Wareneinsatz, Schwund und Abschriften.</p><svg viewBox="0 0 '+chartW+' '+chartH+'" role="img" aria-label="Ertragskurve vom Umsatz bis zum verbleibenden Ertrag" preserveAspectRatio="xMidYMid meet">';
-  [0,1,2,3].forEach(function(i){var y=top+(plotH/3)*i;chart+='<line x1="'+left+'" y1="'+y+'" x2="'+(chartW-right)+'" y2="'+y+'" stroke="rgba(151,211,239,.15)" stroke-width="1"/>';});
+  [0,1,2,3].forEach(function(i){var y=chartTop+(plotH/3)*i;chart+='<line x1="'+left+'" y1="'+y+'" x2="'+(chartW-right)+'" y2="'+y+'" stroke="rgba(151,211,239,.15)" stroke-width="1"/>';});
   chart+='<path d="'+path+'" fill="none" stroke="#68d8ee" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>';
   pts.forEach(function(p){chart+='<circle cx="'+p.x+'" cy="'+p.y+'" r="5" fill="#0b2742" stroke="#d7f8ff" stroke-width="2"/><text x="'+p.x+'" y="'+Math.max(13,p.y-10)+'" text-anchor="middle" fill="#f5f9ff" font-size="10" font-weight="700">'+p.p.value.toLocaleString('de-DE',{maximumFractionDigits:0})+' €</text><text x="'+p.x+'" y="'+(chartH-20)+'" text-anchor="middle" fill="#b9c9d8" font-size="10">'+p.p.label+'</text>';});
   chart+='</svg><div class="chartFoot">Lagerbestand wird separat als Kapitalbindung bewertet und nicht als Verlust abgezogen.</div></div>';
