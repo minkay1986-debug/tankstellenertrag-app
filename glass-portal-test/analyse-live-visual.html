@@ -211,8 +211,10 @@ function dashboard(){
     const span=x2-x1;
     const prevSpan=x2-px(p0),nextSpan=px(p3)-x1;
     const c1x=x1+span/3,c2x=x2-span/3;
-    const c1y=y1+(py(p2)-py(p0))*(span/(prevSpan||span))/6;
-    const c2y=y2-(py(p3)-py(p1))*(span/(nextSpan||span))/6;
+    // Catmull-Rom tangents converted to cubic Bezier controls: matching
+    // tangents at every shared data point removes visible joints.
+    const c1y=y1+((py(p2)-py(p0))/(prevSpan||span))*span/3;
+    const c2y=y2-((py(p3)-py(p1))/(nextSpan||span))*span/3;
     parts.push('C '+fmt(c1x)+' '+fmt(c1y)+', '+fmt(c2x)+' '+fmt(c2y)+', '+fmt(x2)+' '+fmt(y2));
    }
    run=[];
