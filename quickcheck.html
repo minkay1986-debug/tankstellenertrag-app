@@ -166,8 +166,8 @@ function runCheck() {
   } else {
     risks.sort(function(a,b){return b.rank-a.rank;});
     html += risks.map(function(r){return '<div class="signal '+(r.rank===4?'critical':'warn')+'"><b>'+r.title+'</b><span>'+r.text+'</span></div>';}).join('');
-    var top=risks[0];
-    insight.textContent = 'Ihr wichtigstes aktuelles Prüffeld ist '+top.title+'. '+top.text;
+    var topRisk=risks[0];
+    insight.textContent = 'Ihr wichtigstes aktuelles Prüffeld ist '+topRisk.title+'. '+topRisk.text;
   }
 
   if(causes.length){
