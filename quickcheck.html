@@ -102,7 +102,7 @@
   pts.forEach((p,i)=>{let ly=p.y-10;if(ly<T+2)ly=p.y+17; labs.insertAdjacentHTML('beforeend','<text x="'+p.x+'" y="'+ly+'" text-anchor="'+(i===0?'start':i===pts.length-1?'end':'middle')+'" fill="#f5f9ff" font-size="11" font-weight="800">'+euro(p.v).replace(/&/g,'&amp;')+'</text>');});
  }
  ids.forEach(id=>document.getElementById(id).addEventListener('input',render));
- document.getElementById('calc').addEventListener('click',()=>{render();const s=document.getElementById('actionStatus');if(s&&num('rev')>0&&num('ek')<=num('rev'))s.textContent='QuickCheck neu berechnet · Ergebnisse und Ertragskurve wurden aktualisiert.';});
+
  document.getElementById('demo').addEventListener('click',()=>{[120000,85000,900,650,250,24000].forEach((v,i)=>document.getElementById(ids[i]).value=v);render();const s=document.getElementById('actionStatus');if(s)s.textContent='Demo-Werte wurden geladen · Umsatz 120.000 €, EK 85.000 € und Beispielverluste eingesetzt.';});
  render();
 })();
