@@ -30,7 +30,7 @@
         <div class="field"><label for="other">Sonstige Warenverluste</label><input id="other" type="number" min="0" step="10" value="250"><small>Zum Beispiel Bruch oder Verderb</small></div>
         <div class="field"><label for="stock">Lagerbestand EK</label><input id="stock" type="number" min="0" step="100" value="24000"><small>Bestand zum Einkaufswert</small></div>
       </div>
-      <div class="actions"><button class="btn primary" id="calc">QuickCheck berechnen</button><button class="btn secondary" id="demo">Demo-Werte</button></div>
+      <div class="actions"><button type="button" class="btn primary" id="calc">QuickCheck berechnen</button><button type="button" class="btn secondary" id="demo">Demo-Werte laden</button></div><p id="actionStatus" class="actionStatus" aria-live="polite">Beispielwerte sind geladen. Ändern Sie Werte oder berechnen Sie erneut.</p>
       <div class="privacy">Vorschau mit Beispielwerten. Die Berechnung erfolgt direkt im Browser; es werden keine Daten übertragen.</div>
     </section>
     <section class="glass results" aria-live="polite">
@@ -72,6 +72,8 @@
   document.getElementById('loss').textContent=euro(loss);
   document.getElementById('rate').textContent=rev>0?pct(loss/rev*100):'–';
   document.getElementById('rateText').textContent='Verlustquote vom Umsatz';
+   const status=document.getElementById('actionStatus');
+   if(status){status.textContent=rev<=0?'Bitte einen Shop-Umsatz größer als 0 eingeben.':ek>rev?'Achtung: Der Wareneinsatz liegt über dem Umsatz. Bitte Eingabe prüfen.':'Berechnung aktualisiert · Ihre Werte werden nur in diesem Browser verarbeitet.';status.classList.toggle('warning',rev>0&&ek>rev);}
   document.getElementById('shrinkPct').textContent=rev>0?pct(shrink/rev*100):'–';
   document.getElementById('stockPct').textContent=rev>0?pct(stock/rev*100):'–';
   document.getElementById('shrinkText').textContent=rev>0?'Schwund entspricht '+pct(shrink/rev*100)+' des Shop-Umsatzes. Die Entwicklung über mehrere Monate ist besonders aussagekräftig.':'Bitte Umsatz eingeben, um die Schwundquote zu berechnen.';
@@ -92,8 +94,8 @@
   pts.forEach((p,i)=>{let ly=p.y-10;if(ly<T+2)ly=p.y+17; labs.insertAdjacentHTML('beforeend','<text x="'+p.x+'" y="'+ly+'" text-anchor="'+(i===0?'start':i===pts.length-1?'end':'middle')+'" fill="#f5f9ff" font-size="11" font-weight="800">'+euro(p.v).replace(/&/g,'&amp;')+'</text>');});
  }
  ids.forEach(id=>document.getElementById(id).addEventListener('input',render));
- document.getElementById('calc').addEventListener('click',render);
- document.getElementById('demo').addEventListener('click',()=>{[120000,85000,900,650,250,24000].forEach((v,i)=>document.getElementById(ids[i]).value=v);render();});
+ document.getElementById('calc').addEventListener('click',()=>{render();const s=document.getElementById('actionStatus');if(s&&num('rev')>0&&num('ek')<=num('rev'))s.textContent='QuickCheck neu berechnet · Ergebnisse und Ertragskurve wurden aktualisiert.';});
+ document.getElementById('demo').addEventListener('click',()=>{[120000,85000,900,650,250,24000].forEach((v,i)=>document.getElementById(ids[i]).value=v);render();const s=document.getElementById('actionStatus');if(s)s.textContent='Demo-Werte wurden geladen · Umsatz 120.000 €, EK 85.000 € und Beispielverluste eingesetzt.';});
  render();
 })();
 </script>
@@ -104,10 +106,12 @@
   <a href="./datenschutz.html">Datenschutz</a>
   <span aria-hidden="true">·</span>
   <a href="./agb.html">AGB</a>
+  <span aria-hidden="true">·</span>
+  <a class="registerLink" href="./?signup=1">Kundenkonto registrieren</a>
 </footer>
 <style>
-.legal-footer{display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;margin:26px auto 0;padding:16px 12px 22px;color:#9fb2ce;font-size:13px;letter-spacing:.02em}
-.legal-footer a{color:#c9d9f2;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.18);padding-bottom:2px;transition:color .18s ease,border-color .18s ease}
+.actionStatus{margin:10px 0 0;padding:9px 11px;border:1px solid rgba(137,210,255,.2);border-radius:9px;background:rgba(12,35,58,.48);color:#c8def3;font-size:12px;line-height:1.45}.actionStatus.warning{border-color:rgba(255,154,39,.65);color:#ffd29e}.legal-footer{display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;margin:26px auto 0;padding:16px 12px 22px;color:#9fb2ce;font-size:13px;letter-spacing:.02em}
+.legal-footer .registerLink{color:#8bdfff;border-color:rgba(139,223,255,.45);font-weight:700}.legal-footer a{color:#c9d9f2;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.18);padding-bottom:2px;transition:color .18s ease,border-color .18s ease}
 .legal-footer a:hover,.legal-footer a:focus-visible{color:#fff;border-color:#ff5b55;outline:none}
 </style>
 </body>
