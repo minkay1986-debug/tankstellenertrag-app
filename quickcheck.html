@@ -56,14 +56,14 @@
         <div class="chartNote">Lagerbestand wird separat als Kapitalbindung bewertet und nicht als Verlust abgezogen.</div>
       </div>
       <div class="register-cta">
-        <div><strong>Mehr aus Ihren Shop-Zahlen herausholen?</strong><p>Erstellen Sie Ihr Kundenkonto und entdecken Sie die weiterführende Warenwirtschaftsanalyse.</p></div>
-        <a href="./?signup=1">Kundenkonto erstellen <span aria-hidden="true">→</span></a>
+        <div><strong>Ein Monat zeigt einen Ausschnitt. Mehrere Monate zeigen die Entwicklung.</strong><p>Im Kundenbereich können Sie Monatswerte vergleichen und erkennen, ob Schwund, Rohertrag und Lagerquote besser oder schlechter werden.</p></div>
+        <a href="./?signup=1">Monatsvergleich im Kundenbereich <span aria-hidden="true">→</span></a>
       </div>
       <div class="insights">
-        <article class="insight"><div class="panelHead"><h4>Schwund prüfen</h4><span class="tag">Prüffeld</span></div><strong id="shrinkPct">0,8 %</strong><p id="shrinkText">Schwund im Verhältnis zum Shop-Umsatz. Besonders die Entwicklung über mehrere Monate ist interessant.</p></article>
-        <article class="insight"><div class="panelHead"><h4>Lagerbestand beobachten</h4><span class="tag">Kapitalbindung</span></div><strong id="stockPct">20,0 %</strong><p id="stockText">Der Lagerbestand wird im Verhältnis zum Monatsumsatz betrachtet. Prüfen Sie Drehung, Sortiment und Bestellmengen.</p></article>
+        <article class="insight"><div class="panelHead"><h4 id="shrinkHeading">Schwund prüfen</h4><span class="tag" id="shrinkTag">Prüffeld</span></div><strong id="shrinkPct">0,8 %</strong><p id="shrinkText">Schwund im Verhältnis zum Shop-Umsatz. Besonders die Entwicklung über mehrere Monate ist interessant.</p></article>
+        <article class="insight"><div class="panelHead"><h4 id="stockHeading">Lagerbestand beobachten</h4><span class="tag" id="stockTag">Kapitalbindung</span></div><strong id="stockPct">20,0 %</strong><p id="stockText">Der Lagerbestand wird im Verhältnis zum Monatsumsatz betrachtet. Prüfen Sie Drehung, Sortiment und Bestellmengen.</p></article>
       </div>
-      <p class="footnote">Die Ergebnisse sind Prüfsignale, keine Ursachenfeststellung. Saison, Sortiment, Öffnungszeiten und Inventurzeitpunkt können die Werte beeinflussen.</p>
+      <p class="footnote">Die Schwellen sind grobe Orientierung, keine Branchenbenchmarks. Die Bewertung hängt auch von Sortiment, Saison, Lieferintervallen und Inventurzeitpunkt ab.</p>
     </section>
   </div>
 </main>
@@ -84,8 +84,18 @@
    if(status){status.textContent=rev<=0?'Bitte einen Shop-Umsatz größer als 0 eingeben.':ek>rev?'Achtung: Der Wareneinsatz liegt über dem Umsatz. Bitte Eingabe prüfen.':'Berechnung aktualisiert · Ihre Werte werden nur in diesem Browser verarbeitet.';status.classList.toggle('warning',rev>0&&ek>rev);}
   document.getElementById('shrinkPct').textContent=rev>0?pct(shrink/rev*100):'–';
   document.getElementById('stockPct').textContent=rev>0?pct(stock/rev*100):'–';
-  document.getElementById('shrinkText').textContent=rev>0?'Schwund entspricht '+pct(shrink/rev*100)+' des Shop-Umsatzes. Die Entwicklung über mehrere Monate ist besonders aussagekräftig.':'Bitte Umsatz eingeben, um die Schwundquote zu berechnen.';
-  document.getElementById('stockText').textContent=rev>0?'Lagerbestand entspricht '+pct(stock/rev*100)+' des Monatsumsatzes. Prüfen Sie Drehung, Sortiment und Bestellmengen.':'Bitte Umsatz eingeben, um den Lagerbestand einzuordnen.';
+  const shrinkRate=rev>0?shrink/rev*100:null;
+  const stockRate=rev>0?stock/rev*100:null;
+  const sh=document.getElementById('shrinkHeading'), st=document.getElementById('shrinkTag');
+  const lh=document.getElementById('stockHeading'), lt=document.getElementById('stockTag');
+  if(shrinkRate===null){sh.textContent='Schwund prüfen';st.textContent='Umsatz fehlt';document.getElementById('shrinkText').textContent='Geben Sie einen Shop-Umsatz größer als 0 ein, damit die Schwundquote eingeordnet werden kann.';}
+  else if(shrinkRate<1){sh.textContent='Schwund im Blick';st.textContent='Unter 1 %';document.getElementById('shrinkText').textContent='Der erfasste Schwund liegt bei '+pct(shrinkRate)+' des Shop-Umsatzes. Prüfen Sie trotzdem den Monatsvergleich und ob alle Verluste erfasst sind.';}
+  else if(shrinkRate<2){sh.textContent='Schwund beobachten';st.textContent='1–2 %';document.getElementById('shrinkText').textContent='Der Schwund liegt bei '+pct(shrinkRate)+' des Shop-Umsatzes. Vergleichen Sie Vormonate und Warengruppen, um Veränderungen einzugrenzen.';}
+  else{sh.textContent='Schwund genauer prüfen';st.textContent='Über 2 %';document.getElementById('shrinkText').textContent='Der Schwund liegt bei '+pct(shrinkRate)+' des Shop-Umsatzes. Prüfen Sie Erfassung, Inventurdifferenzen und betroffene Warengruppen.';}
+  if(stockRate===null){lh.textContent='Lagerbestand beobachten';lt.textContent='Umsatz fehlt';document.getElementById('stockText').textContent='Geben Sie einen Shop-Umsatz größer als 0 ein, um den Bestand ins Verhältnis zum Umsatz zu setzen.';}
+  else if(stockRate<15){lh.textContent='Lagerquote niedrig';lt.textContent='Unter 15 %';document.getElementById('stockText').textContent='Der Lagerbestand entspricht '+pct(stockRate)+' des Monatsumsatzes. Prüfen Sie, ob die Ware für Nachfrage und Lieferintervalle ausreicht; niedrig ist nicht automatisch besser.';}
+  else if(stockRate<=30){lh.textContent='Lagerquote im Blick';lt.textContent='15–30 %';document.getElementById('stockText').textContent='Der Lagerbestand entspricht '+pct(stockRate)+' des Monatsumsatzes. Bewerten Sie die Quote zusammen mit Warendrehung, Sortiment und Lieferintervallen.';}
+  else{lh.textContent='Hohe Kapitalbindung prüfen';lt.textContent='Über 30 %';document.getElementById('stockText').textContent='Der Lagerbestand entspricht '+pct(stockRate)+' des Monatsumsatzes. Prüfen Sie Ladenhüter, Bestellmengen und Warendrehung. Die Quote allein beweist keinen Überbestand.';}
   const vals=[rev,gross,gross-shrink,gross-shrink-writeoff,remain];
   const W=700,H=205,L=30,R=16,T=25,B=35,plotW=W-L-R,plotH=H-T-B;
   const max=Math.max(1,...vals), min=Math.min(0,...vals), range=Math.max(1,max-min);
