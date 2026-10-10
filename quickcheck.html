@@ -3,185 +3,99 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tankstellen QuickCheck | Kostenloser Ertrags-Check</title>
-<meta name="description" content="Kostenloser Tankstellen QuickCheck: Shop-Umsatz, EK, Schwund und Bestand eingeben und erste wirtschaftliche Prüffelder erkennen. Ohne Konto.">
-<link rel="icon" href="./assets/tankstellenertrag-icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="./assets/tankstellenertrag-icon.svg">
-<link rel="manifest" href="./quickcheck.webmanifest">
-<meta name="theme-color" content="#0b2742">
-<link rel="canonical" href="https://app.tankstellenertrag.de/quickcheck.html">
-<meta name="robots" content="index,follow,max-image-preview:large">
-<meta property="og:title" content="Tankstellen QuickCheck | TankstellenErtrag">
-<meta property="og:description" content="In wenigen Minuten erkennen, welche wirtschaftlichen Bereiche Ihres Tankstellenshops genauer geprüft werden sollten.">
-<meta property="og:url" content="https://app.tankstellenertrag.de/quickcheck.html">
+<title>TankstellenErtrag · QuickCheck Vorschau</title>
+<meta name="robots" content="noindex,nofollow">
 <style>
-:root{--bg:#07182a;--p:#102b46;--p2:#163a5b;--line:rgba(125,207,244,.38);--t:#f5f9ff;--m:#b9c9d8;--o:#ff941f;--g:#45c477;--r:#ef6461}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 78% 8%,#174d78 0,#0b2742 38%,#071421 78%);color:var(--t);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.top{padding:22px 0;border-bottom:1px solid var(--line)}.brand{font-weight:900;color:#fff;text-decoration:none;font-size:22px}.brand span{color:var(--o)}.hero{padding:50px 0 28px}.eyebrow{text-transform:uppercase;letter-spacing:.13em;color:#ff9b4a;font-size:11px;font-weight:900}.hero h1{font-size:44px;line-height:1.06;margin:10px 0 14px}.hero p{color:#d1d8dc;font-size:17px;line-height:1.6;max-width:780px}.grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr);gap:18px;align-items:start}
-.quickIntro{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0 24px}.quickPill{padding:12px 13px;border:1px solid rgba(125,207,244,.28);background:rgba(16,43,70,.88);border-radius:12px}.quickPill b{display:flex;align-items:center;gap:8px;color:#fff;font-size:13px}.quickIcon{width:17px;height:17px;flex:0 0 17px;stroke:#68d8ee;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;fill:none;filter:drop-shadow(0 0 3px #68d8ee22)}.quickPill span{display:block;color:#929ca2;font-size:11px;margin-top:3px}.inputHead{display:flex;justify-content:space-between;align-items:center;gap:10px}.inputHead .num{color:#ff9b4a;font-size:10px;font-weight:900;letter-spacing:.1em}.field input:focus{outline:2px solid rgba(244,123,32,.35);border-color:var(--o)}.progressWrap{margin:4px 0 18px}.progressTop{display:flex;justify-content:space-between;color:#929ca2;font-size:11px;margin-bottom:6px}.progress{height:6px;background:#2a3034;border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;width:0;background:var(--o);transition:width .25s ease}.teaser{padding:22px;border-radius:16px;background:linear-gradient(145deg,#1d2226,#15181a);border:1px solid #353c41;position:sticky;top:18px}.teaser h3{margin:7px 0 8px;font-size:22px}.teaser p{color:#b8c0c5;font-size:13px;line-height:1.55}.teaserList{display:grid;gap:9px;margin:18px 0}.teaserItem{display:flex;gap:10px;align-items:flex-start;padding:11px;border-radius:11px;background:#20262a;border:1px solid #30373b}.teaserItem b{font-size:13px}.teaserItem span{display:block;color:#929ca2;font-size:11px;margin-top:2px}.teaserIcon{width:26px;height:26px;flex:0 0 26px;display:grid;place-items:center;color:#68d8ee}.teaserIcon svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;fill:none}.result.show{animation:rise .35s ease}@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.card{background:linear-gradient(145deg,rgba(22,62,96,.94),rgba(10,31,52,.97));border:1px solid rgba(125,207,244,.42);border-radius:16px;padding:22px;box-shadow:0 10px 28px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.08)}.field{margin:0 0 14px}.field label{display:block;color:#cbd1d5;font-size:13px;margin-bottom:6px}.field small{display:block;color:#7f898f;font-size:11px;margin-top:4px}.field input{width:100%;padding:13px;border-radius:9px;border:1px solid rgba(125,207,244,.36);background:#071a2e;color:#f5f9ff;font-size:15px}.btn{border:0;border-radius:9px;padding:13px 18px;background:var(--o);color:#fff;font-weight:850;cursor:pointer;width:100%}.result{display:none}.result.show{display:block}.score{display:flex;align-items:center;gap:14px;padding:15px;border-radius:12px;background:#20262a;border:1px solid #353c41}.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}.quickChart{margin-top:16px;padding:16px;border:1px solid rgba(125,207,244,.38);border-radius:13px;background:linear-gradient(145deg,rgba(16,48,75,.94),rgba(7,26,46,.98));overflow:hidden}.quickChart h3{margin:0 0 5px;font-size:16px}.quickChart p,.chartFoot{color:#b9c9d8;font-size:11px;line-height:1.45;margin:0 0 10px}.quickChart svg{display:block;width:100%;height:auto;overflow:visible}.chartFoot{margin:7px 0 0}@media(max-width:480px){.quickChart{padding:11px}.quickChart h3{font-size:14px}.quickChart svg text{font-size:9px}}.metric{padding:13px;border-radius:11px;background:#20262a;border:1px solid #353c41}.metric small{display:block;color:#929ca2;font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}.metric strong{font-size:18px}.metric.good{border-color:#315f46}.metric.warn{border-color:#76502e}.metric.critical{border-color:#7b3937;background:#251919}.insight{margin-top:16px;padding:16px;border-radius:12px;background:#1f2326;border:1px solid #454b4f}.insight b{display:block;margin-bottom:5px;color:#ff9b4a}.insight span{color:#d1d8dc;font-size:13px;line-height:1.55}.score strong{font-size:30px}.signal{margin-top:12px;padding:15px;border-radius:12px;border:1px solid #4a4038;background:#211c18}.signal b{display:block;margin-bottom:4px}.signal span{color:#cbd1d5;font-size:13px;line-height:1.5}.signal.warn{border-color:#76502e}.signal.critical{border-color:#7b3937;background:#251919}.testcount{margin-top:12px;color:#9aa3a9;font-size:11px;text-align:center}.privacy{margin-top:10px;color:#7f898f;font-size:11px;line-height:1.45;text-align:center}.note{margin-top:16px;color:#899298;font-size:11px;line-height:1.5}.actions{display:flex;gap:10px;margin-top:18px}.actions a{display:inline-block;text-decoration:none;text-align:center;padding:11px 14px;border-radius:9px;background:#30363a;color:#fff;font-weight:800;flex:1}.actions .primaryAction{background:var(--o)}.footer{padding:28px 0 45px;color:#737d83;font-size:11px}.footer a{color:#969fa6;text-decoration:none}@media(max-width:700px){.hero h1{font-size:35px}.grid{grid-template-columns:1fr}.actions{flex-direction:column}}
+:root{color-scheme:dark;--bg:#06172a;--panel:rgba(8,35,61,.82);--line:#23608b;--white:#f5f8ff;--muted:#b8c8d9;--orange:#ff941f;--cyan:#70e8ff;--red:#f16d78}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 75% 0,#123f67 0,#071c32 43%,#04101e 100%);color:var(--white);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}.wrap{max-width:1440px;margin:auto;padding:28px clamp(16px,3.5vw,52px) 48px}.brand{font-weight:900;font-size:23px;letter-spacing:-.04em}.brand span{color:var(--orange)}.eyebrow{color:var(--orange);font-size:12px;font-weight:850;letter-spacing:.14em;text-transform:uppercase;margin-top:38px}.hero h1{font-size:clamp(34px,4.6vw,64px);line-height:1.02;letter-spacing:-.045em;margin:14px 0}.hero p{font-size:17px;color:#c6d3e2;line-height:1.55;margin:0 0 30px}.layout{display:grid;grid-template-columns:minmax(320px,.95fr) minmax(0,1.05fr);gap:20px;align-items:start}.glass{background:linear-gradient(145deg,rgba(14,54,88,.78),rgba(5,25,45,.88));border:1px solid rgba(73,169,229,.55);border-radius:23px;box-shadow:0 18px 50px #0003,inset 0 1px #ffffff0c;backdrop-filter:blur(16px)}.inputs{padding:26px}.panelHead{display:flex;align-items:center;justify-content:space-between;gap:12px}.panelHead h2,.results h2{font-size:25px;letter-spacing:-.025em;margin:0}.dash{display:flex;gap:6px}.dash i{display:block;width:26px;height:6px;border-radius:10px;background:var(--orange)}.sub{color:var(--muted);font-size:14px;margin:9px 0 24px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:17px 14px}.field label{display:block;font-size:13px;font-weight:750;margin-bottom:8px;color:#dbe6f2}.field input,.field select{width:100%;min-width:0;background:#031326;border:1px solid #24547c;color:white;border-radius:11px;padding:14px;font:inherit;font-size:16px;outline:none}.field input:focus,.field select:focus{border-color:var(--orange);box-shadow:0 0 0 3px #ff941f22}.field small{display:block;color:#8fa7bd;font-size:12px;margin-top:6px}.actions{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}.btn{border:0;border-radius:12px;padding:14px 18px;font:inherit;font-weight:850;cursor:pointer}.primary{background:linear-gradient(110deg,#ff8b13,#ffab21);color:#17100a;box-shadow:0 7px 24px #ff941f26}.secondary{background:#123a60;color:white;border:1px solid #2c6691}.privacy{color:#8fa7bd;font-size:11px;margin-top:14px;line-height:1.5}.results{padding:26px}.resultTitle{display:flex;align-items:center;justify-content:space-between;gap:10px}.live{font-size:12px;color:#65e6ae;white-space:nowrap}.live:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#38e6a1;margin-right:7px}.resultSub{color:var(--muted);font-size:14px;margin:8px 0 22px}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.metric{min-width:0;position:relative;overflow:hidden;padding:17px 15px 20px;border:1px solid #245982;border-radius:16px;background:linear-gradient(150deg,#0b2b49d9,#04172bdc)}.metric:after{content:"";position:absolute;bottom:0;left:0;width:100%;height:4px;background:var(--orange)}.metric label{font-size:12px;color:#d2dfeb}.metric strong{display:block;font-size:clamp(20px,2.1vw,30px);color:var(--orange);margin:8px 0 4px;letter-spacing:-.03em;overflow-wrap:anywhere}.metric small{font-size:11px;color:#a7bbce;line-height:1.35;display:block}.chartCard{margin-top:20px;padding:20px 18px 16px;background:linear-gradient(145deg,#071e35d9,#06182ad9);border:1px solid #23577d;border-radius:18px}.chartCard h3{font-size:17px;margin:0 0 5px}.chartCard p{font-size:12px;color:#b7c9d9;margin:0 0 10px}.chart{width:100%;display:block;overflow:visible}.labels{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:2px}.labels span{text-align:center;font-size:11px;font-weight:750;color:#d4e0ec}.chartNote{font-size:11px;color:#9fb6ca;margin-top:16px}.insights{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.insight{border:1px solid #ed6876;border-radius:15px;padding:16px;background:linear-gradient(145deg,rgba(13,48,77,.9),rgba(5,24,42,.92));box-shadow:inset 0 1px #ffffff0a}.insight h4{font-size:15px;margin:0 0 8px}.insight strong{display:block;font-size:21px;color:#ff9ca5;margin-bottom:7px}.insight p{font-size:12px;line-height:1.55;color:#cfdeeb;margin:0}.footnote{font-size:11px;color:#8fa7bd;line-height:1.5;margin-top:18px}.tag{font-size:10px;color:#ffb1b8;border:1px solid #ed6876;border-radius:20px;padding:5px 8px;white-space:nowrap}@media(max-width:900px){.layout{grid-template-columns:1fr}.hero p{font-size:15px}.results{padding:20px}}@media(max-width:520px){.wrap{padding:20px 13px 30px}.inputs,.results{padding:17px}.fields{grid-template-columns:1fr;gap:14px}.metrics{grid-template-columns:1fr}.metric strong{font-size:27px}.insights{grid-template-columns:1fr}.chartCard{padding:15px 10px}.labels span{font-size:9px}.panelHead h2,.results h2{font-size:22px}}
 </style>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"TankstellenErtrag QuickCheck","applicationCategory":"BusinessApplication","description":"Kostenloser Kurzcheck für wirtschaftliche Prüffelder im Tankstellenshop.","url":"https://app.tankstellenertrag.de/quickcheck.html","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}</script>
 </head>
 <body>
-<header class="top"><div class="wrap"><a class="brand" href="./">Tankstellen<span>Ertrag</span></a></div></header>
 <main class="wrap">
-<section class="hero"><div class="eyebrow">Kostenlos · ohne Konto</div><h1>Wo sollten Sie in Ihrem Shop genauer hinschauen?</h1><p>Der Tankstellen QuickCheck gibt Ihnen anhand weniger Kennzahlen ein erstes neutrales Signal. Er ersetzt keine vollständige Monatsanalyse – er zeigt nur, wo sich ein genauerer Blick lohnen kann.</p></section>
-<div class="quickIntro"><div class="quickPill"><b><svg class="quickIcon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>ca. 60 Sekunden</b><span>5 Werte · keine Registrierung</span></div><div class="quickPill"><b><svg class="quickIcon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4 4M8 11h5M10.5 8.5v5"/></svg>Erste Prüfsignale</b><span>Marge · Schwund · Abschriften</span></div><div class="quickPill"><b>🔒 Privat</b><span>Keine Speicherung der Eingaben</span></div></div>
-<section class="grid">
-<div class="card">
-<div class="eyebrow">Schritt 1 · Zahlen eingeben</div><h2>Ihre Monatswerte</h2><p class="note" style="margin-top:-4px">Keine Sorge: Sie brauchen keine perfekte Buchhaltung. Für einen ersten Eindruck reichen die fünf Monatswerte.</p><div class="progressWrap"><div class="progressTop"><span id="progressText">0 von 5 Angaben</span><span>QuickCheck</span></div><div class="progress"><i id="progressBar"></i></div></div>
-<div class="field"><div class="inputHead"><label for="rev">Shop-Umsatz netto (€)</label><span class="num">01</span></div><input id="rev" type="number" min="0" step="100" placeholder="z. B. 120000"></div>
-<div class="field"><div class="inputHead"><label for="ek">Shop-EK / Wareneinsatz (€)</label><span class="num">02</span></div><input id="ek" type="number" min="0" step="100" placeholder="z. B. 78000"></div>
-<div class="field"><div class="inputHead"><label for="shrink">Schwund (€)</label><span class="num">03</span></div><input id="shrink" type="number" min="0" step="10" placeholder="z. B. 1800"><small>Wenn Sie den Wert nicht kennen, können Sie 0 eingeben.</small></div>
-<div class="field"><div class="inputHead"><label for="writeoff">Abschriften (€)</label><span class="num">04</span></div><input id="writeoff" type="number" min="0" step="10" placeholder="z. B. 600"></div>
-<div class="field"><div class="inputHead"><label for="stock">Aktueller Lagerbestand EK (€)</label><span class="num">05</span></div><input id="stock" type="number" min="0" step="100" placeholder="z. B. 24000"></div>
-<button class="btn" type="button" onclick="runCheck()">QuickCheck auswerten</button><div class="privacy">Ihre Eingaben im QuickCheck werden nicht gespeichert und nicht an unseren Server übertragen.</div>
-</div>
-<div class="teaser"><div class="eyebrow">Was Sie danach sehen</div><h3>Erste Erkenntnisse statt nur Zahlen.</h3><p>Der QuickCheck verbindet Ihre Werte und zeigt Ihnen, <b>wo sich ein genauerer Blick lohnen könnte.</b></p><div class="teaserList"><div class="teaserItem"><span class="teaserIcon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-6"/></svg></span><div><b>Ihre Shop-Marge</b><span>Rohertrag und rechnerische Marge</span></div></div><div class="teaserItem"><span class="teaserIcon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4 4M8 11h5"/></svg></span><div><b>Auffällige Bereiche</b><span>Schwund, Abschriften und Lager</span></div></div><div class="teaserItem"><span class="teaserIcon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 22h4M8.5 14.5a7 7 0 1 1 7 0c-.9.6-1.5 1.5-1.5 2.5h-4c0-1-.6-1.9-1.5-2.5Z"/><path d="M12 3v2M5.6 5.6 7 7M18.4 5.6 17 7"/></svg></span><div><b>Konkrete Prüfrichtung</b><span>Was Sie als Nächstes kontrollieren könnten</span></div></div></div><p style="margin-bottom:0">Keine Ursache wird behauptet. Der QuickCheck zeigt nur nachvollziehbare Prüfsignale.</p></div>
-<div class="card result" id="result">
-<div class="eyebrow">Schritt 2 · Ihre erste Einschätzung</div><h2 id="headline">Ergebnis</h2><div class="score"><strong id="score">–</strong><span id="scoreText">–</span></div>
-<div id="signals"></div>
-<div class="insight"><b>Wo könnte Potenzial liegen?</b><span id="insightText">Geben Sie Ihre Monatswerte ein, um das wichtigste Prüffeld zu sehen.</span></div>
-<div class="note">Die Ergebnisse sind bewusst als Prüfsignale formuliert. Ein auffälliger Wert beweist keine Ursache. Saison, Sortiment, Öffnungszeiten, Inventurzeitpunkt und betriebliche Besonderheiten können die Werte beeinflussen.</div>
-<div class="actions"><a class="primaryAction" href="./?login=1">Jetzt mit TankstellenErtrag weiterarbeiten</a><a href="./warenwirtschaft-tankstelle.html">Mehr über Kennzahlen</a></div>
-</div>
-</section>
+  <div class="brand">Tankstellen<span>Ertrag</span></div>
+  <header class="hero">
+    <div class="eyebrow">Wirtschaftlichkeit · Shop · Ertrag</div>
+    <h1>QuickCheck für Ihre Tankstelle.</h1>
+    <p>Wenige Eckdaten eingeben – der QuickCheck zeigt, wie sich Wareneinsatz und Verluste auf den Shop-Ertrag auswirken.</p>
+  </header>
+  <div class="layout">
+    <section class="glass inputs">
+      <div class="panelHead"><h2>Ihre Eckdaten</h2><div class="dash"><i></i><i></i><i></i></div></div>
+      <p class="sub">Grundlage für die erste Warenwirtschafts-Analyse.</p>
+      <div class="fields">
+        <div class="field"><label for="rev">Monatlicher Shop-Umsatz</label><input id="rev" type="number" min="0" step="100" value="120000"><small>Bruttoumsatz in Euro</small></div>
+        <div class="field"><label for="ek">Wareneinsatz / EK</label><input id="ek" type="number" min="0" step="100" value="85000"><small>Einkaufswert in Euro</small></div>
+        <div class="field"><label for="shrink">Schwund</label><input id="shrink" type="number" min="0" step="10" value="900"><small>Monatlich in Euro</small></div>
+        <div class="field"><label for="writeoff">Abschriften</label><input id="writeoff" type="number" min="0" step="10" value="650"><small>Monatlich in Euro</small></div>
+        <div class="field"><label for="other">Sonstige Warenverluste</label><input id="other" type="number" min="0" step="10" value="250"><small>Zum Beispiel Bruch oder Verderb</small></div>
+        <div class="field"><label for="stock">Lagerbestand EK</label><input id="stock" type="number" min="0" step="100" value="24000"><small>Bestand zum Einkaufswert</small></div>
+      </div>
+      <div class="actions"><button class="btn primary" id="calc">QuickCheck berechnen</button><button class="btn secondary" id="demo">Demo-Werte</button></div>
+      <div class="privacy">Vorschau mit Beispielwerten. Die Berechnung erfolgt direkt im Browser; es werden keine Daten übertragen.</div>
+    </section>
+    <section class="glass results" aria-live="polite">
+      <div class="resultTitle"><h2>Ihr Ergebnis – auf einen Blick</h2><span class="live">Live berechnet</span></div>
+      <p class="resultSub">Direkt aus Ihren Warenwirtschaftsdaten</p>
+      <div class="metrics">
+        <div class="metric"><label>Shop-Rohertrag</label><strong id="gross">35.000 €</strong><small>Nach Wareneinsatz</small></div>
+        <div class="metric"><label>Verluste gesamt</label><strong id="loss">1.800 €</strong><small>Schwund + Abschriften + sonstige Verluste</small></div>
+        <div class="metric"><label>Warenwirtschaft</label><strong id="rate">1,5 %</strong><small id="rateText">Verlustquote vom Umsatz</small></div>
+      </div>
+      <div class="chartCard">
+        <h3>Ertragskurve · Wertentwicklung im Shop</h3>
+        <p>Vom Umsatz zum verbleibenden Ertrag nach Wareneinsatz und Verlusten</p>
+        <svg class="chart" id="chart" viewBox="0 0 700 205" role="img" aria-label="Geglättete Ertragskurve ohne Gelenkpunkte">
+          <defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22c9ff" stop-opacity=".38"/><stop offset="100%" stop-color="#22c9ff" stop-opacity=".015"/></linearGradient><linearGradient id="line" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#a3f4ff"/><stop offset="75%" stop-color="#55dfff"/><stop offset="100%" stop-color="#ff9a27"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="3.2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+          <g id="grid"></g><path id="areaPath" fill="url(#area)"></path><path id="curve" fill="none" stroke="url(#line)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"></path><g id="valueLabels"></g>
+        </svg>
+        <div class="labels"><span>Umsatz</span><span>nach EK</span><span>nach Schwund</span><span>nach Abschriften</span><span>verbleibend</span></div>
+        <div class="chartNote">Lagerbestand wird separat als Kapitalbindung bewertet und nicht als Verlust abgezogen.</div>
+      </div>
+      <div class="insights">
+        <article class="insight"><div class="panelHead"><h4>Schwund prüfen</h4><span class="tag">Prüffeld</span></div><strong id="shrinkPct">0,8 %</strong><p id="shrinkText">Schwund im Verhältnis zum Shop-Umsatz. Besonders die Entwicklung über mehrere Monate ist interessant.</p></article>
+        <article class="insight"><div class="panelHead"><h4>Lagerbestand beobachten</h4><span class="tag">Kapitalbindung</span></div><strong id="stockPct">20,0 %</strong><p id="stockText">Der Lagerbestand wird im Verhältnis zum Monatsumsatz betrachtet. Prüfen Sie Drehung, Sortiment und Bestellmengen.</p></article>
+      </div>
+      <p class="footnote">Die Ergebnisse sind Prüfsignale, keine Ursachenfeststellung. Saison, Sortiment, Öffnungszeiten und Inventurzeitpunkt können die Werte beeinflussen.</p>
+    </section>
+  </div>
 </main>
-<footer class="wrap footer">TankstellenErtrag · Warenwirtschaftliche Monatsanalyse · <a href="./impressum.html">Impressum</a> · <a href="./datenschutz.html">Datenschutz</a></footer>
 <script>
-function runCheck() {
-  var rev = Number(document.getElementById('rev').value) || 0;
-  var ek = Number(document.getElementById('ek').value) || 0;
-  var sh = Number(document.getElementById('shrink').value) || 0;
-  var wo = Number(document.getElementById('writeoff').value) || 0;
-  var stock = Number(document.getElementById('stock').value) || 0;
-  var result = document.getElementById('result');
-  var progressBar = document.getElementById('progressBar');
-  var progressText = document.getElementById('progressText');
-  var headline = document.getElementById('headline');
-  var score = document.getElementById('score');
-  var scoreText = document.getElementById('scoreText');
-  var signals = document.getElementById('signals');
-  var insight = document.getElementById('insightText');
-  result.classList.add('show');
-  var filled=[rev,ek,sh,wo,stock].filter(function(v){return v>0}).length;
-  if(progressBar) progressBar.style.width=(filled/5*100)+'%';
-  if(progressText) progressText.textContent=filled+' von 5 Angaben';
-
-  if (rev <= 0 || ek <= 0) {
-    headline.textContent = 'Noch nicht genug Daten';
-    score.textContent = '–';
-    scoreText.textContent = 'Bitte mindestens Umsatz und EK eingeben.';
-    signals.innerHTML = '';
-    insight.textContent = 'Geben Sie mindestens Shop-Umsatz und EK ein. Dann sehen Sie Ihr erstes Kurzprofil.';
-    return false;
-  }
-
-  var margin = (rev-ek)/rev*100;
-  var gross = rev-ek;
-  var shrinkRate = sh/rev*100;
-  var writeRate = wo/rev*100;
-  var stockRate = stock/rev*100;
-  var risks = [];
-
-  function money(v){return v.toLocaleString('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0});}
-  function one(v){return v.toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';}
-  function metric(label,value,cls){return '<div class="metric '+cls+'"><small>'+label+'</small><strong>'+value+'</strong></div>';}
-  function clsMargin(){return margin<25?'critical':margin<32?'warn':'good';}
-  function clsShrink(){return shrinkRate>=1.5?'critical':shrinkRate>=.8?'warn':'good';}
-  function clsWrite(){return writeRate>=.8?'warn':'good';}
-  function clsStock(){return stockRate>=30?'warn':'good';}
-
-  if(margin<25) risks.push({rank:4,title:'Shop-Marge',text:'Die rechnerische Shop-Marge liegt bei '+one(margin)+'. Prüfen Sie besonders EK, Verkaufspreise und Sortimentsmix.'});
-  else if(margin<32) risks.push({rank:2,title:'Shop-Marge',text:'Die rechnerische Shop-Marge liegt bei '+one(margin)+'. Ein Monatsvergleich zeigt, ob sich die Marge verschlechtert.'});
-  if(shrinkRate>=1.5) risks.push({rank:4,title:'Schwund',text:'Schwund entspricht '+one(shrinkRate)+' des Shop-Umsatzes. Prüfen Sie Inventur, Buchungen, MHD, Verderb und Eigenverbrauch.'});
-  else if(shrinkRate>=.8) risks.push({rank:2,title:'Schwund',text:'Schwund entspricht '+one(shrinkRate)+' des Shop-Umsatzes. Besonders die Entwicklung über mehrere Monate ist interessant.'});
-  if(writeRate>=.8) risks.push({rank:2,title:'Abschriften',text:'Abschriften entsprechen '+one(writeRate)+' des Shop-Umsatzes. Prüfen Sie MHD, Abschriftenprozesse und Sortiment.'});
-  if(stockRate>=30) risks.push({rank:2,title:'Lagerbestand',text:'Der Lagerbestand entspricht '+one(stockRate)+' des monatlichen Shop-Umsatzes. Das kann auf eine relativ hohe Kapitalbindung im Warenbestand hindeuten. Prüfen Sie Drehung, Sortiment und Bestellmengen.'});
-
-  var level = risks.some(function(r){return r.rank===4;}) ? 'HOCH' : (risks.length ? 'MITTEL' : 'NIEDRIG');
-  headline.textContent = level==='HOCH' ? 'Mehrere bzw. starke Prüffelder erkannt' : level==='MITTEL' ? 'Einige Punkte genauer ansehen' : 'Aktuell unauffälliges Kurzprofil';
-  score.textContent = level;
-  scoreText.textContent = 'Erste Einordnung auf Basis Ihrer Monatswerte';
-
-  // Regelbasierte Ursachenanalyse: mehrere Kennzahlen werden miteinander verknüpft,
-  // damit aus einer Auffälligkeit konkrete, nachvollziehbare Prüfhinweise werden.
-  var causes = [];
-  function addCause(title,text,rank){causes.push({title:title,text:text,rank:rank||1});}
-
-  if(shrinkRate>=1.5 && stockRate>=30 && writeRate>=.8)
-    addCause('Mögliche Ursache: Bestand / Warenrotation','Schwund, Lagerbestand und Abschriften sind gleichzeitig erhöht. Prüfen Sie zuerst MHD, Warenrotation, Bestellmengen und Inventurbuchungen.',4);
-  else if(shrinkRate>=1.5 && stockRate>=30)
-    addCause('Mögliche Ursache: hoher Bestand','Der erhöhte Schwund tritt zusammen mit einem relativ hohen Lagerbestand auf. Prüfen Sie Warenrotation, Bestellmengen, Lagerdisziplin und Inventurbuchungen.',3);
-  else if(shrinkRate>=1.5 && writeRate>=.8)
-    addCause('Mögliche Ursache: MHD / Abschriften','Schwund und Abschriften sind gleichzeitig auffällig. Prüfen Sie MHD, Verderb, Abschriftenprozesse und die betroffenen Warengruppen.',3);
-  else if(shrinkRate>=1.5)
-    addCause('Mögliche Ursache: Bestandsdifferenzen','Der Schwund ist deutlich auffällig. Prüfen Sie Inventur, Buchungen, Eigenverbrauch, Verderb und mögliche Differenzen bei Wareneingang bzw. Bestand.',3);
-
-  if(margin<25 && ek/rev>=.70)
-    addCause('Mögliche Ursache: hoher Wareneinsatz','Die niedrige Shop-Marge geht mit einem hohen Wareneinsatz einher. Prüfen Sie Einkaufspreise, Verkaufspreise, Preisnachlässe und den Sortimentsmix.',4);
-  else if(margin<32 && ek/rev>=.68)
-    addCause('Mögliche Ursache: Wareneinsatz / Sortimentsmix','Die Marge ist eher niedrig und der Wareneinsatz relativ hoch. Prüfen Sie Einkaufskonditionen, Verkaufspreise und margenstarke Warengruppen.',2);
-
-  if(writeRate>=.8 && stockRate>=30)
-    addCause('Mögliche Ursache: zu langsame Warenrotation','Hohe Abschriften treffen auf einen hohen Bestand. Prüfen Sie insbesondere langsam drehende Artikel, Bestellmengen und MHD-gesteuerte Sortimente.',3);
-
-  if(margin<25 && shrinkRate>=1.5)
-    addCause('Mögliche Ursache: Ertrag wird doppelt belastet','Eine niedrige Marge trifft gleichzeitig auf hohen Schwund. Dadurch wird der Rohertrag zusätzlich belastet. Prüfen Sie zuerst die schwundstarken Warengruppen und deren Bestandsführung.',4);
-
-  causes.sort(function(a,b){return b.rank-a.rank;});
-
-  var html = '<div class="metrics">';
-  html += metric('Shop-Marge',one(margin),clsMargin());
-  html += metric('Rohertrag',money(gross),'good');
-  html += metric('Schwundquote',one(shrinkRate),clsShrink());
-  html += metric('Abschriftenquote',one(writeRate),clsWrite());
-  html += metric('Lagerquote',one(stockRate),clsStock());
-  html += metric('Lagerbestand EK',money(stock),'good');
-  html += '</div>';
-  // Dynamische Ertragskurve aus den tatsächlich eingegebenen Werten.
-  var chartValues = [
-    {label:'Umsatz', value:rev},
-    {label:'nach EK', value:rev-ek},
-    {label:'nach Schwund', value:rev-ek-sh},
-    {label:'nach Abschriften', value:rev-ek-sh-wo},
-    {label:'verbleibend', value:rev-ek-sh-wo}
-  ];
-  var chartW=620, chartH=210, left=38, right=14, chartTop=22, bottom=48;
-  var maxVal=Math.max(1,rev);
-  var plotH=chartH-chartTop-bottom, plotW=chartW-left-right;
-  var pts=chartValues.map(function(p,i){
-    return {x:left+(plotW/(chartValues.length-1))*i,y:chartTop+plotH-(Math.max(0,p.value)/maxVal)*plotH,p:p};
-  });
-  var path=pts.map(function(p,i){return (i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)}).join(' ');
-  var chart='<div class="quickChart"><h3>Ertragskurve · Wertentwicklung im Shop</h3><p>Vom Umsatz zum verbleibenden Ertrag nach Wareneinsatz, Schwund und Abschriften.</p><svg viewBox="0 0 '+chartW+' '+chartH+'" role="img" aria-label="Ertragskurve vom Umsatz bis zum verbleibenden Ertrag" preserveAspectRatio="xMidYMid meet">';
-  [0,1,2,3].forEach(function(i){var y=chartTop+(plotH/3)*i;chart+='<line x1="'+left+'" y1="'+y+'" x2="'+(chartW-right)+'" y2="'+y+'" stroke="rgba(151,211,239,.15)" stroke-width="1"/>';});
-  chart+='<path d="'+path+'" fill="none" stroke="#68d8ee" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>';
-  pts.forEach(function(p){chart+='<circle cx="'+p.x+'" cy="'+p.y+'" r="5" fill="#0b2742" stroke="#d7f8ff" stroke-width="2"/><text x="'+p.x+'" y="'+Math.max(13,p.y-10)+'" text-anchor="middle" fill="#f5f9ff" font-size="10" font-weight="700">'+p.p.value.toLocaleString('de-DE',{maximumFractionDigits:0})+' €</text><text x="'+p.x+'" y="'+(chartH-20)+'" text-anchor="middle" fill="#b9c9d8" font-size="10">'+p.p.label+'</text>';});
-  chart+='</svg><div class="chartFoot">Lagerbestand wird separat als Kapitalbindung bewertet und nicht als Verlust abgezogen.</div></div>';
-  html += chart;
-  if(!risks.length){
-    html += '<div class="signal"><b>Keine starken Prüfsignale</b><span>Auf Basis Ihrer Angaben ergibt sich aktuell kein deutliches Auffälligkeitssignal. Der Monatsvergleich bleibt trotzdem wichtig.</span></div>';
-    insight.textContent = 'Aktuell zeigt der QuickCheck kein starkes Prüffeld. Der nächste Schritt ist, die Entwicklung über mehrere Monate und einzelne Warengruppen zu betrachten.';
-  } else {
-    risks.sort(function(a,b){return b.rank-a.rank;});
-    html += risks.map(function(r){return '<div class="signal '+(r.rank===4?'critical':'warn')+'"><b>'+r.title+'</b><span>'+r.text+'</span></div>';}).join('');
-    var topRisk=risks[0];
-    insight.textContent = 'Ihr wichtigstes aktuelles Prüffeld ist '+topRisk.title+'. '+topRisk.text;
-  }
-
-  if(causes.length){
-    html += '<div class="insight" style="margin-top:16px"><b>Automatische Ursachenanalyse</b><span>';
-    html += causes.slice(0,3).map(function(c){
-      return '<strong style="display:block;color:#f5f6f7;margin-top:9px">'+c.title+'</strong><span style="display:block;margin-top:3px">'+c.text+'</span>';
-    }).join('');
-    html += '</span></div>';
-  }
-
-  signals.innerHTML = html;
-  return false;
-}
-document.querySelectorAll('#rev,#ek,#shrink,#writeoff,#stock').forEach(function(el){el.addEventListener('input',function(){var vals=['rev','ek','shrink','writeoff','stock'].map(function(id){return Number(document.getElementById(id).value)||0});var n=vals.filter(function(v){return v>0}).length;var bar=document.getElementById('progressBar');var txt=document.getElementById('progressText');if(bar)bar.style.width=(n/5*100)+'%';if(txt)txt.textContent=n+' von 5 Angaben';});});
+(function(){
+ const ids=['rev','ek','shrink','writeoff','other','stock'];
+ const num=id=>Math.max(0,Number(document.getElementById(id).value)||0);
+ const euro=n=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
+ const pct=n=>new Intl.NumberFormat('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1}).format(n)+' %';
+ function render(){
+  const [rev,ek,shrink,writeoff,other,stock]=ids.map(num);
+  const gross=rev-ek, loss=shrink+writeoff+other, remain=gross-loss;
+  document.getElementById('gross').textContent=euro(gross);
+  document.getElementById('loss').textContent=euro(loss);
+  document.getElementById('rate').textContent=rev>0?pct(loss/rev*100):'–';
+  document.getElementById('rateText').textContent='Verlustquote vom Umsatz';
+  document.getElementById('shrinkPct').textContent=rev>0?pct(shrink/rev*100):'–';
+  document.getElementById('stockPct').textContent=rev>0?pct(stock/rev*100):'–';
+  document.getElementById('shrinkText').textContent=rev>0?'Schwund entspricht '+pct(shrink/rev*100)+' des Shop-Umsatzes. Die Entwicklung über mehrere Monate ist besonders aussagekräftig.':'Bitte Umsatz eingeben, um die Schwundquote zu berechnen.';
+  document.getElementById('stockText').textContent=rev>0?'Lagerbestand entspricht '+pct(stock/rev*100)+' des Monatsumsatzes. Prüfen Sie Drehung, Sortiment und Bestellmengen.':'Bitte Umsatz eingeben, um den Lagerbestand einzuordnen.';
+  const vals=[rev,gross,gross-shrink,gross-shrink-writeoff,remain];
+  const W=700,H=205,L=30,R=16,T=25,B=35,plotW=W-L-R,plotH=H-T-B;
+  const max=Math.max(1,...vals), min=Math.min(0,...vals), range=Math.max(1,max-min);
+  const x=i=>L+i*plotW/(vals.length-1), y=v=>T+(max-v)/range*plotH;
+  const pts=vals.map((v,i)=>({x:x(i),y:y(v),v}));
+  // Smooth cubic path; no visible point markers.
+  let d='M '+pts[0].x+' '+pts[0].y;
+  for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1],dx=(b.x-a.x)*.48;d+=' C '+(a.x+dx)+' '+a.y+', '+(b.x-dx)+' '+b.y+', '+b.x+' '+b.y;}
+  document.getElementById('curve').setAttribute('d',d);
+  document.getElementById('areaPath').setAttribute('d',d+' L '+pts[pts.length-1].x+' '+(H-B)+' L '+pts[0].x+' '+(H-B)+' Z');
+  const grid=document.getElementById('grid');grid.innerHTML='';
+  for(let i=0;i<4;i++){const gy=T+i*plotH/3;grid.insertAdjacentHTML('beforeend','<line x1="'+L+'" y1="'+gy+'" x2="'+(W-R)+'" y2="'+gy+'" stroke="#8bc9ef" stroke-opacity=".13" stroke-dasharray="3 5"/>');}
+  const labs=document.getElementById('valueLabels');labs.innerHTML='';
+  pts.forEach((p,i)=>{let ly=p.y-10;if(ly<T+2)ly=p.y+17; labs.insertAdjacentHTML('beforeend','<text x="'+p.x+'" y="'+ly+'" text-anchor="'+(i===0?'start':i===pts.length-1?'end':'middle')+'" fill="#f5f9ff" font-size="11" font-weight="800">'+euro(p.v).replace(/&/g,'&amp;')+'</text>');});
+ }
+ ids.forEach(id=>document.getElementById(id).addEventListener('input',render));
+ document.getElementById('calc').addEventListener('click',render);
+ document.getElementById('demo').addEventListener('click',()=>{[120000,85000,900,650,250,24000].forEach((v,i)=>document.getElementById(ids[i]).value=v);render();});
+ render();
+})();
 </script>
 </body>
 </html>
