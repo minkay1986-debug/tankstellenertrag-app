@@ -79,14 +79,19 @@ function svgBars(items){
  items.map((x,i)=>{let y=16+i*37,w=Math.max(3,Math.abs(x.v)/max*usable),grad=x.c==='#5bb8ff'?'url(#barBlue)':x.c==='#63d9b0'?'url(#barGreen)':'url(#barOrange)',tx=Math.min(490,left+w+8);return '<text x="0" y="'+(y+13)+'" fill="#a9bed4" font-size="11">'+x.n+'</text><rect x="'+left+'" y="'+y+'" width="'+usable+'" height="19" rx="7" fill="#ffffff" fill-opacity=".035"/><rect x="'+left+'" y="'+y+'" width="'+w+'" height="19" rx="7" fill="'+grad+'"/><text x="'+tx+'" y="'+(y+13)+'" fill="#f0f7ff" font-size="10" font-weight="600">'+(x.v<0?'−':'')+euro(Math.abs(x.v))+'</text>'}).join('')
 }
 function lineChart(a,b){
- const all=[...a,...b,0],max=Math.max(1,...all),min=Math.min(0,...all),span=Math.max(1,max-min),X=i=>48+i*105,Y=v=>142-(v-min)/span*105;
- const path=arr=>arr.map((v,i)=>(i?'L':'M')+X(i)+' '+Y(v)).join(' ');
- const area=arr=>path(arr)+' L '+X(arr.length-1)+' 145 L '+X(0)+' 145 Z';
- const labels=[1,2,3,4,5].map((v,i)=>'<text x="'+X(i)+'" y="165" fill="#8da5be" font-size="10" text-anchor="middle">'+v+'</text>').join('');
- return '<defs><linearGradient id="areaBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5bb8ff" stop-opacity=".25"/><stop offset="1" stop-color="#5bb8ff" stop-opacity="0"/></linearGradient><linearGradient id="areaOrange" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9b45" stop-opacity=".18"/><stop offset="1" stop-color="#ff9b45" stop-opacity="0"/></linearGradient></defs>'+
- [0,1,2,3].map(i=>'<line x1="32" y1="'+(30+i*37)+'" x2="500" y2="'+(30+i*37)+'" stroke="#d8eaff" stroke-opacity=".1" stroke-dasharray="3 6"/>').join('')+
- '<path d="'+area(a)+'" fill="url(#areaBlue)"/><path d="'+area(b)+'" fill="url(#areaOrange)"/><path d="'+path(a)+'" fill="none" stroke="#63c8ff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="'+path(b)+'" fill="none" stroke="#ffad5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 5"/>'+
- a.map((v,i)=>'<circle cx="'+X(i)+'" cy="'+Y(v)+'" r="3.5" fill="#081525" stroke="#75d4ff" stroke-width="2"/>').join('')+labels.replace(/>([1-5])</g/g,'>Jahr $1</g>');
+ const all=[...a,...b,0],max=Math.max(1,...all),min=Math.min(0,...all),span=Math.max(1,max-min);
+ const X=i=>48+i*105, Y=v=>24+(max-v)/span*105;
+ const path=arr=>arr.map((v,i)=>(i?'L':'M')+' '+X(i)+' '+Y(v)).join(' ');
+ const area=arr=>path(arr)+' L '+X(arr.length-1)+' 139 L '+X(0)+' 139 Z';
+ const grid=[0,1,2,3].map(i=>{const y=24+i*35;return '<line x1="30" y1="'+y+'" x2="500" y2="'+y+'" stroke="#d8eaff" stroke-opacity=".12" stroke-dasharray="3 6"/>'}).join('');
+ const labels=[1,2,3,4,5].map((v,i)=>'<text x="'+X(i)+'" y="160" fill="#a7bdd4" font-size="11" text-anchor="middle">Jahr '+v+'</text>').join('');
+ const points=arr=>arr.map((v,i)=>'<circle cx="'+X(i)+'" cy="'+Y(v)+'" r="3.5" fill="#0a1b31" stroke="'+(arr===a?'#75d4ff':'#ffad5e')+'" stroke-width="2"/>').join('');
+ const zeroY=Y(0);
+ return '<defs><linearGradient id="areaBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5bb8ff" stop-opacity=".28"/><stop offset="1" stop-color="#5bb8ff" stop-opacity=".015"/></linearGradient><linearGradient id="areaOrange" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9b45" stop-opacity=".22"/><stop offset="1" stop-color="#ff9b45" stop-opacity=".01"/></linearGradient></defs>'+grid+
+ '<line x1="30" y1="'+zeroY+'" x2="500" y2="'+zeroY+'" stroke="#d8eaff" stroke-opacity=".28"/>'+
+ '<path d="'+area(a)+'" fill="url(#areaBlue)"/><path d="'+area(b)+'" fill="url(#areaOrange)"/>'+
+ '<path d="'+path(a)+'" fill="none" stroke="#63c8ff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>'+
+ '<path d="'+path(b)+'" fill="none" stroke="#ffad5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 5"/>'+points(a)+points(b)+labels;
 }
 function render(){const fuel=val('fuel'),shop=val('shop'),wash=val('wash'),rev=fuel+shop+wash;const gross=fuel*val('fuelMargin')/100+shop*val('shopMargin')/100+wash*val('washMargin')/100;const costs=val('staff')+val('rent')+val('energy')+val('other');const op=gross-costs;const debt=Math.max(0,val('investment')-val('equity'));const monthlyRate=val('financeRate')/100/12;const months=Math.max(1,val('financeYears')*12);const payment=monthlyRate>0?debt*monthlyRate/(1-Math.pow(1+monthlyRate,-months)):debt/months;const after=op-payment;const weighted=(val('fuelMargin')/100*fuel+val('shopMargin')/100*shop+val('washMargin')/100*wash)/Math.max(1,rev);const breakEven=weighted>0?(costs+payment)/weighted:0;const locationFactor=val('traffic')*val('competition')*val('catchment')*val('access');const adjusted=gross*locationFactor-costs;const safe=adjusted*(1-val('buffer')/100);const payback=op>0&&val('investment')>0?val('investment')/(op*12):null;
 el('revenue').textContent=euro(rev);el('gross').textContent=euro(gross);el('operating').textContent=euro(op);el('afterInterest').textContent=euro(after);el('breakeven').textContent=euro(breakEven);el('payback').textContent=payback?new Intl.NumberFormat('de-DE',{maximumFractionDigits:1}).format(payback)+' Jahre':'nicht erreicht';el('heroProfit').textContent=euro(adjusted)+' / Monat';el('heroStatus').textContent=adjusted>0?'● Positives Basissignal':'● Kostenmodell prüfen';el('heroStatus').className='pill'+(adjusted<0?' warn':'');
