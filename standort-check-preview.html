@@ -30,13 +30,14 @@
 <div class="field"><label for="shopMargin">Shop-Rohmarge (%)</label><input id="shopMargin" type="number" min="0" max="100" step=".1" value="31"></div>
 <div class="field"><label for="wash">Waschen / Zusatzgeschäft (€)</label><input id="wash" type="number" min="0" step="500" value="12000"></div>
 <div class="field"><label for="washMargin">Rohmarge Zusatzgeschäft (%)</label><input id="washMargin" type="number" min="0" max="100" step=".1" value="48"></div>
+<div class="field full" id="upliftField" hidden><label for="uplift">Zusätzlicher monatlicher Rohertrag durch Modernisierung (€)</label><input id="uplift" type="number" min="0" step="100" value="0"><small>Nur den erwarteten zusätzlichen Rohertrag eintragen – nicht den Umsatz.</small></div>
 </div>
 <div class="section-title">Kosten & Investition</div><div class="fields">
 <div class="field"><label for="staff">Personal / Monat (€)</label><input id="staff" type="number" min="0" step="100" value="18000"></div>
 <div class="field"><label for="rent">Pacht / Miete / Monat (€)</label><input id="rent" type="number" min="0" step="100" value="6500"></div>
 <div class="field"><label for="energy">Energie & Betrieb / Monat (€)</label><input id="energy" type="number" min="0" step="100" value="4800"></div>
 <div class="field"><label for="other">Sonstige Kosten / Monat (€)</label><input id="other" type="number" min="0" step="100" value="5200"></div>
-<div class="field"><label for="investment">Investition / Kaufpreis (€)</label><input id="investment" type="number" min="0" step="5000" value="650000"></div>
+<div class="field"><label for="investment">Gesamtinvestition inkl. Bau & Ausstattung (€)</label><input id="investment" type="number" min="0" step="5000" value="650000"></div>
 <div class="field"><label for="equity">Eigenkapital (€)</label><input id="equity" type="number" min="0" step="5000" value="150000"></div>
 <div class="field"><label for="financeRate">Finanzierungszins (% p.a.)</label><input id="financeRate" type="number" min="0" max="100" step=".1" value="5.5"></div>
 <div class="field"><label for="financeYears">Laufzeit (Jahre)</label><input id="financeYears" type="number" min="1" max="40" step="1" value="15"></div>
@@ -49,7 +50,7 @@
 <div class="field"><label for="competition">Wettbewerb in der Nähe</label><select id="competition"><option value="1.05">Gering</option><option value="1" selected>Mittel</option><option value=".9">Hoch</option><option value=".82">Sehr hoch</option><option value=".95">Noch unbekannt</option></select></div>
 <div class="field"><label for="catchment">Einzugsgebiet</label><select id="catchment"><option value="1.1">Stark / Gewerbe + Wohnen</option><option value="1" selected>Gemischt</option><option value=".9">Eher dünn</option><option value=".82">Ländlich / wenig Frequenz</option></select></div>
 <div class="field"><label for="access">Zufahrt & Sichtbarkeit</label><select id="access"><option value="1.08">Sehr gut</option><option value="1" selected>Gut</option><option value=".9">Eingeschränkt</option><option value=".8">Schwierig</option></select></div>
-</div><p class="notice">Umgebungsfaktoren sind derzeit manuelle Einschätzungen und beeinflussen nur das illustrative Szenario. Keine Live-Karten-, Verkehrs-, Wettbewerbs- oder Bevölkerungsdaten angeschlossen.</p>
+</div><p class="notice" id="modeNote">Neubau: Bau, Technik, Shopausstattung und weitere Investitionskosten vollständig erfassen. Umgebungsfaktoren sind manuelle Einschätzungen und keine Live-Daten.</p>
 </section>
 <section class="glass panel"><h2>Wirtschaftlichkeit auf einen Blick</h2><p class="sub">Vereinfachtes Monatsmodell · Werte vor Steuern</p><div class="results">
 <div class="metric primary"><div class="name">Gesamter Umsatz / Monat</div><strong id="revenue">—</strong><small>Alle Geschäftssäulen</small></div>
@@ -70,10 +71,23 @@
 <p class="notice">* Nicht enthalten: Steuern, Tilgungsplan, Abschreibungen, Umsatzsteuer, Unternehmerlohn, Liquiditätsreserve, Pachtnebenkosten und objektspezifische Einmalkosten. Für Investitionsentscheidungen sind vollständige Unterlagen, reale Standortdaten und fachliche Prüfung erforderlich.</p>
 </main>
 <script>
-const ids=['fuel','fuelMargin','shop','shopMargin','wash','washMargin','staff','rent','energy','other','investment','equity','financeRate','financeYears','growth','costGrowth','buffer','traffic','competition','catchment','access'];
+const ids=['fuel','fuelMargin','shop','shopMargin','wash','washMargin','uplift','staff','rent','energy','other','investment','equity','financeRate','financeYears','growth','costGrowth','buffer','traffic','competition','catchment','access'];
 const el=id=>document.getElementById(id), val=id=>Math.max(0,Number(el(id).value)||0), euro=n=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n), pct=n=>new Intl.NumberFormat('de-DE',{maximumFractionDigits:1}).format(n)+' %';
 let mode='new';
-document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));mode=b.dataset.mode;const presets={new:[650000,150000,15],buy:[850000,250000,12],existing:[0,0,10],upgrade:[180000,60000,8]};const p=presets[mode];el('investment').value=p[0];el('equity').value=p[1];el('financeYears').value=p[2];render()}));
+const modeCopy={
+ new:{investment:'Gesamtinvestition inkl. Bau & Ausstattung (€)',note:'Neubau: Bau, Technik, Shopausstattung und weitere Investitionskosten vollständig erfassen.',upgrade:false},
+ buy:{investment:'Kaufpreis & Übernahmekosten (€)',note:'Übernahme: Kaufpreis und einmalige Übernahmekosten zusammenfassen; Warenbestand und Modernisierung bei Bedarf zusätzlich berücksichtigen.',upgrade:false},
+ existing:{investment:'Zusätzliche Neuinvestition (€)',note:'Bestand: 0 € bedeutet keine neue Investition. Bei geplanten Maßnahmen Betrag und Finanzierung eintragen.',upgrade:false},
+ upgrade:{investment:'Modernisierungsinvestition (€)',note:'Modernisierung: Investitionskosten und erwarteten zusätzlichen monatlichen Rohertrag erfassen.',upgrade:true}
+};
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));mode=b.dataset.mode;
+ const presets={new:[650000,150000,15],buy:[850000,250000,12],existing:[0,0,10],upgrade:[180000,60000,8]};
+ const p=presets[mode];el('investment').value=p[0];el('equity').value=p[1];el('financeYears').value=p[2];
+ el('investment').closest('.field').querySelector('label').textContent=modeCopy[mode].investment;
+ el('upliftField').hidden=!modeCopy[mode].upgrade;
+ render();
+}));
 function svgBars(items){
  const max=Math.max(1,...items.map(x=>Math.abs(x.v))),left=150,right=505,usable=right-left;
  return '<defs><linearGradient id="barBlue" x1="0" x2="1"><stop offset="0" stop-color="#3e9bff"/><stop offset="1" stop-color="#72dcff"/></linearGradient><linearGradient id="barOrange" x1="0" x2="1"><stop offset="0" stop-color="#ff8734"/><stop offset="1" stop-color="#ffc46c"/></linearGradient><linearGradient id="barGreen" x1="0" x2="1"><stop offset="0" stop-color="#39bd9b"/><stop offset="1" stop-color="#8af0ce"/></linearGradient></defs>'+
@@ -100,13 +114,13 @@ function breakEvenSvg(revenue,minimum){
  '<text x="0" y="25" fill="#a9bed4" font-size="11">Aktueller Umsatz</text><rect x="150" y="10" width="350" height="18" rx="7" fill="#ffffff" fill-opacity=".045"/><rect x="150" y="10" width="'+Math.min(350,actual)+'" height="18" rx="7" fill="url(#beBlue)"/><text x="150" y="43" fill="#eaf5ff" font-size="10">'+euro(revenue)+'</text>'+
  '<text x="0" y="72" fill="#a9bed4" font-size="11">Mindestumsatz</text><rect x="150" y="57" width="350" height="18" rx="7" fill="#ffffff" fill-opacity=".045"/><rect x="150" y="57" width="'+Math.min(350,need)+'" height="18" rx="7" fill="url(#beOrange)"/><text x="150" y="91" fill="#eaf5ff" font-size="10">'+euro(minimum)+'</text>';
 }
-function render(){const fuel=val('fuel'),shop=val('shop'),wash=val('wash'),rev=fuel+shop+wash;const gross=fuel*val('fuelMargin')/100+shop*val('shopMargin')/100+wash*val('washMargin')/100;const costs=val('staff')+val('rent')+val('energy')+val('other');const op=gross-costs;const debt=Math.max(0,val('investment')-val('equity'));const monthlyRate=val('financeRate')/100/12;const months=Math.max(1,val('financeYears')*12);const payment=monthlyRate>0?debt*monthlyRate/(1-Math.pow(1+monthlyRate,-months)):debt/months;const after=op-payment;const weighted=(val('fuelMargin')/100*fuel+val('shopMargin')/100*shop+val('washMargin')/100*wash)/Math.max(1,rev);const breakEven=weighted>0?(costs+payment)/weighted:0;const locationFactor=val('traffic')*val('competition')*val('catchment')*val('access');const adjusted=gross*locationFactor-costs;const safe=adjusted*(1-val('buffer')/100);const payback=op>0&&val('investment')>0?val('investment')/(op*12):null;
-el('revenue').textContent=euro(rev);el('gross').textContent=euro(gross);el('operating').textContent=euro(op);el('afterInterest').textContent=euro(after);el('breakeven').textContent=euro(breakEven);el('payback').textContent=payback?new Intl.NumberFormat('de-DE',{maximumFractionDigits:1}).format(payback)+' Jahre':'nicht erreicht';el('heroProfit').textContent=euro(adjusted)+' / Monat';el('heroStatus').textContent=adjusted>0?'● Positives Basissignal':'● Kostenmodell prüfen';el('heroStatus').className='pill'+(adjusted<0?' warn':'');
+function render(){const fuel=val('fuel'),shop=val('shop'),wash=val('wash'),rev=fuel+shop+wash;const tradingGross=fuel*val('fuelMargin')/100+shop*val('shopMargin')/100+wash*val('washMargin')/100;const gross=tradingGross+(mode==='upgrade'?val('uplift'):0);const costs=val('staff')+val('rent')+val('energy')+val('other');const op=gross-costs;const debt=Math.max(0,val('investment')-Math.min(val('equity'),val('investment')));const monthlyRate=val('financeRate')/100/12;const months=Math.max(1,val('financeYears')*12);const payment=monthlyRate>0?debt*monthlyRate/(1-Math.pow(1+monthlyRate,-months)):debt/months;const after=op-payment;const weighted=tradingGross/Math.max(1,rev);const breakEven=weighted>0?(costs+payment-(mode==='upgrade'?val('uplift'):0))/weighted:0;const locationFactor=val('traffic')*val('competition')*val('catchment')*val('access');const adjusted=tradingGross*locationFactor+(mode==='upgrade'?val('uplift'):0)-costs;const safe=adjusted*(1-val('buffer')/100);const payback=op>0&&val('investment')>0?val('investment')/(op*12):null;
+el('revenue').textContent=euro(rev);el('gross').textContent=euro(gross);el('operating').textContent=euro(op);el('afterInterest').textContent=euro(after);el('breakeven').textContent=euro(breakEven);el('payback').textContent=payback?new Intl.NumberFormat('de-DE',{maximumFractionDigits:1}).format(payback)+' Jahre':'nicht erreicht';el('modeNote').textContent=modeCopy[mode].note+' Standortfaktoren sind manuelle Einschätzungen; keine Live-Karten-, Verkehrs-, Wettbewerbs- oder Bevölkerungsdaten angeschlossen.';el('heroProfit').textContent=euro(adjusted)+' / Monat';el('heroStatus').textContent=adjusted>0?'● Positives Basissignal':'● Kostenmodell prüfen';el('heroStatus').className='pill'+(adjusted<0?' warn':'');
 let title,text;if(safe<0){title='⚠ Das Szenario steht unter Druck';text='Im vorsichtigen Szenario reicht das geschätzte Ergebnis nicht aus, um die angesetzten laufenden Kosten sicher zu tragen. Prüfe Marge, Personal, Pacht und Umsatzannahmen.'}else if(op<costs*.15){title='◉ Geringer Ergebnispuffer';text='Das Betriebsergebnis ist im Verhältnis zu den laufenden Kosten knapp. Schon kleine Umsatz- oder Margenrückgänge können die Rechnung drehen.'}else{title='✦ Das Basismodell zeigt einen Überschuss';text='Prüfe nun, ob die Annahmen mit echten Standortdaten belegbar sind. Berücksichtige Anlaufphase, Instandhaltung, Ausfälle und ausreichende Liquiditätsreserve.'}el('insightTitle').textContent=title;el('insightText').textContent=text;
 el('waterfall').innerHTML=svgBars([{n:'Umsatz',v:rev,c:'#5bb8ff'},{n:'Wareneinsatz',v:rev-gross,c:'#ff9b45'},{n:'Laufende Kosten',v:costs,c:'#ff9b45'},{n:'Betriebsergebnis',v:op,c:op>=0?'#63d9b0':'#ff777d'}]);
 const growth=val('growth')/100,costGrowth=val('costGrowth')/100,buffer=val('buffer')/100;
-const forecast=(growthDelta,costDelta)=>Array.from({length:5},(_,i)=>{const years=i+1;const scenarioRevenue=rev*Math.pow(Math.max(0,1+growth+growthDelta),years);const scenarioGross=scenarioRevenue*weighted;const scenarioCosts=costs*Math.pow(1+Math.max(0,costGrowth+costDelta),years);return scenarioGross-scenarioCosts-payment*12;});
-const base=forecast(0,0),cautious=forecast(-.02,.015).map(v=>v*(1-buffer)),optimistic=forecast(.02,-.005);
+const forecast=(growthDelta,costDelta,extraBuffer=0)=>Array.from({length:5},(_,i)=>{const years=i+1;const scenarioRevenue=rev*Math.pow(Math.max(0,1+growth+growthDelta),years);const scenarioGross=scenarioRevenue*weighted+(mode==='upgrade'?val('uplift')*Math.pow(Math.max(0,1+growth+growthDelta),years):0);const scenarioCosts=costs*Math.pow(1+Math.max(0,costGrowth+costDelta),years);const result=scenarioGross-scenarioCosts-payment*12;return result-Math.max(0,scenarioGross)*extraBuffer;});
+const base=forecast(0,0,buffer),cautious=forecast(-.02,.015,Math.min(.8,buffer+.10)),optimistic=forecast(.02,-.005,0);
 el('forecast').innerHTML=lineChart(base,cautious,optimistic);
 el('breakEvenChart').innerHTML=breakEvenSvg(rev,breakEven);
 }
