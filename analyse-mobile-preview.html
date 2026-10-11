@@ -841,4 +841,43 @@ function eeDetective(){eeToast('🕵️ Warenwirtschaftsdetektiv','Fall aufgenom
 function eeRoadtrip(){eeToast('🏁 Route gefunden','Ziel: mehr Ertrag. Weiter geht’s.')}
 function eeMonth(){eeConfetti();eeToast('🏆 Monat geknackt!','Jetzt wird aus Zahlen eine Geschichte.')}
 (function initEasterEggs(){let analyseClicks=0,analyseTimer=null,road='';document.addEventListener('click',e=>{const b=e.target.closest?.('[data-v="analysis"]');if(b){analyseClicks++;clearTimeout(analyseTimer);analyseTimer=setTimeout(()=>analyseClicks=0,1200);if(analyseClicks>=5){analyseClicks=0;eeDetective()}}if(e.target.closest?.('#moneyEgg'))eeMoney()});document.addEventListener('keydown',e=>{if(e.key.length===1){road+=e.key.toLowerCase();road=road.slice(-10);if(road.endsWith('tankstelle')){road='';eeRoadtrip()}}});document.addEventListener('click',e=>{if(e.target.closest?.('#saveMonth'))setTimeout(()=>{const vals=['rev','ek','shrink','writeoff','stock'].map(id=>Number($(id)?.value||0));if(vals.every(Number.isFinite)&&vals.every(v=>v>0)){sessionStorage.setItem('te_month_egg','1');eeMonth()}},350)})})();
-</script></body></html>
+</script>
+<script id="tse-page-swipe-nav-2026-10-11">
+/* Mobile tab navigation: horizontal swipes change app views without hijacking carousels or controls. */
+(function(){
+  if (!('PointerEvent' in window)) return;
+  const navButtons = () => Array.from(document.querySelectorAll('.nav button[data-v]'));
+  let start = null;
+  const ignored = el => !!(el && el.closest(
+    'input,textarea,select,button,a,[contenteditable="true"],.nav,.weather-days,'+
+    '[data-no-page-swipe],canvas,svg,.chart-container,.horizontal-scroll'
+  ));
+  function hasHorizontalScroller(el){
+    for(let node=el; node && node !== document.body; node=node.parentElement){
+      const style=getComputedStyle(node);
+      if((style.overflowX==='auto'||style.overflowX==='scroll') && node.scrollWidth>node.clientWidth+8) return true;
+    }
+    return false;
+  }
+  document.addEventListener('pointerdown', function(e){
+    if(e.pointerType!=='touch' || !e.isPrimary || ignored(e.target) || hasHorizontalScroller(e.target)) { start=null; return; }
+    start={x:e.clientX,y:e.clientY};
+  }, {passive:true});
+  document.addEventListener('pointerup', function(e){
+    if(!start || e.pointerType!=='touch'){start=null;return;}
+    const dx=e.clientX-start.x, dy=e.clientY-start.y;
+    start=null;
+    if(Math.abs(dx)<72 || Math.abs(dx)<Math.abs(dy)*1.35) return;
+    const buttons=navButtons();
+    if(buttons.length<2) return;
+    const active=buttons.findIndex(b=>b.classList.contains('active'));
+    if(active<0) return;
+    /* Requested behavior: swipe right advances from Analyse to Insights & KI. */
+    const next=dx>0 ? active+1 : active-1;
+    if(next<0 || next>=buttons.length) return;
+    nav(buttons[next].dataset.v);
+  }, {passive:true});
+  document.addEventListener('pointercancel',function(){start=null;},{passive:true});
+})();
+</script>
+</body></html>
