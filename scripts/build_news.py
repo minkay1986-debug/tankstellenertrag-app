@@ -5,12 +5,12 @@ from xml.etree import ElementTree as ET
 
 BASE="https://app.tankstellenertrag.de"
 FEEDS=[
- ("Tankstellen & Branche","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstelle Branche Deutschland")+"&hl=de&gl=DE&ceid=DE:de"),
- ("Shop & Sortiment","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstelle Shop Sortiment Convenience Deutschland")+"&hl=de&gl=DE&ceid=DE:de"),
- ("Food & Backshop","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstelle Backshop Bistro Food Convenience Deutschland")+"&hl=de&gl=DE&ceid=DE:de"),
- ("Studien & Kennzahlen","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstellen Studie Shop Konsum Deutschland")+"&hl=de&gl=DE&ceid=DE:de"),
- ("Neuheiten","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstelle neues Produkt Neuheit Getränke Snacks Deutschland")+"&hl=de&gl=DE&ceid=DE:de"),
- ("Regulierung","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstelle neue Regelung Gesetz Deutschland Shop")+"&hl=de&gl=DE&ceid=DE:de"),
+ ("Tankstellen & Branche","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstelle Branche Deutschland when:45d")+"&hl=de&gl=DE&ceid=DE:de"),
+ ("Shop & Sortiment","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstelle Shop Sortiment Convenience Deutschland when:45d")+"&hl=de&gl=DE&ceid=DE:de"),
+ ("Food & Backshop","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstelle Backshop Bistro Food Convenience Deutschland when:45d")+"&hl=de&gl=DE&ceid=DE:de"),
+ ("Studien & Kennzahlen","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstellen Studie Shop Konsum Deutschland when:45d")+"&hl=de&gl=DE&ceid=DE:de"),
+ ("Neuheiten","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstelle neues Produkt Neuheit Getränke Snacks Deutschland when:45d")+"&hl=de&gl=DE&ceid=DE:de"),
+ ("Regulierung","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstelle neue Regelung Gesetz Deutschland Shop when:45d")+"&hl=de&gl=DE&ceid=DE:de"),
 ]
 KEYWORDS={"tankstelle":4,"tankstellen":4,"shop":3,"convenience":3,"backshop":3,"bistro":3,"warenwirtschaft":5,"sortiment":4,"marge":4,"studie":3,"neuheit":3,"produkt":3,"snack":2,"getränk":2,"regul":2,"pfand":2,"verkauf":1}
 
@@ -76,6 +76,9 @@ for category,status,count,old_count,error in feed_stats:
     print(f"[FEED] {category}: {status}; passende Meldungen={count}; älter als 45 Tage verworfen={old_count}" + (f"; Details={error}" if error else ""))
 
 items=sorted(items.values(),key=lambda x:(x["published"],x["score"]),reverse=True)[:30]
+# Fail closed: never replace the published news archive with a tiny/empty result.
+if len(items) < 5:
+    raise SystemExit(f"FEHLER: Nur {len(items)} passende Meldungen gefunden. Bestehende News-Dateien bleiben unverändert.")
 os.makedirs("news/articles",exist_ok=True)
 out=[]
 for n in items:
