@@ -255,7 +255,13 @@ button.btn,button:not(.nav button){border-radius:11px}
  .weather-day-card{flex-basis:142px;width:142px;min-width:142px;max-width:142px}
  .wow-card{padding:14px!important}
 }
-</style>
+
+/* tse-swipe-touch-action-2026-10-11: Allow vertical page scrolling while preserving horizontal swipe gestures on ordinary KPI/content cards. */
+@media (max-width: 900px) {
+  .view .card, .view .panel, .view .wow-card, .view .month-hero {
+    touch-action: pan-y;
+  }
+}</style>
 </head><body><div class="app"><aside class="side"><div class="brand">Tankstellen<span>Ertrag</span></div><div class="tag">Wirtschaftlichkeit · Warenwirtschaft · Ertrag</div><div class="panel" style="margin:0 0 16px;padding:11px;font-size:11px"><b>Aus der Tankstellenpraxis</b><br>für Tankstellen entwickelt.</div><div class="nav"><button class="active" data-v="dashboard">Übersicht</button><button data-v="meinmonat"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-6"/></svg> Mein Monat</button><button data-v="monthly">Monatsdaten</button><button data-v="analysis">Analyse</button><button data-v="insights"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m19 15 .9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9Z"/></svg> Insights & KI</button><button data-v="forecast"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 0-4 12.7c.7.5 1 1.2 1 2.3h6c0-1.1.3-1.8 1-2.3A7 7 0 0 0 12 3Z"/><path d="M9 21h6M10 18h4M12 6v2M6.5 8.5 8 10M17.5 8.5 16 10"/></svg> Prognose & Ausblick</button><button data-v="radar"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg> Ertragsradar</button><button data-v="yearly">Jahresauswertung</button><button data-v="report">Beratungsbericht</button><button type="button" id="navDiniLove" class="dini-tab"><span class="dini-label"><span class="dini-icon">🥐</span>DiniLove</span><span class="dini-sub">Reste retten · Bistro</span></button><button data-v="feedback">⭐ Feedback</button><button data-v="sources">Branchenwissen</button><button data-v="settings">Beratungseinstellungen</button><button data-v="account"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg> Kundenkonto</button></div></aside><main class="main"><div id="gate" class="panel">Verbindung zur Station wird hergestellt …</div><div id="app" style="display:none"><div id="stationInfo" class="panel"></div>
 <section id="dashboard" class="view active"><div class="top"><div><div class="eyebrow">Ihr Überblick</div><div class="h1">Stationsergebnis</div><p class="sub">Shop-Umsatz, Shop-Rohertrag, Shop-Marge, Schwund und Bestandsentwicklung auf einen Blick.<br><span class="small">Kraftstoff und Waschen werden separat betrachtet und nicht in die Shop-Marge einbezogen.</span></p></div><div class="badge">Geschützte Auswertung</div></div><div id="kpis" class="grid cards"></div><div id="dashAlerts" class="panel"></div><div class="panel"><h2>Monatsentwicklung</h2><div id="trend"></div></div></section>
 <section id="meinmonat" class="view">
@@ -843,34 +849,28 @@ function eeMonth(){eeConfetti();eeToast('🏆 Monat geknackt!','Jetzt wird aus Z
 (function initEasterEggs(){let analyseClicks=0,analyseTimer=null,road='';document.addEventListener('click',e=>{const b=e.target.closest?.('[data-v="analysis"]');if(b){analyseClicks++;clearTimeout(analyseTimer);analyseTimer=setTimeout(()=>analyseClicks=0,1200);if(analyseClicks>=5){analyseClicks=0;eeDetective()}}if(e.target.closest?.('#moneyEgg'))eeMoney()});document.addEventListener('keydown',e=>{if(e.key.length===1){road+=e.key.toLowerCase();road=road.slice(-10);if(road.endsWith('tankstelle')){road='';eeRoadtrip()}}});document.addEventListener('click',e=>{if(e.target.closest?.('#saveMonth'))setTimeout(()=>{const vals=['rev','ek','shrink','writeoff','stock'].map(id=>Number($(id)?.value||0));if(vals.every(Number.isFinite)&&vals.every(v=>v>0)){sessionStorage.setItem('te_month_egg','1');eeMonth()}},350)})})();
 </script>
 <script id="tse-page-swipe-nav-2026-10-11">
-/* Mobile page swipes: avoid treating the whole main layout as a horizontal carousel. */
+/* Swipe horizontally from ordinary content cards to move between adjacent app views. */
 (function(){
-  let origin=null,last=0;
-  const navButtons=()=>Array.from(document.querySelectorAll('.nav button[data-v]'));
-  const ignored=el=>!!(el&&el.closest('input,textarea,select,button,a,[contenteditable="true"],.nav,.weather-days,[data-no-page-swipe],.horizontal-scroll,[data-horizontal-carousel]'));
-  function begin(x,y,target){if(ignored(target)){origin=null;return;}origin={x,y};}
-  function finish(x,y){
-    if(!origin)return;
-    const dx=x-origin.x,dy=y-origin.y;origin=null;
+  let start=null,last=0;
+  const buttons=()=>Array.from(document.querySelectorAll('.nav button[data-v]'));
+  const ignored=el=>!!(el&&el.closest('input,textarea,select,button,a,[contenteditable="true"],.nav,.weather-days,.weather-day-card,[data-no-page-swipe],[data-horizontal-carousel]'));
+  function down(e){
+    if(e.pointerType!=='touch'||!e.isPrimary||ignored(e.target)){start=null;return;}
+    start={x:e.clientX,y:e.clientY,target:e.target};
+  }
+  function up(e){
+    if(e.pointerType!=='touch'||!start)return;
+    const dx=e.clientX-start.x,dy=e.clientY-start.y;start=null;
     if(Math.abs(dx)<45||Math.abs(dx)<Math.abs(dy)*1.25||Date.now()-last<450)return;
-    const list=navButtons(),active=list.findIndex(b=>b.classList.contains('active'));
+    const list=buttons(),active=list.findIndex(b=>b.classList.contains('active'));
     if(active<0)return;
     const next=dx>0?active+1:active-1;
     if(next<0||next>=list.length)return;
     last=Date.now();list[next].click();
   }
-  document.addEventListener('touchstart',e=>{
-    if(e.touches.length!==1){origin=null;return;}
-    const p=e.touches[0];begin(p.clientX,p.clientY,e.target);
-  },{capture:true,passive:true});
-  document.addEventListener('touchend',e=>{
-    if(!e.changedTouches.length)return;
-    const p=e.changedTouches[0];finish(p.clientX,p.clientY);
-  },{capture:true,passive:true});
-  document.addEventListener('touchcancel',()=>{origin=null;},{capture:true,passive:true});
-  document.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'&&e.isPrimary)begin(e.clientX,e.clientY,e.target);},{capture:true,passive:true});
-  document.addEventListener('pointerup',e=>{if(e.pointerType==='touch')finish(e.clientX,e.clientY);},{capture:true,passive:true});
-  document.addEventListener('pointercancel',()=>{origin=null;},{capture:true,passive:true});
+  document.addEventListener('pointerdown',down,{capture:true,passive:true});
+  document.addEventListener('pointerup',up,{capture:true,passive:true});
+  document.addEventListener('pointercancel',()=>{start=null;},{capture:true,passive:true});
 })();
 </script>
 </body></html>
