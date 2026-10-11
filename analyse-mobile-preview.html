@@ -855,8 +855,9 @@ function eeMonth(){eeConfetti();eeToast('🏆 Monat geknackt!','Jetzt wird aus Z
   const navButtons=()=>Array.from(document.querySelectorAll('.nav button[data-v]'));
   const views=()=>Array.from(document.querySelectorAll('.view'));
   const ignored=el=>!!(el&&el.closest('input,textarea,select,button,a,[contenteditable="true"],.nav,.weather-days,.weather-day-card,[data-no-page-swipe],[data-horizontal-carousel]'));
+  const inMain=el=>!!(el&&el.closest('.main'));
   function down(e){
-    if(e.touches.length!==1||ignored(e.target)){start=null;return;}
+    if(e.touches.length!==1||ignored(e.target)||!inMain(e.target)){start=null;return;}
     const p=e.touches[0];start={x:p.clientX,y:p.clientY};
   }
   function up(e){
@@ -877,12 +878,12 @@ function eeMonth(){eeConfetti();eeToast('🏆 Monat geknackt!','Jetzt wird aus Z
     const direction=dx<0?-1:1;
     const duration=220;
     oldView.style.transition='transform '+duration+'ms ease, opacity '+duration+'ms ease';
-    oldView.style.transform='translateX('+(-direction*24)+'px)';
+    oldView.style.transform='translateX('+(direction*24)+'px)';
     oldView.style.opacity='.72';
     window.setTimeout(()=>{
       list[next].click();
       newView.style.transition='none';
-      newView.style.transform='translateX('+(direction*24)+'px)';
+      newView.style.transform='translateX('+(-direction*24)+'px)';
       newView.style.opacity='.72';
       /* Force style calculation before animating the incoming view into place. */
       void newView.offsetWidth;
