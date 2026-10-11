@@ -262,7 +262,12 @@ button.btn,button:not(.nav button){border-radius:11px}
   .view .card, .view .panel, .view .wow-card, .view .month-hero {
     touch-action: pan-y;
   }
-}</style>
+}
+/* Fix: keep the full left navigation reachable on short screens and desktop zoom. */
+.side{overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;scrollbar-width:thin;}
+.side .nav{min-height:0;overflow-y:visible;}
+@media (min-width:1101px){.side{position:sticky;top:0;height:100vh;align-self:start;}}
+</style>
 
 <style id="mobile-analysis-kpi-grid-fix-2026-10-11">
 /* Mobile: compact analysis KPIs without changing forms, charts, or calculation logic. */
