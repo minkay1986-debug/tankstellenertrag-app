@@ -57,7 +57,7 @@ for category,url in FEEDS:
                 continue
             combined=(title+" "+desc).lower()
             # Exclude celebrity/entertainment stories that merely mention a gas station.
-            noise_terms=("bademantel","promi","prominente","schöneberger","celebrity","klatsch","tratsch","liebesleben","tv-star")
+            noise_terms=("bademantel","promi","prominente","schöneberger","celebrity","klatsch","tratsch","liebesleben","tv-star","krebsrisiko","magenkrebs","krebs-studie","krebsrisiko","krankheitsrisiko","medizinische warnung","gesundheitsrisiko","weinbergen","klimawandel","starkregen in österreich","hitzebekämpfung")
             if any(term in combined for term in noise_terms):
                 print(f"[FILTER] Nicht fachlich relevant: {title[:100]}")
                 continue
