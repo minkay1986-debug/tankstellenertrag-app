@@ -1,5 +1,5 @@
 import html, json, os, re, urllib.parse, urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
 from xml.etree import ElementTree as ET
 
@@ -19,8 +19,13 @@ def clean(s):
     return re.sub(r"\s+"," ",html.unescape(s)).strip()
 
 def date_of(s):
-    try:return parsedate_to_datetime(s).astimezone(timezone.utc).isoformat()
-    except:return datetime.now(timezone.utc).isoformat()
+    try:
+        parsed = parsedate_to_datetime(s)
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc).isoformat()
+    except Exception:
+        return ""
 
 def slug(s):
     s=re.sub(r"[^a-z0-9äöüß ]+","",s.lower()).replace("ä","ae").replace("ö","oe").replace("ü","ue").replace("ß","ss")
@@ -31,7 +36,12 @@ def fetch(url):
     with urllib.request.urlopen(req,timeout=20) as r:return r.read()
 
 items={}
+feed_stats=[]
+now=datetime.now(timezone.utc)
+minimum_date=now-timedelta(days=45)
 for category,url in FEEDS:
+    feed_count=0
+    rejected_old=0
     try:
         root=ET.fromstring(fetch(url))
         for it in root.findall(".//item"):
@@ -39,6 +49,13 @@ for category,url in FEEDS:
             link=it.findtext("link") or ""
             desc=clean(it.findtext("description"))
             pub=date_of(it.findtext("pubDate") or "")
+            if not pub:
+                print(f"[WARN] {category}: Meldung ohne gültiges Veröffentlichungsdatum übersprungen: {title[:100]}")
+                continue
+            published_dt=datetime.fromisoformat(pub)
+            if published_dt < minimum_date:
+                rejected_old += 1
+                continue
             score=sum(v for k,v in KEYWORDS.items() if k in (title+" "+desc).lower())
             if score<4 or not title or not link: continue
             source=clean((re.search(r"\s-\s([^\-]+)$",title).group(1) if re.search(r"\s-\s([^\-]+)$",title) else "Originalquelle"))
@@ -48,10 +65,17 @@ for category,url in FEEDS:
             key=link.split("&")[0]
             item={"title":title,"link":link,"date":pub[:10],"published":pub,"category":category,"source":source,"summary":summary,"score":score}
             items[key]=item
-    except Exception:
-        continue
+            feed_count += 1
+        feed_stats.append((category, "OK", feed_count, rejected_old, ""))
+    except Exception as exc:
+        message=f"{type(exc).__name__}: {exc}"
+        print(f"[ERROR] Feed '{category}' konnte nicht gelesen werden: {message}")
+        feed_stats.append((category, "FEHLER", feed_count, rejected_old, message))
 
-items=sorted(items.values(),key=lambda x:(x["score"],x["published"]),reverse=True)[:30]
+for category,status,count,old_count,error in feed_stats:
+    print(f"[FEED] {category}: {status}; passende Meldungen={count}; älter als 45 Tage verworfen={old_count}" + (f"; Details={error}" if error else ""))
+
+items=sorted(items.values(),key=lambda x:(x["published"],x["score"]),reverse=True)[:30]
 os.makedirs("news/articles",exist_ok=True)
 out=[]
 for n in items:
@@ -66,4 +90,9 @@ open("news/news.json","w",encoding="utf-8").write(json.dumps(out,ensure_ascii=Fa
 urls=[BASE+"/news.html"]+[BASE+"/news/articles/"+n["slug"]+".html" for n in out]
 xml='<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join(f"<url><loc>{html.escape(u)}</loc></url>" for u in urls)+"</urlset>"
 open("news-sitemap.xml","w",encoding="utf-8").write(xml)
-print(f"Generated {len(out)} news items")
+fresh_count=sum(1 for n in out if n.get("date") and (now-datetime.fromisoformat(n["date"]+"T00:00:00+00:00")).days <= 7)
+print(f"Generated {len(out)} news items; davon {fresh_count} innerhalb der letzten 7 Tage")
+if not out:
+    raise SystemExit("FEHLER: Keine aktuellen Meldungen erzeugt. Bestehende News-Dateien dürfen nicht leer veröffentlicht werden.")
+if not any(status == "OK" for _,status,_,_,_ in feed_stats):
+    raise SystemExit("FEHLER: Kein einziger RSS-Feed konnte erfolgreich gelesen werden.")
