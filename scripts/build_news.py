@@ -5,14 +5,13 @@ from xml.etree import ElementTree as ET
 
 BASE="https://app.tankstellenertrag.de"
 FEEDS=[
- ("Tankstellen & Branche","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstelle Branche Deutschland when:45d")+"&hl=de&gl=DE&ceid=DE:de"),
- ("Shop & Sortiment","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstelle Shop Sortiment Convenience Deutschland when:45d")+"&hl=de&gl=DE&ceid=DE:de"),
- ("Food & Backshop","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstelle Backshop Bistro Food Convenience Deutschland when:45d")+"&hl=de&gl=DE&ceid=DE:de"),
- ("Studien & Kennzahlen","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstellen Studie Shop Konsum Deutschland when:45d")+"&hl=de&gl=DE&ceid=DE:de"),
- ("Neuheiten","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstelle neues Produkt Neuheit Getränke Snacks Deutschland when:45d")+"&hl=de&gl=DE&ceid=DE:de"),
- ("Regulierung","https://news.google.com/rss/search?q="+urllib.parse.quote("Tankstelle neue Regelung Gesetz Deutschland Shop when:45d")+"&hl=de&gl=DE&ceid=DE:de"),
+ ("Warenwirtschaft & Studien","https://news.google.com/rss/search?q="+urllib.parse.quote('(Tankstelle OR Tankstellenshop OR Convenience) (Warenwirtschaft OR Marge OR Wareneinsatz OR Studie OR Untersuchung) when:45d')+"&hl=de&gl=DE&ceid=DE:de"),
+ ("Einkaufsverhalten & Shopper Insights","https://news.google.com/rss/search?q="+urllib.parse.quote('(Tankstelle OR Convenience OR Snack OR Getränke) (Einkaufsverhalten OR Kaufverhalten OR Shopper OR Konsumenten OR Kaufbereitschaft OR Studie) when:45d')+"&hl=de&gl=DE&ceid=DE:de"),
+ ("Wetter & Nachfrage","https://news.google.com/rss/search?q="+urllib.parse.quote('(Einzelhandel OR Tankstelle OR Gastronomie OR Getränke) (Wetter OR Temperatur OR Hitze OR Regen OR Schnee) (Umsatz OR Nachfrage OR Kaufverhalten OR Studie) when:45d')+"&hl=de&gl=DE&ceid=DE:de"),
+ ("Events & Kaufbereitschaft","https://news.google.com/rss/search?q="+urllib.parse.quote('(Einzelhandel OR Tankstelle OR Convenience OR Getränke OR Snacks) (Event OR Veranstaltung OR Feiertag OR Fußball OR Festival) (Umsatz OR Nachfrage OR Kaufverhalten OR Studie) when:45d')+"&hl=de&gl=DE&ceid=DE:de"),
+ ("Konsumforschung & Kaufbereitschaft","https://news.google.com/rss/search?q="+urllib.parse.quote('(Kaufbereitschaft OR Konsumverhalten OR Kaufabsicht OR Shopper Insights) (Lebensmittel OR Getränke OR Snacks OR Einzelhandel) Studie Deutschland when:45d')+"&hl=de&gl=DE&ceid=DE:de"),
 ]
-KEYWORDS={"tankstelle":4,"tankstellen":4,"shop":3,"convenience":3,"backshop":3,"bistro":3,"warenwirtschaft":5,"sortiment":4,"marge":4,"studie":3,"neuheit":3,"produkt":3,"snack":2,"getränk":2,"regul":2,"pfand":2,"verkauf":1}
+KEYWORDS={"warenwirtschaft":6,"wareneinsatz":6,"marge":5,"shopper insights":6,"einkaufsverhalten":6,"kaufverhalten":5,"kaufbereitschaft":6,"kaufabsicht":6,"konsumverhalten":5,"konsumenten":3,"studie":4,"untersuchung":3,"umsatz":2,"nachfrage":3,"wetter":3,"temperatur":2,"hitze":2,"regen":2,"schnee":2,"event":3,"veranstaltung":3,"feiertag":3,"fußball":2,"festival":2,"einzelhandel":2,"tankstelle":3,"tankstellenshop":4,"convenience":3,"snack":2,"getränk":2}
 
 def clean(s):
     s=re.sub(r"<[^>]+>"," ",s or "")
