@@ -843,52 +843,34 @@ function eeMonth(){eeConfetti();eeToast('🏆 Monat geknackt!','Jetzt wird aus Z
 (function initEasterEggs(){let analyseClicks=0,analyseTimer=null,road='';document.addEventListener('click',e=>{const b=e.target.closest?.('[data-v="analysis"]');if(b){analyseClicks++;clearTimeout(analyseTimer);analyseTimer=setTimeout(()=>analyseClicks=0,1200);if(analyseClicks>=5){analyseClicks=0;eeDetective()}}if(e.target.closest?.('#moneyEgg'))eeMoney()});document.addEventListener('keydown',e=>{if(e.key.length===1){road+=e.key.toLowerCase();road=road.slice(-10);if(road.endsWith('tankstelle')){road='';eeRoadtrip()}}});document.addEventListener('click',e=>{if(e.target.closest?.('#saveMonth'))setTimeout(()=>{const vals=['rev','ek','shrink','writeoff','stock'].map(id=>Number($(id)?.value||0));if(vals.every(Number.isFinite)&&vals.every(v=>v>0)){sessionStorage.setItem('te_month_egg','1');eeMonth()}},350)})})();
 </script>
 <script id="tse-page-swipe-nav-2026-10-11">
-/* Global capture-phase swipe handler: card scripts cannot stop the gesture before it is seen. */
+/* Mobile page swipes: avoid treating the whole main layout as a horizontal carousel. */
 (function(){
-  let start=null,last=0;
+  let origin=null,last=0;
   const navButtons=()=>Array.from(document.querySelectorAll('.nav button[data-v]'));
-  const ignored=el=>!!(el&&el.closest('input,textarea,select,button,a,[contenteditable="true"],.nav,.weather-days,[data-no-page-swipe]'));
-  function begin(x,y,target){
-    if(ignored(target)){start=null;return;}
-    start={x,y,target};
-  }
+  const ignored=el=>!!(el&&el.closest('input,textarea,select,button,a,[contenteditable="true"],.nav,.weather-days,[data-no-page-swipe],.horizontal-scroll,[data-horizontal-carousel]'));
+  function begin(x,y,target){if(ignored(target)){origin=null;return;}origin={x,y};}
   function finish(x,y){
-    if(!start)return;
-    const dx=x-start.x,dy=y-start.y,target=start.target;start=null;
-    if(Math.abs(dx)<45||Math.abs(dx)<Math.abs(dy)*1.25)return;
-    /* Let a horizontally scrollable component consume its own swipe whenever it can move. */
-    for(let n=target;n&&n!==document.body;n=n.parentElement){
-      const cs=getComputedStyle(n);
-      if((cs.overflowX==='auto'||cs.overflowX==='scroll')&&n.scrollWidth>n.clientWidth+8){
-        const max=n.scrollWidth-n.clientWidth;
-        if((dx<0&&n.scrollLeft<max-1)||(dx>0&&n.scrollLeft>1))return;
-      }
-    }
-    if(Date.now()-last<450)return;
+    if(!origin)return;
+    const dx=x-origin.x,dy=y-origin.y;origin=null;
+    if(Math.abs(dx)<45||Math.abs(dx)<Math.abs(dy)*1.25||Date.now()-last<450)return;
     const list=navButtons(),active=list.findIndex(b=>b.classList.contains('active'));
     if(active<0)return;
     const next=dx>0?active+1:active-1;
     if(next<0||next>=list.length)return;
-    last=Date.now();
-    list[next].click();
+    last=Date.now();list[next].click();
   }
-  /* Capture phase is intentional: catches gestures even if card/chart code stops bubbling. */
   document.addEventListener('touchstart',e=>{
-    if(e.touches.length!==1){start=null;return;}
+    if(e.touches.length!==1){origin=null;return;}
     const p=e.touches[0];begin(p.clientX,p.clientY,e.target);
   },{capture:true,passive:true});
   document.addEventListener('touchend',e=>{
     if(!e.changedTouches.length)return;
     const p=e.changedTouches[0];finish(p.clientX,p.clientY);
   },{capture:true,passive:true});
-  document.addEventListener('touchcancel',()=>{start=null;},{capture:true,passive:true});
-  document.addEventListener('pointerdown',e=>{
-    if(e.pointerType==='touch'&&e.isPrimary)begin(e.clientX,e.clientY,e.target);
-  },{capture:true,passive:true});
-  document.addEventListener('pointerup',e=>{
-    if(e.pointerType==='touch')finish(e.clientX,e.clientY);
-  },{capture:true,passive:true});
-  document.addEventListener('pointercancel',()=>{start=null;},{capture:true,passive:true});
+  document.addEventListener('touchcancel',()=>{origin=null;},{capture:true,passive:true});
+  document.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'&&e.isPrimary)begin(e.clientX,e.clientY,e.target);},{capture:true,passive:true});
+  document.addEventListener('pointerup',e=>{if(e.pointerType==='touch')finish(e.clientX,e.clientY);},{capture:true,passive:true});
+  document.addEventListener('pointercancel',()=>{origin=null;},{capture:true,passive:true});
 })();
 </script>
 </body></html>
