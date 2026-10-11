@@ -165,12 +165,13 @@ button.btn,button:not(.nav button){border-radius:11px}
 
 
 
-<style id="mobile-analysis-layout-preview-v7">
+
+<style id="mobile-analysis-layout-preview-v8">
 @media screen and (max-width: 600px) {
-  /* All analysis priority-card groups, not just the monthly focus */
+  /* Only the "Ihre wichtigsten Prüffelder" section gets a one-column layout */
   .wow-grid {
     display:grid !important;
-    grid-template-columns:minmax(0,1fr) !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
     grid-auto-flow:row !important;
     gap:10px !important;
     width:100% !important;
@@ -178,8 +179,8 @@ button.btn,button:not(.nav button){border-radius:11px}
   }
   .wow-grid > .wow-card {
     display:block !important;
-    grid-column:1 / -1 !important;
-    width:100% !important;
+    grid-column:auto !important;
+    width:auto !important;
     min-width:0 !important;
     max-width:100% !important;
     min-height:0 !important;
@@ -187,6 +188,14 @@ button.btn,button:not(.nav button){border-radius:11px}
     box-sizing:border-box !important;
     padding:13px 14px 14px 17px !important;
     overflow:visible !important;
+  }
+  /* Monthly focus cards remain full-width and legible */
+  #meinMonatContent .wow-grid {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  #meinMonatContent .wow-grid > .wow-card {
+    grid-column:1 / -1 !important;
+    width:100% !important;
   }
   .wow-card .risk-status {
     display:flex !important;
