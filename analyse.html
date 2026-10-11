@@ -1063,11 +1063,11 @@ function eeMonth(){eeConfetti();eeToast('🏆 Monat geknackt!','Jetzt wird aus Z
   } else {
    const opening=num(tile,'opening'),delivery=num(tile,'delivery'),sold=num(tile,'sold'),closing=num(tile,'closing'),writeoff=num(tile,'writeoff')||0;
    if([opening,delivery,sold,closing].some(v=>v==null)||[opening,delivery,sold,closing,writeoff].some(v=>v<0)){out.innerHTML='<p>Bitte Anfangsbestand, Lieferungen, Verkäufe und Endbestand gültig erfassen.</p>';return;}
-   const expected=opening+delivery-sold-writeoff,diff=closing-expected;
+   const expected=opening+delivery-sold-writeoff,diff=expected-closing;
    record.opening=opening;record.delivery=delivery;record.sold=sold;record.closing=closing;record.writeoff=writeoff;record.diff=diff;
    lines.push('Rechnerischer Soll-Endbestand: <b>'+expected+'</b> Stück.');
-   lines.push('Differenz Ist zu Soll: <b>'+diff+'</b> Stück.');
-   lines.push(diff<0?'Prüfen: möglicher Fehlbestand, nicht dokumentierte Abschrift, Buchungs- oder Lieferabweichung.':diff>0?'Prüfen: möglicher Buchungszeitpunkt, Mehrlieferung oder Zählabweichung.':'Keine Differenz aus den eingegebenen Werten.');
+   lines.push('Fehlbestand rechnerisch (Soll-Endbestand minus Ist-Endbestand): <b>'+(diff>0?'+':'')+diff+'</b> Stück.');
+   lines.push(diff>0?'Prüfen: rechnerischer Fehlbestand, nicht dokumentierte Abschrift, Buchungs- oder Lieferabweichung.':diff<0?'Prüfen: möglicher Überbestand oder Buchungs-/Einheitenabweichung.':'Keine Differenz aus den eingegebenen Werten.');
    lines.push('Die Differenz allein beweist keinen Schwund oder Diebstahl.');
   }
   const storageKey=histKey(station,id);let history=[];
