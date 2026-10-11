@@ -108,7 +108,7 @@ body{background:radial-gradient(ellipse at 15% 0%,rgba(44,104,190,.24),transpare
 <section class="ctaSection publicOnly"><div class="wrap"><div><div class="eyebrow">Pilotphase</div><h2>Erkennen, wo Geld im Shop liegen bleibt.</h2><p>Teste TankstellenErtrag mit deinen Monatsdaten und erhalte eine klare wirtschaftliche Auswertung.</p></div><button id="bottomTest" class="cta">Jetzt kostenlos testen</button></div></section>
 <section id="authView" class="auth hidden"><div class="wrap"><div class="authBox"><button id="closeAuth" type="button" class="close" aria-label="Anmeldefenster schließen" onclick="document.getElementById('authView').classList.add('hidden');document.body.style.overflow='';return false;">×</button><div class="eyebrow">Geschützter Kundenbereich</div><h2 id="formTitle">Anmelden</h2><p id="formHint" class="small">Mit Ihrem Kundenkonto anmelden.</p><div class="form"><div class="field signupField"><label>Name / Ansprechpartner</label><input id="fullName" type="text" autocomplete="name" placeholder="Vor- und Nachname"></div><div class="field signupField"><label>Tankstellenname</label><input id="stationName" type="text" autocomplete="organization" placeholder="Name der Tankstelle"></div><div class="field signupField"><label>PLZ / Ort</label><input id="location" type="text" autocomplete="address-level2" placeholder="z. B. 86150 Augsburg"></div><div class="field signupField"><label>Telefon <span class="small">(optional)</span></label><input id="phone" type="tel" autocomplete="tel" placeholder="Telefonnummer"></div><div class="field"><label>E-Mail</label><input id="email" type="email" autocomplete="email" placeholder="name@unternehmen.de"></div><div class="field"><label>Passwort</label><input id="password" type="password" autocomplete="new-password" placeholder="Mindestens 10 Zeichen"><div id="passwordHint" class="small hidden">Mindestens 10 Zeichen, Groß- und Kleinbuchstabe, Zahl und Sonderzeichen.</div></div><div class="field signupField"><label>Passwort wiederholen</label><div style="position:absolute;left:-9999px;top:-9999px;height:1px;width:1px;overflow:hidden" aria-hidden="true"><label for="website_hp">Website</label><input id="website_hp" name="website_hp" type="text" tabindex="-1" autocomplete="off"></div><input id="password2" type="password" autocomplete="new-password" placeholder="Passwort erneut eingeben"></div><div id="signupLegal" class="signupLegal hidden"><label class="legalCheck"><input id="businessConfirm" type="checkbox"> <span>Ich bestätige, dass ich TankstellenErtrag als Unternehmer im Sinne des § 14 BGB nutze.</span></label><label class="legalCheck"><input id="agbConfirm" type="checkbox"> <span>Ich akzeptiere die <a href="./agb.html" target="_blank" rel="noopener noreferrer">AGB</a> und habe die <a href="./datenschutz.html" target="_blank" rel="noopener noreferrer">Datenschutzerklärung</a> gelesen.</span></label></div><label class="rememberRow"><input id="rememberMe" type="checkbox" checked> <span>Angemeldet bleiben</span></label><div class="actions"><button class="btn primary" id="loginBtn">Anmelden</button><button class="btn secondary" id="signupBtn">Konto registrieren</button></div></div><div id="status" class="status">Verbindung wird geprüft …</div></div></div></section>
 <div id="mfaPanel" class="mfaPanel hidden"><div class="mfaBox"><div class="eyebrow">Admin-Sicherheit</div><h2 id="mfaTitle">Zwei-Faktor-Anmeldung</h2><p id="mfaText" class="small">Schütze dein Administrator-Konto mit einer Authenticator-App.</p><div id="mfaSetupContent"><p class="small">1. QR-Code mit Google Authenticator, Microsoft Authenticator oder einer anderen TOTP-App scannen.</p><img id="mfaQr" class="mfaQr" alt="MFA QR-Code"><p class="small">Falls der QR-Code nicht funktioniert, kannst du diesen Schlüssel manuell eingeben:</p><div id="mfaSecret" class="mfaSecret"></div></div><p class="small">2. Den 6-stelligen Code aus der App eingeben:</p><input id="mfaCode" class="mfaCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000"><div class="mfaActions"><button id="mfaVerify" class="btn primary">MFA aktivieren</button><button id="mfaCancel" class="btn secondary">Abbrechen</button></div><div id="mfaMsg" class="status mfaMsg"></div></div></div>
-<section id="adminView" class="dashboard hidden"><div class="wrap"><div class="panel adminPanel"><div class="eyebrow">Administration</div><div class="adminHead"><div id="visitorStats" class="visitorStats"><div class="visitorStat"><span>Besucher heute</span><b id="statToday">–</b></div><div class="visitorStat"><span>Letzte 7 Tage</span><b id="stat7">–</b></div><div class="visitorStat"><span>Diesen Monat</span><b id="statMonth">–</b></div><div class="visitorStat"><span>Pilotbewerbungen</span><b id="statApplications">–</b></div></div><div class="adminActions"><div><h2>Bewerber</h2><p class="small">Pilotanfragen und Zugänge verwalten.</p></div><button id="refreshApplicants" type="button" class="btn secondary adminRefresh" onclick="refreshAdminData(); return false;">Aktualisieren</button><button id="runDeletionJob" type="button" class="btn secondary adminRefresh" onclick="runDeletionJob(); return false;">Löschungen prüfen</button></div></div><div id="adminStatus" class="status">Bewerber werden geladen …</div><div id="adminDiagnostics" class="adminDiagnostics hidden" aria-live="polite"><div class="adminDiagHead"><div><strong>🔧 Technische Diagnose</strong><span id="adminDiagSummary">Nur sichtbar für den Administrator.</span></div><button id="adminDiagCopy" type="button" class="btn secondary adminDiagCopy">Details kopieren</button></div><div id="adminDiagGrid" class="adminDiagGrid"></div></div><div id="cancellationPanel" class="card hidden" style="margin-top:16px"><div class="adminHead"><div><h3 style="margin:0">Kündigungsanfragen</h3><p class="small">Kündigungen werden hier bestätigt und mit dem tatsächlichen Enddatum hinterlegt.</p></div></div><div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Kunde</th><th>Station</th><th>Angefragt</th><th>Vertragsende</th><th>Datenlöschung</th><th></th></tr></thead><tbody id="cancellationRows"></tbody></table></div></div><div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Bewerber</th><th>Station</th><th>E-Mail</th><th>Account</th><th>Zugang</th><th>Bis</th><th>Aktionen</th></tr></thead><tbody id="applicantRows"></tbody></table></div><div class="card" id="feedbackAdminPanel" style="margin-top:16px"><div class="adminHead"><div><h3 style="margin:0">Kundenfeedback</h3><p class="small">Bewertungen aus den geschützten Stationskonten. Nur mit ausdrücklicher Freigabe darf eine Kundenstimme veröffentlicht werden.</p></div><button id="refreshFeedback" type="button" class="btn secondary adminRefresh" onclick="loadCustomerFeedback(); return false;">Aktualisieren</button></div><div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Station</th><th>Monat</th><th>Gesamt</th><th>Bedienung</th><th>Analyse</th><th>Nutzen</th><th>Kommentar</th><th>Veröffentlichung</th><th></th></tr></thead><tbody id="feedbackRows"></tbody></table></div><div id="feedbackAdminStatus" class="status">Feedback wird geladen …</div></div></div></div></section>
+<section id="adminView" class="dashboard hidden"><div class="wrap"><div class="panel adminPanel"><div class="eyebrow">Administration</div><div class="adminHead"><div id="visitorStats" class="visitorStats"><div class="visitorStat"><span>Besucher heute</span><b id="statToday">–</b></div><div class="visitorStat"><span>Letzte 7 Tage</span><b id="stat7">–</b></div><div class="visitorStat"><span>Diesen Monat</span><b id="statMonth">–</b></div><div class="visitorStat"><span>Pilotbewerbungen</span><b id="statApplications">–</b></div></div><div class="adminActions"><div><h2>Bewerber</h2><p class="small">Pilotanfragen und Zugänge verwalten.</p></div><button id="refreshApplicants" type="button" class="btn secondary adminRefresh" onclick="refreshAdminData(); return false;">Aktualisieren</button><button id="runDeletionJob" type="button" class="btn secondary adminRefresh" onclick="runDeletionJob(); return false;">Löschungen prüfen</button></div></div><div id="adminStatus" class="status">Bewerber werden geladen …</div><div id="adminDiagnostics" class="adminDiagnostics hidden" aria-live="polite"><div class="adminDiagHead"><div><strong>🔧 Technische Diagnose</strong><span id="adminDiagSummary">Nur sichtbar für den Administrator.</span></div><button id="adminDiagCopy" type="button" class="btn secondary adminDiagCopy">Details kopieren</button></div><div id="adminDiagGrid" class="adminDiagGrid"></div></div><div id="cancellationPanel" class="card hidden" style="margin-top:16px"><div class="adminHead"><div><h3 style="margin:0">Kündigungsanfragen</h3><p class="small">Kündigungen werden hier bestätigt und mit dem tatsächlichen Enddatum hinterlegt.</p></div></div><div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Kunde</th><th>Station</th><th>Angefragt</th><th>Vertragsende</th><th>Datenlöschung</th><th></th></tr></thead><tbody id="cancellationRows"></tbody></table></div></div><div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Bewerber</th><th>Station</th><th>E-Mail</th><th>Account</th><th>Zugang</th><th>Bis</th><th>Aktionen</th></tr></thead><tbody id="applicantRows"></tbody></table></div><div class="card" id="snapshotRecoveryPanel" style="margin-top:16px"><div class="adminHead"><div><h3 style="margin:0">Monatsdaten wiederherstellen</h3><p class="small">Versionen je Tankstelle prüfen und einzelne Monate aus einer früheren Sicherung zurückholen. Die übrigen Monate bleiben unverändert.</p></div><button id="refreshSnapshotHistory" type="button" class="btn secondary adminRefresh" onclick="loadSnapshotHistory(); return false;">Historie laden</button></div><div class="field" style="max-width:520px;margin:12px 0"><label for="snapshotStationSelect">Tankstelle</label><select id="snapshotStationSelect" style="width:100%;padding:12px;border-radius:9px;border:1px solid #d9c1b1;background:#fff1e7;color:#171717"><option value="">Tankstelle auswählen …</option></select></div><div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Sicherungszeitpunkt</th><th>Version</th><th>Monat</th><th>Aktion</th></tr></thead><tbody id="snapshotHistoryRows"><tr><td colspan="4">Tankstelle auswählen, um Sicherungen zu laden.</td></tr></tbody></table></div><div id="snapshotRecoveryStatus" class="status">Sicherungen sind nur für den Administrator sichtbar.</div></div><div class="card" id="feedbackAdminPanel" style="margin-top:16px"><div class="adminHead"><div><h3 style="margin:0">Kundenfeedback</h3><p class="small">Bewertungen aus den geschützten Stationskonten. Nur mit ausdrücklicher Freigabe darf eine Kundenstimme veröffentlicht werden.</p></div><button id="refreshFeedback" type="button" class="btn secondary adminRefresh" onclick="loadCustomerFeedback(); return false;">Aktualisieren</button></div><div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Station</th><th>Monat</th><th>Gesamt</th><th>Bedienung</th><th>Analyse</th><th>Nutzen</th><th>Kommentar</th><th>Veröffentlichung</th><th></th></tr></thead><tbody id="feedbackRows"></tbody></table></div><div id="feedbackAdminStatus" class="status">Feedback wird geladen …</div></div></div></div></section>
 <section id="dashboardView" class="dashboard hidden"><div class="wrap"><div class="panel"><div class="eyebrow">Kundenkonto</div><h2>Kundenkonto</h2><p id="userLine" class="small"></p><div id="stationCards" class="cards"></div><div id="stationStatus" class="status"></div><a id="openApp" class="linkbtn hidden" href="https://app.tankstellenertrag.de/analyse.html">Zur TankstellenErtrag-Plattform</a><button id="cancelSubscriptionBtn" type="button" class="btn secondary" onclick="requestCancellation(); return false;">Kündigung anfragen</button><button id="logoutBtn" class="btn secondary">Abmelden</button></div></div></section>
 <div id="diniSticker" class="diniSticker" aria-label="DiniLove Halloween Sticker">
 <button id="diniStickerClose" class="diniStickerClose" type="button" aria-label="Sticker schließen" onclick="this.parentElement.remove(); return false;">×</button>
@@ -156,7 +156,7 @@ async function loadStation(session){
     const factors=await withTimeout(client.auth.mfa.listFactors(),10000,'Admin-Faktoren konnten nicht geladen werden.');
     const verified=(factors.data?.totp||[]).find(x=>x.status==='verified');
     if(!verified){await showAdminMfaSetup();return;}
-    $('adminView').classList.remove('hidden');loadApplicants();loadCancellationRequests();loadVisitorStats();loadCustomerFeedback();
+    $('adminView').classList.remove('hidden');loadApplicants();loadCancellationRequests();loadVisitorStats();loadCustomerFeedback();loadSnapshotRecoveryStations();
     status('Administrator angemeldet – Besucherstatistik wird geladen.','ok');
     return;
   }
@@ -230,6 +230,72 @@ async function runDeletionJob(){
     $('adminStatus').textContent='Löschprüfung fehlgeschlagen: '+(e.message||String(e));
   }finally{
     if(btn){btn.disabled=false;btn.textContent='Löschungen prüfen';}
+  }
+}
+async function loadSnapshotRecoveryStations(){
+  const select=$('snapshotStationSelect'),statusEl=$('snapshotRecoveryStatus');
+  if(!select||!client)return false;
+  try{
+    const {data,error}=await client.from('stations').select('id,station_name,postcode,city').order('station_name');
+    if(error)throw error;
+    const previous=select.value;
+    select.innerHTML='<option value="">Tankstelle auswählen …</option>'+(data||[]).map(s=>{
+      const label=[s.station_name||'Tankstelle',s.postcode,s.city].filter(Boolean).join(' · ');
+      return '<option value="'+esc(String(s.id))+'">'+esc(label)+'</option>';
+    }).join('');
+    if(previous&&(data||[]).some(s=>s.id===previous))select.value=previous;
+    select.onchange=()=>loadSnapshotHistory();
+    if(select.value)await loadSnapshotHistory();
+    else if(statusEl){statusEl.className='status ok';statusEl.textContent=(data||[]).length+' Tankstelle(n) verfügbar. Bitte auswählen.';}
+    return true;
+  }catch(e){
+    if(statusEl){statusEl.className='status err';statusEl.textContent='Tankstellen für Wiederherstellung konnten nicht geladen werden: '+(e.message||String(e));}
+    return false;
+  }
+}
+async function loadSnapshotHistory(){
+  const select=$('snapshotStationSelect'),body=$('snapshotHistoryRows'),statusEl=$('snapshotRecoveryStatus');
+  if(!select||!body||!statusEl||!client)return false;
+  const stationId=select.value;
+  if(!stationId){body.innerHTML='<tr><td colspan="4">Bitte zuerst eine Tankstelle auswählen.</td></tr>';statusEl.className='status';statusEl.textContent='Keine Tankstelle ausgewählt.';return false;}
+  body.innerHTML='<tr><td colspan="4">Sicherungen werden geladen …</td></tr>';
+  statusEl.className='status';statusEl.textContent='Versionshistorie wird geladen …';
+  try{
+    const {data,error}=await client.rpc('get_admin_snapshot_history',{p_station_id:stationId,p_limit:100});
+    if(error)throw error;
+    const rows=Array.isArray(data)?data:[];
+    const html=[];
+    rows.forEach(h=>{
+      const months=Array.isArray(h.available_months)?h.available_months:[];
+      months.forEach(month=>{
+        html.push('<tr><td>'+esc(new Date(h.archived_at).toLocaleString('de-DE'))+'<div class="adminMuted">'+esc(h.archive_reason||'Sicherung')+'</div></td><td>'+esc(h.app_version||'–')+'<div class="adminMuted">Schema '+esc(String(h.schema_version??'–'))+'</div></td><td><strong>'+esc(month)+'</strong></td><td><button type="button" class="btn secondary" data-restore-history="'+esc(String(h.history_id))+'" data-restore-month="'+esc(month)+'" style="padding:7px 10px;font-size:11px">Monat wiederherstellen</button></td></tr>');
+      });
+    });
+    body.innerHTML=html.length?html.join(''):'<tr><td colspan="4">Keine Sicherungen mit Monatsdaten gefunden.</td></tr>';
+    body.querySelectorAll('[data-restore-history]').forEach(btn=>btn.onclick=()=>restoreSnapshotMonth(btn.dataset.restoreHistory,btn.dataset.restoreMonth));
+    statusEl.className='status ok';
+    statusEl.textContent=rows.length+' Sicherungsstand/-stände geladen. Die Wiederherstellung betrifft jeweils nur den gewählten Monat.';
+    return true;
+  }catch(e){
+    body.innerHTML='<tr><td colspan="4" style="color:#ef6461">Sicherungen konnten nicht geladen werden.</td></tr>';
+    statusEl.className='status err';statusEl.textContent='Versionshistorie fehlgeschlagen: '+(e.message||String(e));
+    return false;
+  }
+}
+async function restoreSnapshotMonth(historyId,month){
+  const statusEl=$('snapshotRecoveryStatus');
+  if(!confirm('Monat '+month+' aus dieser Sicherung wiederherstellen? Der aktuelle Stand wird vorher automatisch ebenfalls gesichert. Andere Monate werden nicht verändert.'))return false;
+  statusEl.className='status';statusEl.textContent='Monat wird wiederhergestellt …';
+  try{
+    const {data,error}=await client.rpc('restore_admin_snapshot_month',{p_history_id:Number(historyId),p_month:month});
+    if(error)throw error;
+    if(data!==true)throw new Error('Die Wiederherstellung hat keinen Datensatz geändert.');
+    statusEl.className='status ok';statusEl.textContent='Monat '+month+' wurde wiederhergestellt. Der vorherige Stand wurde in der Historie gesichert.';
+    await loadSnapshotHistory();
+    return true;
+  }catch(e){
+    statusEl.className='status err';statusEl.textContent='Wiederherstellung fehlgeschlagen: '+(e.message||String(e));
+    return false;
   }
 }
 async function loadCustomerFeedback(){
