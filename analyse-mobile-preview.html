@@ -849,24 +849,52 @@ function eeMonth(){eeConfetti();eeToast('🏆 Monat geknackt!','Jetzt wird aus Z
 (function initEasterEggs(){let analyseClicks=0,analyseTimer=null,road='';document.addEventListener('click',e=>{const b=e.target.closest?.('[data-v="analysis"]');if(b){analyseClicks++;clearTimeout(analyseTimer);analyseTimer=setTimeout(()=>analyseClicks=0,1200);if(analyseClicks>=5){analyseClicks=0;eeDetective()}}if(e.target.closest?.('#moneyEgg'))eeMoney()});document.addEventListener('keydown',e=>{if(e.key.length===1){road+=e.key.toLowerCase();road=road.slice(-10);if(road.endsWith('tankstelle')){road='';eeRoadtrip()}}});document.addEventListener('click',e=>{if(e.target.closest?.('#saveMonth'))setTimeout(()=>{const vals=['rev','ek','shrink','writeoff','stock'].map(id=>Number($(id)?.value||0));if(vals.every(Number.isFinite)&&vals.every(v=>v>0)){sessionStorage.setItem('te_month_egg','1');eeMonth()}},350)})})();
 </script>
 <script id="tse-page-swipe-nav-2026-10-11">
-/* Reliable Android touch swipes on content cards; native vertical scrolling remains enabled. */
+/* Native-feeling horizontal page transition with intuitive direction: finger moves left -> next page. */
 (function(){
-  let start=null,last=0;
-  const buttons=()=>Array.from(document.querySelectorAll('.nav button[data-v]'));
+  let start=null,last=0,animating=false;
+  const navButtons=()=>Array.from(document.querySelectorAll('.nav button[data-v]'));
+  const views=()=>Array.from(document.querySelectorAll('.view'));
   const ignored=el=>!!(el&&el.closest('input,textarea,select,button,a,[contenteditable="true"],.nav,.weather-days,.weather-day-card,[data-no-page-swipe],[data-horizontal-carousel]'));
   function down(e){
     if(e.touches.length!==1||ignored(e.target)){start=null;return;}
     const p=e.touches[0];start={x:p.clientX,y:p.clientY};
   }
   function up(e){
-    if(!start||!e.changedTouches.length)return;
+    if(!start||!e.changedTouches.length||animating)return;
     const p=e.changedTouches[0],dx=p.clientX-start.x,dy=p.clientY-start.y;start=null;
-    if(Math.abs(dx)<32||Math.abs(dx)<Math.abs(dy)*1.1||Date.now()-last<250)return;
-    const list=buttons(),active=list.findIndex(b=>b.classList.contains('active'));
+    if(Math.abs(dx)<38||Math.abs(dx)<Math.abs(dy)*1.2||Date.now()-last<320)return;
+    const list=navButtons(),active=list.findIndex(b=>b.classList.contains('active'));
     if(active<0)return;
-    const next=dx>0?active+1:active-1;
+    /* Conventional app behavior: swipe left goes forward; swipe right goes back. */
+    const next=dx<0?active+1:active-1;
     if(next<0||next>=list.length)return;
-    last=Date.now();list[next].click();
+    last=Date.now();animating=true;
+    const oldView=views().find(v=>v.classList.contains('active'));
+    const nextId=list[next].dataset.v;
+    const newView=views().find(v=>v.id===nextId);
+    const main=document.querySelector('.main');
+    if(!oldView||!newView||!main){list[next].click();animating=false;return;}
+    const direction=dx<0?-1:1;
+    const duration=220;
+    oldView.style.transition='transform '+duration+'ms ease, opacity '+duration+'ms ease';
+    oldView.style.transform='translateX('+(-direction*24)+'px)';
+    oldView.style.opacity='.72';
+    window.setTimeout(()=>{
+      list[next].click();
+      newView.style.transition='none';
+      newView.style.transform='translateX('+(direction*24)+'px)';
+      newView.style.opacity='.72';
+      /* Force style calculation before animating the incoming view into place. */
+      void newView.offsetWidth;
+      newView.style.transition='transform '+duration+'ms ease, opacity '+duration+'ms ease';
+      newView.style.transform='translateX(0)';
+      newView.style.opacity='1';
+      window.setTimeout(()=>{
+        oldView.style.transition='';oldView.style.transform='';oldView.style.opacity='';
+        newView.style.transition='';newView.style.transform='';newView.style.opacity='';
+        animating=false;
+      },duration+30);
+    },duration);
   }
   document.addEventListener('touchstart',down,{capture:true,passive:true});
   document.addEventListener('touchend',up,{capture:true,passive:true});
