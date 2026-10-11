@@ -7,8 +7,30 @@
 <meta name="description" content="Aktuelle Studien, Branchennews, Shop-Neuheiten und Entwicklungen, die für Tankstellenbetreiber interessant sein können.">
 <link rel="canonical" href="https://app.tankstellenertrag.de/news.html">
 <style>
-:root{--bg:#0d0f10;--panel:#181c1f;--panel2:#22272b;--line:#353c41;--text:#f5f6f7;--muted:#aeb6bc;--orange:#f47b20;--green:#45c477}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#2a2119 0,#111416 38%,#0d0f10 72%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}.wrap{width:min(1120px,calc(100% - 32px));margin:auto}.top{padding:22px 0;border-bottom:1px solid var(--line)}.brand{font-weight:900;color:#fff;text-decoration:none;font-size:22px}.brand span{color:var(--orange)}.hero{padding:54px 0 30px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;color:var(--orange);font-size:11px;font-weight:800}.hero h1{font-size:44px;line-height:1.05;margin:10px 0 14px}.hero p{color:#d6dce0;max-width:760px;font-size:17px;line-height:1.65}.bar{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.tag{border:1px solid #4b3a2b;background:#211b16;color:#ffc08b;border-radius:999px;padding:7px 10px;font-size:12px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding-bottom:60px}.card{background:rgba(24,28,31,.97);border:1px solid var(--line);border-radius:16px;padding:20px;min-height:220px;display:flex;flex-direction:column}.meta{color:var(--muted);font-size:11px;margin-bottom:12px}.card h2{font-size:20px;line-height:1.25;margin:0 0 10px}.card p{color:#c6cdd1;line-height:1.5;font-size:14px;margin:0 0 18px}.card a{margin-top:auto;color:#fff;text-decoration:none;font-weight:800}.source{color:#8e979d;font-size:11px;margin-top:8px}.empty{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:30px;color:var(--muted)}footer{border-top:1px solid var(--line);padding:22px 0 40px;color:#737d83;font-size:11px}@media(max-width:850px){.grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.hero h1{font-size:35px}.grid{grid-template-columns:1fr}}
+:root{--bg:#080f1c;--panel:rgba(20,36,59,.58);--panel2:rgba(29,52,82,.58);--line:rgba(151,190,235,.22);--text:#f2f7ff;--muted:#a9bdd7;--blue:#78b9ff;--cyan:#9adfff;--green:#6ee7bd}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 15% -10%,rgba(39,107,183,.32),transparent 42%),radial-gradient(ellipse at 90% 8%,rgba(70,112,177,.23),transparent 36%),linear-gradient(145deg,#08101d 0%,#0b1627 48%,#101a2c 100%);background-attachment:fixed;color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
+.wrap{width:min(1120px,calc(100% - 32px));margin:auto}
+.top{padding:22px 0;border-bottom:1px solid var(--line);background:rgba(7,15,27,.58);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.brand{font-weight:900;color:#f5f9ff;text-decoration:none;font-size:22px;letter-spacing:-.03em}.brand span{color:var(--blue)}
+.hero{padding:54px 0 30px}.eyebrow{text-transform:uppercase;letter-spacing:.14em;color:#8fc9ff;font-size:11px;font-weight:800}
+.hero h1{font-size:clamp(35px,5vw,48px);line-height:1.04;letter-spacing:-.04em;margin:10px 0 14px}.hero p{color:#c3d4e9;max-width:760px;font-size:17px;line-height:1.65}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.tag{border:1px solid rgba(143,198,255,.24);background:linear-gradient(135deg,rgba(87,148,215,.18),rgba(34,64,102,.24));color:#c8e4ff;border-radius:999px;padding:8px 12px;font-size:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding-bottom:60px}
+.card{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(35,61,94,.68),rgba(15,29,49,.72));border:1px solid rgba(161,200,244,.24);border-radius:20px;padding:21px;min-height:238px;display:flex;flex-direction:column;box-shadow:0 12px 34px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.10);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.card:before{content:"";position:absolute;inset:0 0 auto;height:1px;background:linear-gradient(90deg,transparent,rgba(190,225,255,.65),transparent);pointer-events:none}
+.card:after{content:"";position:absolute;width:190px;height:190px;right:-110px;top:-115px;border-radius:50%;background:rgba(91,164,244,.12);filter:blur(18px);pointer-events:none}
+.card:hover{transform:translateY(-3px);border-color:rgba(151,207,255,.43);box-shadow:0 18px 40px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.13)}
+.meta{color:#a9c3df;font-size:11px;margin-bottom:13px;line-height:1.5;position:relative;z-index:1}
+.card h2{font-size:20px;line-height:1.25;margin:0 0 10px;letter-spacing:-.02em;position:relative;z-index:1}
+.card p{color:#c8d8e9;line-height:1.55;font-size:14px;margin:0 0 20px;position:relative;z-index:1}
+.card a{margin-top:auto;color:#9dd0ff;text-decoration:none;font-weight:800;position:relative;z-index:1}.card a:hover{color:#fff}
+.source{color:#8e979d;font-size:11px;margin-top:8px}
+.empty{background:rgba(20,36,59,.58);border:1px solid var(--line);border-radius:20px;padding:30px;color:var(--muted);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+footer{border-top:1px solid var(--line);padding:22px 0 40px;color:#849ab5;font-size:11px}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.wrap{width:min(100% - 24px,1120px)}.hero{padding:38px 0 24px}.hero h1{font-size:35px}.grid{grid-template-columns:1fr;gap:12px}.card{min-height:unset;padding:19px}.top{padding:18px 0}}
+@media(prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
 </style>
 </head>
 <body>
