@@ -843,34 +843,34 @@ function eeMonth(){eeConfetti();eeToast('🏆 Monat geknackt!','Jetzt wird aus Z
 (function initEasterEggs(){let analyseClicks=0,analyseTimer=null,road='';document.addEventListener('click',e=>{const b=e.target.closest?.('[data-v="analysis"]');if(b){analyseClicks++;clearTimeout(analyseTimer);analyseTimer=setTimeout(()=>analyseClicks=0,1200);if(analyseClicks>=5){analyseClicks=0;eeDetective()}}if(e.target.closest?.('#moneyEgg'))eeMoney()});document.addEventListener('keydown',e=>{if(e.key.length===1){road+=e.key.toLowerCase();road=road.slice(-10);if(road.endsWith('tankstelle')){road='';eeRoadtrip()}}});document.addEventListener('click',e=>{if(e.target.closest?.('#saveMonth'))setTimeout(()=>{const vals=['rev','ek','shrink','writeoff','stock'].map(id=>Number($(id)?.value||0));if(vals.every(Number.isFinite)&&vals.every(v=>v>0)){sessionStorage.setItem('te_month_egg','1');eeMonth()}},350)})})();
 </script>
 <script id="tse-page-swipe-nav-2026-10-11">
-/* Touch-first mobile view navigation. Horizontal carousels and controls keep their own gestures. */
+/* Swipe anywhere on a page's content to navigate views; keep vertical scrolling and horizontal carousels intact. */
 (function(){
-  let start=null, lastChange=0;
-  const navButtons=()=>Array.from(document.querySelectorAll('.nav button[data-v]'));
+  let start=null,lastChange=0;
+  const buttons=()=>Array.from(document.querySelectorAll('.nav button[data-v]'));
   const ignored=el=>!!(el&&el.closest('input,textarea,select,button,a,[contenteditable="true"],.nav,.weather-days,[data-no-page-swipe],canvas,svg,.chart-container,.horizontal-scroll'));
-  const inHorizontalScroller=el=>{
+  const horizontalScrollAt=(el,x)=>{
     for(let n=el;n&&n!==document.body;n=n.parentElement){
-      const st=window.getComputedStyle(n);
-      if((st.overflowX==='auto'||st.overflowX==='scroll')&&n.scrollWidth>n.clientWidth+8)return true;
+      const st=getComputedStyle(n);
+      if((st.overflowX==='auto'||st.overflowX==='scroll')&&n.scrollWidth>n.clientWidth+8){
+        const max=n.scrollWidth-n.clientWidth;
+        if((x<0&&n.scrollLeft>0)||(x>0&&n.scrollLeft<max-1))return true;
+      }
     }
     return false;
   };
-  function begin(x,y,target){
-    if(ignored(target)||inHorizontalScroller(target)){start=null;return;}
-    start={x,y};
-  }
+  function begin(x,y,target){if(ignored(target)){start=null;return;}start={x,y,target};}
   function finish(x,y){
     if(!start)return;
-    const dx=x-start.x,dy=y-start.y;start=null;
+    const dx=x-start.x,dy=y-start.y,target=start.target;start=null;
     if(Math.abs(dx)<55||Math.abs(dx)<Math.abs(dy)*1.25)return;
-    const now=Date.now();if(now-lastChange<500)return;
-    const buttons=navButtons(),active=buttons.findIndex(b=>b.classList.contains('active'));
+    if(horizontalScrollAt(target,dx))return;
+    if(Date.now()-lastChange<450)return;
+    const list=buttons(),active=list.findIndex(b=>b.classList.contains('active'));
     if(active<0)return;
     const next=dx>0?active+1:active-1;
-    if(next<0||next>=buttons.length)return;
-    lastChange=now;
-    if(typeof window.nav==='function')window.nav(buttons[next].dataset.v);
-    else buttons[next].click();
+    if(next<0||next>=list.length)return;
+    lastChange=Date.now();
+    list[next].click();
   }
   document.addEventListener('touchstart',e=>{
     if(e.touches.length!==1){start=null;return;}
@@ -881,13 +881,10 @@ function eeMonth(){eeConfetti();eeToast('🏆 Monat geknackt!','Jetzt wird aus Z
     const t=e.changedTouches[0];finish(t.clientX,t.clientY);
   },{passive:true});
   document.addEventListener('touchcancel',()=>{start=null;},{passive:true});
-  /* Pointer fallback for devices that expose touch as pointer events. */
   document.addEventListener('pointerdown',e=>{
     if(e.pointerType==='touch'&&e.isPrimary)begin(e.clientX,e.clientY,e.target);
   },{passive:true});
-  document.addEventListener('pointerup',e=>{
-    if(e.pointerType==='touch')finish(e.clientX,e.clientY);
-  },{passive:true});
+  document.addEventListener('pointerup',e=>{if(e.pointerType==='touch')finish(e.clientX,e.clientY);},{passive:true});
   document.addEventListener('pointercancel',()=>{start=null;},{passive:true});
 })();
 </script>
