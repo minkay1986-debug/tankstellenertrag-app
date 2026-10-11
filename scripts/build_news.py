@@ -55,8 +55,17 @@ for category,url in FEEDS:
             if published_dt < minimum_date:
                 rejected_old += 1
                 continue
-            score=sum(v for k,v in KEYWORDS.items() if k in (title+" "+desc).lower())
-            if score<4 or not title or not link: continue
+            combined=(title+" "+desc).lower()
+            # Exclude celebrity/entertainment stories that merely mention a gas station.
+            noise_terms=("bademantel","promi","prominente","schöneberger","celebrity","klatsch","tratsch","liebesleben","tv-star")
+            if any(term in combined for term in noise_terms):
+                print(f"[FILTER] Nicht fachlich relevant: {title[:100]}")
+                continue
+            score=sum(v for k,v in KEYWORDS.items() if k in combined)
+            # Keep the feed focused on the requested topics, not generic fuel-price headlines.
+            topic_terms=("warenwirtschaft","wareneinsatz","marge","shopper","einkaufsverhalten","kaufverhalten","kaufbereitschaft","kaufabsicht","konsumverhalten","konsumenten","studie","untersuchung","umsatz","nachfrage","wetter","temperatur","hitze","regen","schnee","event","veranstaltung","feiertag","fußball","festival","einzelhandel","snack","getränk","convenience")
+            if score<5 or not any(term in combined for term in topic_terms) or not title or not link:
+                continue
             source=clean((re.search(r"\s-\s([^\-]+)$",title).group(1) if re.search(r"\s-\s([^\-]+)$",title) else "Originalquelle"))
             title=re.sub(r"\s+-\s+[^-]+$","",title).strip()
             summary=(desc or "Aktuelle Meldung mit möglicher Relevanz für Tankstellenbetreiber.")
