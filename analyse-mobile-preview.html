@@ -164,39 +164,48 @@ button.btn,button:not(.nav button){border-radius:11px}
 
 
 
-<style id="mobile-analysis-layout-preview-v6">
+
+<style id="mobile-analysis-layout-preview-v7">
 @media screen and (max-width: 600px) {
-  #meinMonatContent .meinmonat-focus .wow-grid,
-  #meinMonatContent .wow-grid {
+  /* All analysis priority-card groups, not just the monthly focus */
+  .wow-grid {
     display:grid !important;
     grid-template-columns:minmax(0,1fr) !important;
     grid-auto-flow:row !important;
     gap:10px !important;
     width:100% !important;
+    align-items:stretch !important;
   }
-  #meinMonatContent .meinmonat-focus .wow-grid > .wow-card,
-  #meinMonatContent .wow-grid > .wow-card {
+  .wow-grid > .wow-card {
     display:block !important;
     grid-column:1 / -1 !important;
     width:100% !important;
     min-width:0 !important;
     max-width:100% !important;
+    min-height:0 !important;
+    height:auto !important;
     box-sizing:border-box !important;
     padding:13px 14px 14px 17px !important;
     overflow:visible !important;
   }
-  #meinMonatContent .wow-card .risk-status {
+  .wow-card .risk-status {
     display:flex !important;
     flex-direction:column !important;
     align-items:flex-start !important;
+    justify-content:flex-start !important;
     gap:7px !important;
   }
-  #meinMonatContent .wow-card .risk-badge {
+  .wow-card .risk-badge {
     position:static !important;
     display:inline-flex !important;
     width:fit-content !important;
     max-width:100% !important;
     white-space:normal !important;
+    overflow-wrap:anywhere !important;
+    line-height:1.25 !important;
+  }
+  .wow-card .wow-title, .wow-card .small, .wow-card .margin-state {
+    min-width:0 !important;
     overflow-wrap:anywhere !important;
   }
 }
