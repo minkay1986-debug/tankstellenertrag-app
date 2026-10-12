@@ -87,13 +87,13 @@ Deno.serve(async (req: Request) => {
     const meta = await metaRes.text();
 
     const stations: { id: string; distance: number }[] = [];
-    for (const line of meta.split(/\\r?\\n/)) {
+    for (const line of meta.split(/\r?\n/)) {
       if (line.length < 55) continue;
       const id = line.slice(0, 5).trim();
       const slatText = line.slice(31, 39).trim().replace(",", ".");
       const slonText = line.slice(40, 49).trim().replace(",", ".");
       const slat = Number(slatText), slon = Number(slonText);
-      if (!/^\\d+$/.test(id) || !slatText || !slonText || !Number.isFinite(slat) || !Number.isFinite(slon)) continue;
+      if (!/^\d+$/.test(id) || !slatText || !slonText || !Number.isFinite(slat) || !Number.isFinite(slon)) continue;
       const distance = Math.hypot((slat - lat) * 111, (slon - lon) * 70);
       stations.push({ id, distance });
     }
@@ -111,9 +111,9 @@ Deno.serve(async (req: Request) => {
       recentIndexRes.text(),
     ]);
     const startKey = start.replaceAll("-", ""), endKey = end.replaceAll("-", "");
-    const historicalMatches = [...historicalIndex.matchAll(/href="(tageswerte_KL_(\\d{5})_(\\d{8})_(\\d{8})_hist\\.zip)"/g)]
+    const historicalMatches = [...historicalIndex.matchAll(/href="(tageswerte_KL_(\d{5})_(\d{8})_(\d{8})_hist\.zip)"/g)]
       .filter((m) => m[3] <= endKey && m[4] >= startKey);
-    const recentMatches = [...recentIndex.matchAll(/href="(tageswerte_KL_(\\d{5})_akt\\.zip)"/g)];
+    const recentMatches = [...recentIndex.matchAll(/href="(tageswerte_KL_(\d{5})_akt\.zip)"/g)];
     const nowKey = new Date().toISOString().slice(0, 10).replaceAll("-", "");
     const recentWindowStart = new Date(Date.now() - 45 * 86400000).toISOString().slice(0, 10).replaceAll("-", "");
     const allowRecent = endKey >= recentWindowStart && startKey <= nowKey;
