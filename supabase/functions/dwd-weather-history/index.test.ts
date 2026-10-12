@@ -102,3 +102,45 @@ Deno.test({
     }));
   },
 });
+
+Deno.test({
+  name: "DWD recent integration: loads observations from the recent directory",
+  sanitizeResources: false,
+  sanitizeOps: false,
+  fn: async () => {
+    const response = await handler(new Request("https://local.test", {
+      method: "POST",
+      headers: { Origin: origin, Authorization: "Bearer test", "Content-Type": "application/json" },
+      body: JSON.stringify({
+        latitude: 49.3,
+        longitude: 10.8,
+        start_date: "2026-09-25",
+        end_date: "2026-09-27",
+      }),
+    }));
+    const payload = await response.json();
+    if (response.status !== 200) {
+      throw new Error(`Expected 200 for recent DWD data, got ${response.status}: ${JSON.stringify(payload)}`);
+    }
+    if (typeof payload.approximate_distance_km !== "number" || payload.approximate_distance_km > 100) {
+      throw new Error(`Recent-data station is implausibly far away: ${payload.station_id}, ${payload.approximate_distance_km} km`);
+    }
+    if (!Array.isArray(payload.daily) || payload.daily.length === 0) {
+      throw new Error("No recent daily observations returned");
+    }
+    if (payload.daily.some((row: Record<string, unknown>) =>
+      typeof row.date !== "string" || row.date < "2026-09-25" || row.date > "2026-09-27"
+    )) {
+      throw new Error("Recent test returned dates outside the requested range");
+    }
+    console.log(JSON.stringify({
+      integration: "passed",
+      region: "Franconia",
+      period: "2026-09-25/2026-09-27",
+      station_id: payload.station_id,
+      approximate_distance_km: payload.approximate_distance_km,
+      days_returned: payload.days_returned,
+      coverage_percent: payload.coverage_percent,
+    }));
+  },
+});
