@@ -643,7 +643,7 @@ async function saveFeedback(){
 function account(){if(!station){$('accountBody').innerHTML='<div class="alert danger"><strong>Keine Station geladen</strong>Bitte melde dich erneut an oder wähle als Administrator zuerst eine Station aus.</div><div class="actions"><button class="btn secondary" id="logout">Abmelden</button></div>';$('logout').onclick=async()=>{await sb.auth.signOut({scope:'local'});location.href='./'};return}const end=station.founding_partner_free_until||station.subscription_ends_at||station.trial_ends_at;$('accountBody').innerHTML='<p><b>'+esc(station.station_name)+'</b></p><p class="small">'+esc(station.postcode)+' '+esc(station.city)+' · Zugang: '+esc(station.subscription_status)+' · bis '+(end?new Date(end).toLocaleDateString('de-DE'):'–')+'</p><div class="alert ok"><strong>Geschützte Cloud-Auswertung</strong>Die Daten dieser Station werden ausschließlich über das angemeldete Kundenkonto gelesen und gespeichert.</div><div class="actions"><button class="btn secondary" id="logout">Abmelden</button></div>';$('logout').onclick=async()=>{await sb.auth.signOut({scope:'local'});location.href='./'}}
 function renderAll(){dashboard();renderMeinMonat();fill();analysis();insights();radar();yearly();economic();report();feedback();sources();settingsUI();loadSettingsUI();account()}
 function parseHuth(text){
- const rows={},neutral={};let fuel=0,wash=0,shop=0,other=0;
+ const rows={},neutral={},unmappedGroups=[];let fuel=0,wash=0,shop=0,other=0;
  const raw=String(text||'').replace(/\u00a0/g,' ');
  const compact=raw.replace(/\s+/g,' ');
  const money=s=>{const m=String(s||'').match(/-?\d{1,3}(?:\.\d{3})*,\d{2}|-?\d+(?:,\d{2})/);return m?Number(m[0].replace(/\./g,'').replace(',','.')):null};
@@ -681,15 +681,16 @@ function parseHuth(text){
    const name=wm[1].trim(),id=groupFor(name),amount=money(wm[2]);
    if(id)add(id,amount);
    else if(/tabak|zigarett|zeitschrift|zubehor|schmierstoff|tier|propangas/.test(normName(name)))other+=amount||0;
+   else if(amount!==null&&!unmappedGroups.includes(name))unmappedGroups.push(name);
  }
  const neutralMatches=[...raw.matchAll(/Schwund\s*\((?:MHD|Bruch|Verderb)\)[\s\S]{0,180}?(-?\d{1,3}(?:\.\d{3})*,\d{2})\s*EUR/gi)];
  const neutralShrink=neutralMatches.reduce((sum,m)=>sum+money(m[1]),0);
  if(!shop)shop=Object.values(rows).reduce((a,b)=>a+b,0)+other;
  if(!wash)wash=rows.waschen||0;
- return {groups:rows,fuel,wash,shop,other,neutral,neutralShrink,sourceLines:raw.split(/\r?\n/).length,groupCount:Object.keys(rows).length};
+ return {groups:rows,fuel,wash,shop,other,neutral,neutralShrink,unmappedGroups,sourceLines:raw.split(/\r?\n/).length,groupCount:Object.keys(rows).length};
 }
 
-let huthParsed=null;function renderHuth(p){huthParsed=p;let rows=Object.entries(p.groups).map(([id,v])=>'<tr><td>'+GROUPS.find(g=>g[0]===id)[1]+'</td><td>'+eur(v)+'</td></tr>').join('');$('huthResult').innerHTML='<div class="alert ok"><strong>HUTH-Prüfung</strong>Kraftstoff '+eur(p.fuel)+' · Shopgruppen '+eur(p.shop)+' · Waschen '+eur(p.wash)+'. Storno/Schwund/Eigenverbrauch/Pfand werden nicht als Umsatz addiert.</div><table><tr><th>Gemappte Shopgruppe</th><th>Netto</th></tr>'+rows+'</table>';$('huthApply').disabled=!rows}
+let huthParsed=null;function renderHuth(p){huthParsed=p;let rows=Object.entries(p.groups).map(([id,v])=>'<tr><td>'+GROUPS.find(g=>g[0]===id)[1]+'</td><td>'+eur(v)+'</td></tr>').join('');const unmapped=Array.isArray(p.unmappedGroups)?p.unmappedGroups:[];const warning=unmapped.length?'<div class="alert danger" style="margin-top:8px"><strong>Import unvollständig prüfen</strong>Diese HUTH-Warengruppen wurden nicht zugeordnet: '+unmapped.map(esc).join(', ')+'. Bitte Mapping prüfen, bevor du den Import übernimmst.</div>':'';$('huthResult').innerHTML='<div class="alert ok"><strong>HUTH-Prüfung</strong>Kraftstoff '+eur(p.fuel)+' · Shopgruppen '+eur(p.shop)+' · Waschen '+eur(p.wash)+'. Storno/Schwund/Eigenverbrauch/Pfand werden nicht als Umsatz addiert.</div>'+warning+'<table><tr><th>Gemappte Shopgruppe</th><th>Netto</th></tr>'+rows+'</table>';$('huthApply').disabled=!rows}
 function applyHuth(){if(!huthParsed)return;const r=mrow();r.groups= r.groups||{};Object.entries(huthParsed.groups).forEach(([id,v])=>{r.groups[id]??={revenue:0,margin:(GROUPS.find(g=>g[0]===id)||[])[2]||0,shrink:0,writeoff:0,stock:0};r.groups[id].revenue=v});r.fuel=huthParsed.fuel;r.wash=huthParsed.wash;r.revenue=huthParsed.shop;r.shrink=Object.entries(huthParsed.neutral).filter(([k])=>/Schwund/i.test(k)).reduce((a,[,v])=>a+v,0);fill();analysis();dashboard();persist()}
 function parseMoney(v){if(v==null)return null;const s=String(v).replace(/\s/g,'').replace(/€$/,'').replace(/\./g,'').replace(',','.');const n=Number(s);return Number.isFinite(n)?n:null}
 function moneyTokens(s){return String(s||'').match(/-?\d{1,3}(?:\.\d{3})*,\d{2}|-?\d+(?:,\d{2})/g)||[]}
