@@ -144,3 +144,49 @@ Deno.test({
     }));
   },
 });
+
+
+Deno.test("rejects missing authorization before calling DWD", async () => {
+  const response = await handler(new Request("https://local.test", {
+    method: "POST",
+    headers: { Origin: origin, "Content-Type": "application/json" },
+    body: JSON.stringify({ latitude: 49.3, longitude: 10.8, start_date: "2025-01-01", end_date: "2025-01-03" }),
+  }));
+  if (response.status !== 401) throw new Error(`Expected 401, got ${response.status}`);
+});
+
+Deno.test("rejects malformed JSON without calling DWD", async () => {
+  const response = await handler(new Request("https://local.test", {
+    method: "POST",
+    headers: { Origin: origin, Authorization: "Bearer test", "Content-Type": "application/json" },
+    body: "{not-json",
+  }));
+  if (response.status !== 400) throw new Error(`Expected 400, got ${response.status}`);
+});
+
+Deno.test("rejects reversed date ranges without calling DWD", async () => {
+  const response = await handler(new Request("https://local.test", {
+    method: "POST",
+    headers: { Origin: origin, Authorization: "Bearer test", "Content-Type": "application/json" },
+    body: JSON.stringify({ latitude: 49.3, longitude: 10.8, start_date: "2025-01-04", end_date: "2025-01-03" }),
+  }));
+  if (response.status !== 400) throw new Error(`Expected 400, got ${response.status}`);
+});
+
+Deno.test("rejects date ranges longer than ten years without calling DWD", async () => {
+  const response = await handler(new Request("https://local.test", {
+    method: "POST",
+    headers: { Origin: origin, Authorization: "Bearer test", "Content-Type": "application/json" },
+    body: JSON.stringify({ latitude: 49.3, longitude: 10.8, start_date: "2000-01-01", end_date: "2011-01-01" }),
+  }));
+  if (response.status !== 400) throw new Error(`Expected 400, got ${response.status}`);
+});
+
+Deno.test("rejects coordinates outside Germany without calling DWD", async () => {
+  const response = await handler(new Request("https://local.test", {
+    method: "POST",
+    headers: { Origin: origin, Authorization: "Bearer test", "Content-Type": "application/json" },
+    body: JSON.stringify({ latitude: 40.7, longitude: -74, start_date: "2025-01-01", end_date: "2025-01-03" }),
+  }));
+  if (response.status !== 400) throw new Error(`Expected 400, got ${response.status}`);
+});
