@@ -34,6 +34,7 @@ console.log(report.summary, report.priorities);
 - regelbasierte Hinweise für deutliche Umsatzabweichungen, Margenrückgang und erhöhten Schwund
 - Priorisierung auffälliger Warengruppen
 - Datenlücken werden kenntlich gemacht; fehlende Werte werden nicht als null behandelt
+- In der Analyse werden leere Standard-Warengruppen ignoriert; ein ausdrücklich bearbeiteter und gespeicherter Umsatz von 0 € bleibt als echter Nullumsatz auswertbar
 - Ergebnis enthält Einschränkungen und wird nicht als Garantie dargestellt
 
 ## Grenzen und nächster Integrationsschritt
@@ -41,3 +42,18 @@ console.log(report.summary, report.priorities);
 Dies ist noch kein trainiertes Machine-Learning-Modell und ruft selbst keine Wetter-, Makro- oder Bewegungsdaten ab. Dafür braucht es verlässliche Datenquellen und eine saubere Zuordnung zu Standort, Zeitraum und Warengruppe. Die Live-Oberfläche muss den Kern nach Prüfung gezielt in Analyse/Ertragswächter einbinden; diese Datei wird nicht automatisch in bestehende Seiten geladen. Bis dahin werden weder Preise noch Bestellmengen automatisch geändert.
 
 Vor Live-Integration: mit anonymisierten Testfällen prüfen (fehlende Historie, Nullumsatz, negative Abweichung, fehlende Daten, Wetterfaktor ohne Historie) und gegen bestehende Kennzahlen abgleichen.
+
+## Geprüfte Rechenfälle (manuelle Referenz)
+
+| Fall | Ist | Vergleichsbasis | Abweichung | Erwartete Prüfsignale |
+|---|---:|---:|---:|---|
+| Stabil | 10.000 € | 10.000 € | 0 € / 0 % | kein Signal |
+| Umsatzrückgang + Margenverlust | 7.000 € | 10.500 € | −3.500 € / −33,33 % | Umsatzwarnung und Margenwarnung |
+| Margenverlust allein | 5.000 € | 5.000 € | 0 € / 0 % | Margenwarnung bei −3 Prozentpunkten |
+| Schwund 3 % | 4.000 € | 4.000 € | 0 € / 0 % | mittlere Schwundwarnung |
+| Schwund 5 % | 3.000 € | 3.000 € | 0 € / 0 % | hohe Schwundwarnung |
+| Keine Vergleichshistorie | 1.200 € | nicht verfügbar | nicht verfügbar | Hinweis auf fehlende Historie |
+| Aktueller Nullumsatz | 0 € | 900 € | −900 € / −100 % | Umsatzwarnung, sofern Nullumsatz ausdrücklich erfasst wurde |
+| Unvollständige Daten | 2.500 € | 2.600 € | −100 € / −3,85 % | Hinweis auf unvollständige Daten |
+
+Die Werte sind synthetische Testdaten. Die Rechenfälle prüfen die Schwellenlogik; sie ersetzen keinen Browser-End-to-End-Test. Der Nullumsatz-Marker in `analyse.html` wird erst beim Bearbeiten des Gruppenumsatzfelds und anschließenden Speichern gesetzt, damit leere Standardgruppen nicht fälschlich als Nullumsatz gewertet werden.
