@@ -45,7 +45,7 @@ Deno.test({
     if (payload.daily.some((row: Record<string, unknown>) => typeof row.date !== "string")) {
       throw new Error("Daily observation is missing its date");
     }
-    if (payload.daily.some((row: Record<string, unknown>) => row.date < "2025-01-01" || row.date > "2025-01-03")) {
+    if (payload.daily.some((row: Record<string, unknown>) => typeof row.date !== "string" || row.date < "2025-01-01" || row.date > "2025-01-03")) {
       throw new Error("Returned dates escaped the requested range");
     }
     console.log(JSON.stringify({
