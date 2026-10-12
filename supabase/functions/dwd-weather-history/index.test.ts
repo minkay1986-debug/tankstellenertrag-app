@@ -254,3 +254,35 @@ Deno.test({
     }
   },
 });
+
+
+Deno.test({
+  name: "returns a clear error when no station has files for the requested period",
+  sanitizeResources: false,
+  sanitizeOps: false,
+  fn: async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.endsWith("KL_Tageswerte_Beschreibung_Stationen.txt")) {
+        return new Response("06158 19510101 20261231 412 49.3000 10.8000 Heilsbronn station fixture\n");
+      }
+      if (url.endsWith("/historical/")) return new Response("<html><body>No matching files</body></html>");
+      if (url.endsWith("/recent/")) return new Response("<html><body>No recent files</body></html>");
+      return new Response("unexpected URL", { status: 404 });
+    }) as typeof fetch;
+    try {
+      const response = await handler(new Request("https://local.test", {
+        method: "POST",
+        headers: { Origin: origin, Authorization: "Bearer test", "Content-Type": "application/json" },
+        body: JSON.stringify({ latitude: 49.3, longitude: 10.8, start_date: "2025-01-01", end_date: "2025-01-03" }),
+      }));
+      const payload = await response.json();
+      if (response.status !== 502) throw new Error(`Expected 502, got ${response.status}`);
+      if (payload.detail !== "DWD-Datenverzeichnis") throw new Error(`Unexpected error stage: ${payload.detail}`);
+      if (!String(payload.hint).includes("Keine DWD-Station")) throw new Error(`Unexpected error hint: ${payload.hint}`);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  },
+});
