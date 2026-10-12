@@ -1,6 +1,9 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { unzipSync } from "npm:fflate@0.8.2";
 
+const DIAGNOSTIC_BUILD = "dwd-history-diag-2026-10-12-a";
+console.info("[dwd-weather-history:boot]", { build: DIAGNOSTIC_BUILD });
+
 const allowedOrigins = new Set([
   "https://minkay1986-debug.github.io",
   "https://app.tankstellenertrag.de",
@@ -11,6 +14,7 @@ const cors = (origin: string) => ({
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Vary": "Origin",
   "Content-Type": "application/json; charset=utf-8",
+  "X-DWD-Diagnostic-Build": DIAGNOSTIC_BUILD,
 });
 const reply = (body: unknown, status = 200, origin = "") =>
   new Response(JSON.stringify(body), { status, headers: cors(origin) });
@@ -26,12 +30,15 @@ class UpstreamError extends Error {
 // with a timeout and short backoff. Never retry malformed data or client errors.
 async function fetchDwd(url: string, stage: string): Promise<Response> {
   let lastError: unknown;
+  const parsedUrl = new URL(url);
+  console.info("[dwd-weather-history:fetch-start]", { build: DIAGNOSTIC_BUILD, stage, host: parsedUrl.host, path: parsedUrl.pathname });
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
       const response = await fetch(url, {
         signal: AbortSignal.timeout(12_000),
         headers: { "User-Agent": "TankstellenErtrag-Wetterhistorie/1.0" },
       });
+      console.info("[dwd-weather-history:fetch-response]", { build: DIAGNOSTIC_BUILD, stage, attempt: attempt + 1, status: response.status });
       if (response.ok) return response;
       if (response.status < 500 && response.status !== 429) {
         throw new UpstreamError(stage, `DWD antwortete mit HTTP ${response.status}.`);
@@ -40,6 +47,7 @@ async function fetchDwd(url: string, stage: string): Promise<Response> {
     } catch (error) {
       if (error instanceof UpstreamError) throw error;
       lastError = error;
+      console.warn("[dwd-weather-history:fetch-error]", { build: DIAGNOSTIC_BUILD, stage, attempt: attempt + 1, name: error instanceof Error ? error.name : "UnknownError", message: error instanceof Error ? error.message : "Unbekannter Fehler" });
     }
     if (attempt < 2) await new Promise((resolve) => setTimeout(resolve, 250 * (attempt + 1)));
   }
@@ -49,6 +57,7 @@ async function fetchDwd(url: string, stage: string): Promise<Response> {
 
 export async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get("Origin") || "";
+  console.info("[dwd-weather-history:request]", { build: DIAGNOSTIC_BUILD, method: req.method, originAllowed: allowedOrigins.has(origin), hasAuthorization: (req.headers.get("Authorization") || "").startsWith("Bearer ") });
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors(origin) });
   if (!allowedOrigins.has(origin)) return reply({ error: "Diese Herkunft ist nicht freigegeben." }, 403, origin);
   if (req.method !== "POST") return reply({ error: "POST erforderlich." }, 405, origin);
@@ -79,6 +88,7 @@ export async function handler(req: Request): Promise<Response> {
   if (days > 3660) return reply({ error: "Bitte höchstens zehn Jahre je Abfrage auswählen." }, 400, origin);
 
   let stage = "DWD-Stationsliste";
+  console.info("[dwd-weather-history:stage]", { build: DIAGNOSTIC_BUILD, stage });
   try {
     const root = "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/";
     const historicalBase = root + "historical/";
@@ -109,6 +119,7 @@ export async function handler(req: Request): Promise<Response> {
     }
 
     stage = "DWD-Datenverzeichnis";
+    console.info("[dwd-weather-history:stage]", { build: DIAGNOSTIC_BUILD, stage, stationCount: stations.length });
     const [historicalIndexRes, recentIndexRes] = await Promise.all([
       fetchDwd(historicalBase, stage),
       fetchDwd(recentBase, stage),
@@ -140,12 +151,14 @@ export async function handler(req: Request): Promise<Response> {
       .filter((station) => station.files.length > 0)
       .sort((left, right) => left.distance - right.distance);
     const best = candidates[0];
+    console.info("[dwd-weather-history:station-selection]", { build: DIAGNOSTIC_BUILD, candidateCount: candidates.length, selectedStation: best?.id ?? null, approximateDistanceKm: best ? Math.round(best.distance) : null, files: best?.files.length ?? 0 });
     if (!best) {
       throw new UpstreamError("DWD-Datenverzeichnis", "Keine DWD-Station mit Daten für den ausgewählten Zeitraum gefunden.");
     }
     const files = best.files;
 
     const daily: Record<string, unknown>[] = [];
+    console.info("[dwd-weather-history:stage]", { build: DIAGNOSTIC_BUILD, stage: "DWD-ZIP-Verarbeitung", fileCount: files.length });
     for (const file of files) {
       stage = `DWD-ZIP-Datei ${file.name}`;
       const res = await fetchDwd(file.url, stage);
@@ -205,6 +218,7 @@ export async function handler(req: Request): Promise<Response> {
       return values.length ? Math.round(values.reduce((p, c) => p + c, 0) * 10) / 10 : null;
     };
 
+    console.info("[dwd-weather-history:success]", { build: DIAGNOSTIC_BUILD, stationId: best.id, daysReturned: daily.length, coveragePercent: Math.min(100, Math.round(daily.length / days * 100)) });
     return reply({
       source: "DWD CDC Tageswerte",
       station_id: best.id,
@@ -225,7 +239,7 @@ export async function handler(req: Request): Promise<Response> {
   } catch (error) {
     const stageName = error instanceof UpstreamError ? error.stage : stage;
     const message = error instanceof Error ? error.message : "Unbekannter Fehler";
-    console.error("[dwd-weather-history]", { stage: stageName, message });
+    console.error("[dwd-weather-history:error]", { build: DIAGNOSTIC_BUILD, stage: stageName, name: error instanceof Error ? error.name : "UnknownError", message, stack: error instanceof Error ? error.stack?.slice(0, 3000) : undefined });
     return reply({
       error: "Historische DWD-Daten konnten nicht geladen werden.",
       detail: stageName,
