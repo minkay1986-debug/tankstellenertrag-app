@@ -86,39 +86,57 @@ Deno.serve(async (req: Request) => {
     const metaRes = await fetchDwd(historicalBase + "KL_Tageswerte_Beschreibung_Stationen.txt", stage);
     const meta = await metaRes.text();
 
-    let best: { id: string; distance: number } | null = null;
-    for (const line of meta.split(/\r?\n/)) {
+    const stations: { id: string; distance: number }[] = [];
+    for (const line of meta.split(/\\r?\\n/)) {
       if (line.length < 55) continue;
       const id = line.slice(0, 5).trim();
-      const from = line.slice(6, 14).trim(), to = line.slice(15, 23).trim();
-      const slat = Number(line.slice(31, 39).trim().replace(",", "."));
-      const slon = Number(line.slice(40, 49).trim().replace(",", "."));
-      if (!/^\d+$/.test(id) || !Number.isFinite(slat) || !Number.isFinite(slon)) continue;
+      const slatText = line.slice(31, 39).trim().replace(",", ".");
+      const slonText = line.slice(40, 49).trim().replace(",", ".");
+      const slat = Number(slatText), slon = Number(slonText);
+      if (!/^\\d+$/.test(id) || !slatText || !slonText || !Number.isFinite(slat) || !Number.isFinite(slon)) continue;
       const distance = Math.hypot((slat - lat) * 111, (slon - lon) * 70);
-      if (!best || distance < best.distance) best = { id, distance };
+      stations.push({ id, distance });
     }
-    if (!best) {
-      throw new UpstreamError(stage, "Keine passende historische DWD-Station für Standort und Zeitraum gefunden.");
+    if (!stations.length) {
+      throw new UpstreamError(stage, "Die DWD-Stationsliste enthält keine gültigen Stationskoordinaten.");
     }
 
     stage = "DWD-Datenverzeichnis";
-    const historicalIndexRes = await fetchDwd(historicalBase, stage);
-    const historicalIndex = await historicalIndexRes.text();
-    const historicalFiles = [...historicalIndex.matchAll(/href="(tageswerte_KL_(\d{5})_(\d{8})_(\d{8})_hist\.zip)"/g)]
-      .filter((m) => m[2] === best!.id && m[3] <= end.replaceAll("-", "") && m[4] >= start.replaceAll("-", ""))
-      .map((m) => ({ name: m[1], url: historicalBase + m[1] }));
+    const [historicalIndexRes, recentIndexRes] = await Promise.all([
+      fetchDwd(historicalBase, stage),
+      fetchDwd(recentBase, stage),
+    ]);
+    const [historicalIndex, recentIndex] = await Promise.all([
+      historicalIndexRes.text(),
+      recentIndexRes.text(),
+    ]);
+    const startKey = start.replaceAll("-", ""), endKey = end.replaceAll("-", "");
+    const historicalMatches = [...historicalIndex.matchAll(/href="(tageswerte_KL_(\\d{5})_(\\d{8})_(\\d{8})_hist\\.zip)"/g)]
+      .filter((m) => m[3] <= endKey && m[4] >= startKey);
+    const recentMatches = [...recentIndex.matchAll(/href="(tageswerte_KL_(\\d{5})_akt\\.zip)"/g)];
+    const nowKey = new Date().toISOString().slice(0, 10).replaceAll("-", "");
+    const recentWindowStart = new Date(Date.now() - 45 * 86400000).toISOString().slice(0, 10).replaceAll("-", "");
+    const allowRecent = endKey >= recentWindowStart && startKey <= nowKey;
 
-    // The DWD publishes the most recent daily observations separately in /recent/.
-    // Include the station's current ZIP and let the row-date filter select the requested period.
-    const recentIndexRes = await fetchDwd(recentBase, stage);
-    const recentIndex = await recentIndexRes.text();
-    const recentFiles = [...recentIndex.matchAll(/href="(tageswerte_KL_(\d{5})_akt\.zip)"/g)]
-      .filter((m) => m[2] === best!.id)
-      .map((m) => ({ name: m[1], url: recentBase + m[1] }));
-    const files = [...historicalFiles, ...recentFiles];
-    if (!files.length) {
-      throw new UpstreamError(stage, "Für die nächste Station sind keine passenden historischen oder aktuellen DWD-Dateien verfügbar.");
+    // Select the closest station that actually has a file covering the requested dates.
+    // A nearby station that stopped reporting years ago must not block a valid alternative.
+    const candidates = stations
+      .map((station) => ({
+        ...station,
+        files: [
+          ...historicalMatches.filter((m) => m[2] === station.id)
+            .map((m) => ({ name: m[1], url: historicalBase + m[1] })),
+          ...(allowRecent ? recentMatches.filter((m) => m[2] === station.id)
+            .map((m) => ({ name: m[1], url: recentBase + m[1] })) : []),
+        ],
+      }))
+      .filter((station) => station.files.length > 0)
+      .sort((left, right) => left.distance - right.distance);
+    const best = candidates[0];
+    if (!best) {
+      throw new UpstreamError("DWD-Datenverzeichnis", "Keine DWD-Station mit Daten für den ausgewählten Zeitraum gefunden.");
     }
+    const files = best.files;
 
     const daily: Record<string, unknown>[] = [];
     for (const file of files) {
