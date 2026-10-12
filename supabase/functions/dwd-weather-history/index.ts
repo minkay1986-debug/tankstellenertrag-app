@@ -143,7 +143,13 @@ Deno.serve(async (req: Request) => {
           const c = line.split(";"), raw = c[di] || "";
           const date = raw.length === 8 ? raw.slice(0, 4) + "-" + raw.slice(4, 6) + "-" + raw.slice(6, 8) : "";
           if (date < start || date > end) continue;
-          const v = (i: number) => i >= 0 && c[i] && c[i] !== "-999" ? Number(c[i].replace(",", ".")) : null;
+          // DWD daily climate parameters TMK/TXK/TNK/RSK/SDK are stored in tenths
+          // of their displayed units. Convert to °C, mm and hours before aggregation.
+          const v = (i: number) => {
+            if (i < 0 || !c[i] || c[i] === "-999" || c[i] === "-9999") return null;
+            const rawValue = Number(c[i].replace(",", "."));
+            return Number.isFinite(rawValue) ? rawValue / 10 : null;
+          };
           daily.push({
             date,
             temp_mean: v(ti),
