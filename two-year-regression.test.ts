@@ -61,12 +61,12 @@ Deno.test("real app calc, year table and report reconcile across all 24 months",
   assert(rt.target.innerHTML.includes("12/12 Monate · vollständig"),"Actual yearly renderer failed full-year status");
   const y25=months.filter(x=>x.year===2025).reduce((a,x)=>a+x.revenue,0);
   const y26=months.filter(x=>x.year===2026).reduce((a,x)=>a+x.revenue,0);
-  assert(rt.target.innerHTML.includes(eurForTest(y25))&&rt.target.innerHTML.includes(eurForTest(y26)),`Actual yearly totals differ from fixture totals. Expected ${eurForTest(y25)} / ${eurForTest(y26)}; rendered: ${rt.target.innerHTML.slice(0,1200)}`);
+  assert(rt.target.innerHTML.replace(/[\\s\\u00a0\\u202f]+/g," ").includes(eurForTest(y25))&&rt.target.innerHTML.replace(/[\\s\\u00a0\\u202f]+/g," ").includes(eurForTest(y26)),`Actual yearly totals differ from fixture totals. Expected ${eurForTest(y25)} / ${eurForTest(y26)}; rendered: ${rt.target.innerHTML.slice(0,1200)}`);
   rt.report();
   for(const label of ["Shop-Umsatz","Rohertrag","Marge","Schwund","Bestand EK","2026-10"])assert(rt.target.innerHTML.includes(label),`Actual report missing ${label}`);
-  assert(rt.target.innerHTML.includes(eurForTest(rt.calc("2026-10").revenue)),"Report revenue differs from app calc");
+  assert(rt.target.innerHTML.replace(/[\\s\\u00a0\\u202f]+/g," ").includes(eurForTest(rt.calc("2026-10").revenue)),"Report revenue differs from app calc");
 });
-function eurForTest(v:number){return (Number(v)||0).toFixed(2);}
+function eurForTest(v:number){return new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Number(v)||0).replace(/[\\s\\u00a0\\u202f]+/g," ").trim();}
 Deno.test("actual app prioritizes an Ist-margin drop and exact calendar month comparison",()=>{
   const rt=runtime(appFixture());
   const rows=rt.wowPriority("2026-06");
