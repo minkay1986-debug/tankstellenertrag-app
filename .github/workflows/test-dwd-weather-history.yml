@@ -4,6 +4,9 @@ on:
   pull_request:
     paths:
       - "supabase/functions/dwd-weather-history/**"
+      - "ertragsoptimierer.js"
+      - "ertragsoptimierer.test.ts"
+      - "analyse.html"
       - ".github/workflows/test-dwd-weather-history.yml"
   workflow_dispatch:
 
@@ -21,7 +24,9 @@ jobs:
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
-      - name: Type-check function
-        run: deno check supabase/functions/dwd-weather-history/index.ts
+      - name: Type-check function and optimizer tests
+        run: deno check supabase/functions/dwd-weather-history/index.ts ertragsoptimierer.test.ts
+      - name: Run optimizer unit tests
+        run: deno test ertragsoptimierer.test.ts
       - name: Run handler tests and real DWD integration test
         run: deno test --allow-net supabase/functions/dwd-weather-history/index.test.ts
