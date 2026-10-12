@@ -1,6 +1,6 @@
 /**
  * TankstellenErtrag – Ertragsoptimierer (erklärbarer Prognosekern)
- * Version 0.1.0
+ * Version 0.2.0
  *
  * Reine Berechnungen ohne Netzwerkzugriff und ohne automatische Preis-/Sortimentsänderung.
  * Erwartete Warengruppen-Datensätze:
@@ -106,6 +106,48 @@
     };
   }
 
+  /**
+   * Lernt vorsichtige, stationsinterne Wettersignale aus gepaarten Beobachtungen.
+   * Jede Beobachtung muss tatsächlichen Warengruppenumsatz und Wetter desselben
+   * Zeitraums enthalten. Nicht für eine automatische Umsatzprognose verwenden,
+   * bevor Datenqualität und Vergleichbarkeit geprüft wurden.
+   *
+   * Observation: { groupKey, actualRevenue, maxTempC, minTempC?, precipitationMm?,
+   *   date?, promotion?, complete?, open? }
+   */
+  function learnWeatherEffects(observations) {
+    const rows = Array.isArray(observations) ? observations.filter(o =>
+      o && typeof o.groupKey === 'string' && o.groupKey.trim() &&
+      finite(o.actualRevenue) && o.actualRevenue >= 0 &&
+      finite(o.maxTempC) && o.complete !== false && o.open !== false &&
+      o.promotion !== true
+    ) : [];
+    const groups = [...new Set(rows.map(o => o.groupKey.trim()))];
+    return groups.map(groupKey => {
+      const own = rows.filter(o => o.groupKey.trim() === groupKey);
+      const warm = own.filter(o => o.maxTempC >= 25);
+      const mild = own.filter(o => o.maxTempC >= 16 && o.maxTempC < 25);
+      const cool = own.filter(o => o.maxTempC <= 15);
+      const mean = list => list.length ? list.reduce((sum, o) => sum + o.actualRevenue, 0) / list.length : null;
+      const warmMean = mean(warm), mildMean = mean(mild), coolMean = mean(cool);
+      const enoughWarm = warm.length >= 3 && mild.length >= 3;
+      const enoughCool = cool.length >= 3 && mild.length >= 3;
+      const effect = (a, b) => b !== null && b > 0 && a !== null ? round((a / b - 1) * 100) : null;
+      return {
+        groupKey,
+        observationCount: own.length,
+        warmObservationCount: warm.length,
+        mildObservationCount: mild.length,
+        coolObservationCount: cool.length,
+        warmVsMildPct: enoughWarm ? effect(warmMean, mildMean) : null,
+        coolVsMildPct: enoughCool ? effect(coolMean, mildMean) : null,
+        warmSignal: enoughWarm ? 'preliminary' : 'insufficient_data',
+        coolSignal: enoughCool ? 'preliminary' : 'insufficient_data',
+        note: 'Vorläufiger Zusammenhang, kein Kausalnachweis. Aktionen und unvollständige/geschlossene Zeiträume werden ausgeschlossen; Wochentag, Saison und Preisänderungen müssen zusätzlich geprüft werden.'
+      };
+    });
+  }
+
   function analyze(input) {
     const groups = Array.isArray(input && input.groups) ? input.groups.map(evaluateGroup) : [];
     const scored = groups.map(g => ({
@@ -144,7 +186,7 @@
     };
   }
 
-  const api = Object.freeze({ version: '0.1.0', evaluateGroup, analyze });
+  const api = Object.freeze({ version: '0.2.0', evaluateGroup, analyze, learnWeatherEffects });
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.TankstellenErtragsoptimierer = api;
 })(typeof window !== 'undefined' ? window : globalThis);
