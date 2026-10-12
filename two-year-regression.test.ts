@@ -46,12 +46,13 @@ function runtime(data:any) {
   const pct = (v:number) => (Number(v)||0).toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1})+" %";
   const target = {value:"",innerHTML:""};
   const yearly = appFunction("yearly","economic",["keys","data","calc","eur","pct","$"],{keys,data,calc,eur,pct,$:(id:string)=>target});
+  const practiceGuidance = appFunction("practiceGuidance","wowCard",[],{});
   const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext"],{
     calc,month:()=> "2026-10",settings,wowPriority,prev,eur,pct,esc:(v:unknown)=>String(v??""),$:(id:string)=>target,
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
     TEStudyContext:{htmlForReport:async()=>""}
   });
-  return {data,calc,wowPriority,yearly,report,target,prev};
+  return {data,calc,wowPriority,yearly,report,practiceGuidance,target,prev};
 }
 Deno.test("real app calc, year table and report reconcile across all 24 months",()=>{
   const rt=runtime(appFixture());
@@ -82,6 +83,17 @@ Deno.test("actual app year renderer marks a partial year and includes inventory-
   rt.yearly();
   assert(rt.target.innerHTML.includes("10/12 Monate · unvollständig"),`Actual year renderer did not mark partial year: ${rt.target.innerHTML.slice(0,1200)}`);
   assert(rt.target.innerHTML.includes("2025-12"),"Inventory-only month was not included in monthly detail");
+});
+
+Deno.test("practical guidance gives actionable checks and separates signals from causes",()=>{
+  const rt=runtime(appFixture());
+  const margin=rt.practiceGuidance({reasons:["Ist-Marge um 2 %-Pkt. gefallen"]});
+  assert(margin.includes("Praxischeck")&&margin.includes("EK anhand der Rechnung")&&margin.includes("Wirkungskontrolle"),"Margin guidance lacks concrete checks or follow-up");
+  const loss=rt.practiceGuidance({reasons:["Schwund auffällig","Abschriften auffällig","Bestandsquote gestiegen"]});
+  assert(loss.includes("Lieferscheine")&&loss.includes("Liefergebinde")&&loss.includes("beweist nicht automatisch eine Ursache"),"Loss/inventory guidance lacks practical checks or caution");
+  const sales=rt.practiceGuidance({reasons:["Umsatz rückläufig"]});
+  assert(sales.includes("Öffnungszeiten")&&sales.includes("Umsatz allein beweist keine höhere Rentabilität"),"Sales guidance must check comparable trading days and avoid equating sales with profit");
+  assert(html.includes("'+practiceGuidance(r)+'</div>'")||html.includes("practiceGuidance(r)"),"Guidance is not wired into the real advisory tile/report renderer");
 });
 
 Deno.test("app has all requested renderers and renderAll calls them",()=>{for(const fn of ["function renderMeinMonat()","function yearly()","function report()","function analysis()","function renderAll()"])assert(html.includes(fn),"Missing "+fn);const renderAllFn=html.slice(html.indexOf("function renderAll()"),html.indexOf("function parseHuth("));assert(["renderMeinMonat()","analysis()","yearly()","report()"].every(call=>renderAllFn.includes(call)),"renderAll must invoke month, analysis, year and report renderers");for(const id of ['id="monthly"','id="yearly"','id="report"','id="dashboard"'])assert(html.includes(id),"Missing section "+id);const yearFn=html.slice(html.indexOf("function yearly()"),html.indexOf("function economic()"));assert(yearFn.includes("Jahresübersicht")&&yearFn.includes("gewichtete Marge"),"Yearly view must show annual totals and weighted margin");const monthFn=html.slice(html.indexOf("function renderMeinMonat()"),html.indexOf("function renderCustomScenarioInputs"));for(const check of ["focus","shrink","action"])assert(monthFn.includes(check),"Missing monthly check tile "+check);const analysisFn=html.slice(html.indexOf("function analysis()"),html.indexOf("function renderCustomScenarioInputs"));assert(analysisFn.includes("Daten-TÜV")&&analysisFn.includes("Bestandsabgleich")&&analysisFn.includes("Ihre wichtigsten Prüffelder"),"Analysis is missing a required check area");const reportFn=html.slice(html.indexOf("function report()"),html.indexOf("function settingsUI()"));for(const item of ["Shop-Umsatz","Rohertrag","Marge","Schwund","Bestand EK","Notizen / Maßnahmen"])assert(reportFn.includes(item),"Report missing "+item);});
