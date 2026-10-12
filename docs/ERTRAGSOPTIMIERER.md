@@ -1,4 +1,4 @@
-# Ertragsoptimierer – Prognosekern v0.1.0
+# Ertragsoptimierer – Prognosekern v0.2.0
 
 Diese Datei stellt `window.TankstellenErtragsoptimierer` bereit. Sie ist absichtlich als isolierter, erklärbarer Rechenkern angelegt und verändert keine vorhandene Login-, Datenbank-, Eingabe- oder Logout-Logik.
 
@@ -37,11 +37,11 @@ console.log(report.summary, report.priorities);
 - In der Analyse werden leere Standard-Warengruppen ignoriert; ein ausdrücklich bearbeiteter und gespeicherter Umsatz von 0 € bleibt als echter Nullumsatz auswertbar
 - Ergebnis enthält Einschränkungen und wird nicht als Garantie dargestellt
 
-## Grenzen und nächster Integrationsschritt
+## Integration und Grenzen
 
-Dies ist noch kein trainiertes Machine-Learning-Modell und ruft selbst keine Wetter-, Makro- oder Bewegungsdaten ab. Dafür braucht es verlässliche Datenquellen und eine saubere Zuordnung zu Standort, Zeitraum und Warengruppe. Die Live-Oberfläche muss den Kern nach Prüfung gezielt in Analyse/Ertragswächter einbinden; diese Datei wird nicht automatisch in bestehende Seiten geladen. Bis dahin werden weder Preise noch Bestellmengen automatisch geändert.
+Der Rechenkern wird im Entwicklungsstand in `analyse.html` unter „Prognose & Ausblick“ aufgerufen. Die Werte stammen aus den gespeicherten Monatsdaten der Warengruppen; historische Artikelbeobachtungen und DWD-Tageswerte sind noch nicht automatisch mit dieser Berechnung verknüpft. Der Kern ist kein trainiertes Machine-Learning-Modell und ruft selbst keine Wetter-, Makro- oder Bewegungsdaten ab. Wetter- und Saisonfaktoren werden nur verwendet, wenn sie ausdrücklich als fachlich begründete Eingaben vorliegen. Bis dahin werden weder Preise noch Bestellmengen automatisch geändert.
 
-Vor Live-Integration: mit anonymisierten Testfällen prüfen (fehlende Historie, Nullumsatz, negative Abweichung, fehlende Daten, Wetterfaktor ohne Historie) und gegen bestehende Kennzahlen abgleichen.
+Vor Veröffentlichung sind die bestehenden Monatsdaten, HUTH-Import, Cloud-Sync, Login, Diagramme sowie die mobile und Desktop-Oberfläche zusätzlich in einem End-to-End-Test zu prüfen. Automatisierte Rechentests ersetzen diesen Funktionstest nicht.
 
 ## Geprüfte Rechenfälle (manuelle Referenz)
 
