@@ -45,7 +45,10 @@ Deno.test({
     if (payload.daily.some((row: Record<string, unknown>) => typeof row.date !== "string")) {
       throw new Error("Daily observation is missing its date");
     }
-    if (typeof payload.approximate_distance_km !== "number" || payload.approximate_distance_km > 100) {\n      throw new Error(`Selected station is implausibly far away: ${payload.station_id}, ${payload.approximate_distance_km} km`);\n    }\n    if (payload.daily.some((row: Record<string, unknown>) => typeof row.date !== "string" || row.date < "2025-01-01" || row.date > "2025-01-03")) {
+    if (typeof payload.approximate_distance_km !== "number" || payload.approximate_distance_km > 100) {
+      throw new Error(`Selected station is implausibly far away: ${payload.station_id}, ${payload.approximate_distance_km} km`);
+    }
+    if (payload.daily.some((row: Record<string, unknown>) => typeof row.date !== "string" || row.date < "2025-01-01" || row.date > "2025-01-03")) {
       throw new Error("Returned dates escaped the requested range");
     }
     console.log(JSON.stringify({
