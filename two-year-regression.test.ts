@@ -61,7 +61,7 @@ Deno.test("real app calc, year table and report reconcile across all 24 months",
   assert(rt.target.innerHTML.includes("12/12 Monate · vollständig"),"Actual yearly renderer failed full-year status");
   const y25=months.filter(x=>x.year===2025).reduce((a,x)=>a+x.revenue,0);
   const y26=months.filter(x=>x.year===2026).reduce((a,x)=>a+x.revenue,0);
-  assert(rt.target.innerHTML.includes(eurForTest(y25))&&rt.target.innerHTML.includes(eurForTest(y26)),"Actual yearly totals differ from fixture totals");
+  assert(rt.target.innerHTML.includes(eurForTest(y25))&&rt.target.innerHTML.includes(eurForTest(y26)),`Actual yearly totals differ from fixture totals. Expected ${eurForTest(y25)} / ${eurForTest(y26)}; rendered: ${rt.target.innerHTML.slice(0,1200)}`);
   rt.report();
   for(const label of ["Shop-Umsatz","Rohertrag","Marge","Schwund","Bestand EK","2026-10"])assert(rt.target.innerHTML.includes(label),`Actual report missing ${label}`);
   assert(rt.target.innerHTML.includes(eurForTest(rt.calc("2026-10").revenue)),"Report revenue differs from app calc");
@@ -80,7 +80,7 @@ Deno.test("actual app year renderer marks a partial year and includes inventory-
   delete rt.data.months["2025-12"];
   rt.data.months["2025-12"]={revenue:0,ek:0,shrink:0,writeoff:0,stock:0,groups:{backshop:{revenue:0,ek:250,shrink:0,writeoff:0,stock:400}}};
   rt.yearly();
-  assert(rt.target.innerHTML.includes("11/12 Monate · unvollständig"),"Actual year renderer did not mark partial year");
+  assert(rt.target.innerHTML.includes("11/12 Monate · unvollständig"),`Actual year renderer did not mark partial year: ${rt.target.innerHTML.slice(0,1200)}`);
   assert(rt.target.innerHTML.includes("2025-12"),"Inventory-only month was not included in monthly detail");
 });
 
