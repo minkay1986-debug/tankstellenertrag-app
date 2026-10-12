@@ -47,7 +47,7 @@ async function fetchDwd(url: string, stage: string): Promise<Response> {
   throw new UpstreamError(stage, `DWD-Abfrage nach 3 Versuchen fehlgeschlagen: ${detail}`);
 }
 
-Deno.serve(async (req: Request) => {
+export async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get("Origin") || "";
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors(origin) });
   if (!allowedOrigins.has(origin)) return reply({ error: "Diese Herkunft ist nicht freigegeben." }, 403, origin);
@@ -225,4 +225,6 @@ Deno.serve(async (req: Request) => {
       hint: message,
     }, 502, origin);
   }
-});
+}
+
+if (import.meta.main) Deno.serve(handler);
