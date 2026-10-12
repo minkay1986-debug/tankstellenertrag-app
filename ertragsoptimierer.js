@@ -164,7 +164,7 @@
     const varianceTotal = expectedTotal === null ? null : actualTotal - expectedTotal;
 
     return {
-      version: '0.1.0',
+      version: '0.2.0',
       generatedAt: new Date().toISOString(),
       summary: {
         groupCount: groups.length,
