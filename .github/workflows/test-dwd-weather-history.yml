@@ -1,0 +1,27 @@
+name: Test DWD weather history
+
+on:
+  pull_request:
+    paths:
+      - "supabase/functions/dwd-weather-history/**"
+      - ".github/workflows/test-dwd-weather-history.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check function
+        run: deno check supabase/functions/dwd-weather-history/index.ts
+      - name: Run handler tests and real DWD integration test
+        run: deno test --allow-net supabase/functions/dwd-weather-history/index.test.ts
