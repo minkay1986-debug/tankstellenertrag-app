@@ -47,10 +47,10 @@ function runtime(data:any) {
   const target = {value:"",innerHTML:""};
   const yearly = appFunction("yearly","economic",["keys","data","calc","eur","pct","$"],{keys,data,calc,eur,pct,$:(id:string)=>target});
   const practiceGuidance = appFunction("practiceGuidance","wowCard",[],{});
-  const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext"],{
+  const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext","practiceGuidance"],{
     calc,month:()=> "2026-10",settings,wowPriority,prev,eur,pct,esc:(v:unknown)=>String(v??""),$:(id:string)=>target,
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
-    TEStudyContext:{htmlForReport:async()=>""}
+    TEStudyContext:{htmlForReport:async()=>""},practiceGuidance
   });
   return {data,calc,wowPriority,yearly,report,practiceGuidance,target,prev};
 }
