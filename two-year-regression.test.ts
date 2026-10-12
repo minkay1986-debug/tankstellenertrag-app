@@ -91,6 +91,7 @@ Deno.test("practical guidance gives actionable checks and separates signals from
   assert(margin.includes("Praxischeck")&&margin.includes("EK anhand der Rechnung")&&margin.includes("Wirkungskontrolle"),"Margin guidance lacks concrete checks or follow-up");
   const loss=rt.practiceGuidance({reasons:["Schwund auffällig","Abschriften auffällig","Bestandsquote gestiegen"]});
   assert(loss.includes("Lieferscheine")&&loss.includes("Liefergebinde")&&loss.includes("beweist nicht automatisch eine Ursache"),"Loss/inventory guidance lacks practical checks or caution");
+  assert(loss.includes("keine Bestellung oder Preisänderung automatisch ausgelöst"),"Guidance must not imply automated operational changes");
   const sales=rt.practiceGuidance({reasons:["Umsatz rückläufig"]});
   assert(sales.includes("Öffnungszeiten")&&sales.includes("Umsatz allein beweist keine höhere Rentabilität"),"Sales guidance must check comparable trading days and avoid equating sales with profit");
   assert(html.includes("'+practiceGuidance(r)+'</div>'")||html.includes("practiceGuidance(r)"),"Guidance is not wired into the real advisory tile/report renderer");
