@@ -66,7 +66,7 @@ Deno.test("real app calc, year table and report reconcile across all 24 months",
   for(const label of ["Shop-Umsatz","Rohertrag","Marge","Schwund","Bestand EK","2026-10"])assert(rt.target.innerHTML.includes(label),`Actual report missing ${label}`);
   assert(rt.target.innerHTML.includes(eurForTest(rt.calc("2026-10").revenue)),"Report revenue differs from app calc");
 });
-function eurForTest(v:number){return new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Number(v)||0);}
+function eurForTest(v:number){return (Number(v)||0).toFixed(2);}
 Deno.test("actual app prioritizes an Ist-margin drop and exact calendar month comparison",()=>{
   const rt=runtime(appFixture());
   const rows=rt.wowPriority("2026-06");
