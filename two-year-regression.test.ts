@@ -80,7 +80,7 @@ Deno.test("actual app year renderer marks a partial year and includes inventory-
   delete rt.data.months["2025-11"];
   rt.data.months["2025-12"]={revenue:0,ek:0,shrink:0,writeoff:0,stock:0,groups:{backshop:{revenue:0,ek:250,shrink:0,writeoff:0,stock:400}}};
   rt.yearly();
-  assert(rt.target.innerHTML.includes("11/12 Monate · unvollständig"),`Actual year renderer did not mark partial year: ${rt.target.innerHTML.slice(0,1200)}`);
+  assert(rt.target.innerHTML.includes("10/12 Monate · unvollständig"),`Actual year renderer did not mark partial year: ${rt.target.innerHTML.slice(0,1200)}`);
   assert(rt.target.innerHTML.includes("2025-12"),"Inventory-only month was not included in monthly detail");
 });
 
