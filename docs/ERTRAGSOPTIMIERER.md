@@ -57,3 +57,11 @@ Vor Live-Integration: mit anonymisierten Testfällen prüfen (fehlende Historie,
 | Unvollständige Daten | 2.500 € | 2.600 € | −100 € / −3,85 % | Hinweis auf unvollständige Daten |
 
 Die Werte sind synthetische Testdaten. Die Rechenfälle prüfen die Schwellenlogik; sie ersetzen keinen Browser-End-to-End-Test. Der Nullumsatz-Marker in `analyse.html` wird erst beim Bearbeiten des Gruppenumsatzfelds und anschließenden Speichern gesetzt, damit leere Standardgruppen nicht fälschlich als Nullumsatz gewertet werden.
+
+
+## Wetterhinweise und individuelles Lernen – aktueller Stand
+
+- Die 7-Tage-Prognose erzeugt jetzt differenziertere, ausdrücklich unverbindliche Prüfhilfen für Eis/gekühlte Getränke (warme Tage), Kaffee/Heißgetränke (kühle Tage und Morgen) sowie Backshop/Snacks (Regen).
+- Die Schwellen dienen nur zum Erkennen möglicher Wetterlagen. Daraus wird **keine feste Umsatzsteigerung in Prozent** abgeleitet und es werden keine Bestellmengen automatisch geändert.
+- Die individuelle Lernfunktion ist noch nicht aktiv: Aktuell werden Wetterprognose und historische Warengruppenumsätze nicht dauerhaft auf Tages-/Zeitraumebene miteinander verknüpft. Monatsumsätze allein reichen nicht aus, um einen belastbaren Wettereffekt zu isolieren.
+- Nächster sicherer technischer Schritt: strukturierte, stationsbezogene Beobachtungen aus Wettermerkmalen und tatsächlich erfassten Warengruppenumsätzen sammeln; erst ab mehreren vergleichbaren Beobachtungen einen vorsichtigen Effekt anzeigen. Vorhandene Monatsdaten dürfen dabei weder überschrieben noch umgedeutet werden.
