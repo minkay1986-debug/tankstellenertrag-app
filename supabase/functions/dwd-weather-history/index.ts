@@ -80,8 +80,10 @@ Deno.serve(async (req: Request) => {
 
   let stage = "DWD-Stationsliste";
   try {
-    const base = "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/";
-    const metaRes = await fetchDwd(base + "KL_Tageswerte_Beschreibung_Stationen.txt", stage);
+    const root = "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/";
+    const historicalBase = root + "historical/";
+    const recentBase = root + "recent/";
+    const metaRes = await fetchDwd(historicalBase + "KL_Tageswerte_Beschreibung_Stationen.txt", stage);
     const meta = await metaRes.text();
 
     let best: { id: string; distance: number } | null = null;
@@ -92,8 +94,6 @@ Deno.serve(async (req: Request) => {
       const slat = Number(line.slice(31, 39).trim().replace(",", "."));
       const slon = Number(line.slice(39, 48).trim().replace(",", "."));
       if (!/^\d+$/.test(id) || !Number.isFinite(slat) || !Number.isFinite(slon)) continue;
-      if (to && /^\d{8}$/.test(to) && to < end.replaceAll("-", "")) continue;
-      if (from && /^\d{8}$/.test(from) && from > start.replaceAll("-", "")) continue;
       const distance = Math.hypot((slat - lat) * 111, (slon - lon) * 70);
       if (!best || distance < best.distance) best = { id, distance };
     }
@@ -102,18 +102,28 @@ Deno.serve(async (req: Request) => {
     }
 
     stage = "DWD-Datenverzeichnis";
-    const indexRes = await fetchDwd(base, stage);
-    const index = await indexRes.text();
-    const matches = [...index.matchAll(/href="(tageswerte_KL_(\d{5})_(\d{8})_(\d{8})_hist\.zip)"/g)]
-      .filter((m) => m[2] === best!.id && m[3] <= end.replaceAll("-", "") && m[4] >= start.replaceAll("-", ""));
-    if (!matches.length) {
-      throw new UpstreamError(stage, "Für die nächste Station ist keine passende historische DWD-Datei verfügbar.");
+    const historicalIndexRes = await fetchDwd(historicalBase, stage);
+    const historicalIndex = await historicalIndexRes.text();
+    const historicalFiles = [...historicalIndex.matchAll(/href="(tageswerte_KL_(\d{5})_(\d{8})_(\d{8})_hist\.zip)"/g)]
+      .filter((m) => m[2] === best!.id && m[3] <= end.replaceAll("-", "") && m[4] >= start.replaceAll("-", ""))
+      .map((m) => ({ name: m[1], url: historicalBase + m[1] }));
+
+    // The DWD publishes the most recent daily observations separately in /recent/.
+    // Include the station's current ZIP and let the row-date filter select the requested period.
+    const recentIndexRes = await fetchDwd(recentBase, stage);
+    const recentIndex = await recentIndexRes.text();
+    const recentFiles = [...recentIndex.matchAll(/href="(tageswerte_KL_(\d{5})_akt\.zip)"/g)]
+      .filter((m) => m[2] === best!.id)
+      .map((m) => ({ name: m[1], url: recentBase + m[1] }));
+    const files = [...historicalFiles, ...recentFiles];
+    if (!files.length) {
+      throw new UpstreamError(stage, "Für die nächste Station sind keine passenden historischen oder aktuellen DWD-Dateien verfügbar.");
     }
 
     const daily: Record<string, unknown>[] = [];
-    for (const file of matches) {
-      stage = `DWD-ZIP-Datei ${file[1]}`;
-      const res = await fetchDwd(base + file[1], stage);
+    for (const file of files) {
+      stage = `DWD-ZIP-Datei ${file.name}`;
+      const res = await fetchDwd(file.url, stage);
       const zipped = new Uint8Array(await res.arrayBuffer());
       let entries: Record<string, Uint8Array>;
       try {
@@ -146,7 +156,11 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    daily.sort((a, b) => String(a.date).localeCompare(String(b.date)));
+    // Recent files are appended after historical files; keep the last row per date so
+    // current DWD corrections take precedence where the date ranges overlap.
+    const byDate = new Map<string, Record<string, unknown>>();
+    for (const row of daily) byDate.set(String(row.date), row);
+    daily.splice(0, daily.length, ...[...byDate.values()].sort((a, b) => String(a.date).localeCompare(String(b.date))));
     if (!daily.length) {
       throw new UpstreamError("DWD-Tagesdaten", "Die DWD-Datei enthält keine passenden Tageswerte für den ausgewählten Zeitraum.");
     }
