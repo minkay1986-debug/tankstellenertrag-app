@@ -40,6 +40,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 8px
 <div class="stat"><span>Abweichung zur Erwartung</span><strong id="variance">–</strong></div>
 <div class="stat"><span>Vergleichsqualität</span><strong id="confidence">–</strong></div>
 </div><div id="alerts" style="margin-top:14px"></div></div>
+<div class="panel"><h2>Wetter-Lernkern · synthetischer Test</h2><p>Prüft, ob der Kern nur bei mindestens drei vergleichbaren Beobachtungen je Temperaturgruppe einen vorläufigen Zusammenhang meldet. Diese Beispieldaten werden nicht gespeichert.</p><div class="stats"><div class="stat"><span>Warme Beobachtungen</span><strong id="learnWarm">–</strong></div><div class="stat"><span>Vergleichsbeobachtungen</span><strong id="learnMild">–</strong></div><div class="stat"><span>Vorläufiger Zusammenhang</span><strong id="learnEffect">–</strong></div></div><div id="learnNote" class="alert" style="margin-top:12px">Noch nicht geprüft.</div><button id="runLearning" type="button">Lernkern testen</button></div>
 <div class="panel"><h2>Technischer Hinweis</h2><p id="notes">Noch keine Berechnung ausgeführt.</p><p class="muted">Der Prototyp gibt Prüfhypothesen aus. Er beweist keine Ursache, verändert keine Preise und erstellt keine automatische Bestellentscheidung.</p></div>
 </main>
 <script src="./ertragsoptimierer.js?v=20261012-1"></script>
@@ -63,6 +64,21 @@ function calculate(){
  result.alerts.forEach(a=>{const el=document.createElement('div');el.className='alert '+a.level;const b=document.createElement('strong');b.textContent=a.title;const p=document.createElement('p');p.textContent=a.detail;p.style.margin='6px 0 0';el.append(b,p);list.append(el)});
  $('notes').textContent='Berechnet für '+result.name+'. Umsatztrend Vormonat: '+pct(result.trendPct)+'. Vorjahresvergleich: '+pct(result.priorYearPct)+'. Margenänderung: '+(result.marginDeltaPp===null?'nicht verfügbar':result.marginDeltaPp.toLocaleString('de-DE')+' Prozentpunkte')+'.';
 }
+function testLearning(){
+ const observations=[];
+ [900,950,920].forEach((v,i)=>observations.push({groupKey:'drinks',date:'warm-'+i,actualRevenue:v,maxTempC:27,complete:true,open:true,promotion:false}));
+ [700,720,710].forEach((v,i)=>observations.push({groupKey:'drinks',date:'mild-'+i,actualRevenue:v,maxTempC:19,complete:true,open:true,promotion:false}));
+ observations.push({groupKey:'drinks',actualRevenue:5000,maxTempC:29,complete:true,open:true,promotion:true});
+ const result=window.TankstellenErtragsoptimierer.learnWeatherEffects(observations)[0];
+ $('learnWarm').textContent=result.warmObservationCount;
+ $('learnMild').textContent=result.mildObservationCount;
+ $('learnEffect').textContent=result.warmVsMildPct===null?'Noch zu wenig Daten':(result.warmVsMildPct>0?'+':'')+result.warmVsMildPct+' %';
+ const pass=result.warmObservationCount===3&&result.mildObservationCount===3&&result.warmVsMildPct!==null;
+ $('learnNote').textContent=(pass?'TEST BESTANDEN: ':'TEST FEHLGESCHLAGEN: ')+(pass?'Die Aktionsbeobachtung wurde ausgeschlossen und der Zusammenhang nur aus drei warmen und drei milden Beispielen berechnet.':'Ergebnis entspricht nicht den erwarteten Mindestbedingungen.');
+ $('learnNote').className='alert '+(pass?'good':'high');
+}
+$('runLearning').addEventListener('click',testLearning);
+testLearning();
 $('run').addEventListener('click',calculate);
 $('demo').addEventListener('click',()=>{const vals={name:'Getränke',actual:10000,previous:13500,year:12800,margin:25,oldMargin:31,shrink:3.1,weather:0,season:0};Object.entries(vals).forEach(([k,v])=>$(k).value=v);calculate()});
 $('clear').addEventListener('click',()=>{['actual','previous','year','margin','oldMargin','shrink','weather','season'].forEach(id=>$(id).value='');$('expected').textContent='–';$('variance').textContent='–';$('confidence').textContent='–';$('alerts').replaceChildren();$('notes').textContent='Werte zurückgesetzt.'});
