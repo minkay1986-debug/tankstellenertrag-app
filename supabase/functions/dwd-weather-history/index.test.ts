@@ -61,3 +61,44 @@ Deno.test({
     }));
   },
 });
+
+Deno.test({
+  name: "DWD historical integration: selects a nearby station for a second region and older period",
+  sanitizeResources: false,
+  sanitizeOps: false,
+  fn: async () => {
+    const response = await handler(new Request("https://local.test", {
+      method: "POST",
+      headers: { Origin: origin, Authorization: "Bearer test", "Content-Type": "application/json" },
+      body: JSON.stringify({
+        latitude: 52.52,
+        longitude: 13.405,
+        start_date: "2010-01-01",
+        end_date: "2010-01-03",
+      }),
+    }));
+    const payload = await response.json();
+    if (response.status !== 200) {
+      throw new Error(`Expected 200, got ${response.status}: ${JSON.stringify(payload)}`);
+    }
+    if (typeof payload.approximate_distance_km !== "number" || payload.approximate_distance_km > 100) {
+      throw new Error(`Selected station is implausibly far from Berlin: ${payload.station_id}, ${payload.approximate_distance_km} km`);
+    }
+    if (!Array.isArray(payload.daily) || payload.daily.length === 0) {
+      throw new Error("No historical observations returned for Berlin test");
+    }
+    if (payload.daily.some((row: Record<string, unknown>) =>
+      typeof row.date !== "string" || row.date < "2010-01-01" || row.date > "2010-01-03"
+    )) {
+      throw new Error("Berlin test returned dates outside the requested range");
+    }
+    console.log(JSON.stringify({
+      integration: "passed",
+      region: "Berlin",
+      station_id: payload.station_id,
+      approximate_distance_km: payload.approximate_distance_km,
+      days_returned: payload.days_returned,
+      coverage_percent: payload.coverage_percent,
+    }));
+  },
+});
