@@ -91,6 +91,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const u=session?.user;
     const type=u?.user_metadata?.avatar||'faucet';
     renderTopAvatar(type);
+    login.style.display=u?'none':'';
+    const legacyLogout=document.getElementById('logoutBtn');
+    if(legacyLogout)legacyLogout.style.display='none';
     if(!u){guest.classList.remove('hidden');userBox.classList.add('hidden');return}
     guest.classList.add('hidden');userBox.classList.remove('hidden');
     name.textContent=u.user_metadata?.full_name||u.email?.split('@')[0]||'Konto';
@@ -100,7 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   btn.onclick=e=>{e.stopPropagation();menu.classList.toggle('hidden')};
   document.getElementById('teLogin').onclick=()=>{menu.classList.add('hidden');login.click()};
   document.getElementById('teChoose').onclick=()=>picker.classList.toggle('hidden');
-  document.getElementById('teLogout').onclick=async()=>{await avatarClient.auth.signOut({scope:'local'});location.reload()};
+  document.getElementById('teLogout').onclick=()=>{const existingLogout=document.getElementById('logoutBtn');if(existingLogout){existingLogout.click();return;}console.warn('Kein bestehender Logout-Handler auf dieser Seite gefunden.');};
   picker.querySelectorAll('button').forEach(b=>b.onclick=async()=>{const {error}=await avatarClient.auth.updateUser({data:{avatar:b.dataset.avatar}});if(error)return;const {data}=await avatarClient.auth.getUser();render({user:data.user});picker.classList.add('hidden')});
   document.addEventListener('click',e=>{if(!menu.contains(e.target)&&e.target!==btn)menu.classList.add('hidden')});
   avatarClient.auth.onAuthStateChange((_event,session)=>{render(session);});
