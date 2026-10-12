@@ -90,10 +90,15 @@ export async function handler(req: Request): Promise<Response> {
     for (const line of meta.split(/\r?\n/)) {
       if (line.length < 55) continue;
       const id = line.slice(0, 5).trim();
-      const slatText = line.slice(31, 39).trim().replace(",", ".");
-      const slonText = line.slice(40, 49).trim().replace(",", ".");
+      // DWD metadata is fixed-width in its leading ID/date fields, but the
+      // spacing before elevation/coordinates varies. Parse the first decimal
+      // coordinate pair after the ID and validity dates instead of hard-coded offsets.
+      const coordinateMatch = line.slice(23).match(/(-?\d+(?:[.,]\d+)?)\s+(-?\d+(?:[.,]\d+)?)/);
+      if (!/^\d+$/.test(id) || !coordinateMatch) continue;
+      const slatText = coordinateMatch[1].replace(",", ".");
+      const slonText = coordinateMatch[2].replace(",", ".");
       const slat = Number(slatText), slon = Number(slonText);
-      if (!/^\d+$/.test(id) || !slatText || !slonText || !Number.isFinite(slat) || !Number.isFinite(slon)) continue;
+      if (!Number.isFinite(slat) || !Number.isFinite(slon) || slat < 47 || slat > 56 || slon < 5 || slon > 16) continue;
       const distance = Math.hypot((slat - lat) * 111, (slon - lon) * 70);
       stations.push({ id, distance });
     }
