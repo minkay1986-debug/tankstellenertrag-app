@@ -92,7 +92,7 @@ Deno.serve(async (req: Request) => {
       const id = line.slice(0, 5).trim();
       const from = line.slice(6, 14).trim(), to = line.slice(15, 23).trim();
       const slat = Number(line.slice(31, 39).trim().replace(",", "."));
-      const slon = Number(line.slice(39, 48).trim().replace(",", "."));
+      const slon = Number(line.slice(40, 49).trim().replace(",", "."));
       if (!/^\d+$/.test(id) || !Number.isFinite(slat) || !Number.isFinite(slon)) continue;
       const distance = Math.hypot((slat - lat) * 111, (slon - lon) * 70);
       if (!best || distance < best.distance) best = { id, distance };
