@@ -42,8 +42,8 @@ function runtime(data:any) {
   const calc = appFunction("calc","reconciliation",["GROUPS","data","settings","mrow"],{GROUPS,data,settings,mrow});
   const wowPriority = appFunction("wowPriority","riskLevel",["calc","prev","settings"],{calc,prev,settings});
   const keys = () => Object.keys(data.months).sort();
-  const eur = (v:number) => Number(v).toFixed(2);
-  const pct = (v:number) => Number(v).toFixed(2)+"%";
+  const eur = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Number(v)||0);
+  const pct = (v:number) => (Number(v)||0).toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1})+" %";
   const target = {value:"",innerHTML:""};
   const yearly = appFunction("yearly","economic",["keys","data","calc","eur","pct","$"],{keys,data,calc,eur,pct,$:(id:string)=>target});
   const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","$","station","TEStudyContext"],{
@@ -77,7 +77,7 @@ Deno.test("actual app prioritizes an Ist-margin drop and exact calendar month co
 });
 Deno.test("actual app year renderer marks a partial year and includes inventory-only month",()=>{
   const rt=runtime(appFixture());
-  delete rt.data.months["2025-12"];
+  delete rt.data.months["2025-11"];
   rt.data.months["2025-12"]={revenue:0,ek:0,shrink:0,writeoff:0,stock:0,groups:{backshop:{revenue:0,ek:250,shrink:0,writeoff:0,stock:400}}};
   rt.yearly();
   assert(rt.target.innerHTML.includes("11/12 Monate · unvollständig"),`Actual year renderer did not mark partial year: ${rt.target.innerHTML.slice(0,1200)}`);
