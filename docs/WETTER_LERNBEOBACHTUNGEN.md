@@ -8,6 +8,12 @@ Die bestehenden Snapshots enthalten `months`, `articleObservations` und `article
 
 Die neue Tabelle `public.station_weather_observations` ist für genau eine Beobachtung pro Tankstelle, Datum und Warengruppe gedacht. Sie trennt die Lernbasis von den bestehenden Monats-Snapshots und überschreibt keine bisherigen Daten.
 
+## Freie Nutzung für alle Nutzer
+
+Der Ertragsoptimierer und seine Wetter-Lernfunktionen sollen für alle angemeldeten Nutzer im vollen Funktionsumfang verfügbar sein, unabhängig von Abo, Teststatus oder Tarif. Die RLS-Regel in der vorbereiteten Migration prüft daher nur, ob die angemeldete Person Eigentümer der jeweiligen Tankstelle ist. Das ist Datenschutz zwischen Kundenkonten, keine Funktions- oder Tarifbeschränkung.
+
+Die Anmeldung bleibt notwendig, damit Umsatzdaten nicht öffentlich lesbar oder änderbar sind. Die neue Regel verändert keine bestehenden Berechtigungen anderer App-Bereiche.
+
 ## Mindestanforderungen an valide Lernzeilen
 
 - Ein echter Tagesumsatz für eine klar definierte Warengruppe.
@@ -17,10 +23,6 @@ Die neue Tabelle `public.station_weather_observations` ist für genau eine Beoba
 - `promotion = true` für Aktionstage; diese werden aus dem Basisvergleich ausgeschlossen.
 - Quelle des Umsatzes und der Wetterdaten wird dokumentiert.
 - Fehlende Wetter- oder Umsatzwerte bleiben unbekannt; sie werden nicht geschätzt.
-
-## Zugriffsschutz
-
-Die Migration aktiviert RLS und erlaubt authentifizierten Nutzern nur Zugriff auf Beobachtungen einer eigenen Station, sofern deren Abo-/Testzugang aktiv ist. Es gibt keine anonyme Leseberechtigung. Die Regel orientiert sich an den bestehenden Snapshot-Zugriffsregeln.
 
 ## Noch ausdrücklich nicht enthalten
 
