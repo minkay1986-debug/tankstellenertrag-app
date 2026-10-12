@@ -190,3 +190,67 @@ Deno.test("rejects coordinates outside Germany without calling DWD", async () =>
   }));
   if (response.status !== 400) throw new Error(`Expected 400, got ${response.status}`);
 });
+
+
+Deno.test({
+  name: "returns a structured 502 when the DWD station list is unavailable",
+  sanitizeResources: false,
+  sanitizeOps: false,
+  fn: async () => {
+    const originalFetch = globalThis.fetch;
+    let calls = 0;
+    globalThis.fetch = (async () => {
+      calls++;
+      return new Response("temporarily unavailable", { status: 503 });
+    }) as typeof fetch;
+    try {
+      const response = await handler(new Request("https://local.test", {
+        method: "POST",
+        headers: { Origin: origin, Authorization: "Bearer test", "Content-Type": "application/json" },
+        body: JSON.stringify({ latitude: 49.3, longitude: 10.8, start_date: "2025-01-01", end_date: "2025-01-03" }),
+      }));
+      const payload = await response.json();
+      if (response.status !== 502) throw new Error(`Expected 502, got ${response.status}`);
+      if (payload.detail !== "DWD-Stationsliste") throw new Error(`Unexpected error stage: ${payload.detail}`);
+      if (calls !== 3) throw new Error(`Expected 3 safe retries, got ${calls}`);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  },
+});
+
+Deno.test({
+  name: "returns a structured 502 when the selected DWD ZIP is corrupt",
+  sanitizeResources: false,
+  sanitizeOps: false,
+  fn: async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.endsWith("KL_Tageswerte_Beschreibung_Stationen.txt")) {
+        return new Response("06158 19510101 20261231 412 49.3000 10.8000 Heilsbronn station fixture\n");
+      }
+      if (url.endsWith("/historical/")) {
+        return new Response('<a href="tageswerte_KL_06158_19510101_20261231_hist.zip">zip</a>');
+      }
+      if (url.endsWith("/recent/")) return new Response("");
+      if (url.endsWith("tageswerte_KL_06158_19510101_20261231_hist.zip")) {
+        return new Response("this is not a zip file");
+      }
+      return new Response("unexpected URL", { status: 404 });
+    }) as typeof fetch;
+    try {
+      const response = await handler(new Request("https://local.test", {
+        method: "POST",
+        headers: { Origin: origin, Authorization: "Bearer test", "Content-Type": "application/json" },
+        body: JSON.stringify({ latitude: 49.3, longitude: 10.8, start_date: "2025-01-01", end_date: "2025-01-03" }),
+      }));
+      const payload = await response.json();
+      if (response.status !== 502) throw new Error(`Expected 502, got ${response.status}: ${JSON.stringify(payload)}`);
+      if (!String(payload.detail).startsWith("DWD-ZIP-Datei")) throw new Error(`Unexpected error stage: ${payload.detail}`);
+      if (!String(payload.hint).includes("nicht entpackt")) throw new Error(`Unexpected error hint: ${payload.hint}`);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  },
+});
