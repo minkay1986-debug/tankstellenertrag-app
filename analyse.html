@@ -739,8 +739,10 @@ function applySourceValues(){
     row.wash=p.wash;
     if(p.neutralShrink>0)row.shrink=p.neutralShrink;
     row.groups=row.groups||{};
-    GROUPS.forEach(g=>row.groups[g[0]]??={revenue:0,margin:g[2],shrink:0,writeoff:0,stock:0});
-    Object.entries(p.groups).forEach(([id,v])=>{row.groups[id].revenue=v});
+    GROUPS.forEach(g=>{row.groups[g[0]]??={revenue:0,margin:g[2],shrink:0,writeoff:0,stock:0};row.groups[g[0]].revenue=0});
+    // HUTH ist für diesen Import die Umsatzquelle: Gruppen, die im aktuellen Report fehlen,
+    // dürfen keine alten Monats-/Manuellwerte behalten. Andere Kennzahlen bleiben erhalten.
+    Object.entries(p.groups).forEach(([id,v])=>{if(row.groups[id])row.groups[id].revenue=v});
     row.huth={monthly:{shop:p.shop,fuel:p.fuel,wash:p.wash,groups:p.groups,lines:p.sourceLines},updatedAt:new Date().toISOString()};
   }
 
