@@ -40,7 +40,7 @@ Deno.test({
       throw new Error(`Expected 200, got ${response.status}: ${JSON.stringify(payload)}`);
     }
     if (payload.source !== "DWD CDC Tageswerte") throw new Error("Unexpected source marker");
-    if (!/^\\d{5}$/.test(payload.station_id)) throw new Error("Missing DWD station ID");
+    if (!/^\d{5}$/.test(payload.station_id)) throw new Error("Missing DWD station ID");
     if (!Array.isArray(payload.daily) || payload.daily.length === 0) throw new Error("No daily observations returned");
     if (payload.daily.some((row: Record<string, unknown>) => typeof row.date !== "string")) {
       throw new Error("Daily observation is missing its date");
