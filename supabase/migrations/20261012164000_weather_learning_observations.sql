@@ -38,7 +38,8 @@ create index if not exists station_weather_observations_group_date_idx
 
 alter table public.station_weather_observations enable row level security;
 
--- Customers can access only their own station's observations while their account is entitled.
+-- Every authenticated user may use the feature for their own station, regardless of plan.
+-- RLS protects customer data; it does not gate product functionality or subscription tiers.
 drop policy if exists "weather observations owner access" on public.station_weather_observations;
 create policy "weather observations owner access"
   on public.station_weather_observations
@@ -50,11 +51,6 @@ create policy "weather observations owner access"
       from public.stations s
       where s.id = station_weather_observations.station_id
         and s.owner_id = auth.uid()
-        and (
-          s.subscription_status = 'active'
-          or (s.subscription_status = 'trial' and s.trial_ends_at > now())
-          or (s.subscription_status = 'founding_partner' and s.founding_partner_free_until > now())
-        )
     )
   )
   with check (
@@ -63,11 +59,6 @@ create policy "weather observations owner access"
       from public.stations s
       where s.id = station_weather_observations.station_id
         and s.owner_id = auth.uid()
-        and (
-          s.subscription_status = 'active'
-          or (s.subscription_status = 'trial' and s.trial_ends_at > now())
-          or (s.subscription_status = 'founding_partner' and s.founding_partner_free_until > now())
-        )
     )
   );
 
