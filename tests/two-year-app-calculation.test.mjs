@@ -19,16 +19,16 @@ const functions = [
   between('function keys(){', 'function renderGroups(){')
 ].join('\n');
 
-const context = { data: { months: fixture.months, settings: {} }, console };
+const elements = { yearTable: { innerHTML: '' } };\nconst context = { data: { months: fixture.months, settings: {} }, console, $: id => elements[id] || (elements[id] = { innerHTML: '' }), eur: n => Number(n || 0).toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €', pct: n => Number(n || 0).toFixed(2) + ' %' };
 vm.createContext(context);
 vm.runInContext(groupDecl + ';' + functions, context);
-const calc = context.calc, keys = context.keys, hasData = context.hasData;
+const calc = context.calc, keys = context.keys, hasData = context.hasData, yearly = context.yearly;
 assert.equal(typeof calc, 'function', 'actual calc() function must be loaded');
 assert.equal(typeof keys, 'function', 'actual keys() function must be loaded');
 assert.equal(typeof hasData, 'function', 'actual hasData() function must be loaded');
 assert.equal(keys().length, 24);
 assert.equal(hasData('2025-01'), true);
-assert.equal(hasData('2026-12'), true);
+assert.equal(hasData('2026-12'), true);\nyearly();\nassert.ok(elements.yearTable.innerHTML.includes('2025'), 'year table must render 2025');\nassert.ok(elements.yearTable.innerHTML.includes('2026'), 'year table must render 2026');\nassert.equal((elements.yearTable.innerHTML.match(/vollständig/g) || []).length, 2, 'both annual rows should show 12/12 complete months');\nassert.equal((elements.yearTable.innerHTML.match(/<tr><td>2025|<tr><td>2026/g) || []).length, 2, 'both annual rows must be present');\nassert.equal((elements.yearTable.innerHTML.match(/<td>2025-/g) || []).length, 12, 'all 2025 monthly rows render');\nassert.equal((elements.yearTable.innerHTML.match(/<td>2026-/g) || []).length, 12, 'all 2026 monthly rows render');
 
 const yearly = {};
 for (const year of ['2025','2026']) {
@@ -65,4 +65,4 @@ assert.ok(yearly['2026'].margin < yearly['2025'].margin);
 for (const name of ['dashboard','analysis','insights','yearly','report','renderArticleDiagnostics']) {
   assert.ok(html.includes('function '+name+'('), 'Expected app renderer '+name);
 }
-console.log(JSON.stringify({status:'PASS',tested:'actual calc()/mrow()/settings()/hasData() extracted from analyse.html',years:Object.fromEntries(Object.entries(yearly).map(([y,v])=>[y,{...v,revenue:+v.revenue.toFixed(2),ek:+v.ek.toFixed(2),gross:+v.gross.toFixed(2),margin:+v.margin.toFixed(2),shrink:+v.shrink.toFixed(2)}])),checks:['24 monthly calculations compared to fixture','annual rollups','gross margin and EK sanity','intentional zero marker and JSON restore','year-over-year revenue up / margin down','renderer functions present']},null,2));
+console.log(JSON.stringify({status:'PASS',tested:'actual calc()/mrow()/settings()/hasData() extracted from analyse.html',years:Object.fromEntries(Object.entries(yearly).map(([y,v])=>[y,{...v,revenue:+v.revenue.toFixed(2),ek:+v.ek.toFixed(2),gross:+v.gross.toFixed(2),margin:+v.margin.toFixed(2),shrink:+v.shrink.toFixed(2)}])),checks:['24 monthly calculations compared to fixture','annual rollups','real yearly() renderer produces 2 complete annual rows and 24 monthly rows','gross margin and EK sanity','intentional zero marker and JSON restore','year-over-year revenue up / margin down','renderer functions present']},null,2));
