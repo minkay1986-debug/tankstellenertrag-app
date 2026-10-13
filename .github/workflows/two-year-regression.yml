@@ -24,3 +24,5 @@ jobs:
         run: node tests/two-year-article-diagnostics.test.mjs
       - name: Render Mein Monat page against controlled month values
         run: node tests/two-year-meinmonat-render.test.mjs
+      - name: Verify yearly overview reacts to changed monthly values
+        run: node tests/two-year-yearly-reactivity.test.mjs
