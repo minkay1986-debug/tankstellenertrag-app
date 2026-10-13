@@ -1,0 +1,16 @@
+name: Two-year regression test
+on:
+  push:
+    branches:
+      - test/live-copy-2026-10-13
+  workflow_dispatch:
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate 2025 and 2026 fixture against current analysis source
+        run: node tests/two-year-regression.test.mjs
