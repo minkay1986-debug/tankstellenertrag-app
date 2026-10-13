@@ -971,7 +971,7 @@ function resetProtectedViews(){
   document.body.style.overflow='';
 }
 function openAuth(){ $('authView').classList.remove('hidden'); document.body.style.overflow='hidden'; setTimeout(()=>document.getElementById('email')?.focus(),50); }
-function closeAuth(){ $('authView').classList.add('hidden'); document.body.style.overflow=''; if(!document.querySelector('.site')?.classList.contains('authenticated')){ window.location.href='https://minkay1986-debug.github.io/tankstellenertrag/'; } }
+function closeAuth(){ $('authView').classList.add('hidden'); document.body.style.overflow=''; if(!document.querySelector('.site')?.classList.contains('authenticated')){ window.location.href='https://app.tankstellenertrag.de/'; } }
 $('navLogin').onclick=openAuth;$('heroLogin').onclick=openAuth;$('knowledgeLogin')?.addEventListener('click',openAuth);
 if(new URLSearchParams(location.search).get('login')==='1')openAuth();$('heroTest').onclick=openAuth;$('bottomTest').onclick=openAuth;$('monthlyPilotBtn')?.addEventListener('click',openAuth);
 $('closeAuth').onclick=closeAuth;
@@ -979,7 +979,7 @@ $('closeAuth').onclick=closeAuth;
 if(client){
   client.auth.onAuthStateChange((event)=>{
     if(event==='SIGNED_OUT'){
-      window.location.replace('https://minkay1986-debug.github.io/tankstellenertrag/');
+      window.location.replace('https://app.tankstellenertrag.de/');
       return;
     }
     // Keine Supabase-Abfragen innerhalb dieses Callbacks.
