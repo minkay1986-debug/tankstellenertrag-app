@@ -164,6 +164,64 @@ main .section .steps>div{box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
 }
 </style>
 
+
+<style id="homepage-layout-balance-v2">
+/* Korrektur nach Live-Sichtprüfung: Hero wirklich breit aufziehen, Verlauf deutlicher */
+main>section.hero.publicOnly{
+ width:100%!important;
+ background:
+  radial-gradient(ellipse at 78% 18%,rgba(31,133,237,.26) 0%,rgba(16,75,145,.13) 35%,transparent 65%),
+  linear-gradient(135deg,#071a35 0%,#0b3563 52%,#071a34 100%)!important;
+}
+main>section.hero.publicOnly>.wrap.heroGrid{
+ width:min(1680px,calc(100% - 56px))!important;
+ max-width:1680px!important;
+ margin-left:auto!important;
+ margin-right:auto!important;
+ grid-template-columns:minmax(0,1.08fr) minmax(0,1fr) minmax(250px,.78fr)!important;
+ gap:clamp(18px,2.1vw,34px)!important;
+ align-items:center!important;
+}
+main>section.hero.publicOnly .heroVisual,
+main>section.hero.publicOnly .heroSide{width:100%;min-width:0}
+main>section.hero.publicOnly .heroSide{height:100%}
+main>section.hero.publicOnly .heroVisual{align-self:stretch}
+main>section.hero.publicOnly .heroVisual *{min-width:0}
+main>section.hero.publicOnly .heroSide h3{overflow-wrap:anywhere}
+main>section.hero.publicOnly .heroSideList b{overflow-wrap:anywhere}
+main>section.publicOnly.section,
+main>section.publicOnly.section.dark,
+main>section.ctaSection.publicOnly{
+ background:
+  radial-gradient(ellipse at 15% 0%,rgba(24,111,202,.22) 0%,transparent 55%),
+  linear-gradient(145deg,#0b2d55 0%,#092647 52%,#071a33 100%)!important;
+}
+main>section.publicOnly.section .steps,
+main>section.publicOnly.section .steps>div,
+main>section.publicOnly.section .cards article,
+main>section.publicOnly.section .monthlyCard,
+main>section.publicOnly.section .monthlyNote,
+main>section.publicOnly.section .monthlyPilot,
+main>section.publicOnly.section .monthlyFlow>div{
+ background:linear-gradient(145deg,rgba(31,78,124,.72),rgba(9,31,58,.92))!important;
+ border-color:rgba(132,194,255,.27)!important;
+}
+@media(max-width:1100px){
+ main>section.hero.publicOnly>.wrap.heroGrid{
+  width:calc(100% - 40px)!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+ }
+ main>section.hero.publicOnly .heroSide{grid-column:1/-1}
+}
+@media(max-width:700px){
+ main>section.hero.publicOnly>.wrap.heroGrid{
+  width:calc(100% - 28px)!important;
+  grid-template-columns:minmax(0,1fr)!important;
+ }
+ main>section.hero.publicOnly .heroSide{grid-column:auto}
+}
+</style>
+
 </head>
 <body>
 <div class="site">
