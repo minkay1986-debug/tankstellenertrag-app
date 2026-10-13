@@ -604,7 +604,7 @@ async function loadStation(session){
     if(cancelError) console.warn('Kündigungsstatus konnte nicht geladen werden:',cancelError.message||cancelError);
   }catch(e){console.warn('Kündigungsstatus konnte nicht geladen werden:',e.message||e)}
 
-  $('stationCards').innerHTML='<div class="card"><div class="label">Station</div><div class="value">'+esc(row.station_name||'—')+'</div><div class="small">'+esc(row.postcode||'')+' '+esc(row.city||'')+'</div></div><div class="card"><div class="label">Zugang</div><div class="value">'+esc(row.subscription_status||'—')+'</div></div><div class="card"><div class="label">Zugang bis</div><div class="value">'+(end?new Date(end).toLocaleDateString('de-DE'):'—')+'</div></div>';
+  $('stationCards').innerHTML='<div class="card"><div class="label">Station</div><div class="value">'+esc(row.station_name||'—')+'</div><div class="small">'+esc(row.postcode||'')+' '+esc(row.city||'')+'</div></div><div class="card"><div class="label">Zugang</div><div class="value">'+esc(String(row.subscription_status||'').toLowerCase()==='founding_partner'?'Kostenloser Pilotzugang':(row.subscription_status||'—'))+'</div>'+(String(row.subscription_status||'').toLowerCase()==='founding_partner'?'<div class="small">Bis zum Start der Bezahlversion</div>':'')+'</div><div class="card"><div class="label">Zugang bis</div><div class="value">'+(end?new Date(end).toLocaleDateString('de-DE'):'—')+'</div></div>';
 
   const cancelStatus=String(cancellation?.status||'').toLowerCase();
   const cancelRequested=cancellation&&['requested','pending'].includes(cancelStatus);
