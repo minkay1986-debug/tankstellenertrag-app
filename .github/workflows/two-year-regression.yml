@@ -22,3 +22,5 @@ jobs:
         run: node tests/two-year-analysis-signals.test.mjs
       - name: Render article diagnostics with known test values
         run: node tests/two-year-article-diagnostics.test.mjs
+      - name: Render Mein Monat page against controlled month values
+        run: node tests/two-year-meinmonat-render.test.mjs
