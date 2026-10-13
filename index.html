@@ -266,6 +266,38 @@ main>section.hero.publicOnly .lead{max-width:100%;overflow-wrap:break-word}
 }
 </style>
 
+
+<style id="hero-parent-grid-fix">
+/* Root cause: .hero itself was still a two-column grid around one .wrap child.
+   The inner three-column grid therefore had a narrower parent and looked shifted left. */
+main>section.hero.publicOnly{
+ display:block!important;
+ width:100%!important;
+ min-width:0!important;
+ overflow:visible!important;
+}
+main>section.hero.publicOnly>.wrap.heroGrid{
+ display:grid!important;
+ width:min(1680px,calc(100% - 56px))!important;
+ max-width:1680px!important;
+ margin-inline:auto!important;
+ box-sizing:border-box!important;
+ grid-template-columns:minmax(0,1.08fr) minmax(0,1fr) minmax(250px,.78fr)!important;
+}
+@media(max-width:1250px){
+ main>section.hero.publicOnly>.wrap.heroGrid{
+  width:calc(100% - 40px)!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+ }
+}
+@media(max-width:850px){
+ main>section.hero.publicOnly>.wrap.heroGrid{
+  width:calc(100% - 28px)!important;
+  grid-template-columns:minmax(0,1fr)!important;
+ }
+}
+</style>
+
 </head>
 <body>
 <div class="site">
