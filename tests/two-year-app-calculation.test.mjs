@@ -16,7 +16,8 @@ const functions = [
   between('function calc(', 'function reconciliation('),
   between('function settings(){', 'function renderGroups(){'),
   between('function hasData(', 'function keys(){'),
-  between('function keys(){', 'function renderGroups(){')
+  between('function keys(){', 'function renderGroups(){'),
+  between('function yearly(){', 'function report(){')
 ].join('\n');
 
 const elements = { yearTable: { innerHTML: '' } };
