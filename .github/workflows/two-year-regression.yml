@@ -20,3 +20,5 @@ jobs:
         run: node tests/two-year-report-render.test.mjs
       - name: Execute real analysis signals and data quality checks
         run: node tests/two-year-analysis-signals.test.mjs
+      - name: Render article diagnostics with known test values
+        run: node tests/two-year-article-diagnostics.test.mjs
