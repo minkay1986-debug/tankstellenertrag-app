@@ -457,6 +457,50 @@ body:has(main>section.hero.publicOnly) .sampleDataNote{
  text-align:center;
 }
 </style>
+
+<style id="customer-account-polish-20261013">
+/* Kundenkonto: gezielte visuelle Veredelung; keine Abo-/Auth-Logik geändert */
+#dashboardView{padding:clamp(18px,4vw,38px) 0 54px}
+#dashboardView>.wrap{max-width:1040px}
+#dashboardView>.wrap>.panel{
+ position:relative;overflow:hidden;padding:clamp(22px,4vw,38px);
+ border-radius:26px!important;
+ background:radial-gradient(ellipse at 92% 0%,rgba(73,157,255,.16),transparent 38%),linear-gradient(145deg,rgba(20,49,82,.88),rgba(7,23,43,.96))!important;
+ border:1px solid rgba(155,202,255,.28)!important;
+ box-shadow:inset 0 1px 0 rgba(235,246,255,.10),0 24px 70px rgba(0,0,0,.25),0 0 42px rgba(49,128,215,.08)!important;
+}
+#dashboardView .eyebrow{font-size:10px;letter-spacing:.19em;font-weight:800;color:#8ecaff!important}
+#dashboardView h2{font-size:clamp(27px,3vw,35px);letter-spacing:-.035em;margin:8px 0 7px}
+#dashboardView #userLine{font-size:13px;color:#b8cce2;overflow-wrap:anywhere;margin:0 0 22px}
+#dashboardView .cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0 0 16px}
+#dashboardView .cards .card{
+ min-width:0;min-height:112px;padding:18px;border-radius:17px!important;
+ background:linear-gradient(145deg,rgba(37,78,121,.56),rgba(8,27,49,.78))!important;
+ border:1px solid rgba(151,199,247,.22)!important;
+ box-shadow:inset 0 1px 0 rgba(230,244,255,.07),0 10px 28px rgba(0,0,0,.12)!important;
+}
+#dashboardView .cards .label{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#a9c3df}
+#dashboardView .cards .value{font-size:clamp(17px,2vw,21px);line-height:1.3;overflow-wrap:anywhere;color:#f5f9ff;margin-top:9px}
+#dashboardView .cards .small{margin-top:7px;color:#a9c1db;line-height:1.45}
+#dashboardView #stationStatus{margin:8px 0 16px;padding:15px 17px;border-radius:14px!important;line-height:1.6;font-size:13px;background:rgba(58,115,173,.14)!important;border:1px solid rgba(129,190,247,.24)!important;color:#dcecff}
+#dashboardView #stationStatus.ok{background:linear-gradient(110deg,rgba(30,92,75,.28),rgba(31,75,116,.24))!important;border-color:rgba(105,211,177,.34)!important}
+#dashboardView #stationStatus.err{background:rgba(130,48,57,.20)!important;border-color:rgba(255,135,145,.35)!important}
+#dashboardView #openApp{display:inline-flex;align-items:center;justify-content:center;min-height:46px;margin:0 10px 0 0;padding:13px 19px;border-radius:13px;background:linear-gradient(135deg,#55adff,#2877d1)!important;box-shadow:0 9px 26px rgba(40,119,209,.24);transition:transform .18s ease,box-shadow .18s ease}
+#dashboardView #openApp:hover{transform:translateY(-1px);box-shadow:0 12px 30px rgba(40,119,209,.32)}
+#dashboardView #cancelSubscriptionBtn,#dashboardView #logoutBtn{width:auto;min-height:44px;margin:0 8px 0 0;padding:11px 16px;border-radius:12px!important;font-size:12px;font-weight:750}
+#dashboardView #cancelSubscriptionBtn:disabled{opacity:.78;cursor:default;border-color:rgba(135,197,246,.23)!important;color:#d5e6f8!important}
+#dashboardView #logoutBtn{background:rgba(133,169,207,.09)!important;border-color:rgba(151,199,247,.19)!important;color:#c5d8ec!important}
+@media(max-width:700px){
+ #dashboardView>.wrap{width:calc(100% - 24px)}
+ #dashboardView>.wrap>.panel{padding:22px 17px;border-radius:21px!important}
+ #dashboardView .cards{grid-template-columns:1fr;gap:10px}
+ #dashboardView .cards .card{min-height:0;padding:15px 16px}
+ #dashboardView .cards .value{font-size:19px}
+ #dashboardView #openApp,#dashboardView #cancelSubscriptionBtn,#dashboardView #logoutBtn{width:100%;margin:8px 0 0}
+}
+@media(prefers-reduced-motion:reduce){#dashboardView #openApp{transition:none}}
+</style>
+
 </head>
 <body>
 <div class="site">
