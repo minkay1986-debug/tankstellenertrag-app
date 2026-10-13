@@ -314,6 +314,11 @@ body:has(main>section.hero.publicOnly) main{
   background:transparent!important;
   background-color:transparent!important;
 }
+body:has(main>section.hero.publicOnly) main>section{
+  background:transparent!important;
+  background-color:transparent!important;
+  background-image:none!important;
+}
 body:has(main>section.hero.publicOnly) main>section.publicOnly,
 body:has(main>section.hero.publicOnly) main>section.publicOnly.section,
 body:has(main>section.hero.publicOnly) main>section.hero.publicOnly,
@@ -358,7 +363,10 @@ body:has(main>section.hero.publicOnly) .wrap{
 body:has(main>section.hero.publicOnly) .panel,
 body:has(main>section.hero.publicOnly) .heroVisual,
 body:has(main>section.hero.publicOnly) .heroSide,
-body:has(main>section.hero.publicOnly) .section .cards article,\nbody:has(main>section.hero.publicOnly) .ertragsradarGrid article,\nbody:has(main>section.hero.publicOnly) .ertragsradarPromo,\nbody:has(main>section.hero.publicOnly) .ertragsradarPromo .ertragsradarGrid article,
+body:has(main>section.hero.publicOnly) .section .cards article,
+body:has(main>section.hero.publicOnly) .ertragsradarGrid article,
+body:has(main>section.hero.publicOnly) .ertragsradarPromo,
+body:has(main>section.hero.publicOnly) .ertragsradarPromo .ertragsradarGrid article,
 body:has(main>section.hero.publicOnly) .section .steps>div,
 body:has(main>section.hero.publicOnly) .monthlyCard,
 body:has(main>section.hero.publicOnly) .monthlyNote,
@@ -411,7 +419,9 @@ body:has(main>section.hero.publicOnly) .topbar{
  body:has(main>section.hero.publicOnly) .monthlyFlow>div,
  body:has(main>section.hero.publicOnly) .appHintBox,
  body:has(main>section.hero.publicOnly) .appHintSteps>div,
- body:has(main>section.hero.publicOnly) .quote,\n body:has(main>section.hero.publicOnly) .ertragsradarPromo,\n body:has(main>section.hero.publicOnly) .ertragsradarGrid article{
+ body:has(main>section.hero.publicOnly) .quote,
+ body:has(main>section.hero.publicOnly) .ertragsradarPromo,
+ body:has(main>section.hero.publicOnly) .ertragsradarGrid article{
    background:rgba(8,30,56,.88)!important;
  }
 }
