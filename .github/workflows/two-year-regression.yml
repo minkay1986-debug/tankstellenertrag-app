@@ -18,3 +18,5 @@ jobs:
         run: node tests/two-year-app-calculation.test.mjs
       - name: Render the real monthly report against fixture data
         run: node tests/two-year-report-render.test.mjs
+      - name: Execute real analysis signals and data quality checks
+        run: node tests/two-year-analysis-signals.test.mjs
