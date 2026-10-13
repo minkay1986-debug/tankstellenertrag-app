@@ -4,27 +4,28 @@ import vm from 'node:vm';
 
 const fixture = JSON.parse(readFileSync(new URL('./two-year-test-data.json', import.meta.url), 'utf8'));
 const html = readFileSync(new URL('../analyse.html', import.meta.url), 'utf8');
-function sourceLine(prefix) {
-  const line = html.split(/\r?\n/).find(row => row.includes(prefix));
-  assert.ok(line, 'Source line found: ' + prefix);
-  return line;
+function between(start, end) {
+  const a = html.indexOf(start), b = html.indexOf(end, a + start.length);
+  assert.ok(a >= 0 && b > a, 'Could not extract source range: ' + start + ' -> ' + end);
+  return html.slice(a, b);
 }
-const groupDecl = sourceLine('const GROUPS=').slice(0, sourceLine('const GROUPS=').indexOf(';const $='));
+const groupDecl = between('const GROUPS=', ';const $=').replace(/;$/, '');
 const functions = [
-  sourceLine('function empty(){').slice(0, sourceLine('function empty(){').indexOf('function month()')),
-  sourceLine('function mrow(').slice(0, sourceLine('function calc(')),
-  sourceLine('function calc(').slice(0, sourceLine('function reconciliation(')),
-  sourceLine('function settings(){').slice(0, sourceLine('function renderGroups(){')),
-  sourceLine('function hasData(').slice(0, sourceLine('function keys(){')),
-  sourceLine('function keys(){').slice(0, sourceLine('function renderGroups(){'))
+  between('function empty(){', 'function month()'),
+  between('function mrow(', 'function calc('),
+  between('function calc(', 'function reconciliation('),
+  between('function settings(){', 'function renderGroups(){'),
+  between('function hasData(', 'function keys(){'),
+  between('function keys(){', 'function renderGroups(){')
 ].join('\n');
 
 const context = { data: { months: fixture.months, settings: {} }, console };
 vm.createContext(context);
 vm.runInContext(groupDecl + ';' + functions, context);
-const calc = vm.runInContext('calc', context);
-const keys = vm.runInContext('keys', context);
-const hasData = vm.runInContext('hasData', context);
+const calc = context.calc, keys = context.keys, hasData = context.hasData;
+assert.equal(typeof calc, 'function', 'actual calc() function must be loaded');
+assert.equal(typeof keys, 'function', 'actual keys() function must be loaded');
+assert.equal(typeof hasData, 'function', 'actual hasData() function must be loaded');
 assert.equal(keys().length, 24);
 assert.equal(hasData('2025-01'), true);
 assert.equal(hasData('2026-12'), true);
@@ -52,8 +53,6 @@ for (const year of ['2025','2026']) {
     assert.ok(Math.abs(results[i].gross-(expected.revenue-expected.ek))<0.011, monthKeys[i]+' gross calc mismatch');
   }
 }
-
-// Intentional zero stays distinguishable, while an unentered default zero remains unmarked.
 const zero = fixture.months['2025-02'].groups.spielzeug;
 assert.equal(zero.revenue, 0);
 assert.equal(zero._revenueEntered, true);
@@ -61,13 +60,9 @@ const legacy = { revenue: 0 };
 assert.equal(legacy._revenueEntered, undefined);
 const restored = JSON.parse(JSON.stringify(fixture.months));
 assert.equal(restored['2025-02'].groups.spielzeug._revenueEntered, true);
-
-// Cross-year comparison must show higher turnover but lower gross margin for the synthetic scenario.
 assert.ok(yearly['2026'].revenue > yearly['2025'].revenue);
 assert.ok(yearly['2026'].margin < yearly['2025'].margin);
-
-// Output surfaces: guard that the real app calls its dashboard, analysis, insights, yearly and report renderers.
 for (const name of ['dashboard','analysis','insights','yearly','report','renderArticleDiagnostics']) {
-  assert.match(html, new RegExp('function '+name+'\\('), 'Expected app renderer '+name);
+  assert.ok(html.includes('function '+name+'('), 'Expected app renderer '+name);
 }
-console.log(JSON.stringify({status:'PASS',tested:'real calc()/mrow()/settings()/hasData() extracted from analyse.html',years:yearly,checks:['24 monthly calculations compared to fixture','annual rollups','gross margin and EK sanity','intentional zero marker and JSON restore','year-over-year revenue up / margin down','analysis/dashboard/year/report/article renderers exist']},null,2));
+console.log(JSON.stringify({status:'PASS',tested:'actual calc()/mrow()/settings()/hasData() extracted from analyse.html',years:Object.fromEntries(Object.entries(yearly).map(([y,v])=>[y,{...v,revenue:+v.revenue.toFixed(2),ek:+v.ek.toFixed(2),gross:+v.gross.toFixed(2),margin:+v.margin.toFixed(2),shrink:+v.shrink.toFixed(2)}])),checks:['24 monthly calculations compared to fixture','annual rollups','gross margin and EK sanity','intentional zero marker and JSON restore','year-over-year revenue up / margin down','renderer functions present']},null,2));
