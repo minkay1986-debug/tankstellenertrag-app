@@ -1320,6 +1320,41 @@ boot();
 }
 </style>
 
+
+<script id="mobile-account-popover-position-fix">
+/* Mobile-only safety fix: keep the public profile/account popover inside the viewport. */
+(function(){
+  function fixAccountPopover(){
+    if (window.matchMedia("(min-width: 701px)").matches) return;
+    var nodes = document.querySelectorAll("body *");
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      if (el.children.length > 2) continue;
+      var label = (el.textContent || "").replace(/\\s+/g, " ").trim().toLocaleUpperCase("de-DE");
+      if (!label || !(label.includes("NUTZERKONTO") || label.includes("NICHT ANGEMELDET"))) continue;
+      var panel = el;
+      for (var depth = 0; panel && panel !== document.body && depth < 6; depth++, panel = panel.parentElement) {
+        var r = panel.getBoundingClientRect();
+        if (r.width >= 260 && r.width <= window.innerWidth + 40 && r.left < 0) {
+          panel.style.setProperty("position", "fixed", "important");
+          panel.style.setProperty("left", "auto", "important");
+          panel.style.setProperty("right", "12px", "important");
+          panel.style.setProperty("width", "min(" + Math.round(r.width) + "px, calc(100vw - 24px))", "important");
+          panel.style.setProperty("max-width", "calc(100vw - 24px)", "important");
+          panel.style.setProperty("box-sizing", "border-box", "important");
+          panel.style.setProperty("transform", "none", "important");
+          break;
+        }
+      }
+    }
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fixAccountPopover);
+  else fixAccountPopover();
+  new MutationObserver(fixAccountPopover).observe(document.documentElement, {childList:true,subtree:true});
+  window.addEventListener("resize", fixAccountPopover, {passive:true});
+})();
+</script>
+
 </body>
 </html>
 
