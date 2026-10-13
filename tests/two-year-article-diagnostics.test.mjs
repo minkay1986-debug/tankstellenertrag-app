@@ -16,8 +16,8 @@ vm.createContext(ctx);vm.runInContext(html,ctx);ctx.renderArticleDiagnostics('ea
 const rendered=outputs.adResults.innerHTML;
 for(const term of ['Test-Kaffee','Absatz & Prognose','Marge & Gewinnpotenzial','Schwund, Verluste & Ursachenprüfung','44 %','Bestandsbewegung rechnerisch ausgeglichen','Artikelhistorie']) assert.ok(rendered.includes(term),'missing expected article output: '+term);
 assert.ok(rendered.includes('80 Stück'),'latest sold quantity should render');
-assert.ok(rendered.includes('Rohertrag je Stück: 1,10 €'),'unit gross margin should calculate 2.5 - 1.4');
-assert.ok(rendered.includes('88,00 €'),'gross contribution should calculate 1.1 * 80');
+assert.ok(/Rohertrag je Stück: 1,10\s*€/u.test(rendered),'unit gross margin should calculate 2.5 - 1.4');
+assert.ok(/88,00\s*€/u.test(rendered),'gross contribution should calculate 1.1 * 80');
 assert.ok(rendered.includes('Absatz gesunken um 20 %'),'month-over-month change should be 20 percent down');
 const emptyData={articleObservations:[]};ctx.data=emptyData;outputs.adResults.innerHTML='';ctx.renderArticleDiagnostics();assert.ok(outputs.adResults.innerHTML.includes('Noch keine Artikelmonate gespeichert'),'empty history state should render');
 console.log(JSON.stringify({status:'PASS',checks:['actual article renderer executes','all three diagnosis cards render','margin and unit gross profit calculated','month-over-month sales change calculated','inventory reconciliation status rendered','empty-history state rendered'],outputLength:rendered.length},null,2));
