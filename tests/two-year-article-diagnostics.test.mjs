@@ -9,7 +9,7 @@ const html=source.slice(a,b);
 const outputs={adResults:{innerHTML:''},adMonth:{value:'2026-07'}};
 const data={articleObservations:[{key:'ean:1234567890123',name:'Test-Kaffee',lastSeen:'2026-07',observations:[
  {month:'2026-06',sold:100,opening:50,delivery:80,closing:25,writeoff:5,ek:1.2,vk:2.5,difference:0},
- {month:'2026-07',sold:80,opening:25,delivery:60,closing:10,writeoff:5,ek:1.4,vk:2.5,difference:0}
+ {month:'2026-07',sold:80,opening:25,delivery:60,closing:0,writeoff:5,ek:1.4,vk:2.5,difference:0}
 ]}]};
 const ctx={data,$:id=>outputs[id]||null,esc:s=>String(s??'').replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])),articleHistoryStage:n=>n>=6?'Historie vorhanden':n>=3?'erste Trends möglich':'Aufbauphase'};
 vm.createContext(ctx);vm.runInContext(html,ctx);ctx.renderArticleDiagnostics('ean:1234567890123');
