@@ -737,6 +737,50 @@ boot();
   window.addEventListener('online',function(){checkOfficialStatus();});
 })();
 </script>
+
+<style id="lower-home-blue-theme">
+/* Öffentliche Startseite: ab "So funktioniert's" durchgängige blaue Glass-Optik */
+#ablauf.publicOnly.section,
+#monatscheck.publicOnly.section,
+#wissen.publicOnly.section,
+.ctaSection.publicOnly {
+  background:linear-gradient(155deg,#0b2b50 0%,#0a2140 48%,#08182e 100%)!important;
+  border-top:1px solid rgba(92,169,245,.22)!important;
+  border-bottom:1px solid rgba(92,169,245,.16)!important;
+}
+#ablauf.publicOnly.section .steps > div,
+#monatscheck.publicOnly.section .monthlyCard,
+#monatscheck.publicOnly.section .monthlyNote,
+#monatscheck.publicOnly.section .monthlyPilot,
+#wissen.publicOnly.section .quote {
+  background:rgba(13,39,69,.68)!important;
+  border-color:rgba(119,183,245,.25)!important;
+  box-shadow:0 12px 34px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.04);
+}
+#ablauf.publicOnly.section h2,
+#monatscheck.publicOnly.section h2,
+#wissen.publicOnly.section h2,
+.ctaSection.publicOnly h2 { color:#f4f8ff; }
+#ablauf.publicOnly.section p,
+#ablauf.publicOnly.section span,
+#monatscheck.publicOnly.section p,
+#monatscheck.publicOnly.section span,
+#wissen.publicOnly.section p,
+#wissen.publicOnly.section .quote small,
+.ctaSection.publicOnly p { color:#c1d5ea; }
+#ablauf.publicOnly.section .steps b { color:#ffad54; }
+#monatscheck.publicOnly.section .monthlyFlow > div {
+  background:rgba(10,36,64,.68)!important;
+  border-color:rgba(119,183,245,.22)!important;
+}
+@media(max-width:700px){
+  #ablauf.publicOnly.section,
+  #monatscheck.publicOnly.section,
+  #wissen.publicOnly.section,
+  .ctaSection.publicOnly { background:linear-gradient(180deg,#0b2b50,#08182e)!important; }
+}
+</style>
+
 </body>
 </html>
 
