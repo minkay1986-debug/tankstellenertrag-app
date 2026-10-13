@@ -11,3 +11,5 @@ Harness syntax corrected before rerun.
 Annual renderer assertions fixed and queued for another CI run.
 
 Actual yearly() function included in isolated VM for renderer test.
+
+Annual row selector narrowed to exact year cells.
