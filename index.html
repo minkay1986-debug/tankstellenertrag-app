@@ -124,6 +124,30 @@ body{background:radial-gradient(ellipse at 15% 0%,rgba(44,104,190,.24),transpare
 
 <style id="unified-home-glass-system">
 /* Einheitliches, transparentes Glass-Design nur für die öffentliche Startseite */
+/* Durchgehender Seitenhintergrund: nicht nur innerhalb einzelner Inhaltsbereiche */
+body:has(main>section.hero.publicOnly){
+  background:#07172e!important;
+  background-image:
+    radial-gradient(ellipse at 76% 7%,rgba(43,151,255,.24),transparent 36%),
+    radial-gradient(ellipse at 12% 42%,rgba(25,112,208,.18),transparent 40%),
+    linear-gradient(145deg,#07172e 0%,#0b2c52 43%,#081a34 100%)!important;
+  background-attachment:fixed!important;
+}
+body:has(main>section.hero.publicOnly) .site,
+body:has(main>section.hero.publicOnly) main{
+  background:transparent!important;
+  background-color:transparent!important;
+}
+body:has(main>section.hero.publicOnly) main>section.publicOnly,
+body:has(main>section.hero.publicOnly) main>section.publicOnly.section,
+body:has(main>section.hero.publicOnly) main>section.hero.publicOnly,
+body:has(main>section.hero.publicOnly) main>section.appHint.publicOnly,
+body:has(main>section.hero.publicOnly) main>section.ctaSection.publicOnly{
+  background:transparent!important;
+  background-color:transparent!important;
+  background-image:none!important;
+}
+
 :root{
   --home-glass-fill:rgba(21,67,112,.22);
   --home-glass-fill-strong:rgba(9,31,57,.48);
