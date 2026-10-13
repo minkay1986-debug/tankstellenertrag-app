@@ -16,3 +16,5 @@ jobs:
         run: node tests/two-year-regression.test.mjs
       - name: Execute real calculation functions from analyse.html against both years
         run: node tests/two-year-app-calculation.test.mjs
+      - name: Render the real monthly report against fixture data
+        run: node tests/two-year-report-render.test.mjs
