@@ -517,6 +517,45 @@ html,body{max-width:100%;overflow-x:hidden}
 @media(prefers-reduced-motion:reduce){#dashboardView #openApp{transition:none}}
 </style>
 
+
+<style id="quickcheck-cta-mobile-layout-fix">
+/* Mobile: prevent the QuickCheck button from squeezing the headline into a narrow column. */
+@media(max-width:700px){
+  #quickcheckCTA .wrap>.panel{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    justify-content:flex-start!important;
+    gap:16px!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+  #quickcheckCTA .wrap>.panel>div{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+  }
+  #quickcheckCTA .wrap>.panel h2{
+    max-width:100%!important;
+    font-size:clamp(24px,6.5vw,32px)!important;
+    line-height:1.16!important;
+    overflow-wrap:normal!important;
+    word-break:normal!important;
+  }
+  #quickcheckCTA .wrap>.panel> a.cta{
+    display:flex!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+    white-space:normal!important;
+    justify-content:center!important;
+    text-align:center!important;
+    overflow-wrap:anywhere!important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div class="site">
