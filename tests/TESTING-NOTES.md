@@ -7,3 +7,5 @@ Der zweite Test führt die originalen Berechnungsfunktionen aus analyse.html in 
 Prüft zusätzlich die echte Jahresübersicht-Funktion mit 12/12 Monatszeilen je Jahr.
 
 Harness syntax corrected before rerun.
+
+Annual renderer assertions fixed and queued for another CI run.
