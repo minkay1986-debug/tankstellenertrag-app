@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TankstellenErtrag – Ertragsoptimierer Test</title>
+<style>
+:root{color-scheme:dark;--bg:#071426;--panel:#10243b;--line:#31506f;--text:#edf5ff;--muted:#adc1d8;--blue:#4a9cff;--orange:#ffad66}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top right,#16365a,#071426 60%);color:var(--text);font:15px system-ui,sans-serif}
+main{max-width:1050px;margin:auto;padding:24px 16px 60px}h1{font-size:clamp(26px,4vw,38px);margin:6px 0}p{color:var(--muted);line-height:1.55}.tag{color:#a9d3ff;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.panel{border:1px solid var(--line);background:linear-gradient(145deg,#142c47ee,#0b1b30ee);border-radius:18px;padding:18px;margin:16px 0;box-shadow:0 16px 45px #0003}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}.field input,.field select{width:100%;padding:11px;border:1px solid #466687;border-radius:9px;background:#07172a;color:#fff;font:inherit}
+button{padding:11px 15px;border:0;border-radius:10px;background:linear-gradient(135deg,#4a9cff,#327ed5);color:white;font-weight:800;cursor:pointer}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.secondary{background:#243d58;border:1px solid #426282}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.stat{padding:14px;border-radius:12px;background:#07182b;border:1px solid #294968}.stat span{display:block;font-size:12px;color:var(--muted)}.stat strong{display:block;font-size:22px;margin-top:5px;overflow-wrap:anywhere}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 8px;border-bottom:1px solid #29415b;font-size:13px}th{color:#b6d8fa}.alert{border:1px solid #476b8d;background:#0a1d32;padding:12px;border-radius:10px;margin:9px 0}.alert.high{border-color:#b86e63}.alert.medium{border-color:#b38a55}.muted{color:var(--muted);font-size:12px}.good{color:#83e4ba}.warn{color:#ffd09a}
+@media(max-width:700px){.grid,.stats{grid-template-columns:1fr}.panel{padding:14px}table{display:block;overflow:auto;white-space:nowrap}}
+</style>
+</head>
+<body><main>
+<div class="tag">Interner Prototyp · nicht live eingebunden</div>
+<h1>Vorausschauender Ertragsoptimierer</h1>
+<p>Testoberfläche für den Rechenkern. Hier können Beispielwerte geprüft werden, ohne bestehende Monatsdaten oder Kundenkonten anzufassen.</p>
+<div class="panel">
+<h2>Warengruppe analysieren</h2>
+<div class="grid">
+<div class="field"><label for="name">Warengruppe</label><input id="name" value="Getränke"></div>
+<div class="field"><label for="actual">Aktueller Umsatz (€)</label><input id="actual" type="number" min="0" step=".01" value="12000"></div>
+<div class="field"><label for="previous">Vormonat (€)</label><input id="previous" type="number" min="0" step=".01" value="13500"></div>
+<div class="field"><label for="year">Vorjahresmonat (€)</label><input id="year" type="number" min="0" step=".01" value="12800"></div>
+<div class="field"><label for="margin">Aktuelle Marge (%)</label><input id="margin" type="number" step=".01" value="29"></div>
+<div class="field"><label for="oldMargin">Marge vorher (%)</label><input id="oldMargin" type="number" step=".01" value="31"></div>
+<div class="field"><label for="shrink">Schwundquote (%)</label><input id="shrink" type="number" min="0" step=".01" value="1.2"></div>
+<div class="field"><label for="weather">Geschätzter Wettereffekt (%)</label><input id="weather" type="number" step=".1" value="0"></div>
+<div class="field"><label for="season">Geschätzter Saisoneffekt (%)</label><input id="season" type="number" step=".1" value="0"></div>
+</div>
+<div class="actions"><button id="run">Analyse berechnen</button><button id="demo" class="secondary">Beispiel mit Auffälligkeiten laden</button><button id="clear" class="secondary">Zurücksetzen</button></div>
+<p class="muted">Wetter- und Saisoneffekte sind hier manuelle Testannahmen, keine automatisch abgerufenen Messdaten.</p>
+</div>
+<div class="panel"><h2>Ergebnis</h2><div class="stats">
+<div class="stat"><span>Erwartungswert (Vergleichsbasis)</span><strong id="expected">–</strong></div>
+<div class="stat"><span>Abweichung zur Erwartung</span><strong id="variance">–</strong></div>
+<div class="stat"><span>Vergleichsqualität</span><strong id="confidence">–</strong></div>
+</div><div id="alerts" style="margin-top:14px"></div></div>
+<div class="panel"><h2>Wetter-Lernkern · synthetischer Test</h2><p>Prüft, ob der Kern nur bei mindestens drei vergleichbaren Beobachtungen je Temperaturgruppe einen vorläufigen Zusammenhang meldet. Diese Beispieldaten werden nicht gespeichert.</p><div class="stats"><div class="stat"><span>Warme Beobachtungen</span><strong id="learnWarm">–</strong></div><div class="stat"><span>Vergleichsbeobachtungen</span><strong id="learnMild">–</strong></div><div class="stat"><span>Vorläufiger Zusammenhang</span><strong id="learnEffect">–</strong></div></div><div id="learnNote" class="alert" style="margin-top:12px">Noch nicht geprüft.</div><button id="runLearning" type="button">Lernkern testen</button></div>
+<div class="panel"><h2>Technischer Hinweis</h2><p id="notes">Noch keine Berechnung ausgeführt.</p><p class="muted">Der Prototyp gibt Prüfhypothesen aus. Er beweist keine Ursache, verändert keine Preise und erstellt keine automatische Bestellentscheidung.</p></div>
+</main>
+<script src="./ertragsoptimierer.js?v=20261012-1"></script>
+<script>
+const $=id=>document.getElementById(id);
+const fmt=n=>n===null||n===undefined?'Nicht verfügbar':new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(n);
+const pct=n=>n===null||n===undefined?'Nicht verfügbar':new Intl.NumberFormat('de-DE',{maximumFractionDigits:2}).format(n)+' %';
+function num(id){const v=$(id).value.trim();return v===''?null:Number(v)}
+function calculate(){
+ const result=window.TankstellenErtragsoptimierer.evaluateGroup({
+  name:$('name').value,actualRevenue:num('actual'),previousRevenue:num('previous'),priorYearRevenue:num('year'),
+  marginPct:num('margin'),previousMarginPct:num('oldMargin'),shrinkPct:num('shrink'),
+  weatherEffectPct:num('weather')??0,seasonEffectPct:num('season')??0,dataComplete:true
+ });
+ $('expected').textContent=fmt(result.expectedRevenue);
+ $('variance').textContent=result.varianceEuro===null?'Nicht verfügbar':fmt(result.varianceEuro)+' ('+pct(result.variancePct)+')';
+ $('variance').className=result.varianceEuro!==null&&result.varianceEuro<0?'warn':'good';
+ $('confidence').textContent=result.confidence==='medium'?'Mittel':'Niedrig';
+ const list=$('alerts');list.replaceChildren();
+ if(!result.alerts.length){const el=document.createElement('div');el.className='alert';el.textContent='Keine Regel hat aktuell ein Prüfsignal ausgelöst. Das ist keine Garantie für Fehlerfreiheit.';list.append(el)}
+ result.alerts.forEach(a=>{const el=document.createElement('div');el.className='alert '+a.level;const b=document.createElement('strong');b.textContent=a.title;const p=document.createElement('p');p.textContent=a.detail;p.style.margin='6px 0 0';el.append(b,p);list.append(el)});
+ $('notes').textContent='Berechnet für '+result.name+'. Umsatztrend Vormonat: '+pct(result.trendPct)+'. Vorjahresvergleich: '+pct(result.priorYearPct)+'. Margenänderung: '+(result.marginDeltaPp===null?'nicht verfügbar':result.marginDeltaPp.toLocaleString('de-DE')+' Prozentpunkte')+'.';
+}
+function testLearning(){
+ const observations=[];
+ [900,950,920].forEach((v,i)=>observations.push({groupKey:'drinks',date:'warm-'+i,actualRevenue:v,maxTempC:27,complete:true,open:true,promotion:false}));
+ [700,720,710].forEach((v,i)=>observations.push({groupKey:'drinks',date:'mild-'+i,actualRevenue:v,maxTempC:19,complete:true,open:true,promotion:false}));
+ observations.push({groupKey:'drinks',actualRevenue:5000,maxTempC:29,complete:true,open:true,promotion:true});
+ const result=window.TankstellenErtragsoptimierer.learnWeatherEffects(observations)[0];
+ $('learnWarm').textContent=result.warmObservationCount;
+ $('learnMild').textContent=result.mildObservationCount;
+ $('learnEffect').textContent=result.warmVsMildPct===null?'Noch zu wenig Daten':(result.warmVsMildPct>0?'+':'')+result.warmVsMildPct+' %';
+ const pass=result.warmObservationCount===3&&result.mildObservationCount===3&&result.warmVsMildPct!==null;
+ $('learnNote').textContent=(pass?'TEST BESTANDEN: ':'TEST FEHLGESCHLAGEN: ')+(pass?'Die Aktionsbeobachtung wurde ausgeschlossen und der Zusammenhang nur aus drei warmen und drei milden Beispielen berechnet.':'Ergebnis entspricht nicht den erwarteten Mindestbedingungen.');
+ $('learnNote').className='alert '+(pass?'good':'high');
+}
+$('runLearning').addEventListener('click',testLearning);
+testLearning();
+$('run').addEventListener('click',calculate);
+$('demo').addEventListener('click',()=>{const vals={name:'Getränke',actual:10000,previous:13500,year:12800,margin:25,oldMargin:31,shrink:3.1,weather:0,season:0};Object.entries(vals).forEach(([k,v])=>$(k).value=v);calculate()});
+$('clear').addEventListener('click',()=>{['actual','previous','year','margin','oldMargin','shrink','weather','season'].forEach(id=>$(id).value='');$('expected').textContent='–';$('variance').textContent='–';$('confidence').textContent='–';$('alerts').replaceChildren();$('notes').textContent='Werte zurückgesetzt.'});
+calculate();
+</script></body></html>
