@@ -35,7 +35,7 @@ renderYearly();
 assert.ok(elements.yearTable.innerHTML.includes('2025'), 'year table must render 2025');
 assert.ok(elements.yearTable.innerHTML.includes('2026'), 'year table must render 2026');
 assert.equal((elements.yearTable.innerHTML.match(/vollständig/g) || []).length, 2, 'both annual rows should show 12/12 complete months');
-assert.equal((elements.yearTable.innerHTML.match(/<tr><td>2025|<tr><td>2026/g) || []).length, 2, 'both annual rows must be present');
+assert.equal((elements.yearTable.innerHTML.match(/<tr><td>2025<\/td>|<tr><td>2026<\/td>/g) || []).length, 2, 'both annual rows must be present');
 assert.equal((elements.yearTable.innerHTML.match(/<td>2025-/g) || []).length, 12, 'all 2025 monthly rows render');
 assert.equal((elements.yearTable.innerHTML.match(/<td>2026-/g) || []).length, 12, 'all 2026 monthly rows render');
 
