@@ -22,11 +22,33 @@ test('entry page remains usable at mobile viewport without horizontal overflow',
   await page.locator('#heroLogin').click();
   await expect(page.locator('#email')).toBeVisible();
   await expect(page.locator('#password')).toBeVisible();
-  const dimensions = await page.evaluate(() => ({
-    viewport: document.documentElement.clientWidth,
-    page: document.documentElement.scrollWidth,
-    body: document.body.scrollWidth
-  }));
+  const dimensions = await page.evaluate(() => {
+    const viewport = document.documentElement.clientWidth;
+    const offenders = [...document.querySelectorAll('body *')]
+      .map(el => {
+        const rect = el.getBoundingClientRect();
+        const style = getComputedStyle(el);
+        return {
+          tag: el.tagName.toLowerCase(),
+          id: el.id || '',
+          className: typeof el.className === 'string' ? el.className.slice(0, 100) : '',
+          left: Math.round(rect.left),
+          right: Math.round(rect.right),
+          width: Math.round(rect.width),
+          position: style.position,
+          overflowX: style.overflowX
+        };
+      })
+      .filter(el => el.width > 0 && (el.right > viewport + 1 || el.left < -1))
+      .sort((a, b) => b.right - a.right)
+      .slice(0, 12);
+    return {
+      viewport,
+      page: document.documentElement.scrollWidth,
+      body: document.body.scrollWidth,
+      offenders
+    };
+  });
   expect(dimensions.page, JSON.stringify(dimensions)).toBeLessThanOrEqual(dimensions.viewport + 1);
   expect(dimensions.body, JSON.stringify(dimensions)).toBeLessThanOrEqual(dimensions.viewport + 1);
 });
