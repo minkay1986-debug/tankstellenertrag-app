@@ -964,10 +964,19 @@ async function boot(){
   loadPilotSlots();
   if(!client){status('Supabase ist noch nicht konfiguriert. Zuerst Projekt-URL und Publishable Key eintragen.','err');return;}
   try{
+    const authParams=new URLSearchParams(location.search);
+    const hashParams=new URLSearchParams(location.hash.replace(/^#/,''));
+    const isPasswordRecovery=authParams.get('reset')==='1'||hashParams.get('type')==='recovery';
+    if(isPasswordRecovery){
+      openAuth();
+      showPasswordReset('new');
+      passwordResetStatus('E-Mail-Link geöffnet. Lege jetzt dein neues Passwort fest.','ok');
+      return;
+    }
     const session=await getStableSession();
     if(session){await loadStation(session);return;}
     status('Keine gespeicherte Sitzung erkannt. Bitte anmelden.');
-    const authParams=new URLSearchParams(location.search);if(authParams.get('signup')==='1'){openAuth();setSignupMode(true);}else if(authParams.get('login')==='1')openAuth();
+    if(authParams.get('signup')==='1'){openAuth();setSignupMode(true);}else if(authParams.get('login')==='1')openAuth();
   }catch(error){
     status('Sitzung konnte beim Seitenaufruf nicht wiederhergestellt werden: '+(error.message||String(error)),'err');
   }
