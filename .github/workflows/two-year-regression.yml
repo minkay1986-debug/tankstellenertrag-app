@@ -14,3 +14,5 @@ jobs:
           node-version: 20
       - name: Validate 2025 and 2026 fixture against current analysis source
         run: node tests/two-year-regression.test.mjs
+      - name: Execute real calculation functions from analyse.html against both years
+        run: node tests/two-year-app-calculation.test.mjs
