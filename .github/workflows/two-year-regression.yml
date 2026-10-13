@@ -26,3 +26,5 @@ jobs:
         run: node tests/two-year-meinmonat-render.test.mjs
       - name: Verify yearly overview reacts to changed monthly values
         run: node tests/two-year-yearly-reactivity.test.mjs
+      - name: Verify dashboard trend chart reacts to changed monthly values
+        run: node tests/two-year-chart-reactivity.test.mjs
