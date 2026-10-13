@@ -26,7 +26,7 @@
 <meta name="theme-color" content="#0d1418">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"TankstellenErtrag","url":"https://app.tankstellenertrag.de/","description":"Warenwirtschaftliche Monatsanalyse für Tankstellenshops."}</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./supabase-config.js?v=20261012-0426"></script>
+<script src="./supabase-config.js?v=20261013-2026"></script>
 <style>
 :root{--bg:#0d0f10;--panel:#181c1f;--panel2:#22272b;--line:#353c41;--text:#f5f6f7;--muted:#aeb6bc;--orange:#f47b20;--orange2:#ff9b4a;--green:#45c477;--red:#ef6461;--input:#fff1e7}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 10%,#2a2119 0,#111416 35%,#0d0f10 70%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
@@ -1321,50 +1321,7 @@ boot();
 </style>
 
 
-<script id="mobile-account-popover-position-fix">
-/* Mobile-only fix: locate the actual account panel from its visible labels and keep it within the viewport. */
-(function(){
-  var scheduled = false;
-  function fixAccountPopover(){
-    scheduled = false;
-    if (!window.matchMedia("(max-width: 700px)").matches) return;
-    var candidates = [];
-    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-    var node;
-    while ((node = walker.nextNode())) {
-      var label = (node.nodeValue || "").replace(/\s+/g, " ").trim().toLocaleUpperCase("de-DE");
-      if (!label || !(label.includes("NUTZERKONTO") || label.includes("NICHT ANGEMELDET"))) continue;
-      var el = node.parentElement;
-      for (var depth = 0; el && el !== document.body && depth < 9; depth++, el = el.parentElement) {
-        var r = el.getBoundingClientRect();
-        var style = window.getComputedStyle(el);
-        if (r.width >= 260 && r.width <= window.innerWidth + 80 && r.left < -8 && r.right > 80 && style.display !== "none" && style.visibility !== "hidden") {
-          candidates.push({el:el, width:r.width, area:r.width * Math.max(1,r.height)});
-        }
-      }
-    }
-    if (!candidates.length) return;
-    /* The closest matching panel is the smallest qualifying ancestor, not the page wrapper. */
-    candidates.sort(function(a,b){ return a.width-b.width || a.area-b.area; });
-    var panel = candidates[0].el;
-    var width = Math.min(Math.round(candidates[0].width), window.innerWidth - 24);
-    panel.style.setProperty("position", "fixed", "important");
-    panel.style.setProperty("left", "auto", "important");
-    panel.style.setProperty("right", "12px", "important");
-    panel.style.setProperty("width", width + "px", "important");
-    panel.style.setProperty("max-width", "calc(100vw - 24px)", "important");
-    panel.style.setProperty("box-sizing", "border-box", "important");
-    panel.style.setProperty("transform", "none", "important");
-    panel.style.setProperty("margin-left", "0", "important");
-    panel.style.setProperty("margin-right", "0", "important");
-  }
-  function scheduleFix(){ if(scheduled)return; scheduled=true; requestAnimationFrame(fixAccountPopover); }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", scheduleFix);
-  else scheduleFix();
-  new MutationObserver(scheduleFix).observe(document.documentElement, {childList:true,subtree:true,characterData:true});
-  window.addEventListener("resize", scheduleFix, {passive:true});
-})();
-</script>
+
 
 </body>
 </html>
