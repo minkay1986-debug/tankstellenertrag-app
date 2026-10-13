@@ -14,7 +14,7 @@ const data={articleObservations:[{key:'ean:1234567890123',name:'Test-Kaffee',las
 const ctx={data,$:id=>outputs[id]||null,esc:s=>String(s??'').replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])),articleHistoryStage:n=>n>=6?'Historie vorhanden':n>=3?'erste Trends möglich':'Aufbauphase'};
 vm.createContext(ctx);vm.runInContext(html,ctx);ctx.renderArticleDiagnostics('ean:1234567890123');
 const rendered=outputs.adResults.innerHTML;
-for(const term of ['Test-Kaffee','Absatz & Prognose','Marge & Gewinnpotenzial','Schwund, Verluste & Ursachenprüfung','20,0 %','Bestandsbewegung rechnerisch ausgeglichen','Artikelhistorie']) assert.ok(rendered.includes(term),'missing expected article output: '+term);
+for(const term of ['Test-Kaffee','Absatz & Prognose','Marge & Gewinnpotenzial','Schwund, Verluste & Ursachenprüfung','44 %','Bestandsbewegung rechnerisch ausgeglichen','Artikelhistorie']) assert.ok(rendered.includes(term),'missing expected article output: '+term);
 assert.ok(rendered.includes('80 Stück'),'latest sold quantity should render');
 assert.ok(rendered.includes('Rohertrag je Stück: 1,10 €'),'unit gross margin should calculate 2.5 - 1.4');
 assert.ok(rendered.includes('88,00 €'),'gross contribution should calculate 1.1 * 80');
