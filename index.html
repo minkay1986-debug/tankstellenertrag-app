@@ -977,6 +977,11 @@ function setSignupMode(v){signupMode=v;document.querySelectorAll('.signupField')
 setSignupMode(false);
 $('loginBtn').onclick=async(e)=>{e?.preventDefault();if(signupMode){setSignupMode(false);return;}if(!client)return;setBusy(true);status('Anmeldung läuft …');try{const {data,error}=await withTimeout(client.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value}),15000,'Supabase antwortet nicht. Bitte Internetverbindung prüfen und erneut versuchen.');if(error)throw error;if(!data?.session)throw new Error('Anmeldung wurde bestätigt, aber keine Sitzung zurückgegeben.');await loadStation(data.session);}catch(e){status(e.message||String(e),'err')}finally{setBusy(false)}};
 let passwordRecoveryMode=false;
+let passwordResetJustCompleted=false;
+function passwordResetStatus(msg,type=''){
+  const el=document.querySelector('#authView .status');
+  if(el){el.className='status '+type;el.textContent=msg;}
+}
 function showPasswordReset(mode){
   $('passwordResetPanel').classList.remove('hidden');
   $('loginBtn').classList.add('hidden');$('signupBtn').classList.add('hidden');$('forgotPasswordBtn').classList.add('hidden');
@@ -990,21 +995,21 @@ function showPasswordReset(mode){
 function hidePasswordReset(){
   $('passwordResetPanel').classList.add('hidden');$('loginBtn').classList.remove('hidden');$('signupBtn').classList.remove('hidden');$('forgotPasswordBtn').classList.remove('hidden');passwordRecoveryMode=false;setSignupMode(false);
 }
-$('forgotPasswordBtn').onclick=()=>{if(!client){status('Anmeldedienst ist nicht verfügbar.','err');return;}showPasswordReset('email');};
-$('cancelPasswordResetBtn').onclick=()=>{hidePasswordReset();status('Bitte melde dich an.');};
+$('forgotPasswordBtn').onclick=()=>{if(!client){passwordResetStatus('Anmeldedienst ist nicht verfügbar.','err');return;}showPasswordReset('email');};
+$('cancelPasswordResetBtn').onclick=()=>{hidePasswordReset();passwordResetStatus('Bitte melde dich an.');};
 $('sendResetEmailBtn').onclick=async()=>{
-  if(!client)return;const email=$('email').value.trim();if(!email){status('Bitte gib zuerst deine Konto-E-Mail ein.','err');$('email').focus();return;}
-  $('sendResetEmailBtn').disabled=true;status('Reset-Link wird angefordert …');
-  try{const {error}=await withTimeout(client.auth.resetPasswordForEmail(email,{redirectTo:'https://app.tankstellenertrag.de/?reset=1'}),15000,'Die Anfrage hat zu lange gedauert. Bitte versuche es erneut.');if(error)throw error;status('Wenn ein Konto zu dieser E-Mail existiert, wurde ein Link zum Zurücksetzen versendet. Bitte prüfe auch den Spam-Ordner.','ok');}
-  catch(e){status(e.message||String(e),'err');}finally{$('sendResetEmailBtn').disabled=false;}
+  if(!client)return;const email=$('email').value.trim();if(!email){passwordResetStatus('Bitte gib zuerst deine Konto-E-Mail ein.','err');$('email').focus();return;}
+  $('sendResetEmailBtn').disabled=true;passwordResetStatus('Reset-Link wird angefordert …');
+  try{const {error}=await withTimeout(client.auth.resetPasswordForEmail(email,{redirectTo:'https://app.tankstellenertrag.de/?reset=1'}),15000,'Die Anfrage hat zu lange gedauert. Bitte versuche es erneut.');if(error)throw error;passwordResetStatus('Wenn ein Konto zu dieser E-Mail existiert, wurde ein Link zum Zurücksetzen versendet. Bitte prüfe auch den Spam-Ordner.','ok');}
+  catch(e){passwordResetStatus(e.message||String(e),'err');}finally{$('sendResetEmailBtn').disabled=false;}
 };
 $('saveNewPasswordBtn').onclick=async()=>{
   const password=$('newPassword').value,confirm=$('newPasswordConfirm').value;
-  if(password.length<10||!/[a-z]/.test(password)||!/[A-Z]/.test(password)||!/[0-9]/.test(password)||!/[^A-Za-z0-9]/.test(password)){status('Mindestens 10 Zeichen mit Groß- und Kleinbuchstaben, Zahl und Sonderzeichen verwenden.','err');return;}
-  if(password!==confirm){status('Die Passwörter stimmen nicht überein.','err');return;}
-  $('saveNewPasswordBtn').disabled=true;status('Neues Passwort wird gespeichert …');
-  try{const {data,error}=await withTimeout(client.auth.updateUser({password}),15000,'Die Anfrage hat zu lange gedauert. Bitte erneut versuchen.');if(error)throw error;await client.auth.signOut({scope:'local'});$('newPassword').value='';$('newPasswordConfirm').value='';hidePasswordReset();status('Passwort geändert. Du kannst dich jetzt mit dem neuen Passwort anmelden.','ok');}
-  catch(e){status(e.message||String(e),'err');}finally{$('saveNewPasswordBtn').disabled=false;}
+  if(password.length<10||!/[a-z]/.test(password)||!/[A-Z]/.test(password)||!/[0-9]/.test(password)||!/[^A-Za-z0-9]/.test(password)){passwordResetStatus('Mindestens 10 Zeichen mit Groß- und Kleinbuchstaben, Zahl und Sonderzeichen verwenden.','err');return;}
+  if(password!==confirm){passwordResetStatus('Die Passwörter stimmen nicht überein.','err');return;}
+  $('saveNewPasswordBtn').disabled=true;passwordResetStatus('Neues Passwort wird gespeichert …');
+  try{const {data,error}=await withTimeout(client.auth.updateUser({password}),15000,'Die Anfrage hat zu lange gedauert. Bitte erneut versuchen.');if(error)throw error;passwordResetJustCompleted=true;await client.auth.signOut({scope:'local'});$('newPassword').value='';$('newPasswordConfirm').value='';hidePasswordReset();passwordResetStatus('Passwort erfolgreich geändert. Bitte melde dich jetzt mit dem neuen Passwort an.','ok');}
+  catch(e){passwordResetStatus(e.message||String(e),'err');}finally{$('saveNewPasswordBtn').disabled=false;}
 };
 
 $('signupBtn').onclick=async(e)=>{e?.preventDefault();if(!signupMode){setSignupMode(true);return;} if(!client)return;setBusy(true);status('Konto wird angelegt …');try{const email=$('email').value.trim(),password=$('password').value,fullName=$('fullName').value.trim(),stationName=$('stationName').value.trim(),location=$('location').value.trim(),phone=$('phone').value.trim();const password2=$('password2').value,honeypot=$('website_hp')?.value.trim();if(honeypot)throw new Error('Registrierung konnte nicht verarbeitet werden.');if(!email||!fullName||!stationName||!location)throw new Error('Bitte Name, Tankstellenname, PLZ/Ort und E-Mail vollständig eingeben.');if(!$('businessConfirm')?.checked)throw new Error('Bitte bestätigen, dass du TankstellenErtrag als Unternehmer nutzt.');if(!$('agbConfirm')?.checked)throw new Error('Bitte AGB und Datenschutzerklärung bestätigen.');if(password.length<10||!/[a-z]/.test(password)||!/[A-Z]/.test(password)||!/[0-9]/.test(password)||! /[^A-Za-z0-9]/.test(password))throw new Error('Das Passwort muss mindestens 10 Zeichen sowie Groß- und Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten.');if(password!==password2)throw new Error('Die Passwörter stimmen nicht überein.');const parts=location.split(/\s+/,2),postcode=/^\d{5}$/.test(parts[0])?parts[0]:null,city=postcode?location.slice(parts[0].length).trim():location;const {data,error}=await client.auth.signUp({email,password,options:{data:{full_name:fullName,station_name:stationName,postcode,city,phone:phone||null}}});if(error)throw error;
@@ -1056,10 +1061,11 @@ if(client){
   client.auth.onAuthStateChange((event)=>{
     if(event==='PASSWORD_RECOVERY'){
       showPasswordReset('new');
-      status('E-Mail-Link bestätigt. Lege jetzt dein neues Passwort fest.','ok');
+      passwordResetStatus('E-Mail-Link bestätigt. Lege jetzt dein neues Passwort fest.','ok');
       return;
     }
     if(event==='SIGNED_OUT'){
+      if(passwordResetJustCompleted){passwordResetJustCompleted=false;return;}
       window.location.replace('https://app.tankstellenertrag.de/');
       return;
     }
