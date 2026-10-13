@@ -96,6 +96,20 @@ body{background:radial-gradient(ellipse at 15% 0%,rgba(44,104,190,.24),transpare
 @media(max-width:850px){.navrow{height:auto;min-height:70px;align-items:flex-start;flex-direction:column;gap:12px;padding-top:12px;padding-bottom:12px}.navrow nav{width:100%;max-width:100%;flex-wrap:wrap;gap:10px 14px}.navrow nav a{white-space:normal}.navrow .brand{flex:0 0 auto}}
 @media(max-width:600px){.heroGrid{width:100%;max-width:100%;min-width:0;grid-template-columns:minmax(0,1fr);gap:20px}.heroGrid>*,.heroVisual,.heroSide{min-width:0;max-width:100%}.heroVisual{transform:none!important;padding:16px;overflow:hidden}.hero .actions{display:flex;flex-direction:column;align-items:stretch;width:100%;min-width:0}.hero .actions .cta,.hero .actions .ghost{display:block;width:100%;max-width:100%;min-width:0;white-space:normal;text-align:center;overflow-wrap:anywhere}.hero h1,.hero .lead{max-width:100%;overflow-wrap:anywhere}.metricRow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.metric{min-width:0}.metric strong{overflow-wrap:anywhere}}
 </style>
+<style id="mobile-overflow-fix-final">
+@media (max-width:600px) {
+  .heroGrid { width:100%; max-width:100%; min-width:0; grid-template-columns:minmax(0,1fr)!important; }
+  .heroGrid > * { grid-column:1/-1!important; grid-row:auto!important; width:100%; min-width:0; max-width:100%; }
+  .heroSide { display:block!important; grid-template-columns:minmax(0,1fr)!important; }
+  .heroSideList { grid-column:auto!important; grid-row:auto!important; min-width:0; }
+  .heroSideList > div { min-width:0; overflow-wrap:anywhere; }
+  .hero .actions { display:flex!important; flex-direction:column!important; align-items:stretch!important; width:100%; min-width:0; }
+  .hero .actions > .cta, .hero .actions > .ghost { display:block!important; box-sizing:border-box; width:100%!important; max-width:100%; min-width:0!important; white-space:normal; overflow-wrap:anywhere; text-align:center; }
+  .heroVisual { transform:none!important; width:100%; max-width:100%; min-width:0; overflow:hidden; }
+  .hero h1, .hero .lead, .praxisNote, .heroSide p, .heroSide h3 { max-width:100%; overflow-wrap:anywhere; }
+  .heroSide, .heroVisual { box-sizing:border-box; }
+}
+</style>
 </head>
 <body>
 <div class="site">
