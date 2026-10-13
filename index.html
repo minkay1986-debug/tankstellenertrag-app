@@ -956,6 +956,7 @@ const originalLoadStation=loadStation;
 
 function setAuthenticatedPage(active){
   document.querySelector('.site')?.classList.toggle('authenticated',!!active);
+  window.TSE_refreshServerNotice?.();
 }
 function resetProtectedViews(){
   setAuthenticatedPage(false);
@@ -1067,7 +1068,8 @@ boot();
 (function(){
   var banner=document.getElementById('serverIncidentBanner');if(!banner)return;
   var localFailure=false,dismissed=false,lastOfficial=false;
-  function render(){banner.hidden=dismissed||!(localFailure||lastOfficial);}
+  function render(){var customerArea=!!document.querySelector('.site')?.classList.contains('authenticated');banner.hidden=!customerArea||dismissed||!(localFailure||lastOfficial);}
+  window.TSE_refreshServerNotice=render;
   window.TSE_dismissServerNotice=function(){dismissed=true;render();};
   window.TSE_serverNotice=function(mode){if(mode==='local'){localFailure=true;dismissed=false;}else if(mode==='clear'){localFailure=false;if(!lastOfficial)dismissed=false;}render();};
   async function checkOfficialStatus(){
