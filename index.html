@@ -110,6 +110,60 @@ body{background:radial-gradient(ellipse at 15% 0%,rgba(44,104,190,.24),transpare
 @media(max-width:700px){.ertragsradarGrid{grid-template-columns:1fr}.ertragsradarGrid article{padding:16px}.ertragsradarAction{align-items:stretch;flex-direction:column}.ertragsradarAction .cta{width:100%;box-sizing:border-box}.ertragsradarPromo{padding:22px!important}}
 </style>
 
+
+<style id="homepage-unified-glass-layout">
+/* Einheitliches TankstellenErtrag-Glass-Design für die gesamte öffentliche Startseite */
+body{
+ background:
+  radial-gradient(ellipse at 78% 12%,rgba(40,126,220,.30) 0%,rgba(20,70,125,.12) 30%,transparent 58%),
+  radial-gradient(ellipse at 12% 55%,rgba(15,91,170,.18) 0%,transparent 48%),
+  linear-gradient(155deg,#071a33 0%,#0a2b50 48%,#06162b 100%)!important;
+ background-attachment:fixed!important;
+}
+main>.section,
+main>section.publicOnly.section,
+main>section.publicOnly.section.dark,
+main>.ctaSection,
+main>section.ctaSection{
+ background:linear-gradient(145deg,rgba(11,43,80,.78),rgba(5,22,43,.80))!important;
+ border-top:1px solid rgba(111,177,245,.16)!important;
+ border-bottom:1px solid rgba(111,177,245,.12)!important;
+}
+main>.section.dark,
+main>section.publicOnly.section.dark{
+ background:linear-gradient(145deg,rgba(10,40,75,.88),rgba(6,24,47,.92))!important;
+}
+main .section .steps,
+main .section .steps>div,
+main .section .cards article,
+main .section .monthlyCard,
+main .section .monthlyNote,
+main .section .monthlyPilot,
+main .section .monthlyFlow>div,
+main .section .quote{
+ background:linear-gradient(145deg,rgba(26,65,105,.58),rgba(8,28,52,.82))!important;
+ border-color:rgba(128,190,247,.22)!important;
+}
+main .section .steps{gap:1px}
+main .section .steps>div{box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+/* Hero auf breiten Monitoren besser ausnutzen, ohne die Karten zu strecken */
+.hero.publicOnly>.wrap.heroGrid{
+ width:min(1480px,calc(100% - 64px))!important;
+ grid-template-columns:minmax(0,1fr) minmax(0,1.02fr) minmax(230px,.72fr)!important;
+ gap:clamp(18px,2vw,30px)!important;
+}
+.hero.publicOnly .heroVisual,.hero.publicOnly .heroSide{min-width:0;max-width:100%}
+@media(max-width:1100px){
+ .hero.publicOnly>.wrap.heroGrid{width:min(100% - 32px,900px)!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+ .hero.publicOnly .heroSide{grid-column:1/-1}
+}
+@media(max-width:700px){
+ .hero.publicOnly>.wrap.heroGrid{width:calc(100% - 28px)!important;grid-template-columns:minmax(0,1fr)!important;gap:16px!important}
+ .hero.publicOnly .heroSide{grid-column:auto}
+ .section{padding:56px 0}
+}
+</style>
+
 </head>
 <body>
 <div class="site">
