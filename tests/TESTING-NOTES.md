@@ -9,3 +9,5 @@ Prüft zusätzlich die echte Jahresübersicht-Funktion mit 12/12 Monatszeilen je
 Harness syntax corrected before rerun.
 
 Annual renderer assertions fixed and queued for another CI run.
+
+Actual yearly() function included in isolated VM for renderer test.
