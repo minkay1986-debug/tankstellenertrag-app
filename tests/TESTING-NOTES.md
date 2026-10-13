@@ -5,3 +5,5 @@ Dieser Testzweig enth채lt synthetische Monatsdaten f체r 2025 und 2026. Die CI f�
 Der zweite Test f체hrt die originalen Berechnungsfunktionen aus analyse.html in einer isolierten Node-VM aus.
 
 Pr체ft zus채tzlich die echte Jahres체bersicht-Funktion mit 12/12 Monatszeilen je Jahr.
+
+Harness syntax corrected before rerun.
