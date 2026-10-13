@@ -23,13 +23,20 @@ const elements = { yearTable: { innerHTML: '' } };
 const context = { data: { months: fixture.months, settings: {} }, console, $: id => elements[id] || (elements[id] = { innerHTML: '' }), eur: n => Number(n || 0).toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €', pct: n => Number(n || 0).toFixed(2) + ' %' };
 vm.createContext(context);
 vm.runInContext(groupDecl + ';' + functions, context);
-const calc = context.calc, keys = context.keys, hasData = context.hasData, yearly = context.yearly;
+const calc = context.calc, keys = context.keys, hasData = context.hasData, renderYearly = context.yearly;
 assert.equal(typeof calc, 'function', 'actual calc() function must be loaded');
 assert.equal(typeof keys, 'function', 'actual keys() function must be loaded');
 assert.equal(typeof hasData, 'function', 'actual hasData() function must be loaded');
 assert.equal(keys().length, 24);
 assert.equal(hasData('2025-01'), true);
-assert.equal(hasData('2026-12'), true);\nyearly();\nassert.ok(elements.yearTable.innerHTML.includes('2025'), 'year table must render 2025');\nassert.ok(elements.yearTable.innerHTML.includes('2026'), 'year table must render 2026');\nassert.equal((elements.yearTable.innerHTML.match(/vollständig/g) || []).length, 2, 'both annual rows should show 12/12 complete months');\nassert.equal((elements.yearTable.innerHTML.match(/<tr><td>2025|<tr><td>2026/g) || []).length, 2, 'both annual rows must be present');\nassert.equal((elements.yearTable.innerHTML.match(/<td>2025-/g) || []).length, 12, 'all 2025 monthly rows render');\nassert.equal((elements.yearTable.innerHTML.match(/<td>2026-/g) || []).length, 12, 'all 2026 monthly rows render');
+assert.equal(hasData('2026-12'), true);
+renderYearly();
+assert.ok(elements.yearTable.innerHTML.includes('2025'), 'year table must render 2025');
+assert.ok(elements.yearTable.innerHTML.includes('2026'), 'year table must render 2026');
+assert.equal((elements.yearTable.innerHTML.match(/vollständig/g) || []).length, 2, 'both annual rows should show 12/12 complete months');
+assert.equal((elements.yearTable.innerHTML.match(/<tr><td>2025|<tr><td>2026/g) || []).length, 2, 'both annual rows must be present');
+assert.equal((elements.yearTable.innerHTML.match(/<td>2025-/g) || []).length, 12, 'all 2025 monthly rows render');
+assert.equal((elements.yearTable.innerHTML.match(/<td>2026-/g) || []).length, 12, 'all 2026 monthly rows render');
 
 const yearly = {};
 for (const year of ['2025','2026']) {
