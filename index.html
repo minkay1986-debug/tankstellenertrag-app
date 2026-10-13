@@ -1040,6 +1040,16 @@ async function verifyAdminMfa(){
   try{const challenge=await client.auth.mfa.challenge({factorId:adminMfaFactorId});if(challenge.error)throw challenge.error;const verify=await client.auth.mfa.verify({factorId:adminMfaFactorId,challengeId:challenge.data.id,code});if(verify.error)throw verify.error;$('mfaPanel').classList.add('hidden');$('mfaCode').value='';$('mfaVerify').disabled=false;const {data:sessionData}=await client.auth.getSession();if(sessionData.session)await loadStation(sessionData.session);}catch(e){$('mfaMsg').className='status err mfaMsg';$('mfaMsg').textContent=e.message||String(e);$('mfaVerify').disabled=false;}
 }
 $('mfaVerify').onclick=verifyAdminMfa;
+$('mfaCancel').onclick=()=>{
+  $('mfaPanel').classList.add('hidden');
+  $('newPassword').value='';
+  $('newPasswordConfirm').value='';
+  $('passwordResetPanel').classList.add('hidden');
+  $('authView').classList.add('hidden');
+  document.body.style.overflow='';
+  const cleanUrl=location.origin+location.pathname;
+  history.replaceState({},document.title,cleanUrl);
+};
 $('logoutBtn').onclick=async()=>{if(client){setBusy(false);await client.auth.signOut({scope:'local'});}};
 const originalLoadStation=loadStation;
 
