@@ -158,10 +158,12 @@ async function loadStation(session){
     status('Anmeldung erfolgreich – Admin-Sicherheit wird geprüft …','ok');
     const aal=await withTimeout(client.auth.mfa.getAuthenticatorAssuranceLevel(),10000,'Admin-Sicherheitsprüfung antwortet nicht.');
     if(aal.error){status('Admin-Sicherheitsprüfung fehlgeschlagen: '+aal.error.message,'err');return;}
-    if(aal.data.nextLevel==='aal2'&&aal.data.currentLevel!=='aal2'){await showAdminMfaChallenge();return;}
     const factors=await withTimeout(client.auth.mfa.listFactors(),10000,'Admin-Faktoren konnten nicht geladen werden.');
+    if(factors.error){status('Admin-Authenticator konnte nicht geprüft werden: '+factors.error.message,'err');return;}
     const verified=(factors.data?.totp||[]).find(x=>x.status==='verified');
     if(!verified){await showAdminMfaSetup();return;}
+    // Adminoberfläche erst nach nachgewiesenem AAL2 freigeben; kein Fail-open bei unerwartetem Auth-Status.
+    if(aal.data.currentLevel!=='aal2'){await showAdminMfaChallenge();return;}
     $('adminView').classList.remove('hidden');loadApplicants();loadCancellationRequests();loadVisitorStats();loadCustomerFeedback();loadSnapshotRecoveryStations();
     status('Administrator angemeldet – Besucherstatistik wird geladen.','ok');
     return;
