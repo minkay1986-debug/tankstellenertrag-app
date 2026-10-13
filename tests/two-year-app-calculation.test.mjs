@@ -19,7 +19,8 @@ const functions = [
   between('function keys(){', 'function renderGroups(){')
 ].join('\n');
 
-const elements = { yearTable: { innerHTML: '' } };\nconst context = { data: { months: fixture.months, settings: {} }, console, $: id => elements[id] || (elements[id] = { innerHTML: '' }), eur: n => Number(n || 0).toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €', pct: n => Number(n || 0).toFixed(2) + ' %' };
+const elements = { yearTable: { innerHTML: '' } };
+const context = { data: { months: fixture.months, settings: {} }, console, $: id => elements[id] || (elements[id] = { innerHTML: '' }), eur: n => Number(n || 0).toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €', pct: n => Number(n || 0).toFixed(2) + ' %' };
 vm.createContext(context);
 vm.runInContext(groupDecl + ';' + functions, context);
 const calc = context.calc, keys = context.keys, hasData = context.hasData, yearly = context.yearly;
