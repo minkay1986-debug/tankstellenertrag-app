@@ -87,3 +87,23 @@ Deno.test("weather matching never fabricates observations when weather or daily 
   );
   if (matched.length !== 0) throw new Error("Unmatched date must not be assigned a weather value");
 });
+
+Deno.test("synthetic test-station data produces a preliminary signal only after three warm and three mild days", () => {
+  const weather = [
+    { date: "2026-07-01", temp_max: 28 }, { date: "2026-07-02", temp_max: 29 }, { date: "2026-07-03", temp_max: 27 },
+    { date: "2026-04-01", temp_max: 20 }, { date: "2026-04-02", temp_max: 19 }, { date: "2026-04-03", temp_max: 22 },
+  ];
+  const sales = [
+    { date: "2026-07-01", groupKey: "eis", actualRevenue: 150 },
+    { date: "2026-07-02", groupKey: "eis", actualRevenue: 160 },
+    { date: "2026-07-03", groupKey: "eis", actualRevenue: 140 },
+    { date: "2026-04-01", groupKey: "eis", actualRevenue: 100 },
+    { date: "2026-04-02", groupKey: "eis", actualRevenue: 110 },
+    { date: "2026-04-03", groupKey: "eis", actualRevenue: 90 },
+  ];
+  const paired = optimizer.matchWeatherSalesObservations(weather, sales);
+  const [result] = optimizer.learnWeatherEffects(paired);
+  if (paired.length !== 6) throw new Error(`Expected six exact date pairs, got ${paired.length}`);
+  if (result.warmObservationCount !== 3 || result.mildObservationCount !== 3) throw new Error("Synthetic station sample counts incorrect");
+  if (result.warmVsMildPct !== 50 || result.warmSignal !== "preliminary") throw new Error("Expected synthetic +50% preliminary warm-weather signal");
+});
