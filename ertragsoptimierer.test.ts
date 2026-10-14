@@ -107,3 +107,54 @@ Deno.test("synthetic test-station data produces a preliminary signal only after 
   if (result.warmObservationCount !== 3 || result.mildObservationCount !== 3) throw new Error("Synthetic station sample counts incorrect");
   if (result.warmVsMildPct !== 50 || result.warmSignal !== "preliminary") throw new Error("Expected synthetic +50% preliminary warm-weather signal");
 });
+
+
+Deno.test("two-year synthetic station run matches every daily record and learns group-specific weather effects", () => {
+  // Test fixture only: 2024-01-01 through 2025-12-31. No real customer data is changed.
+  const weather: any[] = [];
+  const sales: any[] = [];
+  const groups = [
+    { key: "eis", base: 42, warmBoost: 1.8 },
+    { key: "getraenke", base: 210, warmBoost: 1.25 },
+    { key: "backshop", base: 165, warmBoost: 0.82 },
+    { key: "kaffee", base: 95, warmBoost: 0.72 },
+  ];
+  const start = Date.UTC(2024, 0, 1);
+  const end = Date.UTC(2025, 11, 31);
+  let dayIndex = 0;
+  for (let ms = start; ms <= end; ms += 86400000, dayIndex++) {
+    const date = new Date(ms).toISOString().slice(0, 10);
+    // Seasonal daily temperatures with deterministic day-to-day variation.
+    const seasonal = 10 + 10 * Math.sin((2 * Math.PI * (dayIndex - 105)) / 365.25);
+    const tempMax = Math.round((seasonal + 5 * Math.sin(dayIndex * 1.71) + 4) * 10) / 10;
+    const tempMin = Math.round((tempMax - 6 - (dayIndex % 5)) * 10) / 10;
+    weather.push({ date, temp_max: tempMax, temp_min: tempMin, precipitation_mm: dayIndex % 4 === 0 ? 2.5 : 0 });
+    for (const group of groups) {
+      const weekendFactor = [0, 6].includes(new Date(ms).getUTCDay()) ? 1.08 : 1;
+      const warmFactor = tempMax >= 25 ? group.warmBoost : 1;
+      const seasonalNoise = 1 + 0.08 * Math.sin(dayIndex * 0.43 + group.base);
+      const revenue = Math.round(group.base * weekendFactor * warmFactor * seasonalNoise * 100) / 100;
+      sales.push({ date, groupKey: group.key, actualRevenue: revenue, complete: true, open: true, promotion: false });
+    }
+  }
+  const paired = optimizer.matchWeatherSalesObservations(weather, sales);
+  if (weather.length !== 731) throw new Error(`Expected 731 weather days, got ${weather.length}`);
+  if (sales.length !== 2924) throw new Error(`Expected 2,924 daily group records, got ${sales.length}`);
+  if (paired.length !== sales.length) throw new Error(`Expected all daily records to match; matched ${paired.length}/${sales.length}`);
+  const learned = optimizer.learnWeatherEffects(paired);
+  const byGroup = new Map(learned.map((row: any) => [row.groupKey, row]));
+  for (const key of groups.map(g => g.key)) {
+    const row: any = byGroup.get(key);
+    if (!row || row.warmObservationCount < 3 || row.mildObservationCount < 3) {
+      throw new Error(`Insufficient two-year learning samples for ${key}`);
+    }
+    if (row.warmSignal !== "preliminary" || typeof row.warmVsMildPct !== "number") {
+      throw new Error(`No preliminary signal generated for ${key}`);
+    }
+  }
+  const ice: any = byGroup.get("eis");
+  const drinks: any = byGroup.get("getraenke");
+  if (!(ice.warmVsMildPct > drinks.warmVsMildPct)) {
+    throw new Error("Expected ice sales to show a stronger warm-weather effect than drinks");
+  }
+});
