@@ -1,7 +1,7 @@
-/* Nur den Supabase Publishable Key verwenden. Niemals service_role/Secret Keys hier eintragen. */
+/* Browser-Key-Diagnosetest: vorübergehend Legacy anon statt Publishable Key; niemals service_role/Secret Keys hier eintragen. */
 window.TANKSTELLENERTRAG_SUPABASE = {
   url: 'https://irzlbdybtrbztjjkrlad.supabase.co',
-  publishableKey: 'sb_publishable_IcdCc5Wd-coYOLyHl_XBuQ_4FcEyv-1'
+  publishableKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlyemxiZHlidHJienRqamtybGFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MjY3MzcsImV4cCI6MjEwNjEwMjczN30.7Gk98I7vxpXd1dGfNjQ1VohXrgmNUy6LsudhVG44kF4'
 };
 
 /* TankstellenErtrag Profil-Avatar: kleines Konto-Icon, Standard-Zapfhahn und frei wählbare Charaktere. */
