@@ -619,7 +619,12 @@ if(!window.__TSE_errorCaptureInstalled){
   const nativeFetch=window.fetch.bind(window);
   window.fetch=async function(input,init){
     const url=typeof input==='string'?input:(input&&input.url)||'';
-    const response=await nativeFetch(input,init);
+    let response;
+    try{response=await nativeFetch(input,init);}
+    catch(fetchError){
+      try{const u=new URL(url,location.href);if(u.hostname.endsWith('.supabase.co')&&!/\/rest\/v1\/rpc\/(report_app_error|get_admin_app_error_reports|set_admin_app_error_status)/.test(u.pathname)){const source=u.pathname.includes('/functions/v1/')?'edge-function':u.pathname.includes('/auth/v1/')?'auth':'database-api';tseReport(source,'FetchError','Netzwerkfehler bei Supabase-Anfrage: '+u.pathname);}}catch(_){}
+      throw fetchError;
+    }
     try{
       const u=new URL(url,location.href);
       if(u.hostname.endsWith('.supabase.co')&&response.status>=400&&!/\/rest\/v1\/rpc\/(report_app_error|get_admin_app_error_reports|set_admin_app_error_status)/.test(u.pathname)){
