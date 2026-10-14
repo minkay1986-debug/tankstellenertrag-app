@@ -1147,11 +1147,10 @@ window.initTeAsk=initTeAsk;window.loadTeCommunity=loadTeCommunity;
       var relevant=(summary.components||[]).some(function(c){
         return /edge functions|realtime|database|authentication|auth|api gateway|storage/i.test(c.name||'')&&c.status&&c.status!=='operational';
       });
-      var incidents=(summary.incidents||[]).some(function(incident){
-        var text=[incident.name,incident.status].concat((incident.incident_updates||[]).map(function(u){return u.body||'';})).join(' ');
-        return /edge function|realtime|database|authentication|auth service|api gateway|storage/i.test(text)&&!(/resolved|completed/i.test(incident.status||''));
-      });
-      lastOfficial=!!(relevant||incidents);
+      // Nur den aktuellen Status relevanter Komponenten verwenden.
+      // Alte oder noch im Monitoring befindliche Vorfälle dürfen die Meldung
+      // nicht dauerhaft anzeigen, wenn die betroffenen Dienste wieder laufen.
+      lastOfficial=!!relevant;
       if(!lastOfficial&&!localFailure)dismissed=false;
       render();
     }catch(_e){/* Statusseite nicht erreichbar: keine Störung erfinden. */}
