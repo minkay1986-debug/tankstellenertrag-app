@@ -59,3 +59,31 @@ Deno.test("weather learning does not report a signal with too few observations",
     throw new Error("Insufficient samples must not create a weather effect");
   }
 });
+
+Deno.test("weather learning matches station sales to the exact DWD date and filters unsafe samples", () => {
+  const weather = [
+    { date: "2026-07-01", temp_max: 28, temp_min: 17, precipitation_mm: 0 },
+    { date: "2026-04-01", temp_max: 20, temp_min: 9, precipitation_mm: 2 },
+    { date: "2026-07-02", temp_max: 30, temp_min: 18, precipitation_mm: 0 },
+  ];
+  const sales = [
+    { date: "2026-07-01", groupKey: "eis", actualRevenue: 150 },
+    { date: "2026-04-01", groupKey: "eis", actualRevenue: 100 },
+    { date: "2026-07-02", groupKey: "eis", actualRevenue: 180, promotion: true },
+    { date: "2026-07-03", groupKey: "eis", actualRevenue: 999 },
+    { date: "2026-07-01", groupKey: "eis", actualRevenue: 999, complete: false },
+    { date: "2026-07-01", groupKey: "eis", actualRevenue: 999, open: false },
+  ];
+  const matched = optimizer.matchWeatherSalesObservations(weather, sales);
+  if (matched.length !== 2) throw new Error(`Expected 2 valid date-matched observations, got ${matched.length}`);
+  if (matched[0].maxTempC !== 28 || matched[0].actualRevenue !== 150) throw new Error("Weather and revenue were not paired by exact date");
+  if (matched.some((x: any) => x.actualRevenue === 999)) throw new Error("Invalid/incomplete/promotion observations were retained");
+});
+
+Deno.test("weather matching never fabricates observations when weather or daily revenue is missing", () => {
+  const matched = optimizer.matchWeatherSalesObservations(
+    [{ date: "2026-07-01", temp_max: 28 }],
+    [{ date: "2026-07-02", groupKey: "eis", actualRevenue: 150 }]
+  );
+  if (matched.length !== 0) throw new Error("Unmatched date must not be assigned a weather value");
+});
