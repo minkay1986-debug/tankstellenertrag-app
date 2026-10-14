@@ -286,3 +286,77 @@ Deno.test({
     }
   },
 });
+
+
+Deno.test({
+  name: "DWD two-year reliability integration: daily data, month coverage, uniqueness and summary reconcile",
+  sanitizeResources: false,
+  sanitizeOps: false,
+  fn: async () => {
+    const start = "2024-01-01";
+    const end = "2025-12-31";
+    const response = await handler(new Request("https://local.test", {
+      method: "POST",
+      headers: { Origin: origin, Authorization: "Bearer test", "Content-Type": "application/json" },
+      body: JSON.stringify({ latitude: 49.3, longitude: 10.8, start_date: start, end_date: end }),
+    }));
+    const payload = await response.json();
+    if (response.status !== 200) {
+      throw new Error(`Expected 200 for two-year DWD period, got ${response.status}: ${JSON.stringify(payload)}`);
+    }
+    if (payload.source !== "DWD CDC Tageswerte") throw new Error("Two-year response has wrong source");
+    if (payload.start_date !== start || payload.end_date !== end) throw new Error("Two-year response dates do not match request");
+    if (typeof payload.approximate_distance_km !== "number" || payload.approximate_distance_km > 100) {
+      throw new Error(`Two-year station is implausibly far away: ${payload.station_id}, ${payload.approximate_distance_km} km`);
+    }
+    if (!Array.isArray(payload.daily) || payload.daily.length < 500) {
+      throw new Error(`Insufficient daily observations for two years: ${payload.daily?.length ?? "not an array"}`);
+    }
+    const dates = payload.daily.map((row: Record<string, unknown>) => row.date);
+    if (new Set(dates).size !== dates.length) throw new Error("Duplicate daily observations found across ZIPs");
+    if (dates.some((date: unknown) => typeof date !== "string" || date < start || date > end)) {
+      throw new Error("Two-year response includes dates outside the requested period");
+    }
+    if (dates.some((date: string, i: number) => i > 0 && date < dates[i - 1])) {
+      throw new Error("Two-year observations are not sorted by date");
+    }
+    const months = new Set(dates.map((date: string) => date.slice(0, 7)));
+    if (months.size < 22) throw new Error(`Monthly coverage is too sparse: ${months.size}/24 months`);
+    if (payload.coverage_percent !== Math.min(100, Math.round(payload.days_returned / 731 * 100))) {
+      throw new Error("Coverage percentage does not reconcile with returned days");
+    }
+    for (const key of ["temp_mean", "temp_max", "temp_min", "precipitation_mm", "sunshine_hours"]) {
+      const values = payload.daily.map((row: Record<string, unknown>) => row[key]).filter((v: unknown) => typeof v === "number");
+      if (!values.length) throw new Error(`Two-year data has no numeric values for ${key}`);
+      if (values.some((v: number) => !Number.isFinite(v))) throw new Error(`Non-finite values found for ${key}`);
+    }
+    const mean = (key: string) => {
+      const values = payload.daily.map((row: Record<string, unknown>) => row[key]).filter((v: unknown): v is number => typeof v === "number" && Number.isFinite(v));
+      return values.length ? Math.round(values.reduce((a: number, b: number) => a + b, 0) / values.length * 10) / 10 : null;
+    };
+    const sum = (key: string) => {
+      const values = payload.daily.map((row: Record<string, unknown>) => row[key]).filter((v: unknown): v is number => typeof v === "number" && Number.isFinite(v));
+      return values.length ? Math.round(values.reduce((a: number, b: number) => a + b, 0) * 10) / 10 : null;
+    };
+    for (const [summaryKey, dailyKey] of [["temp_mean_c", "temp_mean"], ["temp_max_mean_c", "temp_max"], ["temp_min_mean_c", "temp_min"]] as const) {
+      if (payload.summary[summaryKey] !== mean(dailyKey)) {
+        throw new Error(`Summary ${summaryKey} does not reconcile with daily values`);
+      }
+    }
+    for (const [summaryKey, dailyKey] of [["precipitation_total_mm", "precipitation_mm"], ["sunshine_total_hours", "sunshine_hours"]] as const) {
+      if (payload.summary[summaryKey] !== sum(dailyKey)) {
+        throw new Error(`Summary ${summaryKey} does not reconcile with daily values`);
+      }
+    }
+    console.log(JSON.stringify({
+      integration: "two-year-passed",
+      period: `${start}/${end}`,
+      station_id: payload.station_id,
+      approximate_distance_km: payload.approximate_distance_km,
+      days_returned: payload.days_returned,
+      months_covered: months.size,
+      coverage_percent: payload.coverage_percent,
+      summary_reconciles: true,
+    }));
+  },
+});
