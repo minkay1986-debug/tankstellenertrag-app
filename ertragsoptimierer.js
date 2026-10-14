@@ -148,6 +148,24 @@
     });
   }
 
+  /** Join actual daily station sales with DWD weather for the exact same date. */
+  function matchWeatherSalesObservations(weatherDaily, salesObservations) {
+    const weatherByDate = new Map((Array.isArray(weatherDaily) ? weatherDaily : [])
+      .filter(w => w && typeof w.date === 'string' && finite(w.temp_max))
+      .map(w => [w.date, w]));
+    return (Array.isArray(salesObservations) ? salesObservations : []).flatMap(s => {
+      if (!s || typeof s.date !== 'string' || typeof s.groupKey !== 'string' ||
+          !s.groupKey.trim() || !finite(s.actualRevenue) || s.actualRevenue < 0 ||
+          s.complete === false || s.open === false || s.promotion === true) return [];
+      const w = weatherByDate.get(s.date);
+      if (!w || !finite(w.temp_max)) return [];
+      return [{ groupKey: s.groupKey.trim(), date: s.date, actualRevenue: s.actualRevenue,
+        maxTempC: w.temp_max, minTempC: finite(w.temp_min) ? w.temp_min : undefined,
+        precipitationMm: finite(w.precipitation_mm) ? w.precipitation_mm : undefined,
+        promotion: false, complete: true, open: true }];
+    });
+  }
+
   function analyze(input) {
     const groups = Array.isArray(input && input.groups) ? input.groups.map(evaluateGroup) : [];
     const scored = groups.map(g => ({
@@ -186,7 +204,7 @@
     };
   }
 
-  const api = Object.freeze({ version: '0.2.0', evaluateGroup, analyze, learnWeatherEffects });
+  const api = Object.freeze({ version: '0.3.0', evaluateGroup, analyze, learnWeatherEffects, matchWeatherSalesObservations });
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.TankstellenErtragsoptimierer = api;
 })(typeof window !== 'undefined' ? window : globalThis);
