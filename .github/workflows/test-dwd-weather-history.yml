@@ -32,7 +32,7 @@ jobs:
         run: deno check supabase/functions/dwd-weather-history/index.ts ertragsoptimierer.test.ts
       - name: Run optimizer unit tests
         run: deno test ertragsoptimierer.test.ts
-      - name: Type-check and run admin error-report security contract tests (latest fix)
+      - name: Type-check and run admin error-report security contract tests (RPC assertion corrected)
         run: deno check admin-error-reports.test.ts && deno test --allow-read=index.html,supabase/migrations/20261014190000_admin_app_error_reports.sql admin-error-reports.test.ts
       - name: Run two-year analysis, margin-alert and partial-year regression tests
         run: deno test --allow-read=analyse.html two-year-regression.test.ts
