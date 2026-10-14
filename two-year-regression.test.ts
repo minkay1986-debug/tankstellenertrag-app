@@ -105,7 +105,7 @@ Deno.test("actual monthly advisory report reconciles all displayed KPIs for each
     const rt=runtime(data,m.key);
     const d=rt.calc(m.key);
     rt.report();
-    const rendered=rt.target.innerHTML.replace(/[\\s\\u00a0\\u202f]+/g," ");
+    const rendered=rt.target.innerHTML.replaceAll("\\u00a0"," ").replaceAll("\\u202f"," ");
     for(const [label,value] of [
       ["revenue",eurForTest(d.revenue)],
       ["gross profit",eurForTest(d.gross)],
