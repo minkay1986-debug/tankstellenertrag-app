@@ -34,7 +34,7 @@ function appFixture() {
   }
   return data;
 }
-function runtime(data:any) {
+function runtime(data:any, reportMonth="2026-10") {
   const GROUPS = groupDefs;
   const settings = () => ({...{revenueDrop:5,marginDrop:.5,shrinkRate:1,writeoffRate:.5,stockIncrease:5,targetMargins:{}},...(data.settings||{})});
   const mrow = (k:string) => data.months[k];
@@ -48,7 +48,7 @@ function runtime(data:any) {
   const yearly = appFunction("yearly","economic",["keys","data","calc","eur","pct","$"],{keys,data,calc,eur,pct,$:(id:string)=>target});
   const practiceGuidance = appFunction("practiceGuidance","wowCard",[],{});
   const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext","practiceGuidance"],{
-    calc,month:()=> "2026-10",settings,wowPriority,prev,eur,pct,esc:(v:unknown)=>String(v??""),$:(id:string)=>target,
+    calc,month:()=> reportMonth,settings,wowPriority,prev,eur,pct,esc:(v:unknown)=>String(v??""),$:(id:string)=>target,
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
     TEStudyContext:{htmlForReport:async()=>""},practiceGuidance
   });
@@ -98,3 +98,23 @@ Deno.test("practical guidance gives actionable checks and separates signals from
 });
 
 Deno.test("app has all requested renderers and renderAll calls them",()=>{for(const fn of ["function renderMeinMonat()","function yearly()","function report()","function analysis()","function renderAll()"])assert(html.includes(fn),"Missing "+fn);const renderAllFn=html.slice(html.indexOf("function renderAll()"),html.indexOf("function parseHuth("));assert(["renderMeinMonat()","analysis()","yearly()","report()"].every(call=>renderAllFn.includes(call)),"renderAll must invoke month, analysis, year and report renderers");for(const id of ['id="monthly"','id="yearly"','id="report"','id="dashboard"'])assert(html.includes(id),"Missing section "+id);const yearFn=html.slice(html.indexOf("function yearly()"),html.indexOf("function economic()"));assert(yearFn.includes("Jahresübersicht")&&yearFn.includes("gewichtete Marge"),"Yearly view must show annual totals and weighted margin");const monthFn=html.slice(html.indexOf("function renderMeinMonat()"),html.indexOf("function renderCustomScenarioInputs"));for(const check of ["focus","shrink","action"])assert(monthFn.includes(check),"Missing monthly check tile "+check);const analysisFn=html.slice(html.indexOf("function analysis()"),html.indexOf("function renderCustomScenarioInputs"));assert(analysisFn.includes("Daten-TÜV")&&analysisFn.includes("Bestandsabgleich")&&analysisFn.includes("Ihre wichtigsten Prüffelder"),"Analysis is missing a required check area");const reportFn=html.slice(html.indexOf("function report()"),html.indexOf("function settingsUI()"));for(const item of ["Shop-Umsatz","Rohertrag","Marge","Schwund","Bestand EK","Notizen / Maßnahmen"])assert(reportFn.includes(item),"Report missing "+item);});
+
+Deno.test("actual monthly advisory report reconciles all displayed KPIs for each of the 24 months",()=>{
+  const data=appFixture();
+  for(const m of months){
+    const rt=runtime(data,m.key);
+    const d=rt.calc(m.key);
+    rt.report();
+    const rendered=rt.target.innerHTML.replaceAll(String.fromCharCode(160)," ").replaceAll(String.fromCharCode(8239)," ");
+    for(const [label,value] of [
+      ["revenue",eurForTest(d.revenue)],
+      ["gross profit",eurForTest(d.gross)],
+      ["shrink",eurForTest(d.shrink)],
+      ["stock",eurForTest(d.stock)],
+      ["margin",pctForTest(d.margin)]
+    ]){
+      assert(rendered.includes(value),`${m.key}: report ${label} differs from calc; expected ${value}`);
+    }
+  }
+});
+function pctForTest(v:number){return (Number(v)||0).toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1})+" %";}

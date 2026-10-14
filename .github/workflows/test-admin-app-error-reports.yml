@@ -1,0 +1,33 @@
+name: Test admin app error reports (RPC regex assertion fix)
+
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - "supabase/migrations/20261014190000_admin_app_error_reports.sql"
+      - "admin-error-reports.test.ts"
+      - ".github/workflows/test-admin-app-error-reports.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  error-report-contract-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check tests
+        run: deno check admin-error-reports.test.ts
+      - name: Run error-report security and wiring tests
+        run: deno test --allow-read=index.html,supabase/migrations/20261014190000_admin_app_error_reports.sql admin-error-reports.test.ts
+      - name: Run existing two-year analysis regression suite
+        run: deno test --allow-read=analyse.html two-year-regression.test.ts
+      - name: Run existing Ertragsoptimierer unit tests
+        run: deno test ertragsoptimierer.test.ts
