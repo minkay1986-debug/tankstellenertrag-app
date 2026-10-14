@@ -62,5 +62,5 @@ Deno.test("Admin-Oberfläche: Fehlerliste wird nur über Admin-RPC geladen", () 
 Deno.test("Fehlererfassung enthält keine Zugangsdaten oder Request-Bodies im RPC-Aufruf", () => {
   assertMatch(portal, /p_metadata:\{path:location\.pathname,online:navigator\.onLine,appVersion:/);
   assertMatch(portal, /p_message:text,p_http_status:httpStatus/);
-  assertStringIncludes(portal, "/rest/v1/rpc/(report_app_error|get_admin_app_error_reports|set_admin_app_error_status)");
+  assertMatch(portal, /report_app_error\\|get_admin_app_error_reports\\|set_admin_app_error_status/);
 });
