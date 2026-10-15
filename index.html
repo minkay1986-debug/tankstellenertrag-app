@@ -1033,13 +1033,14 @@ async function trackVisitor(){
       /(^|\\.)lnkd\\.in$/i.test(refHost)?'linkedin':'direct'
     );
     const path=location.pathname||'/';
-    const {error}=await client.from('site_visits').insert({
+    const {error}=await client.from('site_visits').upsert({
       visitor_id:visitorId.slice(0,120),
       referrer:referrer.slice(0,500)||null,
       landing_path:path.slice(0,300),
       source:String(source).slice(0,50)
-    });
-    if(!error)sessionStorage.setItem(key,'1');
+    },{onConflict:'visitor_id,visited_on',ignoreDuplicates:true});
+    // Duplicate visit for the same visitor/day is expected; treat it as tracked.
+    if(!error || error.code==='23505')sessionStorage.setItem(key,'1');
   }catch(_){}
 }
 async function loadPilotSlots(){if(!client)return;try{const {data,error}=await client.rpc('get_pilot_slots');if(error||!data)return;const s=Array.isArray(data)?data[0]:data;if(!s)return;const el=$('pilotSlotsText');const btn=$('monthlyPilotBtn');if(!el)return;const remaining=Math.max(0,Number(s.remaining||0));el.textContent=remaining>0?'Noch '+remaining+' Plätze verfügbar':'Pilotphase aktuell voll';if(btn){btn.disabled=remaining===0;btn.textContent=remaining>0?'Pilot werden →':'Pilotplätze vergeben';}}catch(e){}}
