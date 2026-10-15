@@ -651,6 +651,125 @@ body:has(.tse-showcase){background:radial-gradient(ellipse at 76% 10%,rgba(0,116
 .miniYearChart svg{max-height:96px}
 @media(max-width:650px){.tse-showcase .showcaseMetrics{grid-template-columns:repeat(3,minmax(0,1fr))!important}.tse-showcase .showcaseMetrics>.metric{padding:10px 7px!important}.tse-showcase .showcaseMetrics>.metric strong{font-size:clamp(15px,4.4vw,21px)!important}}
 </style>
+
+<style id="bottom-landing-polish-2026-10-15">
+/* Unteren Startseitenabschluss kompakt und aus einem Guss gestalten */
+body:has(main>section.hero.publicOnly) main>section.ctaSection.publicOnly{
+  padding:clamp(28px,4vw,52px) 0!important;
+  margin:0!important;
+  background:linear-gradient(150deg,rgba(7,35,68,.94),rgba(4,20,40,.98))!important;
+  border-top:1px solid rgba(105,181,248,.22)!important;
+  border-bottom:1px solid rgba(105,181,248,.18)!important;
+}
+body:has(main>section.hero.publicOnly) main>section.ctaSection.publicOnly>.wrap{
+  width:min(1440px,calc(100% - 64px))!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:28px!important;
+  padding:clamp(22px,3vw,36px)!important;
+  border:1px solid rgba(111,184,249,.58)!important;
+  border-radius:20px!important;
+  background:linear-gradient(135deg,rgba(15,65,113,.92),rgba(5,27,53,.97))!important;
+  box-shadow:0 14px 36px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+body:has(main>section.hero.publicOnly) .ctaSection.publicOnly .wrap>div{
+  min-width:0!important;
+  max-width:780px!important;
+  padding:0!important;
+  margin:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+body:has(main>section.hero.publicOnly) .ctaSection.publicOnly .eyebrow{
+  color:#8dd5ff!important;
+  font-size:11px!important;
+  letter-spacing:.14em!important;
+  font-weight:800!important;
+}
+body:has(main>section.hero.publicOnly) .ctaSection.publicOnly h2{
+  margin:8px 0 10px!important;
+  font-size:clamp(25px,3.2vw,38px)!important;
+  line-height:1.15!important;
+  color:#f5f9ff!important;
+}
+body:has(main>section.hero.publicOnly) .ctaSection.publicOnly p{
+  max-width:680px!important;
+  margin:0!important;
+  color:#c9def3!important;
+  font-size:15px!important;
+  line-height:1.55!important;
+}
+body:has(main>section.hero.publicOnly) .ctaSection.publicOnly #bottomTest{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:auto!important;
+  min-width:205px!important;
+  min-height:48px!important;
+  margin:0!important;
+  padding:13px 20px!important;
+  white-space:nowrap!important;
+  border-radius:11px!important;
+  color:#fff!important;
+  background:linear-gradient(135deg,#169cff,#0065e8)!important;
+  border:1px solid rgba(121,204,255,.6)!important;
+  box-shadow:0 8px 25px rgba(0,113,255,.24),inset 0 1px 0 rgba(255,255,255,.2)!important;
+}
+body:has(main>section.hero.publicOnly) main>section#wissen.publicOnly.section{
+  padding-bottom:clamp(28px,4vw,48px)!important;
+}
+body:has(main>section.hero.publicOnly) #wissen.publicOnly .split{
+  align-items:start!important;
+  gap:clamp(24px,4vw,52px)!important;
+}
+body:has(main>section.hero.publicOnly) #wissen.publicOnly .split>div:first-child{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  gap:10px!important;
+}
+body:has(main>section.hero.publicOnly) #wissen.publicOnly .split>div:first-child>a{
+  display:inline-flex!important;
+  align-items:center!important;
+  width:fit-content!important;
+  max-width:100%!important;
+  min-height:42px!important;
+  margin:0!important;
+  padding:10px 15px!important;
+  border-radius:11px!important;
+  border:1px solid rgba(111,184,249,.42)!important;
+  background:linear-gradient(145deg,rgba(17,69,119,.8),rgba(5,29,56,.9))!important;
+  color:#e6f4ff!important;
+  line-height:1.35!important;
+  text-decoration:none!important;
+}
+body:has(main>section.hero.publicOnly) #wissen.publicOnly .split>div:first-child>a:hover{
+  border-color:rgba(111,205,255,.85)!important;
+  box-shadow:0 0 18px rgba(0,129,255,.15)!important;
+}
+body:has(main>section.hero.publicOnly) #wissen.publicOnly .quote{
+  margin:0!important;
+  align-self:start!important;
+}
+@media(max-width:760px){
+  body:has(main>section.hero.publicOnly) main>section.ctaSection.publicOnly>.wrap{
+    width:calc(100% - 28px)!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:18px!important;
+    padding:22px!important;
+  }
+  body:has(main>section.hero.publicOnly) .ctaSection.publicOnly #bottomTest{
+    width:100%!important;
+    min-width:0!important;
+    white-space:normal!important;
+  }
+  body:has(main>section.hero.publicOnly) #wissen.publicOnly .split>div:first-child>a{
+    width:100%!important;
+  }
+}
+</style>
 </body>
 <script>
 // Kanonische App-Domain: Login und Plattform müssen auf derselben Origin laufen, damit die Supabase-Session erhalten bleibt.
