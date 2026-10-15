@@ -1,76 +1,48 @@
--- Show all customer accounts in the admin area, including stations without a pilot application.
+-- Admin account management RPCs. Admin identity is checked in every function.
 create or replace function public.get_admin_customer_accounts()
-returns table (
-  user_id uuid,
-  application_id uuid,
-  email text,
-  full_name text,
-  station_name text,
-  postcode text,
-  city text,
-  phone text,
-  status text,
-  access_type text,
-  access_until timestamptz,
-  created_at timestamptz,
-  station_id text,
-  subscription_status text,
-  trial_ends_at timestamptz,
-  subscription_ends_at timestamptz,
-  founding_partner_free_until timestamptz,
-  is_suspended boolean,
-  suspension_reason text
-)
+returns jsonb
 language plpgsql
 security definer
-set search_path = public, auth
-as $$
+set search_path = public
+as $function$
 begin
-  if lower(coalesce(auth.jwt() ->> 'email','')) <> 'svenkrick@gmx.de' then
+  if lower(coalesce(auth.jwt()->>'email','')) <> 'svenkrick@gmx.de' then
     raise exception 'Keine Administratorberechtigung.';
   end if;
 
-  return query
-  select
-    u.id,
-    a.id,
-    coalesce(a.email, u.email)::text,
-    coalesce(a.full_name, u.raw_user_meta_data ->> 'full_name', '')::text,
-    coalesce(a.station_name, s.station_name, u.raw_user_meta_data ->> 'station_name', '')::text,
-    coalesce(a.postcode, s.postcode, u.raw_user_meta_data ->> 'postcode', '')::text,
-    coalesce(a.city, s.city, u.raw_user_meta_data ->> 'city', '')::text,
-    coalesce(a.phone, u.raw_user_meta_data ->> 'phone', '')::text,
-    coalesce(a.status, case when s.owner_id is not null then 'approved' else 'new' end)::text,
-    coalesce(a.access_type,
-      case s.subscription_status
-        when 'trial' then 'pilot'
-        when 'founding_partner' then 'founding_partner'
-        when 'active' then 'paid'
-        else 'pilot'
-      end)::text,
-    coalesce(a.access_until, s.founding_partner_free_until, s.subscription_ends_at, s.trial_ends_at),
-    coalesce(a.created_at, u.created_at),
-    s.station_id::text,
-    s.subscription_status::text,
-    s.trial_ends_at,
-    s.subscription_ends_at,
-    s.founding_partner_free_until,
-    coalesce(s.is_suspended, false),
-    s.suspension_reason::text
-  from auth.users u
-  left join public.pilot_applications a on a.user_id = u.id
-  left join lateral (
-    select st.*
-    from public.stations st
-    where st.owner_id = u.id
-    order by st.created_at nulls last
-    limit 1
-  ) s on true
-  where lower(coalesce(u.email,'')) <> 'svenkrick@gmx.de'
-    and (a.id is not null or s.owner_id is not null)
-  order by coalesce(a.created_at, u.created_at) desc;
+  return coalesce((
+    select jsonb_agg(to_jsonb(x) order by x.created_at desc nulls last)
+    from (
+      select
+        u.id as user_id,
+        u.email,
+        coalesce(a.full_name, u.raw_user_meta_data->>'full_name', u.raw_user_meta_data->>'name') as full_name,
+        coalesce(a.station_name, s.station_name) as station_name,
+        coalesce(a.postcode, s.postcode) as postcode,
+        coalesce(a.city, s.city) as city,
+        a.phone,
+        a.id as application_id,
+        coalesce(a.status, case when s.id is not null then 'approved' else 'new' end) as status,
+        coalesce(a.access_type, case when s.subscription_status='founding_partner' then 'founding_partner' when s.subscription_status='active' then 'paid' else 'pilot' end) as access_type,
+        a.access_until,
+        s.id as station_uuid,
+        s.station_id,
+        s.subscription_status,
+        s.trial_ends_at,
+        s.subscription_ends_at,
+        s.founding_partner_free_until,
+        coalesce(s.created_at, a.created_at, u.created_at) as created_at,
+        coalesce(s.is_suspended, false) as is_suspended,
+        s.suspension_reason
+      from auth.users u
+      left join public.pilot_applications a on a.user_id=u.id
+      left join public.stations s on s.owner_id=u.id
+      where lower(coalesce(u.email,'')) <> 'svenkrick@gmx.de'
+        and (a.id is not null or s.id is not null)
+    ) x
+  ), '[]'::jsonb);
 end;
-$$;
+$function$;
 
 revoke all on function public.get_admin_customer_accounts() from public, anon;
 grant execute on function public.get_admin_customer_accounts() to authenticated;
@@ -84,12 +56,16 @@ returns jsonb
 language plpgsql
 security definer
 set search_path = public
-as $$
+as $function$
 declare
   v_station_id text;
 begin
-  if lower(coalesce(auth.jwt() ->> 'email','')) <> 'svenkrick@gmx.de' then
+  if lower(coalesce(auth.jwt()->>'email','')) <> 'svenkrick@gmx.de' then
     raise exception 'Keine Administratorberechtigung.';
+  end if;
+
+  if p_user_id is null or p_suspended is null then
+    raise exception 'Kundenkonto oder Sperrstatus fehlt.';
   end if;
 
   select station_id into v_station_id
@@ -108,9 +84,13 @@ begin
       updated_at = now()
   where owner_id = p_user_id;
 
-  return jsonb_build_object('success', true, 'suspended', p_suspended, 'station_id', v_station_id);
+  return jsonb_build_object(
+    'success', true,
+    'suspended', p_suspended,
+    'station_id', v_station_id
+  );
 end;
-$$;
+$function$;
 
 revoke all on function public.set_customer_suspension_by_user(uuid, boolean, text) from public, anon;
 grant execute on function public.set_customer_suspension_by_user(uuid, boolean, text) to authenticated;
@@ -120,26 +100,48 @@ returns jsonb
 language plpgsql
 security definer
 set search_path = public
-as $$
+as $function$
 declare
   v_email text;
+  v_station_count integer;
 begin
-  if lower(coalesce(auth.jwt() ->> 'email','')) <> 'svenkrick@gmx.de' then
+  if lower(coalesce(auth.jwt()->>'email','')) <> 'svenkrick@gmx.de' then
     raise exception 'Keine Administratorberechtigung.';
   end if;
 
-  select email into v_email from auth.users where id = p_user_id for update;
+  if p_user_id is null then
+    raise exception 'Kundenkonto fehlt.';
+  end if;
+
+  if p_user_id = auth.uid() then
+    raise exception 'Das eigene Administratorkonto kann hier nicht gelöscht werden.';
+  end if;
+
+  select email into v_email
+  from auth.users
+  where id = p_user_id
+  for update;
+
   if v_email is null then
     raise exception 'Kundenkonto nicht gefunden.';
   end if;
 
-  delete from public.stations where owner_id = p_user_id;
-  delete from public.pilot_applications where user_id = p_user_id;
+  if lower(v_email) = 'svenkrick@gmx.de' then
+    raise exception 'Das Administratorkonto kann nicht gelöscht werden.';
+  end if;
+
+  select count(*) into v_station_count
+  from public.stations where owner_id = p_user_id;
+
   delete from auth.users where id = p_user_id;
 
-  return jsonb_build_object('success', true, 'email', v_email);
+  if not found then
+    raise exception 'Kundenkonto konnte nicht gelöscht werden.';
+  end if;
+
+  return jsonb_build_object('success', true, 'deleted_user_id', p_user_id, 'stations_removed', v_station_count);
 end;
-$$;
+$function$;
 
 revoke all on function public.delete_customer_account_by_user(uuid) from public, anon;
 grant execute on function public.delete_customer_account_by_user(uuid) to authenticated;
