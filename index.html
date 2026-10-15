@@ -1627,7 +1627,7 @@ function resetProtectedViews(){
 function openAuth(){ $('authView').classList.remove('hidden'); document.body.style.overflow='hidden'; setTimeout(()=>document.getElementById('email')?.focus(),50); }
 function closeAuth(){ $('authView').classList.add('hidden'); document.body.style.overflow=''; if(!document.querySelector('.site')?.classList.contains('authenticated')){ window.location.href='https://app.tankstellenertrag.de/'; } }
 $('navLogin').onclick=openAuth;$('heroLogin').onclick=openAuth;$('knowledgeLogin')?.addEventListener('click',openAuth);$('meinMonatLink')?.addEventListener('click',e=>{e.preventDefault();openAuth();});$('artikelpruefungLink')?.addEventListener('click',e=>{e.preventDefault();openAuth();});$('jahresvergleichLink')?.addEventListener('click',e=>{e.preventDefault();openAuth();});
-if(new URLSearchParams(location.search).get('login')==='1')openAuth();$('bottomTest')?.addEventListener('click',openAuth);$('monthlyPilotBtn')?.addEventListener('click',openAuth);
+if(new URLSearchParams(location.search).get('login')==='1')openAuth();$('bottomTest')?.addEventListener('click',openAuth);$('monthlyPilotBtn')?.addEventListener('click',()=>{window.location.href='./pilot.html';});
 $('closeAuth').onclick=closeAuth;
 
 if(client){
