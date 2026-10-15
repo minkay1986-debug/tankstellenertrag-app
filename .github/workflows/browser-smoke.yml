@@ -20,3 +20,11 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Run browser smoke tests against isolated repository copy
         run: npx playwright test
+      - name: Upload public landing screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: landing-page-browser-screenshots
+          path: test-results/*.png
+          if-no-files-found: warn
+          retention-days: 7
