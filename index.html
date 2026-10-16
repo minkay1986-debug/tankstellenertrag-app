@@ -1455,12 +1455,12 @@ async function trackVisitor(){
       /(^|\\.)lnkd\\.in$/i.test(refHost)?'linkedin':'direct'
     );
     const path=location.pathname||'/';
-    const {error}=await client.from('site_visits').upsert({
+    const {error}=await client.from('site_visits').insert({
       visitor_id:visitorId.slice(0,120),
       referrer:referrer.slice(0,500)||null,
       landing_path:path.slice(0,300),
       source:String(source).slice(0,50)
-    },{onConflict:'visitor_id,visited_on',ignoreDuplicates:true});
+    });
     // Duplicate visit for the same visitor/day is expected; treat it as tracked.
     if(!error || error.code==='23505')sessionStorage.setItem(key,'1');
   }catch(_){}
