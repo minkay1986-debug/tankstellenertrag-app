@@ -98,3 +98,22 @@ Deno.test("practical guidance gives actionable checks and separates signals from
 });
 
 Deno.test("app has all requested renderers and renderAll calls them",()=>{for(const fn of ["function renderMeinMonat()","function yearly()","function report()","function analysis()","function renderAll()"])assert(html.includes(fn),"Missing "+fn);const renderAllFn=html.slice(html.indexOf("function renderAll()"),html.indexOf("function parseHuth("));assert(["renderMeinMonat()","analysis()","yearly()","report()"].every(call=>renderAllFn.includes(call)),"renderAll must invoke month, analysis, year and report renderers");for(const id of ['id="monthly"','id="yearly"','id="report"','id="dashboard"'])assert(html.includes(id),"Missing section "+id);const yearFn=html.slice(html.indexOf("function yearly()"),html.indexOf("function economic()"));assert(yearFn.includes("Jahresübersicht")&&yearFn.includes("gewichtete Marge"),"Yearly view must show annual totals and weighted margin");const monthFn=html.slice(html.indexOf("function renderMeinMonat()"),html.indexOf("function renderCustomScenarioInputs"));for(const check of ["focus","shrink","action"])assert(monthFn.includes(check),"Missing monthly check tile "+check);const analysisFn=html.slice(html.indexOf("function analysis()"),html.indexOf("function renderCustomScenarioInputs"));assert(analysisFn.includes("Daten-TÜV")&&analysisFn.includes("Bestandsabgleich")&&analysisFn.includes("Ihre wichtigsten Prüffelder"),"Analysis is missing a required check area");const reportFn=html.slice(html.indexOf("function report()"),html.indexOf("function settingsUI()"));for(const item of ["Shop-Umsatz","Rohertrag","Marge","Schwund","Bestand EK","Notizen / Maßnahmen"])assert(reportFn.includes(item),"Report missing "+item);});
+
+Deno.test("missing and zero group EK are flagged without inventing a margin",()=>{
+  const rt=runtime(appFixture());
+  const q=rt.data.months["2026-10"].groups.backshop;
+  q.ek=null;q._ekEntered=false;
+  const calc=rt.calc("2026-10").groups.find((g:any)=>g.id==="backshop");
+  assert(calc.actualMargin===null,"Missing EK must not produce an actual margin");
+  const rows=rt.wowPriority("2026-10");
+  assert(rows.some((r:any)=>r.g.id==="backshop"&&r.reasons.some((x:string)=>x.includes("Gruppen-EK nicht erfasst"))),"Missing EK must surface as a review signal");
+  q.ek=0;q._ekEntered=true;
+  const zero=rt.calc("2026-10").groups.find((g:any)=>g.id==="backshop");
+  assert(zero.actualMargin===null,"Explicit zero EK must not produce a margin");
+  const zeroRows=rt.wowPriority("2026-10");
+  assert(zeroRows.some((r:any)=>r.g.id==="backshop"&&r.reasons.some((x:string)=>x.includes("0,00 €"))),"Explicit zero EK must be flagged distinctly");
+});
+Deno.test("prior-period group gross profit is not displayed when prior EK is missing or zero",()=>{
+  assert(html.includes("oldGrossValid=!!old&&old.revenue>0&&old.ek!==null&&old.ek!==undefined&&old.ek>0"),"Prior-period gross-profit guard is missing");
+  assert(html.includes("Rohertrag nicht belastbar berechenbar (EK fehlt/0)"),"Report must explain an invalid prior-period group gross profit");
+});
