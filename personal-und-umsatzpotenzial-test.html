@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TankstellenErtrag – Personal- & Umsatzpotenzial (Prototyp)</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1424;--panel:rgba(22,39,63,.82);--line:rgba(154,190,230,.2);--text:#eef5ff;--muted:#a9bbd2;--blue:#65b8ff;--orange:#ffb45e;--green:#65d6b0}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#183c61 0,transparent 42%),linear-gradient(145deg,#08111f,#111f34);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:1120px;margin:auto;padding:28px 18px 48px}.eyebrow{color:var(--blue);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:.75rem}
+h1{font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.12;margin:.45rem 0}.intro{color:var(--muted);max-width:780px;margin:0 0 24px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 16px 40px #0002;backdrop-filter:blur(14px)}
+h2{font-size:1.15rem;margin:0 0 14px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.layout{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+label{display:block;color:var(--muted);font-size:.88rem;margin-bottom:6px}input,select{width:100%;background:#0b1728;border:1px solid #38516e;color:var(--text);border-radius:10px;padding:11px 12px;font:inherit;min-width:0}input:focus,select:focus{outline:2px solid var(--blue);outline-offset:1px}.field{margin-bottom:14px}.hint{font-size:.78rem;color:var(--muted);margin-top:5px}
+.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.metric{border:1px solid var(--line);border-radius:14px;padding:15px;background:#101f33}.metric span{display:block;color:var(--muted);font-size:.82rem}.metric strong{display:block;font-size:1.65rem;margin-top:4px;letter-spacing:-.02em}.metric.blue strong{color:var(--blue)}.metric.orange strong{color:var(--orange)}.metric.green strong{color:var(--green)}
+.result{margin-top:14px;border-radius:12px;padding:14px;background:#12273b;border:1px solid var(--line)}.result strong{font-size:1.05rem}.note{font-size:.85rem;color:var(--muted);margin-top:8px}.bar{height:9px;border-radius:99px;background:#263b54;overflow:hidden;margin:10px 0 4px}.bar>div{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .2s}
+ul{padding-left:19px;margin:8px 0;color:var(--muted)}li{margin:6px 0}.tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:.75rem;color:var(--blue);margin-bottom:8px}.footer{margin-top:18px;color:var(--muted);font-size:.8rem}
+@media(max-width:760px){.layout,.grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:22px 13px 36px}.panel{padding:16px}}
+@media(max-width:390px){.metrics{grid-template-columns:1fr}.metric strong{font-size:1.45rem}}
+</style>
+</head>
+<body><main>
+<div class="eyebrow">TankstellenErtrag · Konzeptprototyp</div>
+<h1>Personal- & Umsatzpotenzial</h1>
+<p class="intro">Was kostet eine zusätzliche Personalstunde – und welcher zusätzliche Rohertrag könnte entstehen, wenn Backwaren rechtzeitig produziert und Regale verfügbar gehalten werden? Mit eigenen Zahlen überschlagen, statt nur pauschal Personal zu kürzen.</p>
+<div class="layout">
+<section class="panel">
+<span class="tag">Eingaben ändern</span><h2>Beispiel für eine typische Schicht</h2>
+<div class="grid">
+<div class="field"><label for="hours">Zusätzliche Personalstunden</label><input id="hours" type="number" min="0" step=".25" value="4"></div>
+<div class="field"><label for="wage">Stundenlohn (€)</label><input id="wage" type="number" min="0" step=".5" value="14"></div>
+<div class="field"><label for="burden">Lohnnebenkosten (%)</label><input id="burden" type="number" min="0" step="1" value="25"></div>
+<div class="field"><label for="bakery">Zusätzlicher Backwaren-Rohertrag (€)</label><input id="bakery" type="number" min="0" step="1" value="25"></div>
+<div class="field"><label for="shelves">Zusätzlicher Rohertrag durch verfügbare Regale (€)</label><input id="shelves" type="number" min="0" step="1" value="20"></div>
+<div class="field"><label for="other">Weitere messbare Effekte (€)</label><input id="other" type="number" step="1" value="0"></div>
+</div>
+<p class="hint">Die Umsatzeffekte bitte als geschätzten oder gemessenen zusätzlichen Rohertrag eingeben – nicht als Umsatz. Negative Werte bei weiteren Effekten sind möglich.</p>
+</section>
+<section class="panel">
+<span class="tag">Ergebnis · live berechnet</span><h2>Rechnet sich die Zusatzbesetzung?</h2>
+<div class="metrics">
+<div class="metric orange"><span>Zusätzliche Personalkosten</span><strong id="cost">56,00 €</strong></div>
+<div class="metric blue"><span>Geschätzter Mehr-Rohertrag</span><strong id="gain">45,00 €</strong></div>
+<div class="metric green"><span>Saldo vor weiteren Effekten</span><strong id="net">−11,00 €</strong></div>
+<div class="metric"><span>Break-even je Stunde</span><strong id="breakEven">14,00 €</strong></div>
+</div>
+<div class="result" aria-live="polite"><strong id="verdict">Noch nicht wirtschaftlich gedeckt</strong><div class="bar"><div id="bar"></div></div><div id="detail">Der angesetzte Mehr-Rohertrag deckt einen Teil der Personalkosten.</div></div>
+<p class="note">Break-even zeigt den erforderlichen zusätzlichen Rohertrag pro bezahlter Stunde einschließlich des eingestellten Zuschlags. Weitere Effekte werden separat im Saldo berücksichtigt.</p>
+</section>
+</div>
+<div class="layout" style="margin-top:16px">
+<section class="panel"><h2>Was sollte in der Praxis erfasst werden?</h2><ul>
+<li>Zeitraum und tatsächliche Besetzung: allein oder zu zweit</li>
+<li>Backwaren: geplante, produzierte und nicht verfügbare Mengen</li>
+<li>Regale: wiederkehrende Lücken und Dauer bis zum Auffüllen</li>
+<li>Unterbrechungen: Kundenandrang, Waschhallenstörung, Telefon, Kaffeemaschine</li>
+<li>Auswirkung: tatsächlich beobachteter Mehr-Rohertrag – oder ausdrücklich gekennzeichnete Schätzung</li>
+</ul></section>
+<section class="panel"><h2>Wichtige Leitplanken</h2><ul>
+<li>Keine automatische Schuldzuweisung an einzelne Mitarbeiter.</li>
+<li>Leere Regale bedeuten nicht automatisch verlorene Verkäufe; Nachfrage und Ersatzkäufe prüfen.</li>
+<li>Verderb, Energie, zusätzliche Verkäufe und Lohnnebenkosten sauber berücksichtigen.</li>
+<li>Erst mit echten Daten mehrerer vergleichbarer Schichten bewerten.</li>
+</ul></section>
+</div>
+<p class="footer">Interaktiver Konzeptstand – keine Verbindung zu Live-Kundendaten. Alle Werte sind lokale Beispielwerte und werden nicht gespeichert. Vor einer Integration in die Live-App sind fachliche Prüfung, Tests und Freigabe erforderlich.</p>
+</main>
+<script>
+(function(){
+ const ids=['hours','wage','burden','bakery','shelves','other'];
+ const el=Object.fromEntries(ids.map(id=>[id,document.getElementById(id)]));
+ const euro=n=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(n);
+ const num=id=>{const v=Number(el[id].value);return Number.isFinite(v)?v:0};
+ function calc(){
+  const h=Math.max(0,num('hours')),w=Math.max(0,num('wage')),b=Math.max(0,num('burden'))/100;
+  const cost=h*w*(1+b),gain=Math.max(0,num('bakery'))+Math.max(0,num('shelves')),other=num('other'),net=gain+other-cost;
+  document.getElementById('cost').textContent=euro(cost);
+  document.getElementById('gain').textContent=euro(gain);
+  document.getElementById('net').textContent=euro(net);
+  document.getElementById('breakEven').textContent=euro(h>0?cost/h:0);
+  document.getElementById('verdict').textContent=net>=0?'Zusatzbesetzung rechnerisch gedeckt':'Noch nicht wirtschaftlich gedeckt';
+  document.getElementById('detail').textContent=net>=0?'Im Szenario übersteigen die angesetzten Effekte die zusätzlichen Personalkosten.':'Im Szenario liegen die angesetzten Effekte unter den zusätzlichen Personalkosten. Prüfe weitere messbare Effekte und die Qualität der Schätzungen.';
+  document.getElementById('bar').style.width=(cost>0?Math.min(100,Math.max(0,(gain+other)/cost*100)):0)+'%';
+ }
+ ids.forEach(id=>el[id].addEventListener('input',calc));calc();
+})();
+</script></body></html>
