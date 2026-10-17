@@ -286,3 +286,46 @@ Deno.test({
     }
   },
 });
+
+
+Deno.test({
+  name: "DWD historical integration: accepts a long period spanning historical and recent data",
+  sanitizeResources: false,
+  sanitizeOps: false,
+  fn: async () => {
+    const start = "2025-10-01";
+    const end = "2026-10-13";
+    const response = await handler(new Request("https://local.test", {
+      method: "POST",
+      headers: { Origin: origin, Authorization: "Bearer test", "Content-Type": "application/json" },
+      body: JSON.stringify({
+        latitude: 49.3,
+        longitude: 10.8,
+        start_date: start,
+        end_date: end,
+      }),
+    }));
+    const payload = await response.json();
+    if (response.status !== 200) {
+      throw new Error(`Expected 200 for long date range, got ${response.status}: ${JSON.stringify(payload)}`);
+    }
+    if (!Array.isArray(payload.daily) || payload.daily.length === 0) {
+      throw new Error("Long-period request returned no daily observations");
+    }
+    if (payload.daily.some((row: Record<string, unknown>) =>
+      typeof row.date !== "string" || row.date < start || row.date > end
+    )) {
+      throw new Error("Long-period request returned dates outside the requested range");
+    }
+    if (typeof payload.days_returned !== "number" || payload.days_returned < 1) {
+      throw new Error("Long-period request returned an invalid days_returned value");
+    }
+    console.log(JSON.stringify({
+      integration: "passed",
+      period: `${start}/${end}`,
+      station_id: payload.station_id,
+      days_returned: payload.days_returned,
+      coverage_percent: payload.coverage_percent,
+    }));
+  },
+});
