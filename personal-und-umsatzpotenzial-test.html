@@ -41,6 +41,23 @@ ul{padding-left:19px;margin:8px 0;color:var(--muted)}li{margin:6px 0}.tag{displa
     </div>
   </div>
 </section>
+
+<section class="panel" id="rohertragPersonalTile" style="margin:0 0 16px;border-color:rgba(101,184,255,.38);background:linear-gradient(145deg,rgba(25,55,83,.88),rgba(18,28,42,.96))">
+  <span class="tag">Optionale Monatskennzahl</span>
+  <h2>Rohertrag &amp; Personalkosten</h2>
+  <p class="hint">Setze den monatlichen Shop-Rohertrag und die gesamten Personalkosten desselben Monats ins Verhältnis. Die Werte müssen vollständig und auf derselben Abrechnungsbasis erfasst sein.</p>
+  <div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+    <div class="field"><label for="monthlyShopGrossProfit">Monatlicher Shop-Rohertrag (€)</label><input id="monthlyShopGrossProfit" type="number" min="0" step="0.01" placeholder="z. B. 18000"></div>
+    <div class="field"><label for="monthlyStaffCosts">Monatliche Personalkosten inkl. Arbeitgeberanteile (€)</label><input id="monthlyStaffCosts" type="number" min="0" step="0.01" placeholder="z. B. 6000"></div>
+  </div>
+  <label style="display:flex;gap:9px;align-items:flex-start;color:var(--text);margin:8px 0 14px"><input id="monthlyDataComplete" type="checkbox" style="width:auto;margin-top:4px;flex:0 0 auto"><span>Ich bestätige, dass beide Monatswerte vollständig und korrekt sind und denselben Zeitraum abdecken.</span></label>
+  <div class="metrics">
+    <div class="metric blue"><span>Rohertrag je 1 € Personalkosten</span><strong id="staffEfficiencyResult">—</strong></div>
+    <div class="metric orange"><span>Personalkostenquote vom Rohertrag</span><strong id="staffCostRatioResult">—</strong></div>
+  </div>
+  <div class="result" aria-live="polite"><strong id="staffRatioStatus">Noch nicht berechnet</strong><div class="note" id="staffRatioNote">Nur bei vollständiger und korrekter Datenpflege aussagekräftig. Ohne Bestätigung werden keine Kennzahlen angezeigt.</div></div>
+  <p class="note">Die Kennzahl beschreibt ein Verhältnis, beweist aber nicht, ob eine Personalbesetzung optimal ist. Sie wird hier nicht gespeichert und ist noch nicht automatisch mit den Monatswerten der Hauptauswertung synchronisiert.</p>
+</section>
 <section class="panel" style="margin-bottom:16px">
   <span class="tag">Dein Einstieg</span>
   <h2>Was ist dir als Pächter gerade am wichtigsten?</h2>
@@ -170,6 +187,20 @@ ul{padding-left:19px;margin:8px 0;color:var(--muted)}li{margin:6px 0}.tag{displa
    detail.textContent='Haltet fest, welche Abläufe geholfen haben, damit sie beibehalten werden können.';
   }
  }
+
+ const monthlyProfit=document.getElementById('monthlyShopGrossProfit');
+ const monthlyStaff=document.getElementById('monthlyStaffCosts');
+ const monthlyComplete=document.getElementById('monthlyDataComplete');
+ function updateStaffEfficiency(){
+  const p=monthlyProfit.value===''?NaN:Number(monthlyProfit.value);
+  const s=monthlyStaff.value===''?NaN:Number(monthlyStaff.value);
+  const ok=monthlyComplete.checked&&Number.isFinite(p)&&Number.isFinite(s)&&p>0&&s>0;
+  document.getElementById('staffEfficiencyResult').textContent=ok?(p/s).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €':'—';
+  document.getElementById('staffCostRatioResult').textContent=ok?(s/p*100).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %':'—';
+  document.getElementById('staffRatioStatus').textContent=ok?'Kennzahl berechnet':'Vollständige Monatsdaten erforderlich';
+  document.getElementById('staffRatioNote').textContent=ok?'Berechnet aus den bestätigten Monatswerten. Prüfe, ob alle Lohnkosten und der Shop-Rohertrag für denselben Zeitraum vollständig enthalten sind.':'Nur bei vollständiger und korrekter Datenpflege aussagekräftig. Trage beide Monatswerte ein und bestätige die Vollständigkeit.';
+ }
+ [monthlyProfit,monthlyStaff].forEach(el=>el.addEventListener('input',updateStaffEfficiency));monthlyComplete.addEventListener('change',updateStaffEfficiency);updateStaffEfficiency();
  ids.forEach(id=>el[id].addEventListener('input',calc));calc();
  pulseIds.forEach(id=>document.getElementById(id).addEventListener('change',updatePulse));
  updatePulse();
