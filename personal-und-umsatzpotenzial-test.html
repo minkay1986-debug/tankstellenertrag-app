@@ -12,7 +12,7 @@ h1{font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.12;margin:.45rem 0}.intro{co
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 16px 40px #0002;backdrop-filter:blur(14px)}
 h2{font-size:1.15rem;margin:0 0 14px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.layout{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
 .role-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.role-choice{display:flex;flex-direction:column;gap:8px;text-align:left;padding:16px;border:1px solid var(--line);border-radius:14px;background:#101f33;color:var(--text);font:inherit;cursor:pointer;min-height:120px}.role-choice strong{font-size:1rem}.role-choice span{font-size:.85rem;color:var(--muted)}.role-choice.active{border-color:var(--blue);background:linear-gradient(145deg,#18395a,#12253c);box-shadow:0 0 0 1px #65b8ff33}.role-choice:focus-visible{outline:2px solid var(--blue);outline-offset:3px}.role-message{border-left:3px solid var(--blue);padding:8px 0 8px 14px;color:#d4e4f7;margin:16px 0 0}label{display:block;color:var(--muted);font-size:.88rem;margin-bottom:6px}input,select{width:100%;background:#0b1728;border:1px solid #38516e;color:var(--text);border-radius:10px;padding:11px 12px;font:inherit;min-width:0}input:focus,select:focus{outline:2px solid var(--blue);outline-offset:1px}.field{margin-bottom:14px}.hint{font-size:.78rem;color:var(--muted);margin-top:5px}
-.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.metric{border:1px solid var(--line);border-radius:14px;padding:15px;background:#101f33}.metric span{display:block;color:var(--muted);font-size:.82rem}.metric strong{display:block;font-size:1.65rem;margin-top:4px;letter-spacing:-.02em}.metric.blue strong{color:var(--blue)}.metric.orange strong{color:var(--orange)}.metric.green strong{color:var(--green)}
+.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.metric{border:1px solid var(--line);border-radius:14px;padding:15px;background:#101f33}.metric span{display:block;color:var(--muted);font-size:.82rem}.metric strong{display:block;font-size:1.65rem;margin-top:4px;letter-spacing:-.02em}.metric.blue strong{color:var(--blue)}.metric.orange strong{color:var(--orange)}.metric.green strong{color:var(--green)}.metric.negative strong{color:var(--orange)}.metric.positive strong{color:var(--green)}
 .result{margin-top:14px;border-radius:12px;padding:14px;background:#12273b;border:1px solid var(--line)}.result strong{font-size:1.05rem}.note{font-size:.85rem;color:var(--muted);margin-top:8px}.bar{height:9px;border-radius:99px;background:#263b54;overflow:hidden;margin:10px 0 4px}.bar>div{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .2s}
 ul{padding-left:19px;margin:8px 0;color:var(--muted)}li{margin:6px 0}.tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:.75rem;color:var(--blue);margin-bottom:8px}.footer{margin-top:18px;color:var(--muted);font-size:.8rem}
 .team-principle{display:flex;gap:18px;align-items:flex-start;margin:0 0 16px;padding:24px;border:1px solid rgba(101,184,255,.32);border-radius:20px;background:linear-gradient(120deg,rgba(34,83,125,.58),rgba(18,37,61,.82) 58%,rgba(22,39,63,.72));box-shadow:0 14px 36px #0002,inset 0 1px 0 #ffffff12;backdrop-filter:blur(16px)}
@@ -40,6 +40,23 @@ ul{padding-left:19px;margin:8px 0;color:var(--muted)}li{margin:6px 0}.tag{displa
       <span><b>Verbessern</b> statt Schuldige suchen</span>
     </div>
   </div>
+</section>
+
+<section class="panel" id="rohertragPersonalTile" style="margin:0 0 16px;border-color:rgba(101,184,255,.38);background:linear-gradient(145deg,rgba(25,55,83,.88),rgba(18,28,42,.96))">
+  <span class="tag">Optionale Monatskennzahl</span>
+  <h2>Rohertrag &amp; Personalkosten</h2>
+  <p class="hint">Setze den monatlichen Shop-Rohertrag und die gesamten Personalkosten desselben Monats ins Verhältnis. Die Werte müssen vollständig und auf derselben Abrechnungsbasis erfasst sein.</p>
+  <div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+    <div class="field"><label for="monthlyShopGrossProfit">Monatlicher Shop-Rohertrag (€)</label><input id="monthlyShopGrossProfit" type="number" min="0" step="0.01" placeholder="z. B. 18000"></div>
+    <div class="field"><label for="monthlyStaffCosts">Monatliche Personalkosten inkl. Arbeitgeberanteile (€)</label><input id="monthlyStaffCosts" type="number" min="0" step="0.01" placeholder="z. B. 6000"></div>
+  </div>
+  <label style="display:flex;gap:9px;align-items:flex-start;color:var(--text);margin:8px 0 14px"><input id="monthlyDataComplete" type="checkbox" style="width:auto;margin-top:4px;flex:0 0 auto"><span>Ich bestätige, dass beide Monatswerte vollständig und korrekt sind und denselben Zeitraum abdecken.</span></label>
+  <div class="metrics">
+    <div class="metric blue"><span>Rohertrag je 1 € Personalkosten</span><strong id="staffEfficiencyResult">—</strong></div>
+    <div class="metric orange"><span>Personalkostenquote vom Rohertrag</span><strong id="staffCostRatioResult">—</strong></div>
+  </div>
+  <div class="result" aria-live="polite"><strong id="staffRatioStatus">Noch nicht berechnet</strong><div class="note" id="staffRatioNote">Nur bei vollständiger und korrekter Datenpflege aussagekräftig. Ohne Bestätigung werden keine Kennzahlen angezeigt.</div></div>
+  <p class="note">Die Kennzahl beschreibt ein Verhältnis, beweist aber nicht, ob eine Personalbesetzung optimal ist. Sie wird hier nicht gespeichert und ist noch nicht automatisch mit den Monatswerten der Hauptauswertung synchronisiert.</p>
 </section>
 <section class="panel" style="margin-bottom:16px">
   <span class="tag">Dein Einstieg</span>
@@ -88,11 +105,11 @@ ul{padding-left:19px;margin:8px 0;color:var(--muted)}li{margin:6px 0}.tag{displa
 <div class="metrics">
 <div class="metric orange"><span>Zusätzliche Personalkosten</span><strong id="cost">56,00 €</strong></div>
 <div class="metric blue"><span>Geschätzter Mehr-Rohertrag</span><strong id="gain">45,00 €</strong></div>
-<div class="metric green"><span>Saldo vor weiteren Effekten</span><strong id="net">−11,00 €</strong></div>
+<div class="metric" id="netMetric"><span>Saldo nach allen angesetzten Effekten</span><strong id="net">−11,00 €</strong></div>
 <div class="metric"><span>Break-even je Stunde</span><strong id="breakEven">14,00 €</strong></div>
 </div>
 <div class="result" aria-live="polite"><strong id="verdict">Noch nicht wirtschaftlich gedeckt</strong><div class="bar"><div id="bar"></div></div><div id="detail">Der angesetzte Mehr-Rohertrag deckt einen Teil der Personalkosten.</div></div>
-<p class="note">Break-even zeigt den erforderlichen zusätzlichen Rohertrag pro bezahlter Stunde einschließlich des eingestellten Zuschlags. Weitere Effekte werden separat im Saldo berücksichtigt.</p>
+<p class="note">Break-even zeigt den erforderlichen zusätzlichen Rohertrag pro bezahlter Stunde einschließlich des eingestellten Zuschlags. Weitere messbare Effekte sind bereits im Saldo enthalten. Ein negativer Saldo bedeutet, dass die angesetzten Effekte die zusätzlichen Personalkosten noch nicht decken.</p>
 </section>
 </div>
 <section class="panel" id="teamPulse" style="margin:0 0 16px">
@@ -134,7 +151,7 @@ ul{padding-left:19px;margin:8px 0;color:var(--muted)}li{margin:6px 0}.tag{displa
   const cost=h*w*(1+b),gain=Math.max(0,num('bakery'))+Math.max(0,num('shelves')),other=num('other'),net=gain+other-cost;
   document.getElementById('cost').textContent=euro(cost);
   document.getElementById('gain').textContent=euro(gain);
-  document.getElementById('net').textContent=euro(net);
+  document.getElementById('net').textContent=euro(net);\n  const netMetric=document.getElementById('netMetric');\n  netMetric.classList.toggle('negative',net<0);\n  netMetric.classList.toggle('positive',net>=0);
   document.getElementById('breakEven').textContent=euro(h>0?cost/h:0);
   document.getElementById('verdict').textContent=net>=0?'Zusatzbesetzung rechnerisch gedeckt':'Noch nicht wirtschaftlich gedeckt';
   document.getElementById('detail').textContent=net>=0?'Im Szenario übersteigen die angesetzten Effekte die zusätzlichen Personalkosten.':'Im Szenario liegen die angesetzten Effekte unter den zusätzlichen Personalkosten. Prüfe weitere messbare Effekte und die Qualität der Schätzungen.';
@@ -170,6 +187,20 @@ ul{padding-left:19px;margin:8px 0;color:var(--muted)}li{margin:6px 0}.tag{displa
    detail.textContent='Haltet fest, welche Abläufe geholfen haben, damit sie beibehalten werden können.';
   }
  }
+
+ const monthlyProfit=document.getElementById('monthlyShopGrossProfit');
+ const monthlyStaff=document.getElementById('monthlyStaffCosts');
+ const monthlyComplete=document.getElementById('monthlyDataComplete');
+ function updateStaffEfficiency(){
+  const p=monthlyProfit.value===''?NaN:Number(monthlyProfit.value);
+  const s=monthlyStaff.value===''?NaN:Number(monthlyStaff.value);
+  const ok=monthlyComplete.checked&&Number.isFinite(p)&&Number.isFinite(s)&&p>0&&s>0;
+  document.getElementById('staffEfficiencyResult').textContent=ok?(p/s).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €':'—';
+  document.getElementById('staffCostRatioResult').textContent=ok?(s/p*100).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %':'—';
+  document.getElementById('staffRatioStatus').textContent=ok?'Kennzahl berechnet':'Vollständige Monatsdaten erforderlich';
+  document.getElementById('staffRatioNote').textContent=ok?'Berechnet aus den bestätigten Monatswerten. Prüfe, ob alle Lohnkosten und der Shop-Rohertrag für denselben Zeitraum vollständig enthalten sind.':'Nur bei vollständiger und korrekter Datenpflege aussagekräftig. Trage beide Monatswerte ein und bestätige die Vollständigkeit.';
+ }
+ [monthlyProfit,monthlyStaff].forEach(el=>el.addEventListener('input',updateStaffEfficiency));monthlyComplete.addEventListener('change',updateStaffEfficiency);updateStaffEfficiency();
  ids.forEach(id=>el[id].addEventListener('input',calc));calc();
  pulseIds.forEach(id=>document.getElementById(id).addEventListener('change',updatePulse));
  updatePulse();
