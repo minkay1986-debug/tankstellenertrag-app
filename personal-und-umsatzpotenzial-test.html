@@ -85,6 +85,17 @@ ul{padding-left:19px;margin:8px 0;color:var(--muted)}li{margin:6px 0}.tag{displa
 <p class="note">Break-even zeigt den erforderlichen zusätzlichen Rohertrag pro bezahlter Stunde einschließlich des eingestellten Zuschlags. Weitere Effekte werden separat im Saldo berücksichtigt.</p>
 </section>
 </div>
+<section class="panel" id="teamPulse" style="margin:0 0 16px">
+<span class="tag">Team-Puls · freiwillige Einschätzung</span>
+<h2>Wie machbar war die Schicht?</h2>
+<p class="hint">Die Angaben dienen als Gesprächsanstoß für Abläufe und Besetzung. Sie bewerten keine einzelne Person und werden nicht gespeichert.</p>
+<div class="grid">
+<div class="field"><label for="pulseLoad">Arbeitsauslastung</label><select id="pulseLoad"><option value="1">1 – gut machbar</option><option value="2">2 – eher machbar</option><option value="3" selected>3 – teils eng</option><option value="4">4 – sehr anstrengend</option><option value="5">5 – kaum zu bewältigen</option></select></div>
+<div class="field"><label for="pulseStress">Zeitdruck / Stress</label><select id="pulseStress"><option value="1">1 – gering</option><option value="2">2 – eher gering</option><option value="3" selected>3 – mittel</option><option value="4">4 – hoch</option><option value="5">5 – sehr hoch</option></select></div>
+<div class="field"><label for="pulseStaff">Besetzung passend?</label><select id="pulseStaff"><option value="1">1 – deutlich zu knapp</option><option value="2">2 – eher knapp</option><option value="3" selected>3 – teilweise passend</option><option value="4">4 – gut passend</option><option value="5">5 – sehr gut passend</option></select></div>
+</div>
+<div class="result" aria-live="polite"><strong id="pulseResult">Schicht zeitweise eng</strong><div class="note" id="pulseDetail">Besprecht, welche Aufgaben oder Zeitfenster besonders belastend waren.</div></div>
+</section>
 <div class="layout" style="margin-top:16px">
 <section class="panel"><h2>Was sollte in der Praxis erfasst werden?</h2><ul>
 <li>Zeitraum und tatsächliche Besetzung: allein oder zu zweit</li>
