@@ -27,6 +27,7 @@ button{border:0;border-radius:12px;background:linear-gradient(135deg,#69c0ff,#47
 <div class="field"><label for="date">Datum</label><input id="date" type="date" required></div>
 <div class="field"><label for="staffing">Tatsächliche Besetzung</label><select id="staffing"><option value="alone">Allein</option><option value="two" selected>Zu zweit</option><option value="three">Drei oder mehr</option></select></div>
 <div class="field"><label for="gross">Zusätzlicher Rohertrag durch Verbesserungen (€)</label><input id="gross" type="number" min="0" step=".01" value="0"><small>Nur Mehr-Rohertrag, nicht zusätzlicher Umsatz.</small></div>
+<div class="field"><label for="cost">Zusätzliche Personalkosten (€)</label><input id="cost" type="number" min="0" step=".01" value="0"><small>Nur die Kosten der betrachteten Zusatzbesetzung.</small></div>
 <div class="field"><label for="quality">Datenqualität des Tages</label><select id="quality"><option value="complete">Vollständig / gemessen</option><option value="estimated">Teilweise geschätzt</option><option value="incomplete">Unvollständig</option></select></div>
 <div class="field"><label for="availability">Regal- und Backwarenverfügbarkeit</label><select id="availability"><option value="1">1 – häufige Engpässe</option><option value="2">2 – mehrere Engpässe</option><option value="3" selected>3 – teilweise gut</option><option value="4">4 – überwiegend gut</option><option value="5">5 – durchgehend gut</option></select></div>
 <div class="field"><label for="interruptions">Unterbrechungen / Störungen</label><select id="interruptions"><option value="1">1 – sehr häufig</option><option value="2">2 – häufig</option><option value="3" selected>3 – gelegentlich</option><option value="4">4 – wenige</option><option value="5">5 – kaum</option></select></div>
@@ -73,14 +74,14 @@ function mean(vals){return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:nul
 function render(){
  const rows=monthRecords(), ops=mean(rows.map(dailyOps)), teamRows=rows.filter(r=>r.stress!==''&&r.stress!==null&&r.stress!==undefined), team=mean(teamRows.map(r=>(Number(r.stress)-1)*25));
  // Economic score remains unavailable until a defensible station-specific target/potential is entered.
- const economic=null;
+ const econRows=rows.filter(r=>Number(r.cost)>0&&r.quality!=='incomplete'); const economic=econRows.length?mean(econRows.map(r=>Math.min(100,Number(r.gross||0)/Number(r.cost)*100))):null;
  $('opsLabel').textContent=percent(ops);$('opsBar').style.width=(ops||0)+'%';
- $('econLabel').textContent='Noch nicht bewertet';$('econBar').style.width='0%';
+ $('econLabel').textContent=percent(economic);$('econBar').style.width=(economic||0)+'%';
  $('teamLabel').textContent=percent(team);$('teamBar').style.width=(team||0)+'%';
- $('economic').textContent='–';$('economicHint').textContent='Kein validierter Sollwert hinterlegt';
+ $('economic').textContent=percent(economic);$('economicHint').textContent=economic===null?'Kosten und Mehr-Rohertrag für mindestens eine Schicht benötigt':'Mehr-Rohertrag im Verhältnis zu Zusatzpersonalkosten';
  $('team').textContent=percent(team);$('teamHint').textContent=team===null?'Keine freiwilligen Angaben':teamRows.length+' freiwillige Rückmeldungen';
- const overall=ops!==null&&team!==null?(ops+team)/2:null;
- $('overall').textContent=percent(overall);$('overallHint').textContent=overall===null?'Ablauf- und Teamdaten benötigt':'Vorläufiger Teilindex aus Ablauf und Team-Puls';
+ const components=[ops,team,economic].filter(v=>v!==null);const overall=components.length>=2?mean(components):null;
+ $('overall').textContent=percent(overall);$('overallHint').textContent=overall===null?'Ablauf- und Teamdaten benötigt':'Vorläufiger Index aus verfügbaren Teilwerten';
  $('count').textContent=rows.length+' erfasste Schicht'+(rows.length===1?'':'en')+' · '+rows.filter(r=>r.quality==='complete').length+' vollständig';
  const chart=$('dayBars');chart.innerHTML='';
  if(!rows.length){chart.innerHTML='<p class="muted">Noch keine Schichten für diesen Monat gespeichert.</p>'}
@@ -92,16 +93,16 @@ function render(){
 }
 $('save').addEventListener('click',()=>{
  const date=$('date').value;if(!date){$('status').textContent='Bitte ein Datum auswählen.';return}
- const row={date,staffing:$('staffing').value,gross:safeNum($('gross').value,0,100000000),quality:$('quality').value,availability:$('availability').value,interruptions:$('interruptions').value,stress:$('stress').value,notes:$('notes').value.trim()};
+ const row={date,staffing:$('staffing').value,gross:safeNum($('gross').value,0,100000000),cost:safeNum($('cost').value,0,100000000),quality:$('quality').value,availability:$('availability').value,interruptions:$('interruptions').value,stress:$('stress').value,notes:$('notes').value.trim()};
  const idx=records.findIndex(r=>r.date===date);
  if(idx>=0)records[idx]=row;else records.push(row);
  if(saveRecords())$('status').textContent='Lokal im Browser gespeichert · '+(idx>=0?'Tageswert aktualisiert.':'Schicht hinzugefügt.');
  $('month').value=date.slice(0,7);render();
 });
-$('clearForm').addEventListener('click',()=>{$('gross').value='0';$('quality').value='complete';$('availability').value='3';$('interruptions').value='3';$('stress').value='';$('notes').value='';$('status').textContent='Eingaben zurückgesetzt.'});
+$('clearForm').addEventListener('click',()=>{$('gross').value='0';$('cost').value='0';$('quality').value='complete';$('availability').value='3';$('interruptions').value='3';$('stress').value='';$('notes').value='';$('status').textContent='Eingaben zurückgesetzt.'});
 $('month').addEventListener('change',render);
 $('deleteMonth').addEventListener('click',()=>{const m=$('month').value;if(!m)return;if(!confirm('Alle lokalen Vorschau-Daten für '+m+' löschen?'))return;records=records.filter(r=>!r.date.startsWith(m));saveRecords();render();$('status').textContent='Monatsdaten lokal gelöscht.'});
-$('export').addEventListener('click',()=>{const rows=monthRecords();if(!rows.length){$('status').textContent='Für diesen Monat gibt es keine Daten zum Export.';return}const fields=['date','staffing','gross','quality','availability','interruptions','stress','notes'];const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const csv='\uFEFF'+[fields.join(';'),...rows.map(r=>fields.map(k=>esc(r[k])).join(';'))].join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='schichtperformance-'+$('month').value+'.csv';a.click();URL.revokeObjectURL(url)});
+$('export').addEventListener('click',()=>{const rows=monthRecords();if(!rows.length){$('status').textContent='Für diesen Monat gibt es keine Daten zum Export.';return}const fields=['date','staffing','gross','cost','quality','availability','interruptions','stress','notes'];const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const csv='\uFEFF'+[fields.join(';'),...rows.map(r=>fields.map(k=>esc(r[k])).join(';'))].join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='schichtperformance-'+$('month').value+'.csv';a.click();URL.revokeObjectURL(url)});
 render();
 })();
 </script>
