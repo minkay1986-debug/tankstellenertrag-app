@@ -15,7 +15,10 @@ h2{font-size:1.15rem;margin:0 0 14px}.grid{display:grid;grid-template-columns:re
 .metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.metric{border:1px solid var(--line);border-radius:14px;padding:15px;background:#101f33}.metric span{display:block;color:var(--muted);font-size:.82rem}.metric strong{display:block;font-size:1.65rem;margin-top:4px;letter-spacing:-.02em}.metric.blue strong{color:var(--blue)}.metric.orange strong{color:var(--orange)}.metric.green strong{color:var(--green)}
 .result{margin-top:14px;border-radius:12px;padding:14px;background:#12273b;border:1px solid var(--line)}.result strong{font-size:1.05rem}.note{font-size:.85rem;color:var(--muted);margin-top:8px}.bar{height:9px;border-radius:99px;background:#263b54;overflow:hidden;margin:10px 0 4px}.bar>div{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .2s}
 ul{padding-left:19px;margin:8px 0;color:var(--muted)}li{margin:6px 0}.tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:.75rem;color:var(--blue);margin-bottom:8px}.footer{margin-top:18px;color:var(--muted);font-size:.8rem}
-@media(max-width:760px){.layout,.grid,.role-grid{grid-template-columns:1fr}.role-choice{min-height:0}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:22px 13px 36px}.panel{padding:16px}}
+.team-principle{display:flex;gap:18px;align-items:flex-start;margin:0 0 16px;padding:24px;border:1px solid rgba(101,184,255,.32);border-radius:20px;background:linear-gradient(120deg,rgba(34,83,125,.58),rgba(18,37,61,.82) 58%,rgba(22,39,63,.72));box-shadow:0 14px 36px #0002,inset 0 1px 0 #ffffff12;backdrop-filter:blur(16px)}
+.team-principle-icon{display:grid;place-items:center;flex:0 0 46px;width:46px;height:46px;border:1px solid #8acbff55;border-radius:15px;background:linear-gradient(145deg,#3b83b9aa,#183754aa);color:#b7e2ff;font-size:1.55rem;box-shadow:0 0 22px #65b8ff17}
+.team-principle-copy{min-width:0}.team-principle h2{font-size:clamp(1.35rem,3vw,1.8rem);letter-spacing:-.025em;margin:2px 0 4px}.team-principle p{max-width:850px;color:#c6d6e9;margin:9px 0 0}.team-principle .team-principle-lead{color:#a9dfff;font-weight:650;margin-top:0}.team-principle-points{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}.team-principle-points span{font-size:.82rem;color:#dcecff;border:1px solid #8dbce52b;background:#0c1d30a8;border-radius:999px;padding:7px 11px}.team-principle-points b{color:#91d0ff}
+@media(max-width:760px){.team-principle{padding:18px;gap:12px}.team-principle-icon{flex-basis:38px;width:38px;height:38px;border-radius:12px}.team-principle-points{gap:6px}.layout,.grid,.role-grid{grid-template-columns:1fr}.role-choice{min-height:0}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:22px 13px 36px}.panel{padding:16px}}
 @media(max-width:390px){.metrics{grid-template-columns:1fr}.metric strong{font-size:1.45rem}}
 </style>
 </head>
@@ -23,6 +26,21 @@ ul{padding-left:19px;margin:8px 0;color:var(--muted)}li{margin:6px 0}.tag{displa
 <div class="eyebrow">TankstellenErtrag · Personal & Umsatzpotenzial</div>
 <h1>Dein Team kann nicht überall gleichzeitig sein.</h1>
 <p class="intro" id="heroIntro">Wenn Backwaren fehlen, Regale leer bleiben und Kunden warten, liegt das nicht automatisch an deinen Mitarbeitern. Finde heraus, ob eine zusätzliche Hand wirklich hilft – mit deinen Zahlen statt Bauchgefühl.</p>
+<section class="team-principle" aria-labelledby="teamPrincipleTitle">
+  <div class="team-principle-icon" aria-hidden="true">✦</div>
+  <div class="team-principle-copy">
+    <span class="tag">Unsere Haltung</span>
+    <h2 id="teamPrincipleTitle">Gemeinsam. Nicht einsam.</h2>
+    <p class="team-principle-lead">Ein Betrieb. Ein Team. Ein gemeinsames Ziel.</p>
+    <p>Wir sehen nicht nur Zahlen, sondern Menschen und ihre tägliche Arbeit. Kassiervorgänge zeigen einen Teil des Betriebs – nicht die gesamte Leistung eines Menschen.</p>
+    <p>Darum beziehen wir Aufgaben, Arbeitsbedingungen und die Erfahrungen des Teams mit ein. Wir hören zu, erklären Entscheidungen und suchen gemeinsam nach Lösungen.</p>
+    <div class="team-principle-points">
+      <span><b>Erklären</b> statt nur anweisen</span>
+      <span><b>Verstehen</b> statt vorschnell urteilen</span>
+      <span><b>Verbessern</b> statt Schuldige suchen</span>
+    </div>
+  </div>
+</section>
 <section class="panel" style="margin-bottom:16px">
   <span class="tag">Dein Einstieg</span>
   <h2>Was ist dir als Pächter gerade am wichtigsten?</h2>
