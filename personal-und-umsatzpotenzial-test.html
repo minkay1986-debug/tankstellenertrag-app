@@ -141,6 +141,27 @@ ul{padding-left:19px;margin:8px 0;color:var(--muted)}li{margin:6px 0}.tag{displa
   document.getElementById('heroIntro').textContent=copy.intro;
   document.getElementById('roleMessage').textContent=copy.message;
  }));
+ const pulseIds=['pulseLoad','pulseStress','pulseStaff'];
+ function updatePulse(){
+  const load=Number(document.getElementById('pulseLoad').value);
+  const stress=Number(document.getElementById('pulseStress').value);
+  const staffing=Number(document.getElementById('pulseStaff').value);
+  const strain=(load+stress+(6-staffing))/3;
+  const title=document.getElementById('pulseResult');
+  const detail=document.getElementById('pulseDetail');
+  if(strain>=4){
+   title.textContent='Gespräch über Entlastung sinnvoll';
+   detail.textContent='Prüft gemeinsam Aufgabenverteilung, Stoßzeiten und Besetzung. Die Einschätzung ist ein Hinweis, keine Bewertung.';
+  }else if(strain>=2.7){
+   title.textContent='Schicht zeitweise eng';
+   detail.textContent='Besprecht, welche Aufgaben oder Zeitfenster besonders belastend waren.';
+  }else{
+   title.textContent='Schicht derzeit gut machbar';
+   detail.textContent='Haltet fest, welche Abläufe geholfen haben, damit sie beibehalten werden können.';
+  }
+ }
  ids.forEach(id=>el[id].addEventListener('input',calc));calc();
+ pulseIds.forEach(id=>document.getElementById(id).addEventListener('change',updatePulse));
+ updatePulse();
 })();
 </script></body></html>
