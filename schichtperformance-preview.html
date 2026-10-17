@@ -1,109 +1,49 @@
 <!doctype html>
 <html lang="de">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TankstellenErtrag · Schichtperformance Vorschau</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,follow">
+<title>TankstellenErtrag · Schichtperformance-Demo</title>
 <style>
-:root{color-scheme:dark;--bg:#09172a;--panel:#152842;--panel2:#0c1b30;--line:#2b4564;--text:#edf5ff;--muted:#adbed4;--blue:#66baff;--green:#6bd9b0;--amber:#f5c36a;--red:#ff8e8e}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0,#193657 0,transparent 42%),linear-gradient(145deg,#0b1a2d,#091426 75%);color:var(--text);font:16px/1.5 system-ui,-apple-system,sans-serif}
-main{max-width:1050px;margin:auto;padding:24px 16px 56px}h1,h2,h3,p{margin-top:0}h1{font-size:clamp(28px,4vw,40px);line-height:1.15;margin-bottom:8px}h2{font-size:22px;margin-bottom:12px}h3{font-size:17px;margin-bottom:8px}.muted{color:var(--muted)}.eyebrow{display:inline-block;border:1px solid #355575;border-radius:999px;padding:4px 11px;color:var(--blue);font-size:13px;margin-bottom:12px}
-.panel{background:linear-gradient(145deg,#172b46f5,#12233bf5);border:1px solid var(--line);border-radius:22px;padding:22px;margin:18px 0;box-shadow:0 14px 38px #0002}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field label{display:block;color:var(--muted);font-size:14px;margin-bottom:6px}.field input,.field select{width:100%;min-height:48px;padding:11px 13px;background:#09172a;border:1px solid #385371;border-radius:12px;color:var(--text);font:inherit}.field small{display:block;color:var(--muted);font-size:12px;margin-top:5px}
-button{border:0;border-radius:12px;background:linear-gradient(135deg,#69c0ff,#478fe1);color:#071629;font:700 15px system-ui;padding:13px 18px;cursor:pointer}button.secondary{background:#1b3552;color:var(--text);border:1px solid #3a5675}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.stat{background:#0b1a2d;border:1px solid #2c4663;border-radius:16px;padding:16px;min-width:0}.stat span{display:block;color:var(--muted);font-size:13px}.stat strong{display:block;font-size:28px;margin:5px 0;color:var(--blue);overflow-wrap:anywhere}.stat small{color:var(--muted);font-size:12px}
-.bar-row{margin:17px 0}.bar-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:7px}.bar-head strong{font-size:15px}.bar-head b{font-size:18px}.track{height:11px;border-radius:999px;background:#2b3e58;overflow:hidden}.fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#62b8ff,#6bd9b0);width:0;transition:width .2s}.fill.amber{background:linear-gradient(90deg,#f5c36a,#ffdb8c)}.day-bars{display:flex;align-items:end;gap:8px;height:145px;padding-top:10px}.day-col{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:5px}.day-fill{width:100%;max-width:42px;min-height:3px;background:linear-gradient(180deg,#70c6ff,#397fce);border-radius:6px 6px 2px 2px}.day-val,.day-label{font-size:11px;color:var(--muted)}.notice{padding:13px 15px;border:1px solid #385575;background:#10243a;border-radius:13px;color:#c9d9ec;font-size:14px}.status{margin-top:12px;color:var(--green);font-size:13px;min-height:20px}.hidden{display:none!important}
-@media(max-width:640px){main{padding:18px 12px 36px}.panel{padding:17px;border-radius:18px}.grid,.stats{grid-template-columns:1fr}.stat strong{font-size:25px}.day-bars{gap:4px}}
+:root{color-scheme:dark;--text:#edf5ff;--muted:#b5c7dc;--line:rgba(166,207,255,.2);--blue:#8fc7ff;--panel:rgba(19,43,70,.78)}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 15% 0%,rgba(44,104,190,.28),transparent 42%),linear-gradient(155deg,#071426,#091a31 58%,#061020);color:var(--text);font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif}
+main{width:min(1000px,calc(100% - 28px));margin:auto;padding:30px 0 52px}.eyebrow{display:inline-block;border:1px solid #49719b;border-radius:999px;padding:5px 12px;color:var(--blue);font-size:12px;font-weight:700;letter-spacing:.04em}h1{font-size:clamp(30px,5vw,48px);line-height:1.08;letter-spacing:-.035em;margin:18px 0 12px}.lead{max-width:760px;color:#c7d8ea;font-size:18px}.panel{margin-top:22px;padding:clamp(18px,3vw,28px);border:1px solid var(--line);border-radius:22px;background:linear-gradient(145deg,rgba(26,55,88,.72),rgba(8,24,44,.9));box-shadow:inset 0 1px 0 #fff1,0 18px 55px #0003;backdrop-filter:blur(16px)}.sectionHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.sectionHead h2{margin:0;font-size:22px}.sample{color:#a8c6e5;font-size:12px;border:1px solid var(--line);padding:5px 9px;border-radius:999px}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}.stat{padding:16px;border:1px solid var(--line);border-radius:15px;background:#07182c99}.stat span{display:block;color:var(--muted);font-size:13px}.stat strong{display:block;font-size:clamp(23px,3vw,31px);margin:5px 0;color:var(--blue)}.stat small{color:var(--muted);font-size:12px}.bars{display:grid;gap:18px;margin-top:24px}.barTitle{display:flex;justify-content:space-between;gap:10px;margin-bottom:7px;font-size:14px}.track{height:10px;background:#273e59;border-radius:999px;overflow:hidden}.fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#438ee4,#8fc7ff)}.trend{display:flex;align-items:end;gap:12px;height:150px;margin-top:20px;padding:10px 2px 0}.day{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:end;gap:6px;height:100%}.day i{display:block;width:min(44px,100%);border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#8fc7ff,#3679c4);min-height:5px}.day b,.day span{font-size:11px;color:var(--muted);font-style:normal;font-weight:500}.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}.cols h3{margin:0 0 8px;font-size:17px}.cols p{color:var(--muted);font-size:14px;margin:0}.cta{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 18px;border-radius:12px;background:linear-gradient(135deg,#4a9cff,#327ed5);color:white;text-decoration:none;font-weight:800;margin-top:18px}.cta:hover{filter:brightness(1.08)}.notice{margin-top:18px;padding:13px 15px;border:1px solid var(--line);border-radius:13px;color:#c7d8ea;background:#07182c99;font-size:13px}.muted{color:var(--muted)}footer{padding:22px 2px;color:#8fa7c1;font-size:12px}
+@media(max-width:620px){main{padding-top:20px}.stats{grid-template-columns:1fr}.cols{grid-template-columns:1fr}.trend{gap:5px}.day b,.day span{font-size:10px}}
 </style>
 </head>
 <body><main>
 <div class="eyebrow">TankstellenErtrag · Funktionsvorschau</div>
-<h1>Schichtperformance</h1>
-<p class="muted">Tägliche Schichtbeobachtungen werden zu einer Monatsübersicht zusammengeführt. Ziel: Engpässe erkennen, Team entlasten und wirtschaftliche Effekte nachvollziehbar machen.</p>
-<div class="notice"><strong>Konzeptstand:</strong> Diese isolierte Vorschau speichert Beispieldaten nur lokal in diesem Browser. Es gibt keine Verbindung zu Live-Kundendaten und keine Übertragung in die Kundenplattform. Die Indexwerte sind ein testbarer Vorschlag, noch keine validierte Kennzahl.</div>
-
+<h1>Schichtperformance verstehen – ohne einzelne Mitarbeitende zu bewerten.</h1>
+<p class="lead">Die Schichtperformance hilft dabei, wiederkehrende Engpässe, Belastungsspitzen und mögliche wirtschaftliche Effekte im Schichtalltag zu erkennen. Hier siehst du einen beispielhaften Ausschnitt – keine echte Stationsauswertung.</p>
 <section class="panel">
-<div class="eyebrow">Tageserfassung</div><h2>Wie lief die Schicht?</h2>
-<div class="grid">
-<div class="field"><label for="date">Datum</label><input id="date" type="date" required></div>
-<div class="field"><label for="staffing">Tatsächliche Besetzung</label><select id="staffing"><option value="alone">Allein</option><option value="two" selected>Zu zweit</option><option value="three">Drei oder mehr</option></select></div>
-<div class="field"><label for="gross">Zusätzlicher Rohertrag durch Verbesserungen (€)</label><input id="gross" type="number" min="0" step=".01" value="0"><small>Nur Mehr-Rohertrag, nicht zusätzlicher Umsatz.</small></div>
-<div class="field"><label for="cost">Zusätzliche Personalkosten (€)</label><input id="cost" type="number" min="0" step=".01" value="0"><small>Nur die Kosten der betrachteten Zusatzbesetzung.</small></div>
-<div class="field"><label for="quality">Datenqualität des Tages</label><select id="quality"><option value="complete">Vollständig / gemessen</option><option value="estimated">Teilweise geschätzt</option><option value="incomplete">Unvollständig</option></select></div>
-<div class="field"><label for="availability">Regal- und Backwarenverfügbarkeit</label><select id="availability"><option value="1">1 – häufige Engpässe</option><option value="2">2 – mehrere Engpässe</option><option value="3" selected>3 – teilweise gut</option><option value="4">4 – überwiegend gut</option><option value="5">5 – durchgehend gut</option></select></div>
-<div class="field"><label for="interruptions">Unterbrechungen / Störungen</label><select id="interruptions"><option value="1">1 – sehr häufig</option><option value="2">2 – häufig</option><option value="3" selected>3 – gelegentlich</option><option value="4">4 – wenige</option><option value="5">5 – kaum</option></select></div>
-<div class="field"><label for="stress">Belastung der Schicht (freiwillig)</label><select id="stress"><option value="">Keine Angabe</option><option value="1">1 – sehr hoch</option><option value="2">2 – hoch</option><option value="3" selected>3 – mittel</option><option value="4">4 – niedrig</option><option value="5">5 – sehr niedrig</option></select><small>Keine Bewertung einzelner Mitarbeitender.</small></div>
-<div class="field"><label for="notes">Kurze Notiz (optional)</label><input id="notes" maxlength="180" placeholder="z. B. Kaffeemaschine 30 Min. gestört"></div>
-</div>
-<div class="actions"><button id="save">Schicht speichern</button><button class="secondary" id="clearForm" type="button">Eingaben zurücksetzen</button></div><div class="status" id="status" aria-live="polite"></div>
+ <div class="sectionHead"><h2>So könnte deine Monatsübersicht aussehen</h2><span class="sample">Fiktive Beispieldaten</span></div>
+ <div class="stats">
+  <div class="stat"><span>Ablauf & Verfügbarkeit</span><strong>76 %</strong><small>Beispielindex · Monatsdurchschnitt</small></div>
+  <div class="stat"><span>Team-Puls</span><strong>68 %</strong><small>Freiwillige, zusammengefasste Rückmeldungen</small></div>
+  <div class="stat"><span>Zusätzlicher Mehr-Rohertrag</span><strong>420 €</strong><small>Beispielwert, keine Prognose</small></div>
+ </div>
+ <div class="bars">
+  <div><div class="barTitle"><span>Ablauf & Warenverfügbarkeit</span><b>76 %</b></div><div class="track"><div class="fill" style="width:76%"></div></div></div>
+  <div><div class="barTitle"><span>Team-Puls</span><b>68 %</b></div><div class="track"><div class="fill" style="width:68%"></div></div></div>
+ </div>
+ <h3 style="margin:28px 0 0">Beispielhafter Tagesverlauf</h3>
+ <div class="trend" aria-label="Statisches Beispieldiagramm für fünf Tage">
+  <div class="day"><b>72 %</b><i style="height:72%"></i><span>Mo</span></div>
+  <div class="day"><b>61 %</b><i style="height:61%"></i><span>Di</span></div>
+  <div class="day"><b>83 %</b><i style="height:83%"></i><span>Mi</span></div>
+  <div class="day"><b>68 %</b><i style="height:68%"></i><span>Do</span></div>
+  <div class="day"><b>76 %</b><i style="height:76%"></i><span>Fr</span></div>
+ </div>
+ <div class="notice"><strong>Wichtig:</strong> Die Werte und das Diagramm sind rein illustrative Beispieldaten. Diese öffentliche Vorschau nimmt keine Eingaben entgegen, speichert nichts im Browser und überträgt keine Daten.</div>
 </section>
-
 <section class="panel">
-<div class="eyebrow">Monatsübersicht</div><div class="grid" style="align-items:end"><div><h2>Performance im Zeitverlauf</h2><p class="muted">Nur erfasste Tage werden ausgewertet.</p></div><div class="field"><label for="month">Monat auswählen</label><input id="month" type="month"></div></div>
-<div class="stats">
-<div class="stat"><span>Gesamtindex</span><strong id="overall">–</strong><small id="overallHint">Noch keine ausreichenden Daten</small></div>
-<div class="stat"><span>Wirtschaftliche Wirkung</span><strong id="economic">–</strong><small id="economicHint">Mehr-Rohertrag erfasst</small></div>
-<div class="stat"><span>Team-Puls</span><strong id="team">–</strong><small id="teamHint">Freiwillige Rückmeldungen</small></div>
-</div>
-<div class="bar-row"><div class="bar-head"><strong>Ablauf & Verfügbarkeit</strong><b id="opsLabel">–</b></div><div class="track"><div class="fill" id="opsBar"></div></div></div>
-<div class="bar-row"><div class="bar-head"><strong>Wirtschaftliche Wirkung</strong><b id="econLabel">–</b></div><div class="track"><div class="fill" id="econBar"></div></div></div>
-<div class="bar-row"><div class="bar-head"><strong>Team-Puls</strong><b id="teamLabel">–</b></div><div class="track"><div class="fill amber" id="teamBar"></div></div></div>
-<h3 style="margin-top:26px">Tagesverlauf</h3><div class="day-bars" id="dayBars"><p class="muted">Noch keine Schichten für diesen Monat gespeichert.</p></div>
-<div class="notice" id="insight" style="margin-top:18px">Sobald mehrere Tage erfasst sind, erscheinen hier vorsichtige Hinweise auf mögliche Engpässe. Die Werte beweisen keine Ursache und ersetzen keine fachliche Prüfung.</div>
-<div class="actions"><button class="secondary" id="export">Monatsdaten als CSV exportieren</button><button class="secondary" id="deleteMonth">Monatsdaten löschen</button></div>
-<p class="muted" id="count" style="margin-top:12px">0 erfasste Tage</p>
+ <div class="cols">
+  <div><h3>Was die vollständige Funktion leisten soll</h3><p>Schichttage strukturiert erfassen, Monatsentwicklungen vergleichen und Hinweise auf wiederkehrende Engpässe erhalten – auf Basis deiner eigenen Stationsdaten.</p></div>
+  <div><h3>Unser Grundsatz</h3><p>Keine Namen, keine Personalnummern und keine Mitarbeiter-Ranglisten. Im Mittelpunkt stehen Abläufe, Warenverfügbarkeit und die gemeinsame Entlastung des Teams.</p></div>
+ </div>
+ <a class="cta" href="https://app.tankstellenertrag.de/?login=1">Zum Kundenbereich / anmelden</a>
+ <p class="muted" style="font-size:12px;margin:12px 0 0">Die vollständige Erfassung und Auswertung sollte nur im geschützten Kundenbereich mit stationsbezogenem Zugriff angeboten werden.</p>
 </section>
-<section class="panel"><h2>Wie der Index zu verstehen ist</h2><p class="muted">Ablaufindex: Verfügbarkeit und Unterbrechungen. Team-Puls: freiwillige Belastungsangabe, bei fehlender Angabe nicht als null gewertet. Wirtschaftliche Wirkung: vorerst ein neutraler Startwert, solange kein validiertes stationsbezogenes Potenzialmodell vorliegt; eingegebener Mehr-Rohertrag wird separat angezeigt. Der Gesamtindex wird nur bei ausreichender Datengrundlage berechnet und ist ausdrücklich vorläufig.</p><p class="muted">Keine automatische Schuldzuweisung, kein Mitarbeiter-Ranking und keine automatische Bestellung oder Personalentscheidung. Für eine echte Kundenfunktion sind Anmeldung, sichere stationsbezogene Speicherung, Zugriffsschutz, Löschregeln und Tests erforderlich.</p></section>
-</main>
-<script>
-(function(){
-'use strict';
-const $=id=>document.getElementById(id);
-const STORAGE_KEY='te_schichtperformance_preview_v1';
-const today=new Date();
-const localDate=d=>{const x=new Date(d.getTime()-d.getTimezoneOffset()*60000);return x.toISOString().slice(0,10)};
-$('date').value=localDate(today);$('month').value=localDate(today).slice(0,7);
-let records=[];
-try{const raw=localStorage.getItem(STORAGE_KEY);records=raw?JSON.parse(raw):[]}catch(_){records=[]}
-if(!Array.isArray(records))records=[];
-const safeNum=(v,min,max)=>Math.max(min,Math.min(max,Number(v)||0));
-const percent=v=>v===null||!Number.isFinite(v)?'–':Math.round(v)+'%';
-function saveRecords(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(records));return true}catch(_){$('status').textContent='Speichern im Browser nicht möglich. Exportiere die Daten vor dem Verlassen.';return false}}
-function dailyOps(r){return ((Number(r.availability)+Number(r.interruptions)-2)/8)*100}
-function monthRecords(){return records.filter(r=>r.date&&r.date.slice(0,7)===$('month').value).sort((a,b)=>a.date.localeCompare(b.date))}
-function mean(vals){return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null}
-function render(){
- const rows=monthRecords(), ops=mean(rows.map(dailyOps)), teamRows=rows.filter(r=>r.stress!==''&&r.stress!==null&&r.stress!==undefined), team=mean(teamRows.map(r=>(Number(r.stress)-1)*25));
- // Economic score remains unavailable until a defensible station-specific target/potential is entered.
- const econRows=rows.filter(r=>Number(r.cost)>0&&r.quality!=='incomplete'); const economic=econRows.length?mean(econRows.map(r=>Math.min(100,Number(r.gross||0)/Number(r.cost)*100))):null;
- $('opsLabel').textContent=percent(ops);$('opsBar').style.width=(ops||0)+'%';
- $('econLabel').textContent=percent(economic);$('econBar').style.width=(economic||0)+'%';
- $('teamLabel').textContent=percent(team);$('teamBar').style.width=(team||0)+'%';
- $('economic').textContent=percent(economic);$('economicHint').textContent=economic===null?'Kosten und Mehr-Rohertrag für mindestens eine Schicht benötigt':'Mehr-Rohertrag im Verhältnis zu Zusatzpersonalkosten';
- $('team').textContent=percent(team);$('teamHint').textContent=team===null?'Keine freiwilligen Angaben':teamRows.length+' freiwillige Rückmeldungen';
- const components=[ops,team,economic].filter(v=>v!==null);const overall=components.length>=2?mean(components):null;
- $('overall').textContent=percent(overall);$('overallHint').textContent=overall===null?'Ablauf- und Teamdaten benötigt':'Vorläufiger Index aus verfügbaren Teilwerten';
- $('count').textContent=rows.length+' erfasste Schicht'+(rows.length===1?'':'en')+' · '+rows.filter(r=>r.quality==='complete').length+' vollständig';
- const chart=$('dayBars');chart.innerHTML='';
- if(!rows.length){chart.innerHTML='<p class="muted">Noch keine Schichten für diesen Monat gespeichert.</p>'}
- else rows.forEach(r=>{const score=dailyOps(r);const col=document.createElement('div');col.className='day-col';const val=document.createElement('span');val.className='day-val';val.textContent=Math.round(score)+'%';const fill=document.createElement('div');fill.className='day-fill';fill.style.height=Math.max(3,score)+'%';fill.title=r.date+' Ablaufindex '+Math.round(score)+'%';const label=document.createElement('span');label.className='day-label';label.textContent=r.date.slice(8,10)+'.';col.append(val,fill,label);chart.appendChild(col)});
- const totalGross=rows.reduce((s,r)=>s+Number(r.gross||0),0);
- const low=rows.filter(r=>dailyOps(r)<50).length;
- $('insight').textContent=!rows.length?'Noch keine Daten. Erfasse mehrere Schichten, um erste Muster zu erkennen.':(rows.length<5?'Vorläufige Tendenz: erst '+rows.length+' Schichten erfasst. Warte auf mehr vergleichbare Beobachtungen, bevor du Maßnahmen ableitest.':(low?low+' von '+rows.length+' erfassten Schichten hatten einen niedrigen Ablaufindex. Prüfe Zeitfenster, Unterbrechungen und Warenverfügbarkeit, bevor du Ursachen annimmst.':'Der Ablaufindex liegt bei den erfassten Schichten überwiegend höher. Prüfe die Entwicklung weiter und gleiche sie mit realen Kennzahlen ab.'));
- $('insight').textContent+=' Summe eingegebener zusätzlicher Mehr-Rohertrag: '+new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(totalGross)+'.';
-}
-$('save').addEventListener('click',()=>{
- const date=$('date').value;if(!date){$('status').textContent='Bitte ein Datum auswählen.';return}
- const row={date,staffing:$('staffing').value,gross:safeNum($('gross').value,0,100000000),cost:safeNum($('cost').value,0,100000000),quality:$('quality').value,availability:$('availability').value,interruptions:$('interruptions').value,stress:$('stress').value,notes:$('notes').value.trim()};
- const idx=records.findIndex(r=>r.date===date);
- if(idx>=0)records[idx]=row;else records.push(row);
- if(saveRecords())$('status').textContent='Lokal im Browser gespeichert · '+(idx>=0?'Tageswert aktualisiert.':'Schicht hinzugefügt.');
- $('month').value=date.slice(0,7);render();
-});
-$('clearForm').addEventListener('click',()=>{$('gross').value='0';$('cost').value='0';$('quality').value='complete';$('availability').value='3';$('interruptions').value='3';$('stress').value='';$('notes').value='';$('status').textContent='Eingaben zurückgesetzt.'});
-$('month').addEventListener('change',render);
-$('deleteMonth').addEventListener('click',()=>{const m=$('month').value;if(!m)return;if(!confirm('Alle lokalen Vorschau-Daten für '+m+' löschen?'))return;records=records.filter(r=>!r.date.startsWith(m));saveRecords();render();$('status').textContent='Monatsdaten lokal gelöscht.'});
-$('export').addEventListener('click',()=>{const rows=monthRecords();if(!rows.length){$('status').textContent='Für diesen Monat gibt es keine Daten zum Export.';return}const fields=['date','staffing','gross','cost','quality','availability','interruptions','stress','notes'];const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const csv='\uFEFF'+[fields.join(';'),...rows.map(r=>fields.map(k=>esc(r[k])).join(';'))].join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='schichtperformance-'+$('month').value+'.csv';a.click();URL.revokeObjectURL(url)});
-render();
-})();
-</script>
-</body></html>
+<footer>TankstellenErtrag · Öffentliche Produktvorschau · Keine echten Stations- oder Mitarbeiterdaten</footer>
+</main></body></html>
