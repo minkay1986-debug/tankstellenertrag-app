@@ -59,3 +59,47 @@ Deno.test("weather learning does not report a signal with too few observations",
     throw new Error("Insufficient samples must not create a weather effect");
   }
 });
+
+Deno.test("daily sales are matched only to the exact valid weather date", () => {
+  const weather = [
+    { date: "2026-06-01", temp_max: 28, precipitation_sum: 3.5 },
+    { date: "2026-06-02", temp_max: 20, precipitation_sum: 0 },
+  ];
+  const sales = [
+    { date: "2026-06-01", groupKey: "eis", actualRevenue: 150, complete: true, open: true, promotion: false },
+    { date: "2026-06-02", groupKey: "eis", actualRevenue: 100, complete: true, open: true, promotion: false },
+    { date: "2026-06-03", groupKey: "eis", actualRevenue: 999, complete: true, open: true, promotion: false },
+    { date: "2026-02-30", groupKey: "eis", actualRevenue: 999, complete: true, open: true, promotion: false },
+    { date: "2026-06-01", groupKey: "eis", actualRevenue: 999, complete: true, open: false, promotion: false },
+    { date: "2026-06-01", groupKey: "eis", actualRevenue: 999, complete: true, open: true, promotion: true },
+  ];
+  const matched = optimizer.matchWeatherSalesObservations(weather, sales);
+  if (matched.length !== 2) throw new Error(`Expected two valid exact-date matches, got ${matched.length}`);
+  if (matched[0].precipitationMm !== 3.5) throw new Error("DWD precipitation_sum was not mapped to the matched observation");
+  if (matched.some((row: any) => row.date === "2026-06-03" || row.date === "2026-02-30")) {
+    throw new Error("Unmatched or invalid calendar dates were included");
+  }
+});
+
+Deno.test("dated weather learning compares within weekday and quarter strata", () => {
+  const pairs: [string, number, number][] = [
+    ["2026-04-06", 28, 120],
+    ["2026-04-13", 27, 120],
+    ["2026-04-20", 29, 120],
+    ["2026-05-04", 20, 100],
+    ["2026-05-11", 21, 100],
+    ["2026-05-18", 22, 100],
+  ];
+  const weather = pairs.map(([date, temp]) => ({ date, temp_max: temp }));
+  const sales = pairs.map(([date, , revenue]) => ({
+    date, groupKey: "drinks", actualRevenue: revenue,
+    complete: true, open: true, promotion: false,
+  }));
+  const [result] = optimizer.learnWeatherEffects(optimizer.matchWeatherSalesObservations(weather, sales));
+  if (result.comparisonMethod !== "weekday_and_quarter_matched") {
+    throw new Error("Dated learning did not use weekday/quarter matching");
+  }
+  if (result.warmSignal !== "preliminary" || result.warmVsMildPct !== 20) {
+    throw new Error(`Expected preliminary +20% signal, got ${result.warmVsMildPct}`);
+  }
+});
