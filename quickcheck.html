@@ -28,11 +28,11 @@
       <p class="sub">Grundlage für die erste Warenwirtschafts-Analyse.</p>
       <div class="fields">
         <div class="field"><label for="rev">Monatlicher Shop-Umsatz</label><input id="rev" type="number" min="0" step="100" value="120000"><small>Nettoumsatz ohne Umsatzsteuer in Euro</small></div>
-        <div class="field"><label for="ek">Wareneinsatz / EK</label><input id="ek" type="number" min="0" step="100" value="85000"><small>Einkaufswert in Euro</small></div>
-        <div class="field"><label for="shrink">Schwund</label><input id="shrink" type="number" min="0" step="10" value="900"><small>Monatlich in Euro</small></div>
-        <div class="field"><label for="writeoff">Abschriften</label><input id="writeoff" type="number" min="0" step="10" value="650"><small>Monatlich in Euro</small></div>
-        <div class="field"><label for="other">Sonstige Warenverluste</label><input id="other" type="number" min="0" step="10" value="250"><small>Zum Beispiel Bruch oder Verderb</small></div>
-        <div class="field"><label for="stock">Lagerbestand EK</label><input id="stock" type="number" min="0" step="100" value="24000"><small>Bestand zum Einkaufswert</small></div>
+        <div class="field"><label for="ek">Wareneinsatz / EK</label><input id="ek" type="number" min="0" step="100" value="85000"><small>Netto-Einkaufswert ohne Vorsteuer in Euro</small></div>
+        <div class="field"><label for="shrink">Schwund</label><input id="shrink" type="number" min="0" step="10" value="900"><small>Monatlich zum Netto-Einkaufswert in Euro</small></div>
+        <div class="field"><label for="writeoff">Abschriften</label><input id="writeoff" type="number" min="0" step="10" value="650"><small>Monatlich zum Netto-Einkaufswert in Euro</small></div>
+        <div class="field"><label for="other">Sonstige Warenverluste</label><input id="other" type="number" min="0" step="10" value="250"><small>Zum Netto-Einkaufswert in Euro, z. B. Bruch oder Verderb</small></div>
+        <div class="field"><label for="stock">Lagerbestand EK</label><input id="stock" type="number" min="0" step="100" value="24000"><small>Bestand zum Netto-Einkaufswert ohne Vorsteuer</small></div>
       </div>
       <div class="actions"><button type="button" class="btn secondary" id="demo">Demo-Werte laden</button></div><p id="actionStatus" class="actionStatus" aria-live="polite">Beispielwerte sind geladen. Änderungen werden automatisch berechnet.</p>
       <div class="privacy">Vorschau mit Beispielwerten. Die Berechnung erfolgt direkt im Browser; es werden keine Daten übertragen.</div>
