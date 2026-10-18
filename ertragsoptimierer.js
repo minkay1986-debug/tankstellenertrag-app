@@ -155,14 +155,14 @@
         }
         const hotCount = matched.reduce((n, s) => n + s.hot.length, 0);
         const mildCount = matched.reduce((n, s) => n + s.mild.length, 0);
-        const usable = hotCount >= 3 && mildCount >= 3 && matched.length >= 2;
+        const usable = hotCount >= 3 && mildCount >= 3 && matched.length >= 1;
         if (!usable) return { effect: null, hotCount, mildCount, matchedStrata: matched.length, status: 'insufficient_data' };
         // Equal stratum weighting avoids over-weighting a weekday/season with more records.
         const effects = matched.map(s => {
           const hotMean = means(s.hot), mildMean = means(s.mild);
           return mildMean > 0 ? (hotMean / mildMean - 1) * 100 : null;
         }).filter(finite);
-        if (effects.length < 2) return { effect: null, hotCount, mildCount, matchedStrata: matched.length, status: 'insufficient_data' };
+        if (effects.length < 1) return { effect: null, hotCount, mildCount, matchedStrata: matched.length, status: 'insufficient_data' };
         return { effect: round(effects.reduce((a, b) => a + b, 0) / effects.length),
           hotCount, mildCount, matchedStrata: matched.length, status: 'preliminary' };
       };
