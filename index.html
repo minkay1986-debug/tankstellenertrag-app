@@ -649,32 +649,46 @@ html,body{max-width:100%;overflow-x:hidden}
  const cards=document.getElementById('ideasCards'),form=document.getElementById('ideaSuggestionForm');
  if(!cards||!form)return;
  const ids=['stockout','packaging','weather','staff'];
- const labels={stockout:'Lieferengpässe früher erkennen',packaging:'Gebindegrößen optimieren',weather:'Wettergestützte Warenplanung',staff:'Kooperation zwischen Stationen'};
- const storageKey='tse_ideas_v1';
+ const siteKey='0x4AAAAAAFaU5qAHIiyo4F6Y';
+ const storageKey='tse_ideas_v2', browserKeyName='tse_ideas_browser_key';
  let prior={};try{prior=JSON.parse(localStorage.getItem(storageKey)||'{}')}catch(_){}
+ let browserKey=localStorage.getItem(browserKeyName);
+ if(!browserKey){browserKey=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+'-'+Math.random().toString(36).slice(2)+'-'+Math.random().toString(36).slice(2));localStorage.setItem(browserKeyName,browserKey)}
  function getClient(){return window.TANKSTELLENERTRAG_CLIENT||window.client||null}
  function status(message,error){const el=document.getElementById('ideaStatus');if(el){el.textContent=message;el.style.color=error?'#ffb2b2':'#a7f0c2'}}
  function refreshButtons(){cards.querySelectorAll('[data-vote]').forEach(btn=>{const id=btn.dataset.vote;const voted=!!prior[id];btn.disabled=voted;btn.classList.toggle('voted',voted);btn.textContent=voted?'Deine Stimme ist gezählt':'Dafür stimmen'})}
+ async function invoke(action,extra={}){const client=getClient();if(!client)throw new Error('Verbindung nicht bereit');const {data,error}=await client.functions.invoke('public-ideas-vote',{body:{action,...extra}});if(error)throw error;if(data?.error)throw new Error(data.error);return data}
  async function loadCounts(){
-   const client=getClient();
-   if(!client){ids.forEach(id=>{const el=document.getElementById('result-'+id);if(el)el.textContent='Abstimmung lädt, sobald die Verbindung bereit ist.'});return}
-   const {data,error}=await client.from('public_idea_votes').select('idea_id');
-   if(error){ids.forEach(id=>{const el=document.getElementById('result-'+id);if(el)el.textContent='Stimmenstand derzeit nicht verfügbar.'});return}
-   const counts={};(data||[]).forEach(row=>{counts[row.idea_id]=(counts[row.idea_id]||0)+1});
-   const total=ids.reduce((sum,id)=>sum+(counts[id]||0),0);
-   ids.forEach(id=>{const el=document.getElementById('result-'+id);if(el)el.textContent=(counts[id]||0)+' Stimmen'+(total?' · '+Math.round((counts[id]||0)*100/total)+' % der Stimmen':'')});
+   try{const data=await invoke('counts');const counts=data.counts||{};const total=ids.reduce((sum,id)=>sum+(Number(counts[id])||0),0);
+     ids.forEach(id=>{const el=document.getElementById('result-'+id);if(el)el.textContent=(Number(counts[id])||0)+' Stimmen'+(total?' · '+Math.round((Number(counts[id])||0)*100/total)+' % der Stimmen':'')});
+   }catch(_){ids.forEach(id=>{const el=document.getElementById('result-'+id);if(el)el.textContent='Stimmenstand derzeit nicht verfügbar.'})}
  }
- cards.addEventListener('click',async ev=>{
+ let modal,turnstileWidget,activeVote=null;
+ function closeModal(){if(modal){modal.remove();modal=null}activeVote=null}
+ function openVerification(id,btn){
+   if(modal)modal.remove();
+   modal=document.createElement('div');modal.style.cssText='position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:18px;background:rgba(0,0,0,.76)';
+   const panel=document.createElement('div');panel.style.cssText='width:min(420px,100%);padding:24px;border-radius:18px;background:#10243b;border:1px solid rgba(166,207,255,.3);box-shadow:0 24px 80px #0008;color:#f2f7ff;font-family:inherit';
+   panel.innerHTML='<button type="button" aria-label="Schließen" style="float:right;border:0;background:transparent;color:#fff;font-size:24px;cursor:pointer">×</button><h3 style="margin:0 0 8px">Stimme bestätigen</h3><p style="color:#c1d5ea;font-size:13px;line-height:1.5">Bitte bestätige die Mensch-Prüfung, damit wir deine Stimme sicher speichern können.</p><div id="tseTurnstileWidget" style="margin:18px 0;min-height:65px"></div><p id="tseTurnstileStatus" role="status" style="font-size:12px;color:#c1d5ea">Mensch-Prüfung wird geladen …</p>';
+   modal.appendChild(panel);document.body.appendChild(modal);activeVote={id,btn};
+   panel.querySelector('button').addEventListener('click',closeModal);
+   modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
+   function render(){if(!modal||!window.turnstile)return;try{turnstileWidget=window.turnstile.render(panel.querySelector('#tseTurnstileWidget'),{sitekey:siteKey,theme:'dark',callback:async token=>{
+      const current=activeVote;if(!current)return;const {id,btn}=current;btn.disabled=true;btn.textContent='Stimme wird geprüft …';
+      panel.querySelector('#tseTurnstileStatus').textContent='Prüfung erfolgreich – Stimme wird gespeichert …';
+      try{await invoke('vote',{ideaId:id,token,browserKey});prior[id]=true;try{localStorage.setItem(storageKey,JSON.stringify(prior))}catch(_){}closeModal();refreshButtons();await loadCounts();status('Danke! Deine Stimme wurde anonym gezählt.')}
+      catch(e){const msg=String(e.message||e);panel.querySelector('#tseTurnstileStatus').textContent=msg.includes('already_voted')?'Für dieses Gerät wurde bereits abgestimmt.':'Die Prüfung oder Speicherung ist fehlgeschlagen. Bitte erneut versuchen.';btn.disabled=false;btn.textContent='Dafür stimmen';}
+   },'expired-callback':()=>{const el=panel.querySelector('#tseTurnstileStatus');if(el)el.textContent='Prüfung abgelaufen. Bitte erneut bestätigen.'},'error-callback':()=>{const el=panel.querySelector('#tseTurnstileStatus');if(el)el.textContent='Mensch-Prüfung nicht erreichbar. Bitte später erneut versuchen.'}})}catch(_){panel.querySelector('#tseTurnstileStatus').textContent='Mensch-Prüfung konnte nicht geladen werden.'}}
+   if(window.turnstile){render()}else{
+     if(!document.querySelector('script[data-tse-turnstile]')){const script=document.createElement('script');script.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';script.async=true;script.defer=true;script.dataset.tseTurnstile='1';script.onload=render;script.onerror=()=>{const el=panel.querySelector('#tseTurnstileStatus');if(el)el.textContent='Mensch-Prüfung konnte nicht geladen werden.'};document.head.appendChild(script)}
+     else{const check=()=>{if(!modal)return;if(window.turnstile)render();else setTimeout(check,250)};check()}
+   }
+ }
+ cards.addEventListener('click',ev=>{
    const btn=ev.target.closest('[data-vote]');if(!btn)return;
    const id=btn.dataset.vote;if(!ids.includes(id)||prior[id])return;
-   const client=getClient();if(!client){status('Die Abstimmung ist momentan nicht erreichbar. Bitte später erneut versuchen.',true);return}
-   btn.disabled=true;btn.textContent='Stimme wird gespeichert …';
-   try{
-     const {error}=await client.from('public_idea_votes').insert({idea_id:id});
-     if(error)throw error;
-     prior[id]=true;try{localStorage.setItem(storageKey,JSON.stringify(prior))}catch(_){}
-     refreshButtons();await loadCounts();status('Danke! Deine Stimme wurde gezählt.');
-   }catch(e){btn.disabled=false;btn.textContent='Dafür stimmen';status('Die Stimme konnte nicht gespeichert werden. Bitte später erneut versuchen.',true)}
+   if(!getClient()){status('Die Abstimmung ist momentan nicht erreichbar. Bitte später erneut versuchen.',true);return}
+   openVerification(id,btn);
  });
  form.addEventListener('submit',async ev=>{
    ev.preventDefault();const field=document.getElementById('ideaSuggestion'),value=field.value.trim();if(value.length<8){status('Bitte beschreibe deine Idee etwas genauer.',true);return}
