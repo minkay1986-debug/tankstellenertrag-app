@@ -16,6 +16,11 @@
 
   const finite = (v) => typeof v === 'number' && Number.isFinite(v);
   const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  const isIsoCalendarDate = value => {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+    const timestamp = Date.parse(value + 'T12:00:00Z');
+    return !Number.isNaN(timestamp) && new Date(timestamp).toISOString().slice(0, 10) === value;
+  };
   const round = (v, digits = 2) => {
     const f = 10 ** digits;
     return Math.round((v + Number.EPSILON) * f) / f;
@@ -124,10 +129,7 @@
       o && typeof o.groupKey === 'string' && o.groupKey.trim() &&
       finite(o.actualRevenue) && o.actualRevenue >= 0 &&
       finite(o.maxTempC) && o.complete !== false && o.open !== false &&
-      o.promotion !== true && typeof o.date === 'string' &&
-      /^\d{4}-\d{2}-\d{2}$/.test(o.date) &&
-      !Number.isNaN(Date.parse(o.date + 'T12:00:00Z'))
-      && new Date(o.date + 'T12:00:00Z').toISOString().slice(0, 10) === o.date
+      o.promotion !== true && isIsoCalendarDate(o.date)
     ).map(o => {
       const d = new Date(o.date + 'T12:00:00Z');
       return { ...o, _weekday: d.getUTCDay(), _month: d.getUTCMonth() + 1,
@@ -190,10 +192,10 @@
   /** Join actual daily station sales with DWD weather for the exact same date. */
   function matchWeatherSalesObservations(weatherDaily, salesObservations) {
     const weatherByDate = new Map((Array.isArray(weatherDaily) ? weatherDaily : [])
-      .filter(w => w && typeof w.date === 'string' && finite(w.temp_max))
+      .filter(w => w && isIsoCalendarDate(w.date) && finite(w.temp_max))
       .map(w => [w.date, w]));
     return (Array.isArray(salesObservations) ? salesObservations : []).flatMap(s => {
-      if (!s || typeof s.date !== 'string' || typeof s.groupKey !== 'string' ||
+      if (!s || !isIsoCalendarDate(s.date) || typeof s.groupKey !== 'string' ||
           !s.groupKey.trim() || !finite(s.actualRevenue) || s.actualRevenue < 0 ||
           s.complete === false || s.open === false || s.promotion === true) return [];
       const w = weatherByDate.get(s.date);
