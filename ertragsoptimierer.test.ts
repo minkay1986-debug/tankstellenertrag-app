@@ -251,3 +251,25 @@ Deno.test("precipitation is carried through exact-date matching but is not silen
     throw new Error("No independent rain effect should be claimed before a rain-specific model exists");
   }
 });
+
+
+Deno.test("weather matching rejects impossible dates and preserves optional-field absence", () => {
+  const matched = optimizer.matchWeatherSalesObservations(
+    [
+      { date: "2026-02-31", temp_max: 28, precipitation_mm: 4 },
+      { date: "2026-07-04", temp_max: 28, precipitation_mm: Infinity },
+      { date: "06.07.2026", temp_max: 29, precipitation_mm: 1 }
+    ],
+    [
+      { date: "2026-02-31", groupKey: "eis", actualRevenue: 100 },
+      { date: "2026-07-04", groupKey: "eis", actualRevenue: 120 },
+      { date: "06.07.2026", groupKey: "eis", actualRevenue: 130 }
+    ]
+  );
+  if (matched.length !== 1 || matched[0].date !== "2026-07-04") {
+    throw new Error(`Expected only one valid calendar-date pair, got ${matched.length}`);
+  }
+  if (matched[0].precipitationMm !== undefined) {
+    throw new Error("Invalid optional precipitation must remain absent, not be coerced");
+  }
+});
