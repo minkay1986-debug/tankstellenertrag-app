@@ -127,6 +127,7 @@
       o.promotion !== true && typeof o.date === 'string' &&
       /^\d{4}-\d{2}-\d{2}$/.test(o.date) &&
       !Number.isNaN(Date.parse(o.date + 'T12:00:00Z'))
+      && new Date(o.date + 'T12:00:00Z').toISOString().slice(0, 10) === o.date
     ).map(o => {
       const d = new Date(o.date + 'T12:00:00Z');
       return { ...o, _weekday: d.getUTCDay(), _month: d.getUTCMonth() + 1,
