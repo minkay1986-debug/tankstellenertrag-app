@@ -654,14 +654,14 @@ html,body{max-width:100%;overflow-x:hidden}
  let prior={};try{prior=JSON.parse(localStorage.getItem(storageKey)||'{}')}catch(_){}
  let browserKey=localStorage.getItem(browserKeyName);
  if(!browserKey){browserKey=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+'-'+Math.random().toString(36).slice(2)+'-'+Math.random().toString(36).slice(2));localStorage.setItem(browserKeyName,browserKey)}
- function getClient(){return window.TANKSTELLENERTRAG_CLIENT||window.client||null}
+ function getClient(){if(window.TANKSTELLENERTRAG_CLIENT)return window.TANKSTELLENERTRAG_CLIENT;const cfg=window.TANKSTELLENERTRAG_SUPABASE||{};if(window.supabase&&cfg.url&&cfg.publishableKey){window.TANKSTELLENERTRAG_CLIENT=window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:'tankstellenertrag-auth',storage:window.localStorage}});return window.TANKSTELLENERTRAG_CLIENT}return null}
  function status(message,error){const el=document.getElementById('ideaStatus');if(el){el.textContent=message;el.style.color=error?'#ffb2b2':'#a7f0c2'}}
  function refreshButtons(){cards.querySelectorAll('[data-vote]').forEach(btn=>{const id=btn.dataset.vote;const voted=!!prior[id];btn.disabled=voted;btn.classList.toggle('voted',voted);btn.textContent=voted?'Deine Stimme ist gezählt':'Dafür stimmen'})}
  async function invoke(action,extra={}){const client=getClient();if(!client)throw new Error('Verbindung nicht bereit');const {data,error}=await client.functions.invoke('public-ideas-vote',{body:{action,...extra}});if(error)throw error;if(data?.error)throw new Error(data.error);return data}
  async function loadCounts(){
    try{const data=await invoke('counts');const counts=data.counts||{};const total=ids.reduce((sum,id)=>sum+(Number(counts[id])||0),0);
      ids.forEach(id=>{const el=document.getElementById('result-'+id);if(el)el.textContent=(Number(counts[id])||0)+' Stimmen'+(total?' · '+Math.round((Number(counts[id])||0)*100/total)+' % der Stimmen':'')});
-   }catch(_){ids.forEach(id=>{const el=document.getElementById('result-'+id);if(el)el.textContent='Stimmenstand derzeit nicht verfügbar.'})}
+   }catch(err){const detail=String(err?.message||err||'unbekannter Fehler');ids.forEach(id=>{const el=document.getElementById('result-'+id);if(el)el.textContent='Stimmenstand nicht verfügbar ('+detail.slice(0,90)+').'})}
  }
  let modal,turnstileWidget,activeVote=null;
  function closeModal(){if(modal){modal.remove();modal=null}activeVote=null}
