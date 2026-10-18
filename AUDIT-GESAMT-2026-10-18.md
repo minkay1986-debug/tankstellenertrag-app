@@ -124,3 +124,39 @@ Daraus ergeben sich mathematisch:
 
 Die ersten drei Werte stimmen mit den sichtbaren Demo-Angaben überein (35.000 € Rohertrag, 1.800 € Verluste, 1,5 % Verlustquote). Die 33.200 € sind kein vollständiger Gewinn und müssen so bezeichnet bleiben. Die Quoten setzen voraus, dass alle Beträge denselben Monat betreffen und Verluste nicht doppelt gezählt werden. Die Frage der Umsatzsteuerbasis bleibt separat offen.
 
+
+
+### 14. Live-Supabase-Sicherheitsprüfung (18.10.2026, Read-only)
+
+**Direkt im verbundenen Supabase-Projekt abgefragt:** Security Advisor, Tabellen/RLS-Policies und ACLs der `SECURITY DEFINER`-Funktionen. Das sind Live-Konfigurationsdaten, kein lokaler Test und kein Penetrationstest.
+
+**P1 – Tabellen mit aktivem RLS, aber ohne eigene Policies (vom Supabase Security Advisor gemeldet):**
+- `public.app_error_reports`
+- `public.public_idea_votes`
+- `public.quickcheck_usage`
+- `public.station_snapshot_history`
+- `public.subscription_cancellations`
+
+RLS aktiviert ohne Policies bedeutet normalerweise, dass normale API-Rollen keine Zeilen lesen/schreiben können. Das ist nicht automatisch eine Datenfreigabe; es kann aber Funktionen blockieren, die direkten Tabellenzugriff erwarten. Bei `public_idea_votes` und `quickcheck_usage` ist zu prüfen, dass alle vorgesehenen Schreib-/Lesevorgänge ausschließlich über die serverseitigen Funktionen mit minimalen Rechten laufen. Für `app_error_reports`, `station_snapshot_history` und `subscription_cancellations` müssen vorgesehene Nutzer-/Admin-Abläufe explizit getestet werden. Nicht vorschnell Policies hinzufügen, da dies vertrauliche Daten versehentlich freigeben könnte.
+
+**P1 – öffentlich aufrufbare SECURITY DEFINER-Funktionen:**
+Der Security Advisor meldet fünf Funktionen, die `anon` ausführen darf:
+- `archive_station_snapshot_before_update()`
+- `enforce_ten_free_pilot_slots()`
+- `get_pilot_slots()`
+- `skip_duplicate_site_visit()`
+- `track_public_visit(p_visitor_id text)`
+
+Die ACL-Abfrage bestätigt für diese fünf Funktionen `EXECUTE` für `anon`. Bei `archive_station_snapshot_before_update` klingt ein Trigger-Name nach interner Funktion; falls sie als Trigger-Hilfsfunktion gedacht ist, ist ein direkter RPC-Aufruf durch `anon` unnötig und sollte entzogen werden. `enforce_ten_free_pilot_slots` sollte ebenfalls nur dann öffentlich ausführbar sein, wenn das wirklich beabsichtigt ist. `get_pilot_slots` kann eine absichtlich öffentliche, lesende Funktion sein, benötigt aber Prüfung auf Datenminimierung. `skip_duplicate_site_visit` und `track_public_visit` sind ggf. öffentlich benötigte Besuchszähler-Helfer; Parameter-/Missbrauchsschutz prüfen.
+
+Weitere `SECURITY DEFINER`-Funktionen sind für `authenticated` ausführbar. Das ist nicht allein ein Fehler, aber bei Admin-Funktionen wie `approve_pilot_application`, `get_admin_app_error_reports`, `get_admin_customer_accounts`, `get_admin_snapshot_history`, `get_cancellation_requests` und `delete_admin_customer_feedback` muss die Funktionslogik den Adminstatus selbst zuverlässig verifizieren. Der Advisor weist insgesamt 28 solche authentifizierten Aufrufmöglichkeiten aus. Eine Berechtigungsliste allein belegt weder einen Exploit noch die Sicherheit der Implementierung; die SQL-Funktionskörper sind als nächster Schritt einzeln zu prüfen.
+
+**Weitere Advisor-Hinweise (P2):**
+- Erweiterung `pg_net` befindet sich im Schema `public`; Supabase empfiehlt, Erweiterungen nach Möglichkeit aus dem exponierten Schema zu verschieben.
+- Zwei Fremdschlüssel in `subscription_cancellations` sind laut Performance Advisor nicht indexiert.
+- Mehrere RLS-Policies rufen Auth-Funktionen so auf, dass sie pro Zeile erneut ausgewertet werden können. Das ist primär ein Skalierungs-/Performance-Thema, nicht unmittelbar ein Zugriffsleck.
+
+**Wichtig:** Diese Befunde sind aus der Live-Datenbankkonfiguration ausgelesen. Ich habe keine RLS-Policies, Grants, Tabellen oder Funktionen verändert. Vor Änderungen müssen die Funktionskörper und die App-Aufrufpfade geprüft werden; danach sind gezielte Positiv-/Negativtests mit anon, normalem Nutzer und Admin erforderlich.
+
+### 15. Laufzeit-/Deploy-Status sauber getrennt
+Die zuletzt abgefragten GitHub Actions enthalten erfolgreiche Pages-Builds auf `main` (u.a. Commit `d53efb5`). Das belegt den erfolgreichen Pages-Build dieses Commits, aber **nicht** korrekte betriebswirtschaftliche Ergebnisse, sichere Datenisolation oder erfolgreiche End-to-End-Tests. Die DWD-Historie bleibt außerhalb einer Produktionsfreigabe, solange kein tatsächlicher erfolgreicher Abruf unter realen Bedingungen dokumentiert ist.
