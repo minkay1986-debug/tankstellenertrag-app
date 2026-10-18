@@ -160,3 +160,14 @@ Weitere `SECURITY DEFINER`-Funktionen sind für `authenticated` ausführbar. Das
 
 ### 15. Laufzeit-/Deploy-Status sauber getrennt
 Die zuletzt abgefragten GitHub Actions enthalten erfolgreiche Pages-Builds auf `main` (u.a. Commit `d53efb5`). Das belegt den erfolgreichen Pages-Build dieses Commits, aber **nicht** korrekte betriebswirtschaftliche Ergebnisse, sichere Datenisolation oder erfolgreiche End-to-End-Tests. Die DWD-Historie bleibt außerhalb einer Produktionsfreigabe, solange kein tatsächlicher erfolgreicher Abruf unter realen Bedingungen dokumentiert ist.
+
+
+### 16. DWD-Historie – aktueller Live-Logbefund (18.10.2026)
+
+Die read-only-Abfrage der Supabase-Logs für den Zeitraum 18.10.2026 00:00–18:00 UTC zeigt wiederholt:
+- `OPTIONS | 200` für `/functions/v1/dwd-weather-history`
+- direkt anschließende `POST | 400` für denselben Endpunkt (u.a. 14:05:54 und 14:05:59 UTC)
+- POST-Antwort `Content-Type: text/html`, Länge 122 Bytes, Ausführungszeit 16–26 ms; der OPTIONS-Aufruf lieferte JSON und dauerte ca. 150–195 ms.
+- Request-Logs zeigen eine angemeldete Sitzung und den Aufruf der aktuell hinterlegten Function-ID (Deployment-Version 8 im Log; Dashboard listet Version 9, daher Versions-/Rollout-Abgleich erforderlich).
+
+**Interpretation:** CORS-Preflight besteht, der anschließende POST schlägt aber weiterhin fehl. Weil die 400-Antwort HTML statt des JSON-Fehlerformats des Function-Codes zurückkommt und sehr schnell endet, ist ein Fehler vor oder außerhalb der normalen Handler-Antwort plausibel. Das ist noch kein Beweis für die genaue Ursache. Nächster technischer Schritt: Request-ID `01a14f55-6817-7a73-bb3a-64ea4f11accb` sowie zugehörige Function-/Gateway-Logs und die tatsächlich aktive Deployment-Version korrelieren; anschließend einen minimalen kontrollierten POST mit validem JSON-Schema ausführen. **Die Wetterhistorie ist nach diesen Live-Logs weiterhin nicht funktionsfähig und bleibt gesperrt/nicht freigegeben.** Die 7-Tage-Wetterfunktion ist davon getrennt zu bewerten.
