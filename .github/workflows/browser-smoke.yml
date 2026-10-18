@@ -1,0 +1,56 @@
+name: Browser smoke test (analyse.html)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'analyse.html'
+      - '.github/workflows/browser-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Start static server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/tankstellenertrag-http.log 2>&1 &
+          echo $! > /tmp/tankstellenertrag-http.pid
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/analyse.html > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/tankstellenertrag-http.log
+          exit 1
+      - name: Open analyse.html in Chromium and check runtime errors
+        run: |
+          node --input-type=module <<'NODE'
+          import { chromium } from 'playwright';
+          const browser = await chromium.launch({ headless: true });
+          const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
+          const pageErrors = [];
+          page.on('pageerror', error => pageErrors.push(error.stack || error.message));
+          const response = await page.goto('http://127.0.0.1:4173/analyse.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
+          if (!response || !response.ok()) throw new Error('analyse.html returned HTTP ' + (response?.status() ?? 'no response'));
+          await page.waitForTimeout(3000);
+          const title = await page.title();
+          const bodyTextLength = await page.locator('body').innerText().then(t => t.trim().length);
+          if (bodyTextLength < 20) throw new Error('Page body appears empty');
+          if (pageErrors.length) throw new Error('Browser runtime errors:\n' + pageErrors.join('\n---\n'));
+          console.log(JSON.stringify({ url: page.url(), status: response.status(), title, bodyTextLength, pageErrors: pageErrors.length }, null, 2));
+          await browser.close();
+          NODE
