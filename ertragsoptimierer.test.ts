@@ -222,25 +222,30 @@ Deno.test("weather learner rejects impossible calendar dates and malformed dates
 });
 
 Deno.test("precipitation is carried through exact-date matching but is not silently treated as a learned rain effect", () => {
+  // All observations are Saturdays in the same quarter, so the learner can compare them.
   const weather = [
     { date: "2026-07-04", temp_max: 28, precipitation_mm: 0 },
     { date: "2026-07-11", temp_max: 28, precipitation_mm: 18 },
-    { date: "2026-07-05", temp_max: 20, precipitation_mm: 0 },
-    { date: "2026-07-12", temp_max: 20, precipitation_mm: 18 },
+    { date: "2026-07-18", temp_max: 28, precipitation_mm: 0 },
+    { date: "2026-07-25", temp_max: 20, precipitation_mm: 0 },
+    { date: "2026-08-01", temp_max: 20, precipitation_mm: 18 },
+    { date: "2026-08-08", temp_max: 20, precipitation_mm: 0 },
   ];
   const sales = [
     { date: "2026-07-04", groupKey: "eis", actualRevenue: 150 },
     { date: "2026-07-11", groupKey: "eis", actualRevenue: 150 },
-    { date: "2026-07-05", groupKey: "eis", actualRevenue: 100 },
-    { date: "2026-07-12", groupKey: "eis", actualRevenue: 100 },
+    { date: "2026-07-18", groupKey: "eis", actualRevenue: 150 },
+    { date: "2026-07-25", groupKey: "eis", actualRevenue: 100 },
+    { date: "2026-08-01", groupKey: "eis", actualRevenue: 100 },
+    { date: "2026-08-08", groupKey: "eis", actualRevenue: 100 },
   ];
   const matched = optimizer.matchWeatherSalesObservations(weather, sales);
-  if (matched.length !== 4 || matched[1].precipitationMm !== 18) {
+  if (matched.length !== 6 || matched[1].precipitationMm !== 18) {
     throw new Error("Exact-date precipitation data should be preserved for future modeling");
   }
   const [result] = optimizer.learnWeatherEffects(matched);
-  if (result.warmVsMildPct !== 50) {
-    throw new Error("Current learner should estimate its temperature comparison, not claim an independent rain effect");
+  if (result.warmVsMildPct !== 50 || result.warmSignal !== "preliminary") {
+    throw new Error("Current learner should estimate temperature comparison after weekday/quarter matching");
   }
   if (Object.prototype.hasOwnProperty.call(result, "rainEffectPct")) {
     throw new Error("No independent rain effect should be claimed before a rain-specific model exists");
