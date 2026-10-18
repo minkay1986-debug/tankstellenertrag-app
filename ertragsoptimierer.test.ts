@@ -158,3 +158,34 @@ Deno.test("two-year synthetic station run matches every daily record and learns 
     throw new Error("Expected ice sales to show a stronger warm-weather effect than drinks");
   }
 });
+
+Deno.test("learned weather effects reach the expected-revenue calculation only for an explicit supported regime", () => {
+  const learned = [{
+    groupKey: "eis", warmVsMildPct: 50, warmSignal: "preliminary",
+    coolVsMildPct: -10, coolSignal: "preliminary"
+  }];
+  const base = { groupKey: "eis", name: "Eis", actualRevenue: 100, previousRevenue: 100, priorYearRevenue: 100 };
+  const warm = optimizer.analyze({ groups: [base], weatherLearning: learned, weatherRegime: "warm" });
+  if (warm.priorities[0].expectedRevenue !== 120) throw new Error("Warm learning effect must be capped at +20%");
+  const cool = optimizer.analyze({ groups: [base], weatherLearning: learned, weatherRegime: "cool" });
+  if (cool.priorities[0].expectedRevenue !== 90) throw new Error("Cool learning effect should adjust baseline by -10%");
+  const mild = optimizer.analyze({ groups: [base], weatherLearning: learned, weatherRegime: "mild" });
+  if (mild.priorities[0].expectedRevenue !== 100) throw new Error("Mild regime must not apply warm/cool effects");
+  const noLearning = optimizer.analyze({ groups: [base] });
+  if (noLearning.priorities[0].expectedRevenue !== 100) throw new Error("Legacy analysis must remain unchanged without learning input");
+});
+
+Deno.test("learned weather effect is not applied when sample status is insufficient and group keys must match", () => {
+  const learned = [
+    { groupKey: "eis", warmVsMildPct: 18, warmSignal: "insufficient_data" },
+    { groupKey: "kaffee", warmVsMildPct: 12, warmSignal: "preliminary" }
+  ];
+  const groups = [
+    { groupKey: "eis", actualRevenue: 100, previousRevenue: 100 },
+    { groupKey: "getraenke", actualRevenue: 200, previousRevenue: 200 }
+  ];
+  const result = optimizer.analyze({ groups, weatherLearning: learned, weatherRegime: "warm" });
+  if (result.priorities.some(row => row.expectedRevenue !== row.actualRevenue)) {
+    throw new Error("Insufficient or unmatched learning data must not alter expected revenue");
+  }
+});
