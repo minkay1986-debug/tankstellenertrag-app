@@ -125,7 +125,7 @@
       finite(o.actualRevenue) && o.actualRevenue >= 0 &&
       finite(o.maxTempC) && o.complete !== false && o.open !== false &&
       o.promotion !== true && typeof o.date === 'string' &&
-      /^\\d{4}-\\d{2}-\\d{2}$/.test(o.date) &&
+      /^\d{4}-\d{2}-\d{2}$/.test(o.date) &&
       !Number.isNaN(Date.parse(o.date + 'T12:00:00Z'))
     ).map(o => {
       const d = new Date(o.date + 'T12:00:00Z');
