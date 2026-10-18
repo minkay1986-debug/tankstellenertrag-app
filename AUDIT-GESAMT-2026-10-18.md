@@ -106,3 +106,21 @@ Keine echten Stationsdaten produktiv verwenden, bevor Berechnungen, Zugriffsschu
 
 Statisch untersucht: Hauptanalyse, QuickCheck, Personal-Szenario, Zwei-Jahres-Regressionstest, DWD-Testdatei, Ideenbox-Edge-Function und AGB/Datenschutz.  
 Noch nicht als bestanden behauptet: Live-Browser-End-to-End, komplette Ausführung aller Tests, RLS-/Penetrationstest, juristische Prüfung.
+
+### 12. Wichtiger fachlicher Prüfpunkt: Umsatzbasis inkl. Umsatzsteuer
+Im QuickCheck ist das Feld „Monatlicher Shop-Umsatz“ mit „Bruttoumsatz in Euro“ beschriftet. Die Formel zieht davon den Wareneinsatz/EK ab und bezeichnet das Ergebnis als „Shop-Rohertrag“. Ein betriebswirtschaftlicher Rohertrag bzw. eine vergleichbare Marge muss auf konsistenten Umsatz- und EK-Bewertungsbasen beruhen; insbesondere darf nicht ohne Klarstellung ein Umsatz inklusive Umsatzsteuer mit einem Wareneinsatz auf anderer (z.B. netto) Basis verrechnet werden. Aus dem UI ist die EK-Steuerbasis nicht eindeutig ersichtlich.
+
+**Priorität P1 für die fachliche Freigabe:** Umsatzbasis ausdrücklich festlegen (netto oder brutto), EK-Basis dazu passend definieren und Ergebnistext/QuickCheck entsprechend korrigieren. Bis geklärt, die Beispielrechnung nicht als verbindliche Rohertrags- oder Margenkennzahl bewerben.
+
+### 13. QuickCheck – Sollwert der eingebauten Demo
+Die hinterlegten Demo-Werte sind: Umsatz 120.000 €, EK 85.000 €, Schwund 900 €, Abschriften 650 €, sonstige Warenverluste 250 €, Bestand zu EK 24.000 €.
+Daraus ergeben sich mathematisch:
+- Rohertrag vor erfassten Verlusten: 35.000 €
+- Erfasste Verluste zusammen: 1.800 €
+- Verlustquote auf Umsatz: 1,5 %
+- Schwundquote auf Umsatz: 0,75 %
+- Lagerbestand / Monatsumsatz: 20,0 %
+- Vereinfachter Zwischenwert nach erfassten Verlusten: 33.200 €
+
+Die ersten drei Werte stimmen mit den sichtbaren Demo-Angaben überein (35.000 € Rohertrag, 1.800 € Verluste, 1,5 % Verlustquote). Die 33.200 € sind kein vollständiger Gewinn und müssen so bezeichnet bleiben. Die Quoten setzen voraus, dass alle Beträge denselben Monat betreffen und Verluste nicht doppelt gezählt werden. Die Frage der Umsatzsteuerbasis bleibt separat offen.
+
