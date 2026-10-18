@@ -185,7 +185,7 @@ Deno.test("learned weather effect is not applied when sample status is insuffici
     { groupKey: "getraenke", actualRevenue: 200, previousRevenue: 200 }
   ];
   const result = optimizer.analyze({ groups, weatherLearning: learned, weatherRegime: "warm" });
-  if (result.priorities.some(row => row.expectedRevenue !== row.actualRevenue)) {
+  if (result.priorities.some((row: any) => row.expectedRevenue !== row.actualRevenue)) {
     throw new Error("Insufficient or unmatched learning data must not alter expected revenue");
   }
 });
