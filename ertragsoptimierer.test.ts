@@ -189,3 +189,21 @@ Deno.test("learned weather effect is not applied when sample status is insuffici
     throw new Error("Insufficient or unmatched learning data must not alter expected revenue");
   }
 });
+
+
+Deno.test("weekday-only revenue differences must not be learned as a weather effect", () => {
+  // Warm observations are Saturdays with higher sales; mild observations are Sundays.
+  // Because there are no same-weekday comparisons, the learner must abstain.
+  const observations = [
+    ...["2024-07-06", "2024-07-13", "2024-07-20"].map(date => ({
+      groupKey: "eis", date, actualRevenue: 180, maxTempC: 29
+    })),
+    ...["2024-07-07", "2024-07-14", "2024-07-21"].map(date => ({
+      groupKey: "eis", date, actualRevenue: 100, maxTempC: 20
+    }))
+  ];
+  const [result] = optimizer.learnWeatherEffects(observations);
+  if (result.warmSignal !== "insufficient_data" || result.warmVsMildPct !== null) {
+    throw new Error("Weekday imbalance must not create a weather signal");
+  }
+});
