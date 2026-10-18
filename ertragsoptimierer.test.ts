@@ -38,8 +38,8 @@ Deno.test("weather learning requires comparable sample counts and excludes promo
   const observations = [
     ...Array.from({ length: 3 }, (_, i) => ({ groupKey: "eis", actualRevenue: 150, maxTempC: 28, date: ["2024-07-06", "2025-07-05", "2026-07-04"][i] })),
     ...Array.from({ length: 3 }, (_, i) => ({ groupKey: "eis", actualRevenue: 100, maxTempC: 20, date: ["2024-07-13", "2025-07-12", "2026-07-11"][i] })),
-    { groupKey: "eis", actualRevenue: 999, maxTempC: 30, promotion: true },
-    { groupKey: "eis", actualRevenue: 999, maxTempC: 30, complete: false },
+    { groupKey: "eis", actualRevenue: 999, maxTempC: 30, date: "2026-07-18", promotion: true },
+    { groupKey: "eis", actualRevenue: 999, maxTempC: 30, date: "2026-07-25", complete: false },
   ];
   const [result] = optimizer.learnWeatherEffects(observations);
   if (result.warmObservationCount !== 3 || result.mildObservationCount !== 3) {
