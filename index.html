@@ -598,7 +598,97 @@ html,body{max-width:100%;overflow-x:hidden}
 <img class="diniStickerArt" src="./assets/dinilove-halloween.webp" alt="DiniLove Halloween Sticker">
 </a>
 <a class="diniStickerLink" href="./dini.html" target="_blank" rel="noopener noreferrer">🎄 Adventskalender öffnen →</a>
-</div></main>
+</div>
+<section id="ideenbox" class="publicOnly section" aria-labelledby="ideenboxTitle">
+ <div class="wrap">
+  <div class="panel ideasPanel">
+   <div class="ideasEyebrow">DU ENTSCHEIDEST MIT</div>
+   <h2 id="ideenboxTitle">Die Ideenbox von TankstellenErtrag</h2>
+   <p class="ideasLead">Welche Funktion würde deinen Tankstellenalltag wirklich verbessern? Stimme ab und gestalte mit, was wir als Nächstes entwickeln.</p>
+   <div id="ideasCards" class="ideasGrid" aria-live="polite">
+    <article class="ideaCard" data-idea="stockout"><span class="ideaTag">Warenwirtschaft</span><h3>Lieferengpässe früher erkennen</h3><p>Auffällige Absatzrückgänge und mögliche Fehlbestände erkennen, bevor Umsatz verloren geht.</p><button type="button" class="ideaVote" data-vote="stockout">Dafür stimmen</button><div class="ideaResult" id="result-stockout">Wird geladen …</div></article>
+    <article class="ideaCard" data-idea="packaging"><span class="ideaTag">Bestelloptimierung</span><h3>Gebindegrößen optimieren</h3><p>Prüfen, ob Verpackungs- und Bestellmengen wirklich zur Nachfrage der Station passen.</p><button type="button" class="ideaVote" data-vote="packaging">Dafür stimmen</button><div class="ideaResult" id="result-packaging">Wird geladen …</div></article>
+    <article class="ideaCard" data-idea="weather"><span class="ideaTag">Intelligente Planung</span><h3>Wettergestützte Warenplanung</h3><p>Wetter, Absatz und saisonale Empfehlungen noch besser miteinander verbinden.</p><button type="button" class="ideaVote" data-vote="weather">Dafür stimmen</button><div class="ideaResult" id="result-weather">Wird geladen …</div></article>
+    <article class="ideaCard" data-idea="staff"><span class="ideaTag">Personal</span><h3>Kooperation zwischen Stationen</h3><p>Ideen zur gegenseitigen Unterstützung bei kurzfristigen Personalausfällen prüfen.</p><button type="button" class="ideaVote" data-vote="staff">Dafür stimmen</button><div class="ideaResult" id="result-staff">Wird geladen …</div></article>
+   </div>
+   <div class="ideasOwn">
+    <div><h3>Du hast eine eigene Idee?</h3><p>Teile mit uns, welches Problem wir als Nächstes lösen sollten.</p></div>
+    <form id="ideaSuggestionForm" class="ideaSuggestionForm"><label for="ideaSuggestion">Dein Vorschlag</label><textarea id="ideaSuggestion" maxlength="500" required placeholder="Was würde deinen Tankstellenalltag einfacher oder wirtschaftlicher machen?"></textarea><button class="cta" type="submit">Idee einreichen</button><p class="ideasPrivacy">Bitte keine personenbezogenen Daten oder vertraulichen Betriebsdaten eintragen. Vorschläge werden vor einer Veröffentlichung geprüft.</p><div id="ideaStatus" role="status" aria-live="polite"></div></form>
+   </div>
+   <p class="ideasFootnote">Ideen und Abstimmungsergebnisse dienen der Produktplanung. Eine Abstimmung ist keine Zusage, dass eine Funktion umgesetzt wird.</p>
+  </div>
+ </div>
+</section>
+<style id="ideas-box-styles">
+#ideenbox{padding:48px 0;background:linear-gradient(155deg,#0b2b50 0%,#0a2140 52%,#08182e 100%);border-top:1px solid rgba(92,169,245,.22);border-bottom:1px solid rgba(92,169,245,.16)}
+.ideasPanel{padding:clamp(20px,4vw,38px)!important;background:linear-gradient(145deg,rgba(26,55,88,.7),rgba(8,24,44,.94))!important;border:1px solid rgba(166,207,255,.22)!important}
+.ideasEyebrow{font-size:11px;font-weight:850;letter-spacing:.12em;color:#9bcaff}
+#ideenbox h2{font-size:clamp(27px,4vw,38px);line-height:1.12;margin:8px 0 12px}
+.ideasLead{max-width:760px;color:#c1d5ea;line-height:1.65;margin:0 0 24px}
+.ideasGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.ideaCard{padding:20px;border:1px solid rgba(135,190,245,.22);border-radius:15px;background:rgba(5,18,34,.48);min-width:0}
+.ideaTag{display:inline-block;padding:5px 8px;border-radius:999px;background:rgba(74,156,255,.13);color:#a8d1ff;font-size:10px;font-weight:800}
+.ideaCard h3,.ideasOwn h3{margin:12px 0 7px;font-size:18px}
+.ideaCard p,.ideasOwn p{color:#c1d0e0;font-size:13px;line-height:1.55;margin:0 0 16px}
+.ideaVote{width:100%;padding:11px 14px;border:1px solid rgba(130,190,250,.4);border-radius:10px;background:rgba(74,156,255,.15);color:#f2f7ff;font-weight:800;cursor:pointer}
+.ideaVote:hover,.ideaVote:focus-visible{background:#327ed5;outline:2px solid #9bcaff;outline-offset:2px}
+.ideaVote:disabled{opacity:.65;cursor:default}
+.ideaVote.voted{background:rgba(69,196,119,.15);border-color:rgba(69,196,119,.5);color:#a7f0c2}
+.ideaResult{font-size:11px;color:#aebfd0;margin-top:9px;min-height:16px}
+.ideasOwn{display:grid;grid-template-columns:.8fr 1.2fr;gap:24px;margin-top:20px;padding:22px;border:1px solid rgba(135,190,245,.22);border-radius:15px;background:rgba(5,18,34,.35)}
+.ideasOwn h3{margin-top:0}.ideaSuggestionForm{display:grid;gap:8px}.ideaSuggestionForm label{font-size:12px;color:#d6e6f7;font-weight:700}
+.ideaSuggestionForm textarea{width:100%;min-height:100px;resize:vertical;padding:12px;border:1px solid rgba(166,207,255,.32);border-radius:10px;background:#edf5ff;color:#142238;font:inherit;font-size:14px}
+.ideaSuggestionForm .cta{border:0;border-radius:10px;padding:12px 15px;font-weight:800;cursor:pointer}
+.ideasPrivacy,.ideasFootnote{font-size:11px!important;color:#9fb4ca!important;line-height:1.5}
+#ideaStatus{font-size:12px;color:#a7f0c2}
+.ideasFootnote{margin:18px 0 0}
+@media(max-width:700px){#ideenbox{padding:30px 0}.ideasGrid,.ideasOwn{grid-template-columns:1fr}.ideaCard{padding:17px}.ideasOwn{padding:18px;gap:8px}}
+</style>
+<script id="ideas-box-logic">
+(function(){
+ const cards=document.getElementById('ideasCards'),form=document.getElementById('ideaSuggestionForm');
+ if(!cards||!form)return;
+ const ids=['stockout','packaging','weather','staff'];
+ const labels={stockout:'Lieferengpässe früher erkennen',packaging:'Gebindegrößen optimieren',weather:'Wettergestützte Warenplanung',staff:'Kooperation zwischen Stationen'};
+ const storageKey='tse_ideas_v1';
+ let prior={};try{prior=JSON.parse(localStorage.getItem(storageKey)||'{}')}catch(_){}
+ function getClient(){return window.TANKSTELLENERTRAG_CLIENT||window.client||null}
+ function status(message,error){const el=document.getElementById('ideaStatus');if(el){el.textContent=message;el.style.color=error?'#ffb2b2':'#a7f0c2'}}
+ function refreshButtons(){cards.querySelectorAll('[data-vote]').forEach(btn=>{const id=btn.dataset.vote;const voted=!!prior[id];btn.disabled=voted;btn.classList.toggle('voted',voted);btn.textContent=voted?'Deine Stimme ist gezählt':'Dafür stimmen'})}
+ async function loadCounts(){
+   const client=getClient();
+   if(!client){ids.forEach(id=>{const el=document.getElementById('result-'+id);if(el)el.textContent='Abstimmung lädt, sobald die Verbindung bereit ist.'});return}
+   const {data,error}=await client.from('public_idea_votes').select('idea_id');
+   if(error){ids.forEach(id=>{const el=document.getElementById('result-'+id);if(el)el.textContent='Stimmenstand derzeit nicht verfügbar.'});return}
+   const counts={};(data||[]).forEach(row=>{counts[row.idea_id]=(counts[row.idea_id]||0)+1});
+   const total=ids.reduce((sum,id)=>sum+(counts[id]||0),0);
+   ids.forEach(id=>{const el=document.getElementById('result-'+id);if(el)el.textContent=(counts[id]||0)+' Stimmen'+(total?' · '+Math.round((counts[id]||0)*100/total)+' % der Stimmen':'')});
+ }
+ cards.addEventListener('click',async ev=>{
+   const btn=ev.target.closest('[data-vote]');if(!btn)return;
+   const id=btn.dataset.vote;if(!ids.includes(id)||prior[id])return;
+   const client=getClient();if(!client){status('Die Abstimmung ist momentan nicht erreichbar. Bitte später erneut versuchen.',true);return}
+   btn.disabled=true;btn.textContent='Stimme wird gespeichert …';
+   try{
+     const {error}=await client.from('public_idea_votes').insert({idea_id:id});
+     if(error)throw error;
+     prior[id]=true;try{localStorage.setItem(storageKey,JSON.stringify(prior))}catch(_){}
+     refreshButtons();await loadCounts();status('Danke! Deine Stimme wurde gezählt.');
+   }catch(e){btn.disabled=false;btn.textContent='Dafür stimmen';status('Die Stimme konnte nicht gespeichert werden. Bitte später erneut versuchen.',true)}
+ });
+ form.addEventListener('submit',async ev=>{
+   ev.preventDefault();const field=document.getElementById('ideaSuggestion'),value=field.value.trim();if(value.length<8){status('Bitte beschreibe deine Idee etwas genauer.',true);return}
+   const client=getClient();if(!client){status('Das Einreichen ist momentan nicht erreichbar. Bitte später erneut versuchen.',true);return}
+   const submit=form.querySelector('button[type=submit]');submit.disabled=true;submit.textContent='Wird eingereicht …';
+   try{const {error}=await client.from('public_idea_suggestions').insert({suggestion:value});if(error)throw error;field.value='';status('Danke! Deine Idee ist eingegangen und wird vor einer möglichen Veröffentlichung geprüft.')}
+   catch(e){status('Deine Idee konnte nicht gespeichert werden. Bitte später erneut versuchen.',true)}
+   finally{submit.disabled=false;submit.textContent='Idee einreichen'}
+ });
+ refreshButtons();loadCounts();
+})();
+</script>
+
+</main>
 <footer><div class="wrap footer"><b>Tankstellen<span>Ertrag</span></b><span>Warenwirtschaftliche Monatsanalyse</span><a href="./impressum.html">Impressum</a><a href="./datenschutz.html">Datenschutz</a><a href="./agb.html">AGB</a><a href="./avv.html">AVV</a><a class="footerLinkedIn" href="https://www.linkedin.com/company/tankstellenertrag/" target="_blank" rel="noopener noreferrer" aria-label="TankstellenErtrag auf LinkedIn"><span class="linkedinIcon">in</span><span>LinkedIn</span></a></div></footer>
 </div>
 <style>
