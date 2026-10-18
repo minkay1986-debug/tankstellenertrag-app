@@ -166,8 +166,49 @@
     });
   }
 
+  /**
+   * Apply a learned weather signal only when the caller explicitly supplies
+   * the weather regime for the period being evaluated. No automatic regime
+   * inference is made here because season and weekday effects can confound
+   * the simple warm/mild/cool comparison.
+   *
+   * Regime must be "warm" or "cool"; "mild", missing or unknown leaves groups
+   * unchanged. Only preliminary signals with sufficient samples are applied.
+   * The applied adjustment is capped at +/-20% to limit small-sample extremes.
+   */
+  function applyLearnedWeatherEffects(groups, learned, regime) {
+    const rows = Array.isArray(groups) ? groups : [];
+    const effects = new Map((Array.isArray(learned) ? learned : [])
+      .filter(row => row && typeof row.groupKey === 'string')
+      .map(row => [row.groupKey.trim(), row]));
+    const validRegime = regime === 'warm' || regime === 'cool' ? regime : 'mild';
+    return rows.map(group => {
+      const g = group || {};
+      const key = typeof g.groupKey === 'string' ? g.groupKey.trim()
+        : typeof g.name === 'string' ? g.name.trim() : '';
+      const signal = effects.get(key);
+      const raw = validRegime === 'warm' ? signal?.warmVsMildPct
+        : validRegime === 'cool' ? signal?.coolVsMildPct : null;
+      const status = validRegime === 'warm' ? signal?.warmSignal
+        : validRegime === 'cool' ? signal?.coolSignal : 'not_applied';
+      const usable = status === 'preliminary' && finite(raw);
+      const effectPct = usable ? clamp(raw, -20, 20) : 0;
+      return {
+        ...g,
+        weatherEffectPct: effectPct,
+        weatherLearningApplied: usable,
+        weatherLearningRegime: validRegime,
+        weatherLearningSignalPct: usable ? round(raw) : null
+      };
+    });
+  }
+
   function analyze(input) {
-    const groups = Array.isArray(input && input.groups) ? input.groups.map(evaluateGroup) : [];
+    const suppliedGroups = Array.isArray(input && input.groups) ? input.groups : [];
+    const groupsForEvaluation = input && Array.isArray(input.weatherLearning)
+      ? applyLearnedWeatherEffects(suppliedGroups, input.weatherLearning, input.weatherRegime)
+      : suppliedGroups;
+    const groups = groupsForEvaluation.map(evaluateGroup);
     const scored = groups.map(g => ({
       ...g,
       priorityScore: (g.alerts || []).reduce((s, a) =>
@@ -204,7 +245,7 @@
     };
   }
 
-  const api = Object.freeze({ version: '0.3.0', evaluateGroup, analyze, learnWeatherEffects, matchWeatherSalesObservations });
+  const api = Object.freeze({ version: '0.4.0', evaluateGroup, analyze, learnWeatherEffects, matchWeatherSalesObservations, applyLearnedWeatherEffects });
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.TankstellenErtragsoptimierer = api;
 })(typeof window !== 'undefined' ? window : globalThis);
