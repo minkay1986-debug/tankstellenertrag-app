@@ -106,10 +106,6 @@
       marginPct: margin === null ? null : round(margin),
       marginDeltaPp: marginDelta === null ? null : round(marginDelta),
       shrinkPct: shrink === null ? null : round(shrink),
-      weatherEffectPct: round(weather),
-      weatherLearningApplied: g.weatherLearningApplied === true,
-      weatherLearningRegime: typeof g.weatherLearningRegime === 'string' ? g.weatherLearningRegime : null,
-      weatherLearningSignalPct: finite(g.weatherLearningSignalPct) ? round(g.weatherLearningSignalPct) : null,
       confidence,
       alerts
     };
@@ -216,16 +212,6 @@
     });
   }
 
-  /**
-   * Apply a learned weather signal only when the caller explicitly supplies
-   * the weather regime for the period being evaluated. No automatic regime
-   * inference is made here because season and weekday effects can confound
-   * the simple warm/mild/cool comparison.
-   *
-   * Regime must be "warm" or "cool"; "mild", missing or unknown leaves groups
-   * unchanged. Only preliminary signals with sufficient samples are applied.
-   * The applied adjustment is capped at +/-20% to limit small-sample extremes.
-   */
   function applyLearnedWeatherEffects(groups, learned, regime) {
     const rows = Array.isArray(groups) ? groups : [];
     const effects = new Map((Array.isArray(learned) ? learned : [])
@@ -295,7 +281,7 @@
     };
   }
 
-  const api = Object.freeze({ version: '0.4.0', evaluateGroup, analyze, learnWeatherEffects, matchWeatherSalesObservations, applyLearnedWeatherEffects });
+  const api = Object.freeze({ version: '0.2.0', evaluateGroup, analyze, learnWeatherEffects, matchWeatherSalesObservations, applyLearnedWeatherEffects });
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.TankstellenErtragsoptimierer = api;
 })(typeof window !== 'undefined' ? window : globalThis);
