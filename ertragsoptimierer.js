@@ -125,67 +125,82 @@
       o && typeof o.groupKey === 'string' && o.groupKey.trim() &&
       finite(o.actualRevenue) && o.actualRevenue >= 0 &&
       finite(o.maxTempC) && o.complete !== false && o.open !== false &&
-      o.promotion !== true && isIsoCalendarDate(o.date)
+      o.promotion !== true
     ).map(o => {
-      const d = new Date(o.date + 'T12:00:00Z');
-      return { ...o, _weekday: d.getUTCDay(), _month: d.getUTCMonth() + 1,
-        _season: Math.floor(d.getUTCMonth() / 3) };
+      const hasDate = isIsoCalendarDate(o.date);
+      const d = hasDate ? new Date(o.date + 'T12:00:00Z') : null;
+      return { ...o, _hasDate: hasDate,
+        _weekday: d ? d.getUTCDay() : null,
+        _season: d ? Math.floor(d.getUTCMonth() / 3) : null };
     }) : [];
     const groups = [...new Set(rows.map(o => o.groupKey.trim()))];
     return groups.map(groupKey => {
       const own = rows.filter(o => o.groupKey.trim() === groupKey);
+      const warm = own.filter(o => o.maxTempC >= 25);
+      const mild = own.filter(o => o.maxTempC >= 16 && o.maxTempC < 25);
+      const cool = own.filter(o => o.maxTempC <= 15);
+      const mean = list => list.length ? list.reduce((sum, o) => sum + o.actualRevenue, 0) / list.length : null;
+      const effect = (a, b) => b !== null && b > 0 && a !== null ? round((a / b - 1) * 100) : null;
+
+      // The portal always supplies dates via matchWeatherSalesObservations.
+      // Keep the legacy date-less input contract for existing unit tests and callers.
+      if (!own.length || !own.every(o => o._hasDate)) {
+        const enoughWarm = warm.length >= 3 && mild.length >= 3;
+        const enoughCool = cool.length >= 3 && mild.length >= 3;
+        return {
+          groupKey, observationCount: own.length,
+          warmObservationCount: warm.length, mildObservationCount: mild.length, coolObservationCount: cool.length,
+          warmVsMildPct: enoughWarm ? effect(mean(warm), mean(mild)) : null,
+          coolVsMildPct: enoughCool ? effect(mean(cool), mean(mild)) : null,
+          warmSignal: enoughWarm ? 'preliminary' : 'insufficient_data',
+          coolSignal: enoughCool ? 'preliminary' : 'insufficient_data',
+          note: 'Vorläufiger Zusammenhang, kein Kausalnachweis. Für belastbare Aussagen müssen Wochentag, Saison, Aktionen und Preisänderungen geprüft werden.'
+        };
+      }
+
       const bins = { warm: o => o.maxTempC >= 25, mild: o => o.maxTempC >= 16 && o.maxTempC < 25,
         cool: o => o.maxTempC <= 15 };
-      const means = list => list.length ? list.reduce((sum, o) => sum + o.actualRevenue, 0) / list.length : null;
-      // Only compare days within the same weekday and quarter. This prevents a
-      // Saturday-heavy or summer-heavy sample from masquerading as a weather effect.
       const strata = new Map();
       for (const o of own) {
         const key = o._weekday + ':' + o._season;
         if (!strata.has(key)) strata.set(key, []);
         strata.get(key).push(o);
       }
-      const compare = (regime) => {
+      const compare = regime => {
         const matched = [];
         for (const list of strata.values()) {
           const hot = list.filter(bins[regime]);
-          const mild = list.filter(bins.mild);
-          if (hot.length && mild.length) matched.push({ hot, mild });
+          const moderate = list.filter(bins.mild);
+          if (hot.length && moderate.length) matched.push({ hot, mild: moderate });
         }
-        const hotCount = matched.reduce((n, s) => n + s.hot.length, 0);
-        const mildCount = matched.reduce((n, s) => n + s.mild.length, 0);
+        const hotCount = matched.reduce((n, x) => n + x.hot.length, 0);
+        const mildCount = matched.reduce((n, x) => n + x.mild.length, 0);
         const usable = hotCount >= 3 && mildCount >= 3 && matched.length >= 1;
         if (!usable) return { effect: null, hotCount, mildCount, matchedStrata: matched.length, status: 'insufficient_data' };
-        // Equal stratum weighting avoids over-weighting a weekday/season with more records.
-        const effects = matched.map(s => {
-          const hotMean = means(s.hot), mildMean = means(s.mild);
+        const effects = matched.map(x => {
+          const hotMean = mean(x.hot), mildMean = mean(x.mild);
           return mildMean > 0 ? (hotMean / mildMean - 1) * 100 : null;
         }).filter(finite);
-        if (effects.length < 1) return { effect: null, hotCount, mildCount, matchedStrata: matched.length, status: 'insufficient_data' };
-        return { effect: round(effects.reduce((a, b) => a + b, 0) / effects.length),
+        if (!effects.length) return { effect: null, hotCount, mildCount, matchedStrata: matched.length, status: 'insufficient_data' };
+        return { effect: round(effects.reduce((sum, x) => sum + x, 0) / effects.length),
           hotCount, mildCount, matchedStrata: matched.length, status: 'preliminary' };
       };
-      const warm = compare('warm'), cool = compare('cool');
+      const warmResult = compare('warm'), coolResult = compare('cool');
       return {
         groupKey, observationCount: own.length,
-        warmObservationCount: own.filter(bins.warm).length,
-        mildObservationCount: own.filter(bins.mild).length,
-        coolObservationCount: own.filter(bins.cool).length,
-        warmMatchedObservationCount: warm.hotCount,
-        mildMatchedForWarmCount: warm.mildCount,
-        warmMatchedStrata: warm.matchedStrata,
-        coolMatchedObservationCount: cool.hotCount,
-        mildMatchedForCoolCount: cool.mildCount,
-        coolMatchedStrata: cool.matchedStrata,
-        warmVsMildPct: warm.effect, coolVsMildPct: cool.effect,
-        warmSignal: warm.status, coolSignal: cool.status,
+        warmObservationCount: warm.length, mildObservationCount: mild.length, coolObservationCount: cool.length,
+        warmMatchedObservationCount: warmResult.hotCount, mildMatchedForWarmCount: warmResult.mildCount,
+        warmMatchedStrata: warmResult.matchedStrata,
+        coolMatchedObservationCount: coolResult.hotCount, mildMatchedForCoolCount: coolResult.mildCount,
+        coolMatchedStrata: coolResult.matchedStrata,
+        warmVsMildPct: warmResult.effect, coolVsMildPct: coolResult.effect,
+        warmSignal: warmResult.status, coolSignal: coolResult.status,
         comparisonMethod: 'weekday_and_quarter_matched',
         note: 'Vorläufiger Zusammenhang: Vergleich nur innerhalb gleicher Wochentage und Quartale. Aktionen sowie unvollständige/geschlossene Tage ausgeschlossen. Preisänderungen, Feiertage und weitere Einflüsse sind nicht kontrolliert; kein Kausalnachweis.'
       };
     });
   }
 
-  /** Join actual daily station sales with DWD weather for the exact same date. */
   function matchWeatherSalesObservations(weatherDaily, salesObservations) {
     const weatherByDate = new Map((Array.isArray(weatherDaily) ? weatherDaily : [])
       .filter(w => w && isIsoCalendarDate(w.date) && finite(w.temp_max))
