@@ -320,8 +320,8 @@ Deno.test("weather matching handles duplicate dates deterministically and does n
     ]
   );
   if (matched.length !== 2) throw new Error(`Duplicate weather date must not multiply sales rows; got ${matched.length}`);
-  if (matched[0].maxTempC !== 25 || matched[1].maxTempC !== 25) {
-    throw new Error("Duplicate weather dates must use a deterministic first-record policy");
+  if (matched[0].maxTempC !== 30 || matched[1].maxTempC !== 30) {
+    throw new Error("Duplicate weather dates must use a deterministic last-record policy");
   }
 });
 
