@@ -51,3 +51,58 @@ Es existiert ein Zwei-Jahres-Regressionstest, der u.a. Monats-/Jahreswerte, gewi
 ## Freigaberegel
 
 Keine echten Stationsdaten produktiv verwenden, bevor Berechnungen, Zugriffsschutz, Datenschutz/AGB/Impressum und Auftragsverarbeitung geprüft und freigegeben sind. Bis dahin nur synthetische oder anonymisierte Testdaten verwenden.
+
+
+## Gebündelter Prüfdurchgang – fachliche Schwachstellen (18.10.2026)
+
+### 7. QuickCheck: mathematische Randfälle
+- Die Eingabefunktion `num()` wandelt negative Eingaben in 0 um. Das verhindert negative Kostenpositionen, zeigt Nutzern aber nicht zwingend an, dass ihre Eingabe verworfen/begrenzt wurde. Empfehlung: Werte validieren und bei negativen Eingaben sichtbar warnen, statt still zu klemmen.
+- Bei `EK > Umsatz` wird eine Warnung angezeigt; der Rohertrag bleibt jedoch negativ. Das ist rechnerisch korrekt, muss in Kurve und Ergebnistext aber klar als unplausible/prüfbedürftige Eingabe erscheinen.
+- Bei Umsatz 0 werden Quoten als „–“ ausgegeben. Das ist korrekt und verhindert Division durch null.
+- Schwundschwellen <1 %, 1–2 %, >2 % sowie Lagerquoten <15 %, 15–30 %, >30 % sind im Code fest hinterlegt. Im vorliegenden Code ist keine belastbare externe Quelle dafür ausgewiesen. Daher nur als interne Orientierungswerte verwenden, nicht als gesicherte Tankstellen-Branchenstandards bewerben.
+- Die Lagerquote wird als Bestand zu EK / Monatsumsatz berechnet. Zähler und Nenner beruhen damit auf unterschiedlichen Bewertungsbasen (EK-Bestand vs. Umsatz). Als grobe Kapitalbindungskennzahl möglich, aber nicht direkt mit einer klassischen Lagerreichweite oder Umschlagshäufigkeit gleichzusetzen. Beschriftung und Erklärung müssen diese Einschränkung deutlich machen.
+- Die interne Variable `remain = gross - loss` ist rechnerisch korrekt, muss aber sprachlich als „Rohertrag nach erfassten Verlusten“/vereinfachter Zwischenwert behandelt werden, nicht als Betriebsgewinn.
+
+### 8. Hauptanalyse: Null-EK und fehlende Daten
+- Die Funktion `calc(k)` unterscheidet explizit, ob ein Warengruppen-EK eingegeben wurde; die tatsächliche Gruppenmarge wird nur berechnet, wenn Umsatz > 0 und EK > 0 sind. Das verhindert, dass eine fehlende EK-Angabe still als 0-%-Kostenbasis erscheint. Allerdings wird ein tatsächlich korrekt erfasster EK von 0 ebenfalls nicht als echte Marge berechnet. Das ist für seltene/kommissionsbasierte Warengruppen möglicherweise beabsichtigt, braucht aber eine klare Statusunterscheidung: „EK fehlt“, „EK ausdrücklich 0“ und „Warengruppe mit Kommission/ohne Wareneinsatz“ sind fachlich verschiedene Fälle.
+- Die Jahresübersicht sammelt Monate mit positiven Umsatz-, EK-, Schwund-, Abschriften- oder Bestandswerten und markiert Jahre mit weniger als 12 Umsatzmonaten als unvollständig. Das ist grundsätzlich gut. Weiterer Testbedarf besteht bei negativen Korrekturbuchungen, Monaten mit expliziten Nullwerten und gemischter Datenerfassung auf Gesamt- und Warengruppenebene.
+- HUTH-Mapping wird aus Textzeilen mit `=` geparst und ordnet nur bekannte Warengruppennamen/-IDs zu. Das ist ein bewusst einfacher Mapper, aber noch kein Beweis, dass beliebige HUTH-Exporte automatisch korrekt zugeordnet werden. Unbekannte Quellgruppen, doppelte Quellschlüssel und uneindeutige Gruppennamen müssen im Importbericht sichtbar abgewiesen werden.
+
+### 9. Personal-Szenario
+- Die Zusatzkostenformel `Stunden × Stundenlohn × (1 + Zuschlag)` ist rechnerisch korrekt für die vereinfachte Annahme eines prozentualen Zuschlags.
+- Der Break-even-Wert wird als Kosten/Stunden berechnet und bei 0 Stunden auf 0 gesetzt. Das vermeidet einen Rechenfehler, könnte bei 0 Stunden aber irreführend wie „keine Kosten nötig“ aussehen. Besser: „nicht berechenbar – keine Zusatzstunden“ anzeigen.
+- Die Zusatz-Rohertragseffekte werden bei Backwaren/Regalverfügbarkeit auf mindestens 0 begrenzt; der separate weitere Effekt kann negativ sein. Die Oberfläche sollte die Annahmen pro Effekt klar erklären und keine sichere Kausalität/Ertragssteigerung versprechen.
+- Die Kennzahl „Rohertrag pro bezahlter Stunde“ ist nur so gut wie die Vollständigkeit der eingetragenen bezahlten Stunden und die Definition des zugeordneten Rohertrags. Sie ist keine isolierte Leistungsbewertung einzelner Mitarbeiter.
+
+### 10. Rechtstexte – konkrete redaktionelle Mängel
+- `datenschutz.html`: doppelte Überschrift „4.“; nach „8a“ springt die Nummerierung auf „10“. Fortlaufend nummerieren und Inhalt/Links anschließend erneut prüfen.
+- `agb.html`: „3a. Öffentliche Ideenbox“ steht vor „2a. Zugangsfreigabe und Stationspilot“ und vor Abschnitt 3. Inhaltlich/reihenfolgenmäßig sortieren und anschließend prüfen, ob der Abschnitt zur Ideenbox inhaltlich noch die aktuelle Abstimmung abdeckt.
+- Die Datenschutzerklärung beschreibt Datenflüsse teils bewusst allgemein („jeweils aktuelle Verträge und technische Konfigurationen“). Vor dem produktiven Betrieb muss sie mit tatsächlich aktivierten Supabase-Funktionen, Speicherorten, Logs, Turnstile und den eingebundenen externen Ressourcen abgeglichen werden. Das kann eine statische Textprüfung nicht abschließend bestätigen.
+
+### 11. Automatisierte Tests – Umfang und Grenzen
+- Der Zwei-Jahres-Test enthält gezielte Prüfungen für 24 Monate, Jahressummen, gewichtete Marge, Teiljahrkennzeichnung, Bestandsmonate und die Formulierung „keine Ursache bewiesen“. Das ist eine sinnvolle Regressionstestbasis.
+- Der Browser-Smoke-Workflow prüft derzeit nur `analyse.html` auf HTTP-Erfolg, nichtleeren Inhalt und JavaScript-Laufzeitfehler. Er testet nicht die korrekten Ergebnisse aller Kennzahlen und nicht Login, QuickCheck, Personal, Wetter, PDF/Export oder die Ideenbox.
+- Die Dateien enthalten Tests für DWD-Historie und Ertragsoptimierer. Ein vorhandener Test ist kein Nachweis, dass er beim aktuellen Commit erfolgreich ausgeführt wurde. Für diesen Audit wurden die Testdateien statisch gelesen; ein erfolgreicher aktueller CI-Lauf wurde hier noch nicht verifiziert.
+
+## Priorisierte Schwachstellenliste
+
+**P1 – vor echter Station / vor Produktionsfreigabe**
+1. Alle Kernformeln mit unabhängigen Sollwerten und Randfällen ausführen; insbesondere Mischung aus Gesamtwerten und Warengruppenwerten.
+2. Rollen-/Stationszugriff, Supabase RLS und Datenisolation zwischen Kunden technisch testen.
+3. Live-Datenflüsse mit Datenschutztext, AVV und tatsächlichen Provider-Einstellungen abgleichen.
+4. Wetterlern-Funktion nicht als verfügbar/zuverlässig bewerben; aktueller Fokus nur auf 7-Tage-Wetter.
+
+**P2 – vor breiter öffentlicher Vermarktung**
+5. Orientierungswerte im QuickCheck als nicht validierte Richtwerte kennzeichnen und Quellen-/Methodiknotiz ergänzen.
+6. Negative Eingaben im QuickCheck sichtbar validieren, statt sie still auf null zu setzen.
+7. Personal-Break-even bei 0 Stunden als „nicht berechenbar“ anzeigen; Schätzungen deutlich kennzeichnen.
+8. HUTH-Import-Mapping mit unbekannten/mehrdeutigen Warengruppen und Importbericht prüfen.
+
+**P3 – redaktionell/Qualität**
+9. Datenschutz- und AGB-Abschnittsfolge korrigieren.
+10. Vorschau-/Testdateien und produktive Einstiegspunkte inventarisieren, um versehentliche Tests/alte Varianten zu vermeiden.
+
+## Teststatus dieses Durchgangs
+
+Statisch untersucht: Hauptanalyse, QuickCheck, Personal-Szenario, Zwei-Jahres-Regressionstest, DWD-Testdatei, Ideenbox-Edge-Function und AGB/Datenschutz.  
+Noch nicht als bestanden behauptet: Live-Browser-End-to-End, komplette Ausführung aller Tests, RLS-/Penetrationstest, juristische Prüfung.
