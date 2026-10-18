@@ -366,3 +366,59 @@ Deno.test("weather temperature bands use inclusive warm/cool limits and exclude 
     throw new Error("25°C must be warm and 24.9°C must be mild under the documented thresholds");
   }
 });
+
+
+Deno.test("learned weather effect clamps extreme positive and negative values to 20 percent", () => {
+  const base = { groupKey: "eis", actualRevenue: 100, previousRevenue: 100, priorYearRevenue: 100 };
+  const positive = optimizer.analyze({
+    groups: [base],
+    weatherLearning: [{ groupKey: "eis", warmVsMildPct: 85, warmSignal: "preliminary" }],
+    weatherRegime: "warm"
+  });
+  if (positive.priorities[0].expectedRevenue !== 120) {
+    throw new Error(`Extreme positive effect must be capped at +20%; got ${positive.priorities[0].expectedRevenue}`);
+  }
+  const negative = optimizer.analyze({
+    groups: [base],
+    weatherLearning: [{ groupKey: "eis", coolVsMildPct: -75, coolSignal: "preliminary" }],
+    weatherRegime: "cool"
+  });
+  if (negative.priorities[0].expectedRevenue !== 80) {
+    throw new Error(`Extreme negative effect must be capped at -20%; got ${negative.priorities[0].expectedRevenue}`);
+  }
+});
+
+Deno.test("weather learner does not apply an effect for missing, unknown or mismatched regime data", () => {
+  const group = { groupKey: "eis", actualRevenue: 100, previousRevenue: 100, priorYearRevenue: 100 };
+  const learned = [{ groupKey: "eis", warmVsMildPct: 18, warmSignal: "preliminary" }];
+  for (const input of [
+    { groups: [group], weatherLearning: learned },
+    { groups: [group], weatherLearning: learned, weatherRegime: "rainy" },
+    { groups: [{ ...group, groupKey: "getraenke" }], weatherLearning: learned, weatherRegime: "warm" }
+  ]) {
+    const result = optimizer.analyze(input);
+    if (result.priorities[0].expectedRevenue !== 100) {
+      throw new Error("Missing/unknown regime or mismatched group must leave baseline unchanged");
+    }
+  }
+});
+
+Deno.test("weather learner ignores missing optional fields and rejects non-finite precipitation", () => {
+  const matched = optimizer.matchWeatherSalesObservations(
+    [
+      { date: "2026-07-04", temp_max: 28 },
+      { date: "2026-07-11", temp_max: 27, temp_min: NaN, precipitation_mm: Infinity }
+    ],
+    [
+      { date: "2026-07-04", groupKey: "eis", actualRevenue: 100 },
+      { date: "2026-07-11", groupKey: "eis", actualRevenue: 110 }
+    ]
+  );
+  if (matched.length !== 2) throw new Error("Valid observations should survive absent optional weather fields");
+  if (matched[0].minTempC !== undefined || matched[0].precipitationMm !== undefined) {
+    throw new Error("Absent optional weather fields must remain absent");
+  }
+  if (matched[1].minTempC !== undefined || matched[1].precipitationMm !== undefined) {
+    throw new Error("Non-finite optional weather values must remain absent");
+  }
+});
