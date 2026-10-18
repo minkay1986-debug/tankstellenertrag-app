@@ -62,8 +62,8 @@ Deno.test("weather learning does not report a signal with too few observations",
 
 Deno.test("daily sales are matched only to the exact valid weather date", () => {
   const weather = [
-    { date: "2026-06-01", temp_max: 28 },
-    { date: "2026-06-02", temp_max: 20 },
+    { date: "2026-06-01", temp_max: 28, precipitation_sum: 3.5 },
+    { date: "2026-06-02", temp_max: 20, precipitation_sum: 0 },
   ];
   const sales = [
     { date: "2026-06-01", groupKey: "eis", actualRevenue: 150, complete: true, open: true, promotion: false },
@@ -75,6 +75,7 @@ Deno.test("daily sales are matched only to the exact valid weather date", () => 
   ];
   const matched = optimizer.matchWeatherSalesObservations(weather, sales);
   if (matched.length !== 2) throw new Error(`Expected two valid exact-date matches, got ${matched.length}`);
+  if (matched[0].precipitationMm !== 3.5) throw new Error("DWD precipitation_sum was not mapped to the matched observation");
   if (matched.some((row: any) => row.date === "2026-06-03" || row.date === "2026-02-30")) {
     throw new Error("Unmatched or invalid calendar dates were included");
   }
