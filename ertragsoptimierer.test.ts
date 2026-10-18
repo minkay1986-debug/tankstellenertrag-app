@@ -207,3 +207,42 @@ Deno.test("weekday-only revenue differences must not be learned as a weather eff
     throw new Error("Weekday imbalance must not create a weather signal");
   }
 });
+
+
+Deno.test("weather learner rejects impossible calendar dates and malformed dates", () => {
+  const observations = [
+    { groupKey: "eis", date: "2026-02-31", actualRevenue: 180, maxTempC: 29 },
+    { groupKey: "eis", date: "2026-07-06", actualRevenue: 180, maxTempC: 29 },
+    { groupKey: "eis", date: "06.07.2026", actualRevenue: 180, maxTempC: 29 },
+  ];
+  const [result] = optimizer.learnWeatherEffects(observations);
+  if (!result || result.observationCount !== 1) {
+    throw new Error(`Expected only the valid calendar date to be retained; got ${result?.observationCount ?? 0}`);
+  }
+});
+
+Deno.test("precipitation is carried through exact-date matching but is not silently treated as a learned rain effect", () => {
+  const weather = [
+    { date: "2026-07-04", temp_max: 28, precipitation_mm: 0 },
+    { date: "2026-07-11", temp_max: 28, precipitation_mm: 18 },
+    { date: "2026-07-05", temp_max: 20, precipitation_mm: 0 },
+    { date: "2026-07-12", temp_max: 20, precipitation_mm: 18 },
+  ];
+  const sales = [
+    { date: "2026-07-04", groupKey: "eis", actualRevenue: 150 },
+    { date: "2026-07-11", groupKey: "eis", actualRevenue: 150 },
+    { date: "2026-07-05", groupKey: "eis", actualRevenue: 100 },
+    { date: "2026-07-12", groupKey: "eis", actualRevenue: 100 },
+  ];
+  const matched = optimizer.matchWeatherSalesObservations(weather, sales);
+  if (matched.length !== 4 || matched[1].precipitationMm !== 18) {
+    throw new Error("Exact-date precipitation data should be preserved for future modeling");
+  }
+  const [result] = optimizer.learnWeatherEffects(matched);
+  if (result.warmVsMildPct !== 50) {
+    throw new Error("Current learner should estimate its temperature comparison, not claim an independent rain effect");
+  }
+  if (Object.prototype.hasOwnProperty.call(result, "rainEffectPct")) {
+    throw new Error("No independent rain effect should be claimed before a rain-specific model exists");
+  }
+});
