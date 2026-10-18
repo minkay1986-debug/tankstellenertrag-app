@@ -81,7 +81,7 @@ Deno.test("daily sales are matched only to the exact valid weather date", () => 
 });
 
 Deno.test("dated weather learning compares within weekday and quarter strata", () => {
-  const pairs = [
+  const pairs: [string, number, number][] = [
     ["2026-04-06", 28, 120],
     ["2026-04-13", 27, 120],
     ["2026-04-20", 29, 120],
