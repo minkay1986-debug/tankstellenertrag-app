@@ -194,15 +194,24 @@
     const weatherByDate = new Map((Array.isArray(weatherDaily) ? weatherDaily : [])
       .filter(w => w && isIsoCalendarDate(w.date) && finite(w.temp_max))
       .map(w => [w.date, w]));
-    return (Array.isArray(salesObservations) ? salesObservations : []).flatMap(s => {
+    // One daily revenue record per date/group is expected. If upstream sends
+    // duplicates, use the last valid record deterministically rather than
+    // counting the same day more than once in the learner.
+    const salesByKey = new Map();
+    for (const s of (Array.isArray(salesObservations) ? salesObservations : [])) {
       if (!s || !isIsoCalendarDate(s.date) || typeof s.groupKey !== 'string' ||
           !s.groupKey.trim() || !finite(s.actualRevenue) || s.actualRevenue < 0 ||
-          s.complete === false || s.open === false || s.promotion === true) return [];
+          s.complete === false || s.open === false || s.promotion === true) continue;
+      const key = s.date + ':' + s.groupKey.trim();
+      salesByKey.set(key, { ...s, groupKey: s.groupKey.trim() });
+    }
+    return [...salesByKey.values()].flatMap(s => {
       const w = weatherByDate.get(s.date);
       if (!w || !finite(w.temp_max)) return [];
-      return [{ groupKey: s.groupKey.trim(), date: s.date, actualRevenue: s.actualRevenue,
-        maxTempC: w.temp_max, minTempC: finite(w.temp_min) ? w.temp_min : undefined,
-        precipitationMm: finite(w.precipitation_mm) ? w.precipitation_mm : undefined,
+      return [{ groupKey: s.groupKey, date: s.date, actualRevenue: s.actualRevenue,
+        maxTempC: w.temp_max,
+        minTempC: finite(w.temp_min) && w.temp_min <= w.temp_max ? w.temp_min : undefined,
+        precipitationMm: finite(w.precipitation_mm) && w.precipitation_mm >= 0 ? w.precipitation_mm : undefined,
         promotion: false, complete: true, open: true }];
     });
   }
