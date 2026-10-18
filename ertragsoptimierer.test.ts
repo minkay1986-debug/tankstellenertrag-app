@@ -273,3 +273,65 @@ Deno.test("weather matching rejects impossible dates and preserves optional-fiel
     throw new Error("Invalid optional precipitation must remain absent, not be coerced");
   }
 });
+
+
+Deno.test("weather learner handles zero revenue without division errors", () => {
+  const observations = [
+    ...["2026-07-04", "2026-07-11", "2026-07-18"].map(date => ({
+      groupKey: "eis", date, actualRevenue: 0, maxTempC: 28
+    })),
+    ...["2026-07-25", "2026-08-01", "2026-08-08"].map(date => ({
+      groupKey: "eis", date, actualRevenue: 0, maxTempC: 20
+    }))
+  ];
+  const [result] = optimizer.learnWeatherEffects(observations);
+  if (!result || result.warmVsMildPct !== null || result.warmSignal !== "insufficient_data") {
+    throw new Error("Zero-revenue baseline must not produce an infinite or misleading effect");
+  }
+});
+
+Deno.test("weather matching excludes invalid revenue and invalid temperature, but accepts zero values", () => {
+  const matched = optimizer.matchWeatherSalesObservations(
+    [
+      { date: "2026-07-04", temp_max: 0, precipitation_mm: 0 },
+      { date: "2026-07-05", temp_max: NaN, precipitation_mm: 0 },
+      { date: "2026-07-06", temp_max: 25, precipitation_mm: 0 }
+    ],
+    [
+      { date: "2026-07-04", groupKey: "eis", actualRevenue: 0 },
+      { date: "2026-07-05", groupKey: "eis", actualRevenue: 100 },
+      { date: "2026-07-06", groupKey: "eis", actualRevenue: -1 }
+    ]
+  );
+  if (matched.length !== 1 || matched[0].actualRevenue !== 0 || matched[0].maxTempC !== 0) {
+    throw new Error("Only finite, non-negative revenue and finite temperature should match; zero is valid");
+  }
+});
+
+Deno.test("weather matching handles duplicate dates deterministically and does not create extra rows", () => {
+  const matched = optimizer.matchWeatherSalesObservations(
+    [
+      { date: "2026-07-04", temp_max: 25, precipitation_mm: 0 },
+      { date: "2026-07-04", temp_max: 30, precipitation_mm: 5 }
+    ],
+    [
+      { date: "2026-07-04", groupKey: "eis", actualRevenue: 100 },
+      { date: "2026-07-04", groupKey: "getraenke", actualRevenue: 200 }
+    ]
+  );
+  if (matched.length !== 2) throw new Error(`Duplicate weather date must not multiply sales rows; got ${matched.length}`);
+  if (matched[0].maxTempC !== 25 || matched[1].maxTempC !== 25) {
+    throw new Error("Duplicate weather dates must use a deterministic first-record policy");
+  }
+});
+
+Deno.test("weather learner ignores malformed observations without throwing", () => {
+  const result = optimizer.learnWeatherEffects([
+    null,
+    {},
+    { groupKey: "eis", date: "2026-07-04", actualRevenue: 100, maxTempC: Infinity },
+    { groupKey: "eis", date: "2026-07-04", actualRevenue: -1, maxTempC: 28 },
+    { groupKey: "eis", date: "2026-07-04", actualRevenue: 100, maxTempC: 28, promotion: true }
+  ] as any);
+  if (result.length !== 0) throw new Error("Malformed, impossible or promoted observations must be ignored safely");
+});
