@@ -335,3 +335,34 @@ Deno.test("weather learner ignores malformed observations without throwing", () 
   ] as any);
   if (result.length !== 0) throw new Error("Malformed, impossible or promoted observations must be ignored safely");
 });
+
+
+Deno.test("weather learner accepts leap days and rejects invalid month/day boundaries", () => {
+  const observations = [
+    { groupKey: "eis", date: "2024-02-29", actualRevenue: 100, maxTempC: 10 },
+    { groupKey: "eis", date: "2025-02-29", actualRevenue: 100, maxTempC: 10 },
+    { groupKey: "eis", date: "2026-00-10", actualRevenue: 100, maxTempC: 10 },
+    { groupKey: "eis", date: "2026-13-01", actualRevenue: 100, maxTempC: 10 },
+    { groupKey: "eis", date: "2026-04-31", actualRevenue: 100, maxTempC: 10 }
+  ];
+  const [result] = optimizer.learnWeatherEffects(observations);
+  if (!result || result.observationCount !== 1) {
+    throw new Error(`Expected only valid leap day to remain, got ${result?.observationCount ?? 0}`);
+  }
+});
+
+Deno.test("weather temperature bands use inclusive warm/cool limits and exclude gaps", () => {
+  const observations = [
+    ...["2026-07-04", "2026-07-11", "2026-07-18"].map(date => ({
+      groupKey: "eis", date, actualRevenue: 150, maxTempC: 25
+    })),
+    ...["2026-07-25", "2026-08-01", "2026-08-08"].map(date => ({
+      groupKey: "eis", date, actualRevenue: 100, maxTempC: 24.9
+    }))
+  ];
+  const [result] = optimizer.learnWeatherEffects(observations);
+  if (!result || result.warmObservationCount !== 3 || result.mildObservationCount !== 3 ||
+      result.warmVsMildPct !== 50 || result.warmSignal !== "preliminary") {
+    throw new Error("25°C must be warm and 24.9°C must be mild under the documented thresholds");
+  }
+});
