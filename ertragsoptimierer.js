@@ -222,7 +222,7 @@
       return [{ groupKey: s.groupKey, date: s.date, actualRevenue: s.actualRevenue,
         maxTempC: w.temp_max,
         minTempC: finite(w.temp_min) && w.temp_min <= w.temp_max ? w.temp_min : undefined,
-        precipitationMm: finite(w.precipitation_mm) && w.precipitation_mm >= 0 ? w.precipitation_mm : undefined,
+        precipitationMm: finite(w.precipitation_sum) && w.precipitation_sum >= 0 ? w.precipitation_sum : (finite(w.precipitation_mm) && w.precipitation_mm >= 0 ? w.precipitation_mm : undefined),
         promotion: false, complete: true, open: true }];
     });
   }
