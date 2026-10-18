@@ -422,3 +422,28 @@ Deno.test("weather learner ignores missing optional fields and rejects non-finit
     throw new Error("Non-finite optional weather values must remain absent");
   }
 });
+
+
+Deno.test("realistic extreme temperatures remain valid weather observations", () => {
+  const matched = optimizer.matchWeatherSalesObservations(
+    [{ date: "2026-01-10", temp_max: -20, temp_min: -27 }, { date: "2026-07-25", temp_max: 45, temp_min: 26 }],
+    [{ date: "2026-01-10", groupKey: "kaffee", actualRevenue: 120 }, { date: "2026-07-25", groupKey: "eis", actualRevenue: 220 }]
+  );
+  if (matched.length !== 2 || matched[0].maxTempC !== -20 || matched[1].maxTempC !== 45) throw new Error("Valid temperature extremes were lost");
+});
+
+Deno.test("duplicate sales rows for a date and group do not inflate sample counts", () => {
+  const matched = optimizer.matchWeatherSalesObservations(
+    [{ date: "2026-07-04", temp_max: 28 }],
+    [{ date: "2026-07-04", groupKey: "eis", actualRevenue: 100 }, { date: "2026-07-04", groupKey: "eis", actualRevenue: 130 }]
+  );
+  if (matched.length !== 1 || matched[0].actualRevenue !== 130) throw new Error("Expected deterministic last-record policy for duplicate sales key");
+});
+
+Deno.test("contradictory optional weather values are omitted", () => {
+  const matched = optimizer.matchWeatherSalesObservations(
+    [{ date: "2026-07-04", temp_max: 28, temp_min: 35, precipitation_mm: -1 }],
+    [{ date: "2026-07-04", groupKey: "eis", actualRevenue: 100 }]
+  );
+  if (matched.length !== 1 || matched[0].minTempC !== undefined || matched[0].precipitationMm !== undefined) throw new Error("Contradictory optional weather data should be omitted");
+});
