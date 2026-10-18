@@ -36,8 +36,8 @@ Deno.test("comparison baseline and revenue variance are calculated transparently
 
 Deno.test("weather learning requires comparable sample counts and excludes promotions", () => {
   const observations = [
-    ...Array.from({ length: 3 }, (_, i) => ({ groupKey: "eis", actualRevenue: 150, maxTempC: 28, date: `warm-${i}` })),
-    ...Array.from({ length: 3 }, (_, i) => ({ groupKey: "eis", actualRevenue: 100, maxTempC: 20, date: `mild-${i}` })),
+    ...Array.from({ length: 3 }, (_, i) => ({ groupKey: "eis", actualRevenue: 150, maxTempC: 28, date: ["2024-07-06", "2025-07-05", "2026-07-04"][i] })),
+    ...Array.from({ length: 3 }, (_, i) => ({ groupKey: "eis", actualRevenue: 100, maxTempC: 20, date: ["2024-04-06", "2025-04-05", "2026-04-04"][i] })),
     { groupKey: "eis", actualRevenue: 999, maxTempC: 30, promotion: true },
     { groupKey: "eis", actualRevenue: 999, maxTempC: 30, complete: false },
   ];
@@ -52,8 +52,8 @@ Deno.test("weather learning requires comparable sample counts and excludes promo
 
 Deno.test("weather learning does not report a signal with too few observations", () => {
   const result = optimizer.learnWeatherEffects([
-    { groupKey: "backwaren", actualRevenue: 100, maxTempC: 27 },
-    { groupKey: "backwaren", actualRevenue: 90, maxTempC: 20 },
+    { groupKey: "backwaren", actualRevenue: 100, maxTempC: 27, date: "2026-07-04" },
+    { groupKey: "backwaren", actualRevenue: 90, maxTempC: 20, date: "2026-07-11" },
   ])[0];
   if (result.warmVsMildPct !== null || result.warmSignal !== "insufficient_data") {
     throw new Error("Insufficient samples must not create a weather effect");
@@ -90,16 +90,16 @@ Deno.test("weather matching never fabricates observations when weather or daily 
 
 Deno.test("synthetic test-station data produces a preliminary signal only after three warm and three mild days", () => {
   const weather = [
-    { date: "2026-07-01", temp_max: 28 }, { date: "2026-07-02", temp_max: 29 }, { date: "2026-07-03", temp_max: 27 },
-    { date: "2026-04-01", temp_max: 20 }, { date: "2026-04-02", temp_max: 19 }, { date: "2026-04-03", temp_max: 22 },
+    { date: "2024-07-06", temp_max: 28 }, { date: "2025-07-05", temp_max: 29 }, { date: "2026-07-04", temp_max: 27 },
+    { date: "2024-04-06", temp_max: 20 }, { date: "2025-04-05", temp_max: 19 }, { date: "2026-04-04", temp_max: 22 },
   ];
   const sales = [
-    { date: "2026-07-01", groupKey: "eis", actualRevenue: 150 },
-    { date: "2026-07-02", groupKey: "eis", actualRevenue: 160 },
-    { date: "2026-07-03", groupKey: "eis", actualRevenue: 140 },
-    { date: "2026-04-01", groupKey: "eis", actualRevenue: 100 },
-    { date: "2026-04-02", groupKey: "eis", actualRevenue: 110 },
-    { date: "2026-04-03", groupKey: "eis", actualRevenue: 90 },
+    { date: "2024-07-06", groupKey: "eis", actualRevenue: 150 },
+    { date: "2025-07-05", groupKey: "eis", actualRevenue: 160 },
+    { date: "2026-07-04", groupKey: "eis", actualRevenue: 140 },
+    { date: "2024-04-06", groupKey: "eis", actualRevenue: 100 },
+    { date: "2025-04-05", groupKey: "eis", actualRevenue: 110 },
+    { date: "2026-04-04", groupKey: "eis", actualRevenue: 90 },
   ];
   const paired = optimizer.matchWeatherSalesObservations(weather, sales);
   const [result] = optimizer.learnWeatherEffects(paired);
