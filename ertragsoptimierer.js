@@ -101,6 +101,10 @@
       marginPct: margin === null ? null : round(margin),
       marginDeltaPp: marginDelta === null ? null : round(marginDelta),
       shrinkPct: shrink === null ? null : round(shrink),
+      weatherEffectPct: round(weather),
+      weatherLearningApplied: g.weatherLearningApplied === true,
+      weatherLearningRegime: typeof g.weatherLearningRegime === 'string' ? g.weatherLearningRegime : null,
+      weatherLearningSignalPct: finite(g.weatherLearningSignalPct) ? round(g.weatherLearningSignalPct) : null,
       confidence,
       alerts
     };
