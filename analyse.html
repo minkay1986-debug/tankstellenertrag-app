@@ -224,12 +224,8 @@ button.btn,button:not(.nav button){border-radius:11px}
  .wow-card{padding:14px!important}
 }
 
-/* tse-swipe-touch-action-2026-10-11: Allow vertical page scrolling while preserving horizontal swipe gestures on ordinary KPI/content cards. */
-@media (max-width: 900px) {
-  .view .card, .view .panel, .view .wow-card, .view .month-hero {
-    touch-action: pan-y;
-  }
-}
+/* Mobile swipe fix 2026-10-19: do not constrain touch-action on card ancestors.
+   Nested horizontal scrollers need the browser's native horizontal pan behavior. */
 /* Fix: keep the full left navigation reachable on short screens and desktop zoom. */
 .side{overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;scrollbar-width:thin;}
 .side .nav{min-height:0;overflow-y:visible;}
@@ -996,7 +992,19 @@ function eeMonth(){eeConfetti();eeToast('🏆 Monat geknackt!','Jetzt wird aus Z
   let start=null,last=0,animating=false;
   const navButtons=()=>Array.from(document.querySelectorAll('.nav button[data-v]'));
   const views=()=>Array.from(document.querySelectorAll('.view'));
-  const ignored=el=>!!(el&&el.closest('input,textarea,select,button,a,[contenteditable="true"],.nav,.weather-days,.weather-day-card,[data-no-page-swipe],[data-horizontal-carousel]'));
+  function ignored(el){
+    if(!el)return false;
+    if(el.closest('input,textarea,select,button,a,[contenteditable="true"],.nav,[data-no-page-swipe],[data-horizontal-carousel]'))return true;
+    /* If the gesture starts inside any actually scrollable horizontal region,
+       let that region handle it instead of switching the whole app view. */
+    let node=el;
+    while(node&&node!==document.body){
+      const style=window.getComputedStyle(node);
+      if((style.overflowX==='auto'||style.overflowX==='scroll')&&node.scrollWidth>node.clientWidth+2)return true;
+      node=node.parentElement;
+    }
+    return false;
+  }
   const inMain=el=>!!(el&&el.closest('.main'));
   function down(e){
     if(e.touches.length!==1||ignored(e.target)||!inMain(e.target)){start=null;return;}
