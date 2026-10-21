@@ -1,6 +1,6 @@
 -- Secure moderation workflow for public idea suggestions.
 -- Public visitors can submit ideas but cannot read, change, approve, or delete them.
--- Only the configured administrator can review submissions through narrowly scoped RPCs.
+-- Admin access is enforced by RLS; no SECURITY DEFINER functions are introduced.
 
 alter table public.public_idea_suggestions
   add column if not exists status text not null default 'pending',
@@ -13,9 +13,12 @@ alter table public.public_idea_suggestions
   add constraint public_idea_suggestions_status_check
   check (status in ('pending', 'approved', 'rejected'));
 
--- Keep direct table access minimal; RPCs below are the only moderation interface.
+-- Revoke broad grants, then grant only the minimum required privileges.
 revoke all on table public.public_idea_suggestions from public, anon, authenticated;
 grant insert on table public.public_idea_suggestions to anon, authenticated;
+grant select on table public.public_idea_suggestions to authenticated;
+grant update (status, reviewed_at, reviewed_by) on table public.public_idea_suggestions to authenticated;
+
 revoke select on sequence public.public_idea_suggestions_id_seq from anon, authenticated;
 grant usage on sequence public.public_idea_suggestions_id_seq to anon, authenticated;
 
@@ -40,67 +43,13 @@ drop policy if exists "Admin can review idea suggestions" on public.public_idea_
 create policy "Admin can review idea suggestions"
   on public.public_idea_suggestions
   for update to authenticated
-  using ((auth.jwt() ->> 'email') = 'svenkrick@gmx.de')
+  using (
+    (auth.jwt() ->> 'email') = 'svenkrick@gmx.de'
+    and status = 'pending'
+  )
   with check (
     (auth.jwt() ->> 'email') = 'svenkrick@gmx.de'
-    and status in ('pending', 'approved', 'rejected')
+    and status in ('approved', 'rejected')
+    and reviewed_at is not null
+    and reviewed_by = 'svenkrick@gmx.de'
   );
-
--- Do not expose the table through direct grants; the admin-only SECURITY DEFINER
--- RPCs are additionally guarded by the verified JWT email.
-create or replace function public.get_admin_idea_suggestions()
-returns table (
-  id bigint,
-  suggestion text,
-  created_at timestamptz,
-  status text,
-  reviewed_at timestamptz,
-  reviewed_by text
-)
-language plpgsql
-security definer
-set search_path = ''
-as $$
-begin
-  if auth.uid() is null or (auth.jwt() ->> 'email') is distinct from 'svenkrick@gmx.de' then
-    raise exception 'not authorized' using errcode = '42501';
-  end if;
-
-  return query
-    select s.id, s.suggestion, s.created_at, s.status, s.reviewed_at, s.reviewed_by
-    from public.public_idea_suggestions as s
-    order by case s.status when 'pending' then 0 when 'approved' then 1 else 2 end,
-             s.created_at desc;
-end;
-$$;
-
-create or replace function public.review_idea_suggestion(p_id bigint, p_status text)
-returns void
-language plpgsql
-security definer
-set search_path = ''
-as $$
-begin
-  if auth.uid() is null or (auth.jwt() ->> 'email') is distinct from 'svenkrick@gmx.de' then
-    raise exception 'not authorized' using errcode = '42501';
-  end if;
-  if p_status not in ('approved', 'rejected') then
-    raise exception 'invalid status' using errcode = '22023';
-  end if;
-
-  update public.public_idea_suggestions
-     set status = p_status,
-         reviewed_at = now(),
-         reviewed_by = 'svenkrick@gmx.de'
-   where id = p_id;
-
-  if not found then
-    raise exception 'suggestion not found' using errcode = 'P0002';
-  end if;
-end;
-$$;
-
-revoke all on function public.get_admin_idea_suggestions() from public, anon, authenticated;
-revoke all on function public.review_idea_suggestion(bigint, text) from public, anon, authenticated;
-grant execute on function public.get_admin_idea_suggestions() to authenticated;
-grant execute on function public.review_idea_suggestion(bigint, text) to authenticated;
