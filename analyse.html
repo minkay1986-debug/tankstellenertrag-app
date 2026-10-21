@@ -310,45 +310,63 @@ button.btn,button:not(.nav button){border-radius:11px}
 .server-incident-copy{display:grid;gap:3px;min-width:0;font-size:12px;line-height:1.45}.server-incident-copy strong{font-size:12px;letter-spacing:.02em}.server-incident-copy span{color:#d9e9fb}.server-incident-close{margin-left:auto;flex:0 0 auto;border:0;background:transparent;color:#e6f2ff;font-size:21px;line-height:1;cursor:pointer;padding:0 2px}
 @media(max-width:700px){.server-incident{top:4px;margin:0 0 12px;padding:11px 12px;border-radius:13px}.server-incident-copy{font-size:11px}}
 
-/* TankstellenErtrag Glass Refresh v2 — site-wide, stronger page gradient + translucent surfaces */
-:root{--bg:#07172d;--p:rgba(10,35,67,.38);--p2:rgba(12,44,81,.32);--line:rgba(183,218,255,.30)}
-html{background:#07172d!important}
+/* TankstellenErtrag · Cool Blue Glass — ruhiges Navy, dezentes Licht, echte Glaskacheln */
+:root{
+ --tse-glass-text:#edf5ff;
+ --tse-glass-line:rgba(163,198,232,.20);
+}
+html{background:#050d1b!important}
 body{
  background:
-  radial-gradient(ellipse at 14% 7%,rgba(0,174,255,.34) 0%,transparent 38%),
-  radial-gradient(ellipse at 86% 30%,rgba(44,93,230,.32) 0%,transparent 42%),
-  radial-gradient(ellipse at 48% 86%,rgba(0,208,210,.18) 0%,transparent 38%),
-  linear-gradient(135deg,#061329 0%,#0b2b55 34%,#123d78 61%,#071a37 100%)!important;
- background-color:#07172d!important;background-attachment:fixed!important;color:#f5f9ff
+  radial-gradient(ellipse 52% 42% at 82% 76%,rgba(22,93,165,.20) 0%,rgba(22,93,165,0) 100%),
+  radial-gradient(ellipse 48% 38% at 48% 42%,rgba(18,69,128,.17) 0%,rgba(18,69,128,0) 100%),
+  radial-gradient(ellipse 30% 26% at 8% 92%,rgba(13,105,147,.10) 0%,rgba(13,105,147,0) 100%),
+  linear-gradient(145deg,#050c19 0%,#09172b 34%,#0b1e37 66%,#071224 100%)!important;
+ background-color:#050d1b!important;
+ background-attachment:fixed!important;
+ color:#edf5ff!important;
 }
 .app,.main,.view,.content,.workspace{background:transparent!important}
-.card,.panel,.wow-card,.month-hero,.investigation-card,.practice-box,
-.cause-tool-intro,.weather-day-card,.calendar-card,.season-card,.forecast-card,
-.regional-card,.event-card,.weather-check-card,.weather-impact-card,
-.study-source-card,.report-month-hero{
- background-color:rgba(8,30,58,.34)!important;
- background-image:none!important;
- border-color:rgba(190,224,255,.32)!important;
- box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 8px 26px rgba(0,7,22,.13)!important;
- -webkit-backdrop-filter:blur(18px) saturate(145%)!important;
- backdrop-filter:blur(18px) saturate(145%)!important;
+#stationInfo,.panel,.card,.view>.panel,.view>.card,.view .panel,.view .card{
+ background:linear-gradient(135deg,rgba(117,163,207,.075) 0%,rgba(40,78,119,.045) 48%,rgba(3,12,25,.24) 100%)!important;
+ border:1px solid rgba(157,198,237,.19)!important;
+ border-top-color:rgba(204,229,251,.27)!important;
+ box-shadow:0 10px 28px rgba(0,0,0,.16),inset 0 1px 0 rgba(241,248,255,.065),inset 0 -1px 0 rgba(2,8,18,.22)!important;
+ -webkit-backdrop-filter:blur(18px) saturate(120%)!important;
+ backdrop-filter:blur(18px) saturate(120%)!important;
+ color:#edf5ff!important;
 }
-.card:hover,.panel:hover,.wow-card:hover{
- background-color:rgba(13,47,83,.40)!important;
+#stationInfo{background:linear-gradient(120deg,rgba(24,68,112,.24),rgba(8,23,42,.32))!important}
+#kpis .card{background:linear-gradient(135deg,rgba(35,87,139,.20),rgba(8,24,43,.36))!important}
+.nav button{
+ background:rgba(135,174,214,.035)!important;
+ border-color:rgba(166,202,235,.12)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;
+}
+.nav button:hover{background:rgba(104,160,214,.09)!important;border-color:rgba(166,202,235,.22)!important}
+.nav button.active{
+ background:linear-gradient(115deg,rgba(63,126,185,.17),rgba(255,255,255,.025))!important;
+ border-color:rgba(157,198,237,.23)!important;
+ border-left:3px solid #e99448!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 5px 16px rgba(0,0,0,.12)!important;
 }
 .side{
- background:rgba(4,15,31,.72)!important;
- border-color:rgba(183,218,255,.18)!important;
- -webkit-backdrop-filter:blur(22px) saturate(140%)!important;
- backdrop-filter:blur(22px) saturate(140%)!important;
+ background:rgba(3,10,21,.78)!important;
+ border-right:1px solid rgba(163,198,232,.12)!important;
+ box-shadow:8px 0 28px rgba(0,0,0,.13)!important;
+ -webkit-backdrop-filter:blur(22px) saturate(120%)!important;
+ backdrop-filter:blur(22px) saturate(120%)!important;
 }
-.nav button.active,.nav button:hover{background:rgba(116,176,235,.16)!important}
-.chip,.badge,.risk-badge,.risk-pill{backdrop-filter:blur(10px)}
-/* Keep weather photography visible inside the seven forecast cards. */
-.weather-day-card{background-image:var(--weather-image)!important;background-color:rgba(8,30,58,.24)!important}
+input:not([type=checkbox]):not([type=radio]),select,textarea,.field input,.field select,.field textarea,.input{
+ background:rgba(3,11,22,.48)!important;
+ border-color:rgba(157,198,237,.20)!important;
+}
+@media(max-width:700px){#stationInfo,.panel,.card{border-radius:14px!important}}
 @media print{
- body,html{background:#fff!important;color:#111!important}
- .card,.panel,.wow-card,.month-hero,.investigation-card,.practice-box,.weather-day-card,.calendar-card,.season-card,.forecast-card,.regional-card,.event-card,.weather-check-card,.weather-impact-card,.study-source-card,.report-month-hero{background:#fff!important;background-image:none!important;color:#111!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important}
+ html,body{background:#fff!important;color:#111!important}
+ #stationInfo,.panel,.card,.view>.panel,.view>.card,.view .panel,.view .card{
+  background:#fff!important;color:#111!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important;border-color:#ccc!important
+ }
 }
 </style>
 </head><body><div class="app"><aside class="side"><div class="brand">Tankstellen<span>Ertrag</span></div><div class="tag">Wirtschaftlichkeit · Warenwirtschaft · Ertrag</div><div class="panel" style="margin:0 0 16px;padding:11px;font-size:11px"><b>Aus der Tankstellenpraxis</b><br>für Tankstellen entwickelt.</div><div class="nav"><button class="active" data-v="dashboard">Übersicht</button><button data-v="meinmonat"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-6"/></svg> Mein Monat</button><button data-v="monthly">Monatsdaten</button><button data-v="analysis">Analyse</button><button data-v="advisorChat">Beratungs-Chat</button><button data-v="ask">Frag TankstellenErtrag</button><button data-v="community">Community · später</button><button type="button" id="navTeamPersonal" onclick="window.location.href='/personal-und-umsatzpotenzial-test.html'"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5.5a3 3 0 0 1 0 5.8M18 14a5 5 0 0 1 3 4.5"/></svg> Team &amp; Personal</button><button data-v="insights"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m19 15 .9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9Z"/></svg> Insights & KI</button><button data-v="forecast"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 0-4 12.7c.7.5 1 1.2 1 2.3h6c0-1.1.3-1.8 1-2.3A7 7 0 0 0 12 3Z"/><path d="M9 21h6M10 18h4M12 6v2M6.5 8.5 8 10M17.5 8.5 16 10"/></svg> Prognose & Ausblick</button><button data-v="radar"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg> Ertragsradar</button><button data-v="yearly">Jahresauswertung</button><button data-v="report">Beratungsbericht</button><button type="button" id="navDiniLove" class="dini-tab"><span class="dini-label"><span class="dini-icon">🥐</span>DiniLove</span><span class="dini-sub">Reste retten · Bistro</span></button><button data-v="feedback">⭐ Feedback</button><button data-v="sources">Branchenwissen</button><button data-v="settings">Beratungseinstellungen</button><button data-v="account"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg> Kundenkonto</button></div></aside><main class="main"><div id="gate" class="panel">Verbindung zur Station wird hergestellt …</div><div id="serverIncidentBanner" class="server-incident" role="status" aria-live="polite" hidden><span class="server-incident-mark" aria-hidden="true">i</span><div class="server-incident-copy"><strong>Vorübergehende Serverstörung</strong><span>Leider gibt es momentan serverseitige Störungen. Bis diese behoben sind, kann es zu Einschränkungen einzelner Funktionen kommen.</span></div><button type="button" class="server-incident-close" aria-label="Hinweis schließen" onclick="window.TSE_dismissServerNotice&&window.TSE_dismissServerNotice()">×</button></div><div id="app" style="display:none"><div id="stationInfo" class="panel"></div>
