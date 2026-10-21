@@ -40,6 +40,7 @@ function runtime(data:any) {
   const mrow = (k:string) => data.months[k];
   const prev = (k:string) => {const [y,mo]=k.split("-").map(Number);const d=new Date(y,mo-2,1);const p=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;return Object.hasOwn(data.months,p)?p:null;};
   const calc = appFunction("calc","reconciliation",["GROUPS","data","settings","mrow"],{GROUPS,data,settings,mrow});
+  const dataQuality = appFunction("dataQuality","hasData",["data","mrow","calc","prev","eur"],{data,mrow,calc,prev,eur});
   const wowPriority = appFunction("wowPriority","riskLevel",["calc","prev","settings"],{calc,prev,settings});
   const keys = () => Object.keys(data.months).sort();
   const eur = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Number(v)||0);
@@ -52,7 +53,7 @@ function runtime(data:any) {
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
     TEStudyContext:{htmlForReport:async()=>""},practiceGuidance
   });
-  return {data,calc,wowPriority,yearly,report,practiceGuidance,target,prev};
+  return {data,calc,dataQuality,wowPriority,yearly,report,practiceGuidance,target,prev};
 }
 Deno.test("real app calc, year table and report reconcile across all 24 months",()=>{
   const rt=runtime(appFixture());
@@ -98,3 +99,28 @@ Deno.test("practical guidance gives actionable checks and separates signals from
 });
 
 Deno.test("app has all requested renderers and renderAll calls them",()=>{for(const fn of ["function renderMeinMonat()","function yearly()","function report()","function analysis()","function renderAll()"])assert(html.includes(fn),"Missing "+fn);const renderAllFn=html.slice(html.indexOf("function renderAll()"),html.indexOf("function parseHuth("));assert(["renderMeinMonat()","analysis()","yearly()","report()"].every(call=>renderAllFn.includes(call)),"renderAll must invoke month, analysis, year and report renderers");for(const id of ['id="monthly"','id="yearly"','id="report"','id="dashboard"'])assert(html.includes(id),"Missing section "+id);const yearFn=html.slice(html.indexOf("function yearly()"),html.indexOf("function economic()"));assert(yearFn.includes("Jahresübersicht")&&yearFn.includes("gewichtete Marge"),"Yearly view must show annual totals and weighted margin");const monthFn=html.slice(html.indexOf("function renderMeinMonat()"),html.indexOf("function renderCustomScenarioInputs"));for(const check of ["focus","shrink","action"])assert(monthFn.includes(check),"Missing monthly check tile "+check);const analysisFn=html.slice(html.indexOf("function analysis()"),html.indexOf("function renderCustomScenarioInputs"));assert(analysisFn.includes("Daten-TÜV")&&analysisFn.includes("Bestandsabgleich")&&analysisFn.includes("Ihre wichtigsten Prüffelder"),"Analysis is missing a required check area");const reportFn=html.slice(html.indexOf("function report()"),html.indexOf("function settingsUI()"));for(const item of ["Shop-Umsatz","Rohertrag","Marge","Schwund","Bestand EK","Notizen / Maßnahmen"])assert(reportFn.includes(item),"Report missing "+item);});
+
+
+Deno.test("missing top-level values are not reported as explicitly entered zeroes",()=>{
+  const rt=runtime(appFixture());
+  const row=rt.data.months["2026-10"];
+  row.ek=null; row.shrink=null; row.writeoff=null; row.stock=null;
+  const quality=rt.dataQuality("2026-10");
+  assert(!quality.notes.some((n:string)=>n.includes("Shop-EK = 0,00 €")),"Missing Shop-EK was misreported as a confirmed zero");
+  assert(!quality.notes.some((n:string)=>n.includes("Schwund = 0,00 €")),"Missing shrink was misreported as a confirmed zero");
+  assert(!quality.notes.some((n:string)=>n.includes("Abschriften = 0,00 €")),"Missing writeoffs were misreported as a confirmed zero");
+  assert(!quality.notes.some((n:string)=>n.includes("Bestand EK = 0,00 €")),"Missing stock was misreported as a confirmed zero");
+});
+
+Deno.test("an explicitly entered zero remains visible as a data-quality check",()=>{
+  const rt=runtime(appFixture());
+  rt.data.months["2026-10"].ek=0;
+  const quality=rt.dataQuality("2026-10");
+  assert(quality.notes.some((n:string)=>n.includes("Shop-EK = 0,00 €")),"Explicit zero should remain flagged for confirmation");
+});
+
+Deno.test("empty dashboard KPI values are displayed as unavailable instead of zero",()=>{
+  assert(html.includes("available?eur(d.revenue):'—'"),"Revenue KPI does not distinguish no data from zero");
+  assert(html.includes("available?pct(d.margin):'—'"),"Margin KPI does not distinguish no data from zero");
+  assert(html.includes("available?eur(d.shrink):'—'"),"Shrink KPI does not distinguish no data from zero");
+});
