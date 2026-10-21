@@ -30,11 +30,12 @@
  if((session.user?.email||'').toLowerCase()!=='svenkrick@gmx.de'){say('Zugriff verweigert: Dieses Konto ist nicht als Administrator freigeschaltet.','error');return}
  async function load(){
   say('Vorschläge werden geladen …');
-  const {data,error}=await client.rpc('get_admin_idea_suggestions');
-  if(error){say('Laden fehlgeschlagen. Die Datenbank-Migration muss zuerst eingespielt sein.','error');return}
+  const {data,error}=await client.from('public_idea_suggestions').select('id,suggestion,created_at,status,reviewed_at,reviewed_by').order('created_at',{ascending:false});
+  if(error){say('Laden fehlgeschlagen. Prüfe Anmeldung, RLS und die Datenbank-Migration.','error');return}
   listEl.replaceChildren();
   if(!data?.length){listEl.innerHTML='<div class="panel empty">Noch keine Vorschläge vorhanden.</div>';say('Liste erfolgreich geladen.','ok');return}
-  for(const item of data){
+  const ordered=[...data].sort((a,b)=>({pending:0,approved:1,rejected:2}[a.status]-({pending:0,approved:1,rejected:2}[b.status]))||new Date(b.created_at)-new Date(a.created_at));
+  for(const item of ordered){
    const card=document.createElement('article');card.className='idea';
    const head=document.createElement('div');head.className='idea-head';
    const date=document.createElement('div');date.className='meta';date.textContent='Eingereicht: '+new Date(item.created_at).toLocaleString('de-DE');
@@ -47,7 +48,7 @@
     const actions=document.createElement('div');actions.className='actions';
     for(const [label,next,cls] of [['Freigeben','approved','approve'],['Ablehnen','rejected','reject']]){
      const button=document.createElement('button');button.type='button';button.className='btn '+cls;button.textContent=label;
-     button.addEventListener('click',async()=>{if(!confirm(label+'?'))return;button.disabled=true;say('Status wird gespeichert …');const {error}=await client.rpc('review_idea_suggestion',{p_id:item.id,p_status:next});if(error){say('Speichern fehlgeschlagen. Bitte erneut versuchen.','error');button.disabled=false;return}await load()});
+     button.addEventListener('click',async()=>{if(!confirm(label+'?'))return;button.disabled=true;say('Status wird gespeichert …');const {data:updated,error}=await client.from('public_idea_suggestions').update({status:next,reviewed_at:new Date().toISOString(),reviewed_by:session.user.email}).eq('id',item.id).eq('status','pending').select('id').maybeSingle();if(error){say('Speichern fehlgeschlagen. Bitte erneut versuchen.','error');button.disabled=false;return}if(!updated){say('Der Vorschlag wurde inzwischen bereits bearbeitet. Liste wird aktualisiert.','error');await load();return}await load()});
      actions.append(button)
     }
     card.append(actions)
