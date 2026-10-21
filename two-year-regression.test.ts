@@ -2,6 +2,7 @@ import "./ertragsoptimierer.js";
 const optimizer = (globalThis as any).TankstellenErtragsoptimierer;
 if (!optimizer) throw new Error("Ertragsoptimierer API wurde nicht geladen");
 const html = await Deno.readTextFile(new URL("./analyse.html", import.meta.url));
+const homepage = await Deno.readTextFile(new URL("./index.html", import.meta.url));
 const assert = (ok: unknown, message: string) => { if (!ok) throw new Error(message); };
 const months = Array.from({length:24},(_,i)=>{const year=2025+Math.floor(i/12),month=i%12+1;const seasonal=[.86,.88,.93,.96,1.02,1.08,1.16,1.13,1.04,.99,.94,1.12][month-1];const revenue=Math.round(100000*seasonal*(year===2026?1.04:1)*100)/100;const marginPct=year===2026&&month>=6?48:52;const shrinkPct=year===2026&&month===10?3.2:.8;return{key:`${year}-${String(month).padStart(2,"0")}`,year,month,revenue,ek:revenue*(1-marginPct/100),marginPct,shrinkPct};});
 Deno.test("24-month fixture covers two complete years without duplicate keys",()=>{assert(months.length===24,"Expected 24 months");assert(months[0].key==="2025-01"&&months[11].key==="2025-12","2025 range incorrect");assert(months[12].key==="2026-01"&&months[23].key==="2026-12","2026 range incorrect");assert(new Set(months.map(x=>x.key)).size===24,"Duplicate month key");});
@@ -43,6 +44,7 @@ function runtime(data:any) {
   const wowPriority = appFunction("wowPriority","riskLevel",["calc","prev","settings"],{calc,prev,settings});
   const keys = () => Object.keys(data.months).sort();
   const eur = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Number(v)||0);
+  const dataQuality = appFunction("dataQuality","hasData",["data","mrow","calc","prev","eur"],{data,mrow,calc,prev,eur});
   const pct = (v:number) => (Number(v)||0).toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1})+" %";
   const target = {value:"",innerHTML:""};
   const yearly = appFunction("yearly","economic",["keys","data","calc","eur","pct","$"],{keys,data,calc,eur,pct,$:(id:string)=>target});
@@ -52,7 +54,7 @@ function runtime(data:any) {
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
     TEStudyContext:{htmlForReport:async()=>""},practiceGuidance
   });
-  return {data,calc,wowPriority,yearly,report,practiceGuidance,target,prev};
+  return {data,calc,dataQuality,wowPriority,yearly,report,practiceGuidance,target,prev};
 }
 Deno.test("real app calc, year table and report reconcile across all 24 months",()=>{
   const rt=runtime(appFixture());
@@ -98,3 +100,66 @@ Deno.test("practical guidance gives actionable checks and separates signals from
 });
 
 Deno.test("app has all requested renderers and renderAll calls them",()=>{for(const fn of ["function renderMeinMonat()","function yearly()","function report()","function analysis()","function renderAll()"])assert(html.includes(fn),"Missing "+fn);const renderAllFn=html.slice(html.indexOf("function renderAll()"),html.indexOf("function parseHuth("));assert(["renderMeinMonat()","analysis()","yearly()","report()"].every(call=>renderAllFn.includes(call)),"renderAll must invoke month, analysis, year and report renderers");for(const id of ['id="monthly"','id="yearly"','id="report"','id="dashboard"'])assert(html.includes(id),"Missing section "+id);const yearFn=html.slice(html.indexOf("function yearly()"),html.indexOf("function economic()"));assert(yearFn.includes("Jahresübersicht")&&yearFn.includes("gewichtete Marge"),"Yearly view must show annual totals and weighted margin");const monthFn=html.slice(html.indexOf("function renderMeinMonat()"),html.indexOf("function renderCustomScenarioInputs"));for(const check of ["focus","shrink","action"])assert(monthFn.includes(check),"Missing monthly check tile "+check);const analysisFn=html.slice(html.indexOf("function analysis()"),html.indexOf("function renderCustomScenarioInputs"));assert(analysisFn.includes("Daten-TÜV")&&analysisFn.includes("Bestandsabgleich")&&analysisFn.includes("Ihre wichtigsten Prüffelder"),"Analysis is missing a required check area");const reportFn=html.slice(html.indexOf("function report()"),html.indexOf("function settingsUI()"));for(const item of ["Shop-Umsatz","Rohertrag","Marge","Schwund","Bestand EK","Notizen / Maßnahmen"])assert(reportFn.includes(item),"Report missing "+item);});
+
+
+Deno.test("missing top-level values are not reported as explicitly entered zeroes",()=>{
+  const rt=runtime(appFixture());
+  const row=rt.data.months["2026-10"];
+  row.ek=null; row.shrink=null; row.writeoff=null; row.stock=null;
+  const quality=rt.dataQuality("2026-10");
+  assert(!quality.notes.some((n:string)=>n.includes("Shop-EK = 0,00 €")),"Missing Shop-EK was misreported as a confirmed zero");
+  assert(!quality.notes.some((n:string)=>n.includes("Schwund = 0,00 €")),"Missing shrink was misreported as a confirmed zero");
+  assert(!quality.notes.some((n:string)=>n.includes("Abschriften = 0,00 €")),"Missing writeoffs were misreported as a confirmed zero");
+  assert(!quality.notes.some((n:string)=>n.includes("Bestand EK = 0,00 €")),"Missing stock was misreported as a confirmed zero");
+});
+
+Deno.test("an explicitly entered zero remains visible as a data-quality check",()=>{
+  const rt=runtime(appFixture());
+  rt.data.months["2026-10"].ek=0; rt.data.months["2026-10"].inventoryEkEntered=true;
+  const quality=rt.dataQuality("2026-10");
+  assert(quality.notes.some((n:string)=>n.includes("Shop-EK = 0,00 €")),"Explicit zero should remain flagged for confirmation");
+});
+
+Deno.test("empty dashboard KPI values are displayed as unavailable instead of zero",()=>{
+  assert(html.includes("available?eur(d.revenue):'—'"),"Revenue KPI does not distinguish no data from zero");
+  assert(html.includes("available?pct(d.margin):'—'"),"Margin KPI does not distinguish no data from zero");
+  assert(html.includes("available?eur(d.shrink):'—'"),"Shrink KPI does not distinguish no data from zero");
+});
+
+Deno.test("an untouched month is not reported as several confirmed zeroes",()=>{
+  const data:any={months:{},settings:{targetMargins:{}}};
+  const GROUPS=[["backshop","Backwaren",59.2],["kaffee","Kaffee",55],["süsswaren","Süßwaren",50],["drogerie","Drogerie",50],["lebensmittel","Lebensmittel",50],["spielzeug","Spielzeug",45],["waschen","Waschen",0],["getraenke","Getränke",50],["eis","Eis",56.8]];
+  const settings=()=>({targetMargins:{}}),mrow=(k:string)=>data.months[k]||(data.months[k]={revenue:0,ek:0,shrink:0,writeoff:0,stock:0,groups:{}}),prev=()=>null,eur=(v:number)=>String(v);
+  const calc=appFunction("calc","reconciliation",["GROUPS","data","settings","mrow"],{GROUPS,data,settings,mrow});
+  const quality=appFunction("dataQuality","hasData",["data","mrow","calc","prev","eur"],{data,mrow,calc,prev,eur});
+  const result=quality("2026-10");
+  assert(result.status==="check","Untouched month should be marked not yet assessable");
+  assert(result.notes.length===1&&result.notes[0].includes("Noch keine Monatsdaten erfasst"),"Untouched month should have one clear missing-data note");
+});
+
+Deno.test("missing or zero Shop EK cannot produce a fabricated gross profit or margin",()=>{
+  const rt=runtime(appFixture());
+  const row=rt.data.months["2026-10"];
+  row.inventoryEkEntered=false; row.ek=0;
+  let result=rt.calc("2026-10");
+  assert(result.ek===null&&result.gross===null&&result.margin===null,"Blank EK produced financial totals");
+  assert(rt.dataQuality("2026-10").notes.some((n:string)=>n.includes("Shop-EK fehlt")),"Missing EK warning absent");
+  row.inventoryEkEntered=true; row.ek=0;
+  result=rt.calc("2026-10");
+  assert(result.ek===null&&result.gross===null&&result.margin===null,"Zero EK produced a false margin");
+  assert(rt.dataQuality("2026-10").notes.some((n:string)=>n.includes("Shop-EK = 0,00 €")),"Explicit zero EK was not flagged");
+});
+
+Deno.test("admin error reports load only when the collapsed panel is opened",()=>{
+  assert(!homepage.includes("loadSnapshotRecoveryStations();loadAdminAppErrorReports();loadIdeaSuggestions();"),"Error reports are still fetched during the full admin bootstrap");
+  assert(homepage.includes("$('appErrorReportsPanel')?.addEventListener('toggle'"),"Lazy-load toggle handler is missing");
+  assert(homepage.includes("adminAppErrorReportsLoading"),"In-flight guard for error-report loading is missing");
+});
+
+Deno.test("explicit zero Shop EK remains visible in the monthly input",()=>{
+  assert(html.includes("$('ek').value=r.inventoryEkEntered===true?String(r.ek??0)"),"The monthly form hides a previously confirmed zero EK");
+});
+
+Deno.test("shrink KPI does not fabricate a zero month-over-month delta",()=>{
+  assert(html.includes("shrinkDelta===null?'keine Vergleichsbasis':fmtPts(shrinkDelta)+' zum Vormonat'"),"Missing comparison month is shown as a zero shrink change");
+});
