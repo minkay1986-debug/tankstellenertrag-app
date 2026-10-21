@@ -26,7 +26,8 @@
  if(!window.supabase||!cfg?.url||!cfg?.publishableKey){say('Supabase-Konfiguration fehlt.','error');return}
  const client=window.TANKSTELLENERTRAG_CLIENT||window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:'tankstellenertrag-auth',storage:window.localStorage}});
  const {data:{session},error:sessionError}=await client.auth.getSession();
- if(sessionError){say('Anmeldesitzung konnte nicht gelesen werden. Bitte auf der Startseite neu anmelden und erneut öffnen.','error');return}\n if(!session){say('Keine aktive Anmeldung gefunden. Bitte auf der Startseite anmelden und diese Seite danach erneut öffnen.','error');return}
+ if(sessionError){say('Anmeldesitzung konnte nicht gelesen werden. Bitte auf der Startseite neu anmelden und erneut öffnen.','error');return}
+ if(!session){say('Keine aktive Anmeldung gefunden. Bitte auf der Startseite anmelden und diese Seite danach erneut öffnen.','error');return}
  if((session.user?.email||'').toLowerCase()!=='svenkrick@gmx.de'){say('Zugriff verweigert: Dieses Konto ist nicht als Administrator freigeschaltet.','error');return}
  async function load(){
   say('Vorschläge werden geladen …');
