@@ -124,3 +124,14 @@ Deno.test("empty dashboard KPI values are displayed as unavailable instead of ze
   assert(html.includes("available?pct(d.margin):'—'"),"Margin KPI does not distinguish no data from zero");
   assert(html.includes("available?eur(d.shrink):'—'"),"Shrink KPI does not distinguish no data from zero");
 });
+
+Deno.test("an untouched month is not reported as several confirmed zeroes",()=>{
+  const data:any={months:{},settings:{targetMargins:{}}};
+  const GROUPS=[["backshop","Backwaren",59.2],["kaffee","Kaffee",55],["süsswaren","Süßwaren",50],["drogerie","Drogerie",50],["lebensmittel","Lebensmittel",50],["spielzeug","Spielzeug",45],["waschen","Waschen",0],["getraenke","Getränke",50],["eis","Eis",56.8]];
+  const settings=()=>({targetMargins:{}}),mrow=(k:string)=>data.months[k]||(data.months[k]={revenue:0,ek:0,shrink:0,writeoff:0,stock:0,groups:{}}),prev=()=>null,eur=(v:number)=>String(v);
+  const calc=appFunction("calc","reconciliation",["GROUPS","data","settings","mrow"],{GROUPS,data,settings,mrow});
+  const quality=appFunction("dataQuality","hasData",["data","mrow","calc","prev","eur"],{data,mrow,calc,prev,eur});
+  const result=quality("2026-10");
+  assert(result.status==="check","Untouched month should be marked not yet assessable");
+  assert(result.notes.length===1&&result.notes[0].includes("Noch keine Monatsdaten erfasst"),"Untouched month should have one clear missing-data note");
+});
