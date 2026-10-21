@@ -2,6 +2,7 @@ import "./ertragsoptimierer.js";
 const optimizer = (globalThis as any).TankstellenErtragsoptimierer;
 if (!optimizer) throw new Error("Ertragsoptimierer API wurde nicht geladen");
 const html = await Deno.readTextFile(new URL("./analyse.html", import.meta.url));
+const homepage = await Deno.readTextFile(new URL("./index.html", import.meta.url));
 const assert = (ok: unknown, message: string) => { if (!ok) throw new Error(message); };
 const months = Array.from({length:24},(_,i)=>{const year=2025+Math.floor(i/12),month=i%12+1;const seasonal=[.86,.88,.93,.96,1.02,1.08,1.16,1.13,1.04,.99,.94,1.12][month-1];const revenue=Math.round(100000*seasonal*(year===2026?1.04:1)*100)/100;const marginPct=year===2026&&month>=6?48:52;const shrinkPct=year===2026&&month===10?3.2:.8;return{key:`${year}-${String(month).padStart(2,"0")}`,year,month,revenue,ek:revenue*(1-marginPct/100),marginPct,shrinkPct};});
 Deno.test("24-month fixture covers two complete years without duplicate keys",()=>{assert(months.length===24,"Expected 24 months");assert(months[0].key==="2025-01"&&months[11].key==="2025-12","2025 range incorrect");assert(months[12].key==="2026-01"&&months[23].key==="2026-12","2026 range incorrect");assert(new Set(months.map(x=>x.key)).size===24,"Duplicate month key");});
@@ -147,4 +148,10 @@ Deno.test("missing or zero Shop EK cannot produce a fabricated gross profit or m
   result=rt.calc("2026-10");
   assert(result.ek===null&&result.gross===null&&result.margin===null,"Zero EK produced a false margin");
   assert(rt.dataQuality("2026-10").notes.some((n:string)=>n.includes("Shop-EK = 0,00 €")),"Explicit zero EK was not flagged");
+});
+
+Deno.test("admin error reports load only when the collapsed panel is opened",()=>{
+  assert(!homepage.includes("loadSnapshotRecoveryStations();loadAdminAppErrorReports();loadIdeaSuggestions();"),"Error reports are still fetched during the full admin bootstrap");
+  assert(homepage.includes("$('appErrorReportsPanel')?.addEventListener('toggle'"),"Lazy-load toggle handler is missing");
+  assert(homepage.includes("adminAppErrorReportsLoading"),"In-flight guard for error-report loading is missing");
 });
