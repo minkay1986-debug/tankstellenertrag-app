@@ -339,6 +339,61 @@ p,.small,.label,.sub{color:var(--tse-glass-muted)}
 }
 
 </style>
+
+<style id="ocean-glass-reference-refinement">
+/* Ocean Blue Glass — Feinabstimmung nach mobiler Referenz */
+:root{
+  --og-navy-0:#030b18;
+  --og-navy-1:#06172d;
+  --og-navy-2:#0a2850;
+}
+html,body{
+  background-color:var(--og-navy-0)!important;
+  background-image:
+    radial-gradient(ellipse 78% 58% at 78% 13%,rgba(24,104,190,.32) 0%,rgba(14,63,125,.18) 38%,transparent 74%),
+    radial-gradient(ellipse 62% 64% at 12% 55%,rgba(13,77,142,.27) 0%,transparent 72%),
+    linear-gradient(138deg,#071b35 0%,#06152b 48%,#030a16 100%)!important;
+  background-attachment:fixed!important;
+}
+#app,.app,.layout,.main,.content,.workspace,.view{
+  background:transparent!important;
+}
+#stationInfo,.panel,.card,.view>.panel,.view>.card,.view .panel,.view .card,
+.view .step,.view .alert,.view .month-hero,.view .wow-card,
+#kpis .card,.study-context-card,.chat-message.assistant{
+  background:linear-gradient(138deg,rgba(17,48,83,.58) 0%,rgba(7,25,48,.48) 55%,rgba(4,16,32,.58) 100%)!important;
+  border:1px solid rgba(164,202,242,.20)!important;
+  box-shadow:inset 0 1px 0 rgba(229,242,255,.045),0 10px 28px rgba(0,4,14,.13)!important;
+  -webkit-backdrop-filter:blur(14px) saturate(125%);
+  backdrop-filter:blur(14px) saturate(125%);
+}
+.view .panel .panel,.view .card .card{
+  background:rgba(7,25,48,.28)!important;
+  border-color:rgba(164,202,242,.15)!important;
+}
+.nav,.sidebar{
+  background:linear-gradient(180deg,rgba(4,17,34,.94),rgba(3,12,25,.88))!important;
+  border-color:rgba(164,202,242,.16)!important;
+  -webkit-backdrop-filter:blur(16px);
+  backdrop-filter:blur(16px);
+}
+h1,h2,h3,h4,.card-title,.panel-title{color:#f1f7ff}
+p,.muted,.subtle,.description{color:rgba(218,231,247,.82)}
+@media(max-width:700px){
+  html,body{background-attachment:scroll!important}
+  .panel,.card,.view>.panel,.view>.card,.view .panel,.view .card{
+    border-radius:22px!important;
+  }
+}
+@media(prefers-reduced-transparency:reduce){
+  #stationInfo,.panel,.card,.view>.panel,.view>.card,.view .panel,.view .card,
+  .view .step,.view .alert,.view .month-hero,.view .wow-card,#kpis .card{
+    -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+    background:rgba(7,25,48,.88)!important;
+  }
+}
+</style>
+
 </head><body><div class="app"><aside class="side"><div class="brand">Tankstellen<span>Ertrag</span></div><div class="tag">Wirtschaftlichkeit · Warenwirtschaft · Ertrag</div><div class="panel" style="margin:0 0 16px;padding:11px;font-size:11px"><b>Aus der Tankstellenpraxis</b><br>für Tankstellen entwickelt.</div><div class="nav"><button class="active" data-v="dashboard">Übersicht</button><button data-v="meinmonat"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-6"/></svg> Mein Monat</button><button data-v="monthly">Monatsdaten</button><button data-v="analysis">Analyse</button><button data-v="advisorChat">Beratungs-Chat</button><button data-v="ask">Frag TankstellenErtrag</button><button data-v="community">Community · später</button><button type="button" id="navTeamPersonal" onclick="window.location.href='/personal-und-umsatzpotenzial-test.html'"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5.5a3 3 0 0 1 0 5.8M18 14a5 5 0 0 1 3 4.5"/></svg> Team &amp; Personal</button><button data-v="insights"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m19 15 .9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9Z"/></svg> Insights & KI</button><button data-v="forecast"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 0-4 12.7c.7.5 1 1.2 1 2.3h6c0-1.1.3-1.8 1-2.3A7 7 0 0 0 12 3Z"/><path d="M9 21h6M10 18h4M12 6v2M6.5 8.5 8 10M17.5 8.5 16 10"/></svg> Prognose & Ausblick</button><button data-v="radar"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg> Ertragsradar</button><button data-v="yearly">Jahresauswertung</button><button data-v="report">Beratungsbericht</button><button type="button" id="navDiniLove" class="dini-tab"><span class="dini-label"><span class="dini-icon">🥐</span>DiniLove</span><span class="dini-sub">Reste retten · Bistro</span></button><button data-v="feedback">⭐ Feedback</button><button data-v="sources">Branchenwissen</button><button data-v="settings">Beratungseinstellungen</button><button data-v="account"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg> Kundenkonto</button></div></aside><main class="main"><div id="gate" class="panel">Verbindung zur Station wird hergestellt …</div><div id="serverIncidentBanner" class="server-incident" role="status" aria-live="polite" hidden><span class="server-incident-mark" aria-hidden="true">i</span><div class="server-incident-copy"><strong>Vorübergehende Serverstörung</strong><span>Leider gibt es momentan serverseitige Störungen. Bis diese behoben sind, kann es zu Einschränkungen einzelner Funktionen kommen.</span></div><button type="button" class="server-incident-close" aria-label="Hinweis schließen" onclick="window.TSE_dismissServerNotice&&window.TSE_dismissServerNotice()">×</button></div><div id="app" style="display:none"><div id="stationInfo" class="panel"></div>
 <section id="dashboard" class="view active"><div class="top"><div><div class="eyebrow">Ihr Überblick</div><div class="h1">Stationsergebnis</div><p class="sub">Shop-Umsatz, Shop-Rohertrag, Shop-Marge, Schwund und Bestandsentwicklung auf einen Blick.<br><span class="small">Kraftstoff und Waschen werden separat betrachtet und nicht in die Shop-Marge einbezogen.</span></p></div><div class="badge">Geschützte Auswertung</div></div><div id="kpis" class="grid cards"></div><div id="dashAlerts" class="panel"></div><div class="panel"><h2>Monatsentwicklung</h2><div id="trend"></div></div></section>
 <section id="meinmonat" class="view">
