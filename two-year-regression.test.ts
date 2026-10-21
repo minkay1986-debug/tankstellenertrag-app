@@ -40,10 +40,11 @@ function runtime(data:any) {
   const mrow = (k:string) => data.months[k];
   const prev = (k:string) => {const [y,mo]=k.split("-").map(Number);const d=new Date(y,mo-2,1);const p=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;return Object.hasOwn(data.months,p)?p:null;};
   const calc = appFunction("calc","reconciliation",["GROUPS","data","settings","mrow"],{GROUPS,data,settings,mrow});
+  const hasData = appFunction("hasData","keys",["data"],{data});
   const wowPriority = appFunction("wowPriority","riskLevel",["calc","prev","settings"],{calc,prev,settings});
   const keys = () => Object.keys(data.months).sort();
   const eur = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Number(v)||0);
-  const dataQuality = appFunction("dataQuality","hasData",["data","mrow","calc","prev","eur"],{data,mrow,calc,prev,eur});
+  const dataQuality = appFunction("dataQuality","hasData",["data","mrow","calc","prev","eur","hasData"],{data,mrow,calc,prev,eur,hasData});
   const pct = (v:number) => (Number(v)||0).toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1})+" %";
   const target = {value:"",innerHTML:""};
   const yearly = appFunction("yearly","economic",["keys","data","calc","eur","pct","$"],{keys,data,calc,eur,pct,$:(id:string)=>target});
@@ -134,4 +135,17 @@ Deno.test("an untouched month is not reported as several confirmed zeroes",()=>{
   const result=quality("2026-10");
   assert(result.status==="check","Untouched month should be marked not yet assessable");
   assert(result.notes.length===1&&result.notes[0].includes("Noch keine Monatsdaten erfasst"),"Untouched month should have one clear missing-data note");
+});
+
+Deno.test("missing or zero Shop EK cannot produce a fabricated gross profit or margin",()=>{
+  const rt=runtime(appFixture());
+  const row=rt.data.months["2026-10"];
+  row.inventoryEkEntered=false; row.ek=0;
+  let result=rt.calc("2026-10");
+  assert(result.ek===null&&result.gross===null&&result.margin===null,"Blank EK produced financial totals");
+  assert(rt.dataQuality("2026-10").notes.some((n:string)=>n.includes("Shop-EK fehlt")),"Missing EK warning absent");
+  row.inventoryEkEntered=true; row.ek=0;
+  result=rt.calc("2026-10");
+  assert(result.ek===null&&result.gross===null&&result.margin===null,"Zero EK produced a false margin");
+  assert(rt.dataQuality("2026-10").notes.some((n:string)=>n.includes("Shop-EK = 0,00 €")),"Explicit zero EK was not flagged");
 });
