@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Ideenbox moderieren · TankstellenErtrag</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js?v=20261021-ideas"></script>
+<style>
+:root{color-scheme:dark;--bg:#0d0f10;--panel:#181c1f;--line:#353c41;--text:#f5f6f7;--muted:#aeb6bc;--orange:#f47b20;--green:#45c477;--red:#ef6461;--yellow:#f0bd4f}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,sans-serif}.wrap{max-width:1050px;margin:auto;padding:24px 16px 48px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}.eyebrow{color:var(--orange);font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}h1{margin:5px 0 8px;font-size:clamp(25px,4vw,36px)}p{color:var(--muted)}.panel,.idea{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:16px}.status{padding:12px;border-radius:9px;background:#22272b;color:var(--muted);margin-top:12px}.status.error{color:#ffaaa7;border:1px solid #673535}.status.ok{color:#8ce2ad;border:1px solid #285c42}.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.btn{border:0;border-radius:8px;padding:10px 13px;font-weight:750;cursor:pointer}.primary{background:var(--orange);color:white}.secondary{background:#30363a;color:white}.approve{background:#1e3b2b;color:#8ce2ad}.reject{background:#3b2222;color:#ffaaa7}.btn:disabled{opacity:.55;cursor:wait}.idea-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.idea-text{white-space:pre-wrap;overflow-wrap:anywhere;font-size:16px;margin:12px 0}.meta{font-size:12px;color:var(--muted)}.tag{display:inline-block;padding:4px 8px;border-radius:20px;font-size:12px;background:#30363a}.tag.pending{color:var(--yellow)}.tag.approved{color:var(--green)}.tag.rejected{color:#ffaaa7}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.empty{padding:28px;text-align:center;color:var(--muted)}a{color:#ffb477}.hidden{display:none!important}@media(max-width:600px){.wrap{padding:16px 12px}.panel,.idea{padding:14px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+ <div class="top"><div><div class="eyebrow">Interne Administration</div><h1>Ideenbox moderieren</h1><p>Vorschläge prüfen, bevor sie gegebenenfalls veröffentlicht oder weiterverwendet werden.</p></div><div class="toolbar"><button id="refresh" class="btn secondary" type="button">Aktualisieren</button><button id="logout" class="btn secondary" type="button">Abmelden</button></div></div>
+ <div class="panel"><strong>Sicherheitsregeln</strong><p>Nur das angemeldete Administratorkonto svenkrick@gmx.de darf diese Liste lesen und Bewertungen setzen. Öffentliche Besucher können Vorschläge einreichen, aber weder die Liste lesen noch ihren Status ändern. „Freigegeben“ macht einen Vorschlag nicht automatisch öffentlich sichtbar.</p><div id="status" class="status" role="status" aria-live="polite">Anmeldung wird geprüft …</div></div>
+ <section id="ideas" aria-label="Eingereichte Ideen"></section>
+</main>
+<script>
+(async()=>{
+ const statusEl=document.getElementById('status'), listEl=document.getElementById('ideas');
+ const say=(message,type='')=>{statusEl.textContent=message;statusEl.className='status'+(type?' '+type:'')};
+ const cfg=window.TANKSTELLENERTRAG_SUPABASE;
+ if(!window.supabase||!cfg?.url||!cfg?.publishableKey){say('Supabase-Konfiguration fehlt.','error');return}
+ const client=window.supabase.createClient(cfg.url,cfg.publishableKey);
+ const {data:{session},error:sessionError}=await client.auth.getSession();
+ if(sessionError||!session){say('Bitte zuerst auf der Startseite anmelden und dann diese Admin-Seite erneut öffnen.','error');return}
+ if((session.user?.email||'').toLowerCase()!=='svenkrick@gmx.de'){say('Zugriff verweigert: Dieses Konto ist nicht als Administrator freigeschaltet.','error');return}
+ async function load(){
+  say('Vorschläge werden geladen …');
+  const {data,error}=await client.rpc('get_admin_idea_suggestions');
+  if(error){say('Laden fehlgeschlagen. Die Datenbank-Migration muss zuerst eingespielt sein.','error');return}
+  listEl.replaceChildren();
+  if(!data?.length){listEl.innerHTML='<div class="panel empty">Noch keine Vorschläge vorhanden.</div>';say('Liste erfolgreich geladen.','ok');return}
+  for(const item of data){
+   const card=document.createElement('article');card.className='idea';
+   const head=document.createElement('div');head.className='idea-head';
+   const date=document.createElement('div');date.className='meta';date.textContent='Eingereicht: '+new Date(item.created_at).toLocaleString('de-DE');
+   const tag=document.createElement('span');tag.className='tag '+item.status;tag.textContent=({pending:'Offen',approved:'Freigegeben',rejected:'Abgelehnt'})[item.status]||item.status;
+   head.append(date,tag);
+   const text=document.createElement('div');text.className='idea-text';text.textContent=item.suggestion;
+   card.append(head,text);
+   if(item.reviewed_at){const reviewed=document.createElement('div');reviewed.className='meta';reviewed.textContent='Geprüft: '+new Date(item.reviewed_at).toLocaleString('de-DE')+(item.reviewed_by?' · '+item.reviewed_by:'');card.append(reviewed)}
+   if(item.status==='pending'){
+    const actions=document.createElement('div');actions.className='actions';
+    for(const [label,next,cls] of [['Freigeben','approved','approve'],['Ablehnen','rejected','reject']]){
+     const button=document.createElement('button');button.type='button';button.className='btn '+cls;button.textContent=label;
+     button.addEventListener('click',async()=>{if(!confirm(label+'?'))return;button.disabled=true;say('Status wird gespeichert …');const {error}=await client.rpc('review_idea_suggestion',{p_id:item.id,p_status:next});if(error){say('Speichern fehlgeschlagen. Bitte erneut versuchen.','error');button.disabled=false;return}await load()});
+     actions.append(button)
+    }
+    card.append(actions)
+   }
+   listEl.append(card)
+  }
+  say(data.length+' Vorschlag/Vorschläge geladen.','ok')
+ }
+ document.getElementById('refresh').addEventListener('click',load);
+ document.getElementById('logout').addEventListener('click',async()=>{await client.auth.signOut();location.href='./'});
+ await load();
+})();
+</script>
+</body>
+</html>
