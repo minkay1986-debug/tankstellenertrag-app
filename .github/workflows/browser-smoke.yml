@@ -31,7 +31,7 @@ jobs:
         with:
           deno-version: v2.x
       - name: Run calculation and two-year regression tests
-        run: deno test --allow-read --allow-unsafe-eval ertragsoptimierer.test.ts two-year-regression.test.ts
+        run: deno test --allow-read ertragsoptimierer.test.ts two-year-regression.test.ts
       - name: Install Playwright
         run: |
           npm install --no-save playwright
