@@ -40,11 +40,10 @@ function runtime(data:any) {
   const mrow = (k:string) => data.months[k];
   const prev = (k:string) => {const [y,mo]=k.split("-").map(Number);const d=new Date(y,mo-2,1);const p=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;return Object.hasOwn(data.months,p)?p:null;};
   const calc = appFunction("calc","reconciliation",["GROUPS","data","settings","mrow"],{GROUPS,data,settings,mrow});
-  const hasData = appFunction("hasData","keys",["data"],{data});
   const wowPriority = appFunction("wowPriority","riskLevel",["calc","prev","settings"],{calc,prev,settings});
   const keys = () => Object.keys(data.months).sort();
   const eur = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Number(v)||0);
-  const dataQuality = appFunction("dataQuality","hasData",["data","mrow","calc","prev","eur","hasData"],{data,mrow,calc,prev,eur,hasData});
+  const dataQuality = appFunction("dataQuality","hasData",["data","mrow","calc","prev","eur"],{data,mrow,calc,prev,eur});
   const pct = (v:number) => (Number(v)||0).toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1})+" %";
   const target = {value:"",innerHTML:""};
   const yearly = appFunction("yearly","economic",["keys","data","calc","eur","pct","$"],{keys,data,calc,eur,pct,$:(id:string)=>target});
@@ -115,7 +114,7 @@ Deno.test("missing top-level values are not reported as explicitly entered zeroe
 
 Deno.test("an explicitly entered zero remains visible as a data-quality check",()=>{
   const rt=runtime(appFixture());
-  rt.data.months["2026-10"].ek=0;
+  rt.data.months["2026-10"].ek=0; rt.data.months["2026-10"].inventoryEkEntered=true;
   const quality=rt.dataQuality("2026-10");
   assert(quality.notes.some((n:string)=>n.includes("Shop-EK = 0,00 €")),"Explicit zero should remain flagged for confirmation");
 });
