@@ -155,3 +155,7 @@ Deno.test("admin error reports load only when the collapsed panel is opened",()=
   assert(homepage.includes("$('appErrorReportsPanel')?.addEventListener('toggle'"),"Lazy-load toggle handler is missing");
   assert(homepage.includes("adminAppErrorReportsLoading"),"In-flight guard for error-report loading is missing");
 });
+
+Deno.test("explicit zero Shop EK remains visible in the monthly input",()=>{
+  assert(html.includes("$('ek').value=r.inventoryEkEntered===true?String(r.ek??0)"),"The monthly form hides a previously confirmed zero EK");
+});
