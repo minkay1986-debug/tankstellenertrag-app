@@ -47,10 +47,45 @@ jobs:
           const response = await page.goto('http://127.0.0.1:4173/analyse.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
           if (!response || !response.ok()) throw new Error('analyse.html returned HTTP ' + (response?.status() ?? 'no response'));
           await page.waitForTimeout(3000);
+          await page.screenshot({ path: 'ocean-glass-desktop.png', fullPage: true });
+          const glassAudit = await page.evaluate(() => {
+            const body = getComputedStyle(document.body);
+            const candidates = [...document.querySelectorAll('.panel,.card,#stationInfo')];
+            const sample = candidates.find(el => {
+              const r = el.getBoundingClientRect();
+              return r.width > 40 && r.height > 30;
+            });
+            const tile = sample ? getComputedStyle(sample) : null;
+            return {
+              bodyBackgroundImage: body.backgroundImage,
+              bodyBackgroundColor: body.backgroundColor,
+              sampleTileFound: Boolean(sample),
+              sampleTileBackground: tile?.backgroundColor ?? null,
+              sampleTileBackdropFilter: tile?.backdropFilter ?? null
+            };
+          });
+          if (!glassAudit.bodyBackgroundImage.includes('radial-gradient') ||
+              !glassAudit.bodyBackgroundImage.includes('linear-gradient')) {
+            throw new Error('Ocean-Blue background gradients are not applied: ' + JSON.stringify(glassAudit));
+          }
+          if (!glassAudit.sampleTileFound) throw new Error('No panel/card tile found for glass style audit');
           const title = await page.title();
           const bodyTextLength = await page.locator('body').innerText().then(t => t.trim().length);
           if (bodyTextLength < 20) throw new Error('Page body appears empty');
           if (pageErrors.length) throw new Error('Browser runtime errors:\n' + pageErrors.join('\n---\n'));
-          console.log(JSON.stringify({ url: page.url(), status: response.status(), title, bodyTextLength, pageErrors: pageErrors.length }, null, 2));
+          console.log(JSON.stringify({ url: page.url(), status: response.status(), title, bodyTextLength, pageErrors: pageErrors.length, glassAudit }, null, 2));
+          await page.setViewportSize({ width: 390, height: 844 });
+          await page.screenshot({ path: 'ocean-glass-mobile.png', fullPage: true });
           await browser.close();
           NODE
+
+      - name: Upload desktop and mobile visual snapshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocean-blue-glass-visual-review
+          path: |
+            ocean-glass-desktop.png
+            ocean-glass-mobile.png
+          if-no-files-found: warn
+          retention-days: 7
