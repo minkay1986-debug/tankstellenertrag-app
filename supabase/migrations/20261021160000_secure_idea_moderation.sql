@@ -2,6 +2,13 @@
 -- Public visitors can submit ideas but cannot read, change, approve, or delete them.
 -- Admin access is enforced by RLS; no SECURITY DEFINER functions are introduced.
 
+create table if not exists public.public_idea_suggestions (
+  id bigint generated always as identity primary key,
+  suggestion text not null check (char_length(trim(suggestion)) between 8 and 500),
+  created_at timestamptz not null default now()
+);
+alter table public.public_idea_suggestions enable row level security;
+
 alter table public.public_idea_suggestions
   add column if not exists status text not null default 'pending',
   add column if not exists reviewed_at timestamptz,
