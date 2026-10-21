@@ -4,7 +4,6 @@ on:
   pull_request:
     paths:
       - "supabase/functions/dwd-weather-history/**"
-      - ".github/workflows/test-dwd-weather-history.yml"
   workflow_dispatch:
 
 permissions:
