@@ -368,6 +368,31 @@ input:not([type=checkbox]):not([type=radio]),select,textarea,.field input,.field
   background:#fff!important;color:#111!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important;border-color:#ccc!important
  }
 }
+
+/* Final override: cards stay calm and dark; overrides the earlier bright site-wide glass rule */
+.app .card,.app .panel,.app .step,.app .alert,.app .wow-card,.app .investigation-card,
+.app .month-hero,.app .weather-day-card,.app .weather-dashboard,.app .custom-scenario-row,
+.app .study-context-card,.app .weather-tile,.app .grid>.card,.app .grid>.panel,
+.app .grid>div.card,.app .grid>div.panel{
+ background:linear-gradient(135deg,rgba(22,43,67,.48) 0%,rgba(13,29,49,.55) 55%,rgba(6,17,31,.66) 100%)!important;
+ border-color:rgba(151,184,216,.23)!important;
+ box-shadow:0 8px 22px rgba(0,0,0,.18),inset 0 1px 0 rgba(225,239,255,.07)!important;
+ -webkit-backdrop-filter:blur(18px) saturate(112%)!important;
+ backdrop-filter:blur(18px) saturate(112%)!important;
+}
+.app .card:hover,.app .panel:hover,.app .step:hover,.app .wow-card:hover,.app .investigation-card:hover{
+ background:linear-gradient(135deg,rgba(27,51,77,.54),rgba(8,22,39,.68))!important;
+ border-color:rgba(171,204,235,.32)!important;
+ box-shadow:0 10px 25px rgba(0,0,0,.20),inset 0 1px 0 rgba(225,239,255,.09)!important;
+}
+.app .month-hero,.app .report-month-hero{
+ border-top:1px solid rgba(151,184,216,.25)!important;
+}
+@media print{
+ .app .card,.app .panel,.app .step,.app .alert,.app .wow-card,.app .investigation-card,.app .month-hero,.app .weather-day-card,.app .weather-dashboard,.app .custom-scenario-row,.app .study-context-card,.app .weather-tile{
+  background:#fff!important;color:#111!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important;border:1px solid #9aa4ae!important
+ }
+}
 </style>
 </head><body><div class="app"><aside class="side"><div class="brand">Tankstellen<span>Ertrag</span></div><div class="tag">Wirtschaftlichkeit · Warenwirtschaft · Ertrag</div><div class="panel" style="margin:0 0 16px;padding:11px;font-size:11px"><b>Aus der Tankstellenpraxis</b><br>für Tankstellen entwickelt.</div><div class="nav"><button class="active" data-v="dashboard">Übersicht</button><button data-v="meinmonat"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-6"/></svg> Mein Monat</button><button data-v="monthly">Monatsdaten</button><button data-v="analysis">Analyse</button><button data-v="advisorChat">Beratungs-Chat</button><button data-v="ask">Frag TankstellenErtrag</button><button data-v="community">Community · später</button><button type="button" id="navTeamPersonal" onclick="window.location.href='/personal-und-umsatzpotenzial-test.html'"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5.5a3 3 0 0 1 0 5.8M18 14a5 5 0 0 1 3 4.5"/></svg> Team &amp; Personal</button><button data-v="insights"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m19 15 .9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9Z"/></svg> Insights & KI</button><button data-v="forecast"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 0-4 12.7c.7.5 1 1.2 1 2.3h6c0-1.1.3-1.8 1-2.3A7 7 0 0 0 12 3Z"/><path d="M9 21h6M10 18h4M12 6v2M6.5 8.5 8 10M17.5 8.5 16 10"/></svg> Prognose & Ausblick</button><button data-v="radar"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg> Ertragsradar</button><button data-v="yearly">Jahresauswertung</button><button data-v="report">Beratungsbericht</button><button type="button" id="navDiniLove" class="dini-tab"><span class="dini-label"><span class="dini-icon">🥐</span>DiniLove</span><span class="dini-sub">Reste retten · Bistro</span></button><button data-v="feedback">⭐ Feedback</button><button data-v="sources">Branchenwissen</button><button data-v="settings">Beratungseinstellungen</button><button data-v="account"><svg class="navIcon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg> Kundenkonto</button></div></aside><main class="main"><div id="gate" class="panel">Verbindung zur Station wird hergestellt …</div><div id="serverIncidentBanner" class="server-incident" role="status" aria-live="polite" hidden><span class="server-incident-mark" aria-hidden="true">i</span><div class="server-incident-copy"><strong>Vorübergehende Serverstörung</strong><span>Leider gibt es momentan serverseitige Störungen. Bis diese behoben sind, kann es zu Einschränkungen einzelner Funktionen kommen.</span></div><button type="button" class="server-incident-close" aria-label="Hinweis schließen" onclick="window.TSE_dismissServerNotice&&window.TSE_dismissServerNotice()">×</button></div><div id="app" style="display:none"><div id="stationInfo" class="panel"></div>
 <section id="dashboard" class="view active"><div class="top"><div><div class="eyebrow">Ihr Überblick</div><div class="h1">Stationsergebnis</div><p class="sub">Shop-Umsatz, Shop-Rohertrag, Shop-Marge, Schwund und Bestandsentwicklung auf einen Blick.<br><span class="small">Kraftstoff und Waschen werden separat betrachtet und nicht in die Shop-Marge einbezogen.</span></p></div><div class="badge">Geschützte Auswertung</div></div><div id="kpis" class="grid cards"></div><div id="dashAlerts" class="panel"></div><div class="panel"><h2>Monatsentwicklung</h2><div id="trend"></div></div></section>
