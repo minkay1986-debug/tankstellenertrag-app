@@ -159,3 +159,7 @@ Deno.test("admin error reports load only when the collapsed panel is opened",()=
 Deno.test("explicit zero Shop EK remains visible in the monthly input",()=>{
   assert(html.includes("$('ek').value=r.inventoryEkEntered===true?String(r.ek??0)"),"The monthly form hides a previously confirmed zero EK");
 });
+
+Deno.test("shrink KPI does not fabricate a zero month-over-month delta",()=>{
+  assert(html.includes("shrinkDelta===null?'keine Vergleichsbasis':fmtPts(shrinkDelta)+' zum Vormonat'"),"Missing comparison month is shown as a zero shrink change");
+});
