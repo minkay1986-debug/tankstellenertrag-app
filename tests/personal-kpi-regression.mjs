@@ -28,7 +28,7 @@ assert.match(monthHandler, /fill\(\)/);
 // Save path must preserve both values in the month row and invoke the established persistence flow.
 const saveHandler = between("$('saveMonth').onclick=", ";['openingStock'");
 assert.match(saveHandler, /r\.staffCosts=staffRaw===''\?null:Number\(staffRaw\)/);
-assert.match(saveHandler, /r\.staffCostsComplete=\$('staffCostsComplete'\)\.checked/);
+assert.ok(saveHandler.includes("r.staffCostsComplete=$('staffCostsComplete').checked"));
 assert.match(saveHandler, /await persist\(\)/);
 assert.match(html, /function saveLocal\(\)\{try\{localStorage\.setItem\('tse_current',JSON\.stringify\(data\)\)/);
 assert.match(html, /async function persist\(\)\{saveLocal\(\);try\{await cloudSave\(\)/);
