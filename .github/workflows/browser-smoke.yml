@@ -131,6 +131,21 @@ jobs:
               return { id:item.id, intent:item.intent, question:item.question, must_not:item.must_not, answer:'', knowledge:'', answerEmpty:true, knowledgeHit:false, technicalError:true, error:String(error?.message || error) };
             }
           }), questions);
+          const directAnswerChecks = await page.evaluate(() => {
+            const cases = [
+              { id: 'direct-margin-vs-gross-profit', question: 'Kannst du Marge und Rohertrag verständlich auseinanderhalten?', must: ['Eurobetrag', 'Anteil am Umsatz'] },
+              { id: 'direct-more-sales-not-automatic-profit', question: 'Wenn ich mehr verkaufe, verdiene ich dann automatisch mehr?', must: ['nicht automatisch', 'Wareneinsatz'] },
+              { id: 'direct-low-margin-causes', question: 'Welche Gründe könnten hinter meiner niedrigen Marge stecken?', must: ['Einkaufspreise', 'keine festgestellten Ursachen'] },
+              { id: 'direct-priority', question: 'Wo lohnt es sich, als Erstes genauer hinzusehen?', must: ['EK und Marge', 'Schwund und Abschriften'] },
+              { id: 'direct-missing-month-comparison', question: 'Verglichen mit dem Vormonat: ist mein Geschäft besser gelaufen?', must: ['keine echten Stationswerte', 'Kennzahl'] }
+            ];
+            return cases.map(c => {
+              const answer = String(advisorReply(c.question) || '').replace(/<[^>]*>/g, ' ').replace(/\\s+/g, ' ').trim();
+              return { id: c.id, pass: c.must.every(term => answer.toLowerCase().includes(term.toLowerCase())), missing: c.must.filter(term => !answer.toLowerCase().includes(term.toLowerCase())), answer };
+            });
+          });
+          const directAnswerFailures = directAnswerChecks.filter(x => !x.pass);
+          if (directAnswerFailures.length) throw new Error('Direct-answer regression failures: ' + JSON.stringify(directAnswerFailures));
           const summary = {
             generatedAt: new Date().toISOString(),
             page: 'analyse.html on isolated PR test branch',
@@ -140,6 +155,8 @@ jobs:
             knowledgeHits: results.filter(x=>x.knowledgeHit).length,
             technicalErrors: results.filter(x=>x.technicalError).length,
             browserErrors: errors,
+            directAnswerChecks,
+            directAnswerFailures: directAnswerFailures.length,
             results
           };
           const criteria = {
@@ -181,7 +198,7 @@ jobs:
           };
           await writeFile('advisor-100-question-benchmark.json', JSON.stringify(summary, null, 2));
           await writeFile('advisor-manual-scorecard.json', JSON.stringify(scorecard, null, 2));
-          console.log(JSON.stringify({questionCount:summary.questionCount,emptyAnswers:summary.emptyAnswers,knowledgeHits:summary.knowledgeHits,technicalErrors:summary.technicalErrors,browserErrors:errors.length,report:'advisor-100-question-benchmark.json'},null,2));
+          console.log(JSON.stringify({questionCount:summary.questionCount,emptyAnswers:summary.emptyAnswers,knowledgeHits:summary.knowledgeHits,technicalErrors:summary.technicalErrors,browserErrors:errors.length,directAnswerChecks:directAnswerChecks.length,directAnswerFailures:directAnswerFailures.length,report:'advisor-100-question-benchmark.json'},null,2));
           if (results.length !== 100 || summary.emptyAnswers || summary.technicalErrors || errors.length) {
             throw new Error('Benchmark found empty answers, technical errors, or browser errors; inspect uploaded JSON report.');
           }
