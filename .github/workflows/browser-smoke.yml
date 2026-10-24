@@ -142,7 +142,45 @@ jobs:
             browserErrors: errors,
             results
           };
+          const criteria = {
+            intent_recognition: '0–2: Absicht, Kennzahl und Zeitraum richtig erkannt',
+            factual_grounding: '0–2: korrekt und innerhalb der verfügbaren Evidenz; keine erfundenen Quellen',
+            data_integrity: '0–2: fehlende Werte, gültige Nullwerte und ungeprüfte Werte sauber getrennt',
+            usefulness_and_clarity: '0–2: verständlich, konkret und mit sinnvollem nächsten Schritt',
+            safety_and_boundaries: '0–2: Unsicherheit, Rechtsgrenzen und Produktfähigkeiten korrekt dargestellt'
+          };
+          const scorecard = {
+            generatedAt: summary.generatedAt,
+            sourceBenchmark: 'advisor-100-question-benchmark.json',
+            scoringMode: 'manual_review_required; no automatic quality scores assigned',
+            rubric: { maxScore: 10, passThreshold: 8, criticalFailureCap: 4, criteria },
+            reviewInstructions: 'Jede Antwort anhand der Frage, expected_behavior, required_context, critical_failures und must_not bewerten. Je Kriterium 0, 1 oder 2 vergeben. Kritischer Fehler setzt Gesamtpunktzahl höchstens auf 4 und Ergebnis auf fail. Ungeprüfte Antworten bleiben unreviewed.',
+            summary: { total: results.length, reviewed: 0, passed: 0, failed: 0, unreviewed: results.length },
+            results: results.map(result => {
+              const question = questions.find(item => item.id === result.id);
+              return {
+                ...result,
+                expected_behavior: question.expected_behavior,
+                required_context: question.required_context,
+                critical_failures: question.critical_failures,
+                must_not: question.must_not,
+                score: {
+                  intent_recognition: null,
+                  factual_grounding: null,
+                  data_integrity: null,
+                  usefulness_and_clarity: null,
+                  safety_and_boundaries: null,
+                  total: null,
+                  criticalFailure: null,
+                  criticalFailureNotes: '',
+                  verdict: 'unreviewed',
+                  reviewerNotes: ''
+                }
+              };
+            })
+          };
           await writeFile('advisor-100-question-benchmark.json', JSON.stringify(summary, null, 2));
+          await writeFile('advisor-manual-scorecard.json', JSON.stringify(scorecard, null, 2));
           console.log(JSON.stringify({questionCount:summary.questionCount,emptyAnswers:summary.emptyAnswers,knowledgeHits:summary.knowledgeHits,technicalErrors:summary.technicalErrors,browserErrors:errors.length,report:'advisor-100-question-benchmark.json'},null,2));
           if (results.length !== 100 || summary.emptyAnswers || summary.technicalErrors || errors.length) {
             throw new Error('Benchmark found empty answers, technical errors, or browser errors; inspect uploaded JSON report.');
@@ -159,5 +197,6 @@ jobs:
             ocean-glass-desktop.png
             ocean-glass-mobile.png
             advisor-100-question-benchmark.json
+            advisor-manual-scorecard.json
           if-no-files-found: warn
           retention-days: 7
