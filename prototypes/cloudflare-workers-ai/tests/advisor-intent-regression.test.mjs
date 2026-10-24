@@ -96,8 +96,8 @@ test("zero, missing data and causality guardrails are explicitly represented in 
   const corpus = await loadCorpus();
   const questions = corpus.map(x => x.question.toLowerCase()).join("\n");
   const guardrails = corpus.map(x => x.must_not.toLowerCase()).join("\n");
-  assert.match(questions, /einkauf ist null/);
-  assert.match(questions, /keine daten für den einkauf/);
+  assert.match(questions, /ek steht 0|einkauf ist null/);
+  assert.match(questions, /fehlt der ek-wert|keine daten für den einkauf/);
   assert.match(guardrails, /ursache/);
   assert.match(guardrails, /fehlenden ek/);
 });
