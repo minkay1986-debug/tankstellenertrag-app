@@ -1050,13 +1050,13 @@ function advisorDirectAnswer(raw){
  // Answer straightforward educational questions directly instead of dumping dashboard metrics.
  // Route common operational questions to focused, evidence-bounded guidance.
  // Do not invent station-specific causes, sales forecasts, or order quantities when required data is absent.
- if(/\b(was soll ich bestellen|wie viel soll ich bestellen|bestellmenge|zu viel bestellt|zu wenig bestellt|nachbestellen|uberbestand|zu viel auf lager|ladenhuter|liegt zu lange im regal)\b/.test(q)){
+ if(/\b(was soll ich bestellen|wie viel soll ich(?: [a-z]+){0,2} bestellen|bestellmenge|zu viel bestellt|zu wenig bestellt|nachbestellen|uberbestand|zu viel auf lager|liegt zu lange im regal)\b/.test(q)){
   return '<b>Bestellmenge nicht aus dem Bauch heraus festlegen</b><p>Für eine belastbare Empfehlung brauche ich mindestens Artikelabsatz im vergleichbaren Zeitraum, aktuellen Bestand, Lieferzeit und Bestellrhythmus. Bei schnell verderblicher Ware kommen Haltbarkeit und erwartete Nachfrage hinzu.</p><p><b>Prüfe zuerst:</b> Absatz je Artikel, Bestand und offene Lieferungen; gleiche Wochentage und Aktionen berücksichtigen. Ohne diese Werte nenne ich keine scheinbar exakte Bestellmenge.</p>';
  }
  if(/\b(abgelaufen|mhd|verdirbt|verderb|wegwerfen|weggeworfen|abschriften|backwaren ubrig|backwaren bleiben|nicht mehr frisch)\b/.test(q)){
   return '<b>Verderb und Abschriften eingrenzen</b><p>Trenne dokumentierte Abschriften von vermutetem Verderb. Prüfe Artikel, Menge, Datum/Uhrzeit, Einkaufsmenge und Absatz bis zum Ablauf. Bei Backwaren sind insbesondere Tagesabsatz, Produktions-/Liefermenge und Restmenge je Wochentag hilfreich.</p><p>Ohne diese Daten lässt sich die Ursache nicht sicher feststellen. Teste kleinere Nachbestell- oder Produktionsmengen schrittweise und vergleiche Abschriften und Verfügbarkeit, statt pauschal den Bestand zu reduzieren.</p>';
  }
- if(/\b(regal leer|regalluck|nicht verfugbar|standig ausverkauft|artikel fehlt|artikel nicht da|fehlt im regal|ausverkauft)\b/.test(q)){
+ if(/\b(regal(?:e|er)?(?: standig)? leer|regalluck|nicht verfugbar|standig ausverkauft|artikel fehlt|artikel nicht da|fehlt im regal|ausverkauft)\b/.test(q)){
   return '<b>Regallücken gezielt prüfen</b><p>Eine leere Regalfläche kann durch zu geringe Disposition, verspätete Lieferung, nicht eingeräumte Ware oder eine falsche Bestandsbuchung entstehen. Prüfe zuerst Regalbestand gegen Lagerbestand, letzte Lieferung, Lieferzeit und Absatz des Artikels.</p><p>Ein möglicher Umsatzverlust ist ohne Nachfrage- und Verfügbarkeitsdaten nicht bezifferbar. Dokumentiere betroffene Artikel und Zeitfenster, bevor du eine Ursache festlegst.</p>';
  }
  if(/\b(sortiment optimieren|welcher artikel lohnt|was soll raus|was fliegt raus|auslisten|verkauft sich nicht|steht nur rum|regalplatz|ladenhuter)\b/.test(q)){
