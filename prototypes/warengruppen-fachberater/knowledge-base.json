@@ -1,6 +1,6 @@
 {
-  "version": "0.2.0",
-  "description": "Fachwissensbestand für den TankstellenErtrag-Beratungs-Chat. Enthält allgemeine Prüfansätze sowie ausgewählte veröffentlichte Branchen- und Handelsquellen. Fremdbenchmarks sind ausdrücklich nicht als Tankstellen-Sollwerte zu verwenden; methodische Einschränkungen sind je Eintrag dokumentiert.",
+  "version": "0.3.0",
+  "description": "Fachwissensbestand für den TankstellenErtrag-Beratungs-Chat. Enthält allgemeine Prüfansätze sowie ausgewählte veröffentlichte Branchen- und Handelsquellen. Fremdbenchmarks sind ausdrücklich nicht als Tankstellen-Sollwerte zu verwenden; methodische Einschränkungen sind je Eintrag dokumentiert. Quellen werden nur verlinkt und in eigenen Worten zusammengefasst; keine Volltexte, Tabellen oder Abbildungen werden ohne Nutzungsrecht übernommen. Allgemeine Handels-/Forschungsbefunde werden als nicht tankstellenspezifisch gekennzeichnet.",
   "entries": [
     {
       "id": "margin-diagnosis-001",
@@ -488,6 +488,92 @@
       "sourceUrl": "https://www.bft.de/download_file/force/623",
       "sourceDate": "2025 (zitiert wird B&G Shopper Monitor 2024)",
       "limitations": "Öffentlich sichtbarer Fachmagazin-Auszug ist eine Sekundärquelle. Die dargestellten Preiswahrnehmungen sind keine experimentelle Messung der Preiselastizität und belegen keine kausale Wirkung einer Preissenkung."
+    },
+    {
+      "id": "source-gs1-optimal-shelf-availability",
+      "title": "GS1 Germany – Optimal Shelf Availability (Regalverfügbarkeit)",
+      "keywords": [
+        "gs1",
+        "regallücke",
+        "regallücken",
+        "out of stock",
+        "out-of-stock",
+        "verfügbarkeit",
+        "verfuegbarkeit",
+        "warenverfügbarkeit",
+        "nachschub",
+        "absatzverlust",
+        "fehlbestand",
+        "lieferfähigkeit",
+        "lieferfaehigkeit"
+      ],
+      "tags": [
+        "regalverfügbarkeit",
+        "disposition",
+        "retail-transfer"
+      ],
+      "questionHints": [
+        "was kosten regallücken",
+        "wie vermeide ich out of stock",
+        "warum ist artikel nicht verfügbar",
+        "regalverfügbarkeit verbessern"
+      ],
+      "answer": "GS1 Germany beschreibt Optimal Shelf Availability als Konzept zur Verbesserung der Warenverfügbarkeit am Verkaufsort. Wenn ein Artikel fehlt, kann ein Kunde auf eine Alternative ausweichen, anderswo kaufen oder auf den Kauf verzichten. Für eine Station ist das ein plausibler Prüfansatz; daraus lässt sich ohne eigene Messung kein pauschaler Euro-Verlust je Regallücke ableiten.",
+      "checklist": [
+        "Regallücken und tatsächliche Nichtverfügbarkeit getrennt erfassen.",
+        "Ursache prüfen: nicht bestellt, Lieferproblem, Bestand falsch, Ware im Lager oder Regalpflege.",
+        "Fehlzeiten, Absatz und Warengruppe über einen vergleichbaren Zeitraum auswerten.",
+        "Möglichen entgangenen Umsatz nur als Schätzung mit offengelegten Annahmen ausweisen."
+      ],
+      "evidenceLabel": "Fachkonzept eines Branchenstandards; allgemeiner Handel, keine Tankstellen-Verluststudie",
+      "sourceTitle": "GS1 Germany – Effizientes Supply Chain Management / Optimal Shelf Availability",
+      "sourceUrl": "https://www.gs1-germany.de/branchen-themen/scm-supply-chain-management/",
+      "sourceDate": "Webseite geprüft am 24.10.2026",
+      "limitations": "Die öffentlich zugängliche Seite beschreibt das Konzept, belegt aber keinen festen Verlustbetrag pro Regal-Lücke und keine spezifische Wirkungshöhe für Tankstellen. Keine erfundene Pauschale als Benchmark verwenden."
+    },
+    {
+      "id": "source-fraunhofer-reif-food-waste",
+      "title": "Fraunhofer – Forschungsprojekt REIF: datenbasierte Absatz- und Produktionsplanung gegen Lebensmittelverluste",
+      "keywords": [
+        "fraunhofer",
+        "reif",
+        "lebensmittelverschwendung",
+        "food waste",
+        "backwaren",
+        "bäckerei",
+        "abschriften",
+        "verderb",
+        "mhd",
+        "haltbarkeit",
+        "absatzplanung",
+        "prognose",
+        "bestellplanung",
+        "lebensmittel"
+      ],
+      "tags": [
+        "abschriften",
+        "absatzplanung",
+        "forschung",
+        "retail-transfer"
+      ],
+      "questionHints": [
+        "wie kann ich backwaren abschriften senken",
+        "wie verderb reduzieren",
+        "wie daten für bestellplanung nutzen",
+        "gibt es forschung zu lebensmittelverlusten"
+      ],
+      "answer": "Das Fraunhofer-Projekt REIF untersuchte, wie datenbasierte Planung und die Zusammenführung von Informationen entlang der Lebensmittel-Wertschöpfungskette Lebensmittelverluste reduzieren können. Für Tankstellenshops lässt sich daraus die Prüffrage ableiten, ob Absatz, Bestand, Haltbarkeit und Abschriften gemeinsam betrachtet werden. Die Projektbeschreibung beweist jedoch nicht, dass ein bestimmter Algorithmus an einer einzelnen Tankstelle einen bestimmten Betrag spart.",
+      "checklist": [
+        "Für Backwaren und andere verderbliche Artikel Tagesabsatz und Abschriften nach Uhrzeit/Tag erfassen, soweit vorhanden.",
+        "Bestellmengen, Lieferzeiten, Aktionen und Feiertage als Kontext dokumentieren.",
+        "Testweise Prognose gegen einfache Baseline vergleichen und Fehler messen.",
+        "Einsparungen erst nach einem kontrollierten Vorher-Nachher-Vergleich mit vergleichbaren Zeiträumen beziffern."
+      ],
+      "evidenceLabel": "Öffentlich dokumentiertes Forschungsprojekt; nicht speziell für Tankstellen validiert",
+      "sourceTitle": "Fraunhofer IGCV – REIF: Resource-efficient, Economic and Intelligent Foodchain",
+      "sourceUrl": "https://www.igcv.fraunhofer.de/de/forschung/referenzprojekte/reif_kuenstliche_intelligenz_nachhaltigkeit_lebensmittelindustrie.html",
+      "sourceDate": "Projektlaufzeit 03/2020–02/2023; Webseite geprüft am 24.10.2026",
+      "limitations": "Forschungsprojekt mit Fokus auf Lebensmittel-Wertschöpfungsketten, nicht ein Beleg für konkrete Tankstellen-KPIs. Allgemeine Aussagen und Einsparungspotenziale nicht als garantierte Ergebnisse oder Stationsbenchmarks ausgeben."
     }
   ]
 }
