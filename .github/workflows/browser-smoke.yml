@@ -135,11 +135,16 @@ jobs:
             const cases = [
               { id: 'direct-margin-vs-gross-profit', question: 'Kannst du Marge und Rohertrag verständlich auseinanderhalten?', must: ['Eurobetrag', 'Anteil am Umsatz'] },
               { id: 'direct-more-sales-not-automatic-profit', question: 'Wenn ich mehr verkaufe, verdiene ich dann automatisch mehr?', must: ['nicht automatisch', 'Wareneinsatz'] },
-              { id: 'direct-low-margin-causes', question: 'Welche Gründe könnten hinter meiner niedrigen Marge stecken?', must: ['Einkaufspreise', 'keine festgestellten Ursachen'] },
               { id: 'direct-lost-profit-priority', question: 'Bei welchen Shop-Artikeln geht mir wahrscheinlich Ertrag verloren?', must: ['EK und Marge', 'Schwund und Abschriften'] },
               { id: 'direct-low-margin-causes', question: 'Welche Gründe könnten hinter meiner niedrigen Marge stecken?', must: ['Einkaufspreise', 'keine festgestellten Ursachen'] },
               { id: 'direct-priority', question: 'Wo lohnt es sich, als Erstes genauer hinzusehen?', must: ['EK und Marge', 'Schwund und Abschriften'] },
-              { id: 'direct-missing-month-comparison', question: 'Verglichen mit dem Vormonat: ist mein Geschäft besser gelaufen?', must: ['keine echten Stationswerte', 'Kennzahl'] }
+              { id: 'direct-missing-month-comparison', question: 'Verglichen mit dem Vormonat: ist mein Geschäft besser gelaufen?', must: ['keine echten Stationswerte', 'Kennzahl'] },
+              { id: 'direct-order-quantity', question: 'Wie viel soll ich morgen bestellen?', must: ['aktuellen Bestand', 'keine scheinbar exakte Bestellmenge'] },
+              { id: 'direct-expiry-waste', question: 'Warum muss ich so viele Backwaren wegwerfen?', must: ['Abschriften', 'Tagesabsatz'] },
+              { id: 'direct-shelf-gaps', question: 'Warum sind meine Regale ständig leer?', must: ['Regallücken', 'Lieferzeit'] },
+              { id: 'direct-assortment', question: 'Welche Ladenhüter soll ich auslisten?', must: ['Rohertrag in Euro', 'keine konkrete Streichliste'] },
+              { id: 'direct-pricing', question: 'Soll ich die Preise senken?', must: ['Rohertrag je Stück', 'vor und nach einer Änderung'] },
+              { id: 'direct-clarification', question: 'Erklär das bitte einfacher, welche Zahl meinst du?', must: ['Umsatz', 'Marge in Prozent'] }
             ];
             return cases.map(c => {
               const answer = String(advisorReply(c.question) || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
