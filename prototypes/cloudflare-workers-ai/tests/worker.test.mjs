@@ -167,3 +167,26 @@ test("returns the model answer and model identifier on success", async () => {
   assert.equal(payload.model, "@cf/zai-org/glm-4.7-flash");
   assert.equal(payload.prototype, true);
 });
+
+
+test("system prompt requires natural understanding, targeted clarification, and evidence boundaries", async () => {
+  let captured;
+  const env = fakeEnv({
+    AI: {
+      run: async (_model, input) => {
+        captured = input;
+        return { response: "Meinst du den Umsatz oder den Rohertrag?" };
+      },
+    },
+  });
+  const response = await worker.fetch(request({
+    body: validBody({ question: "Warum bleibt so wenig hängen?" }),
+  }), env);
+  assert.equal(response.status, 200);
+  const systemPrompt = captured.messages.find(message => message.role === "system")?.content ?? "";
+  assert.match(systemPrompt, /Alltagssprache/);
+  assert.match(systemPrompt, /genau eine kurze, hilfreiche Rückfrage/);
+  assert.match(systemPrompt, /Erfinde keine Zahlen/);
+  assert.match(systemPrompt, /Ein fehlender Einkaufspreis ist nicht dasselbe wie null Einkaufskosten/);
+  assert.match(systemPrompt, /keine Ursache/);
+});
