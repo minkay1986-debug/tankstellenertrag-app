@@ -1,0 +1,280 @@
+{
+  "version": "0.1.0",
+  "description": "Starterbestand für den isolierten Warenwirtschafts-Fachberater. Keine personenbezogenen oder realen Stationsdaten. Einträge ohne verifizierte externe Quelle sind ausdrücklich allgemeine Prüfansätze, keine Studienergebnisse.",
+  "entries": [
+    {
+      "id": "margin-diagnosis-001",
+      "title": "Sinkende Marge systematisch untersuchen",
+      "keywords": [
+        "marge",
+        "rohertrag",
+        "wareneinsatz",
+        "einkaufspreis",
+        "verkaufspreis",
+        "preis",
+        "margenrückgang"
+      ],
+      "tags": [
+        "margenentwicklung",
+        "datenqualität"
+      ],
+      "questionHints": [
+        "sinkende marge",
+        "marge gesunken",
+        "warum ist meine marge gesunken"
+      ],
+      "answer": "Eine sinkende Marge ist zunächst ein Signal zur Ursachenprüfung, noch keine Erklärung. Vergleiche identische Zeiträume und Warengruppen und prüfe, ob Umsatz und Wareneinsatz nach derselben Abgrenzung erfasst wurden.",
+      "checklist": [
+        "Verkaufspreisänderungen und Einkaufspreise getrennt vergleichen.",
+        "Warengruppenmix und Aktionszeiträume berücksichtigen.",
+        "Rabatte, Abschriften und Schwund getrennt auswerten.",
+        "Fehlende oder verspätete EK-Werte sowie Importzuordnungen prüfen."
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz · keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Die Prüfliste benennt mögliche Ursachen, beweist aber keine davon. Für einen belastbaren Befund sind vollständige und vergleichbare Daten erforderlich."
+    },
+    {
+      "id": "shrinkage-controls-001",
+      "title": "Schwund von Abschriften und Bestandsfehlern trennen",
+      "keywords": [
+        "schwund",
+        "verlust",
+        "fehlbestand",
+        "inventur",
+        "bestandsdifferenz",
+        "diebstahl",
+        "abschrift",
+        "bruchschaeden"
+      ],
+      "tags": [
+        "bestandskontrolle",
+        "verlustanalyse"
+      ],
+      "questionHints": [
+        "schwund systematisch prüfen",
+        "unerklärter verlust"
+      ],
+      "answer": "Schwund, dokumentierte Abschriften, Buchungsfehler und rechnerische Bestandsdifferenzen sollten getrennt erfasst werden. Eine Differenz allein belegt weder Diebstahl noch eine bestimmte Ursache.",
+      "checklist": [
+        "Bestandsaufnahme und Buchungszeitpunkt abgleichen.",
+        "Abschriften, Bruch, Verderb und Retouren separat prüfen.",
+        "Wareneingänge, Lieferscheine und Artikelzuordnung kontrollieren.",
+        "Auffälligkeiten erst nach Datenprüfung als Hypothese untersuchen."
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz · keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Keine Aussage über einzelne Personen. Aus aggregierten Warenwirtschaftsdaten lässt sich keine individuelle Schuld ableiten."
+    },
+    {
+      "id": "ordering-001",
+      "title": "Bestellmengen anhand von Bedarf und Lieferbedingungen prüfen",
+      "keywords": [
+        "bestellung",
+        "bestellmenge",
+        "nachbestellung",
+        "lieferzeit",
+        "reichweite",
+        "bestand",
+        "lagerumschlag",
+        "mindestbestand",
+        "sicherheitsbestand"
+      ],
+      "tags": [
+        "disposition",
+        "bestand"
+      ],
+      "questionHints": [
+        "bestellmengen festlegen",
+        "wie viel soll ich bestellen"
+      ],
+      "answer": "Eine Bestellmenge sollte sich am erwarteten Absatz bis zur nächsten Lieferung, am verfügbaren Bestand und an den Lieferbedingungen orientieren. Eine pauschale Bestellregel ist ohne Artikel- und Lieferdaten nicht zuverlässig.",
+      "checklist": [
+        "Absatz im passenden Zeitraum und saisonale Schwankungen prüfen.",
+        "Verfügbaren Bestand und bereits bestellte Ware abziehen.",
+        "Lieferzeit, Mindestbestellmenge und Liefertage berücksichtigen.",
+        "Verderb, Haltbarkeit, Lagerkapazität und Kapitalbindung beachten."
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz · keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Die optimale Menge hängt von Artikel, Lieferant, Nachfrage und Betriebsablauf ab; dieser Eintrag berechnet keine konkrete Menge."
+    },
+    {
+      "id": "writeoffs-001",
+      "title": "Abschriften transparent und ursachenbezogen erfassen",
+      "keywords": [
+        "abschrift",
+        "abschriften",
+        "mhd",
+        "mindesthaltbarkeit",
+        "verderb",
+        "bruch",
+        "retoure",
+        "ware"
+      ],
+      "tags": [
+        "verlustanalyse",
+        "bestandskontrolle"
+      ],
+      "questionHints": [
+        "was bei abschriften beachten"
+      ],
+      "answer": "Abschriften sollten mit Betrag, Artikel beziehungsweise Warengruppe, Zeitraum und einem geeigneten Grund erfasst werden. So lassen sie sich von anderen Bestandsdifferenzen unterscheiden und im Zeitverlauf prüfen.",
+      "checklist": [
+        "Gründe einheitlich definieren, etwa Verderb, Bruch oder Beschädigung.",
+        "Erfassung zeitnah und nachvollziehbar halten.",
+        "Abschriftenquoten nur bei vergleichbarer Datenbasis vergleichen.",
+        "Bei auffälligen Mustern zuerst Prozess- und Datenfehler prüfen."
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz · keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Keine universelle Zielquote hinterlegt; konkrete Grenzwerte benötigen passende, belastbare Vergleichsdaten."
+    },
+    {
+      "id": "assortment-001",
+      "title": "Sortiment nicht allein nach Umsatz bewerten",
+      "keywords": [
+        "sortiment",
+        "artikel",
+        "warengruppe",
+        "regalplatz",
+        "platzierung",
+        "ladenhueter",
+        "umsatz",
+        "rohertrag",
+        "marge"
+      ],
+      "tags": [
+        "sortimentsanalyse",
+        "warengruppen"
+      ],
+      "questionHints": [
+        "artikel aus dem sortiment nehmen",
+        "sortiment verbessern"
+      ],
+      "answer": "Umsatz allein zeigt nicht, welchen wirtschaftlichen Beitrag ein Artikel leistet. Für eine Sortimentsentscheidung sollten mindestens Rohertrag, Absatztrend, Platzbedarf, Verfügbarkeit, Abschriften und die Funktion des Artikels im Sortiment betrachtet werden.",
+      "checklist": [
+        "Umsatz und Rohertrag gemeinsam betrachten.",
+        "Datenlücken bei EK oder Bestand sichtbar halten.",
+        "Saison und Aktionszeiträume berücksichtigen.",
+        "Vor Auslistung Ersatzartikel, Kundenbedarf und Lieferbedingungen prüfen."
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz · keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Keine pauschale Auslistungsempfehlung ohne Artikel- und Kontextdaten."
+    },
+    {
+      "id": "data-quality-001",
+      "title": "Datenqualität vor wirtschaftlicher Interpretation prüfen",
+      "keywords": [
+        "datenqualität",
+        "importfehler",
+        "fehlende daten",
+        "null",
+        "ek",
+        "einkaufspreis",
+        "wareneinsatz",
+        "daten korrekt",
+        "unvollständig"
+      ],
+      "tags": [
+        "datenprüfung",
+        "import"
+      ],
+      "questionHints": [
+        "welche daten fehlen",
+        "einkauf ist null",
+        "stimmen die daten"
+      ],
+      "answer": "Fehlende oder unplausible Werte müssen von echten Nullwerten unterschieden werden. Wenn der Einkaufspreis fehlt, kann eine daraus berechnete Marge unbrauchbar sein; fehlende Daten sind kein Beleg für null Kosten oder null Verluste.",
+      "checklist": [
+        "Fehlend, echter Nullwert und nicht anwendbar getrennt markieren.",
+        "Zeitraum, Währung, Steuerlogik und Warengruppenzuordnung prüfen.",
+        "Import auf Duplikate, verspätete Buchungen und fehlende Zeilen untersuchen.",
+        "Kennzahlen mit unzureichender Datengrundlage nicht als gesichert ausgeben."
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz · keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Validierung muss an das jeweilige Quellformat und die Definition der Kennzahl angepasst werden."
+    },
+    {
+      "id": "seasonality-001",
+      "title": "Saisonale Nachfrage nicht aus einem einzelnen Zeitraum ableiten",
+      "keywords": [
+        "saison",
+        "saisonal",
+        "wetter",
+        "temperatur",
+        "feiertag",
+        "vergleich",
+        "vorjahr",
+        "nachfrage"
+      ],
+      "tags": [
+        "absatzplanung",
+        "vergleich"
+      ],
+      "questionHints": [
+        "saisonale nachfrage",
+        "wetter und absatz"
+      ],
+      "answer": "Saisonale Effekte sollten möglichst anhand vergleichbarer Zeiträume, tatsächlicher Absatzdaten und relevanter Rahmenbedingungen geprüft werden. Ein einzelner warmer oder kalter Zeitraum beweist nicht, dass das Wetter eine Veränderung verursacht hat.",
+      "checklist": [
+        "Gleiche Kalenderwochen oder vergleichbare Zeiträume gegenüberstellen.",
+        "Aktionen, Öffnungszeiten und Verfügbarkeit als mögliche Einflussfaktoren notieren.",
+        "Wetterdaten nur als Kontext, nicht als alleinigen Kausalnachweis verwenden.",
+        "Vorhersagen als unsicher kennzeichnen."
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz · keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Keine Wetterhistorie und keine externen Daten werden in diesem Prototyp abgefragt."
+    },
+    {
+      "id": "benchmark-001",
+      "title": "Branchenbenchmarks auf Vergleichbarkeit prüfen",
+      "keywords": [
+        "benchmark",
+        "vergleichswert",
+        "branche",
+        "durchschnitt",
+        "studie",
+        "kennzahl",
+        "vergleich"
+      ],
+      "tags": [
+        "studienbewertung",
+        "benchmarking"
+      ],
+      "questionHints": [
+        "mit anderen tankstellen vergleichen",
+        "gibt es einen branchenwert"
+      ],
+      "answer": "Ein Branchenwert ist nur hilfreich, wenn Definition, Zeitraum, Warengruppenmix, Standorttyp, Betriebsmodell und Datenqualität ausreichend vergleichbar sind. Ein Wert aus dem allgemeinen Einzelhandel ist nicht automatisch auf Tankstellen übertragbar.",
+      "checklist": [
+        "Quelle, Veröffentlichungsdatum und untersuchte Stichprobe dokumentieren.",
+        "Kennzahlendefinition und Einheit prüfen.",
+        "Übertragbarkeit auf Tankstellenshops begründen.",
+        "Unterschiede und Unsicherheiten sichtbar ausweisen."
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz · keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Dieser Eintrag enthält selbst keinen Branchenbenchmark und behauptet keinen repräsentativen Tankstellen-Durchschnitt."
+    }
+  ]
+}
