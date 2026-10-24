@@ -144,7 +144,17 @@ jobs:
               { id: 'direct-shelf-gaps', question: 'Warum sind meine Regale ständig leer?', must: ['Regallücken', 'Lieferzeit'] },
               { id: 'direct-assortment', question: 'Welche Ladenhüter soll ich auslisten?', must: ['Rohertrag in Euro', 'keine konkrete Streichliste'] },
               { id: 'direct-pricing', question: 'Soll ich die Preise senken?', must: ['Rohertrag je Stück', 'vor und nach einer Änderung'] },
-              { id: 'direct-clarification', question: 'Erklär das bitte einfacher, welche Zahl meinst du?', must: ['Umsatz', 'Marge in Prozent'] }
+              { id: 'direct-clarification', question: 'Erklär das bitte einfacher, welche Zahl meinst du?', must: ['Umsatz', 'Marge in Prozent'] },
+              { id: 'review-ek-zero', question: 'Beim EK steht 0: bedeutet das wirklich, dass nichts eingekauft wurde?', must: ['echter Nullwert', 'Import', 'nicht sicher'] },
+              { id: 'review-shelf-recording', question: 'Wie lassen sich leere Regalfächer systematisch erfassen?', must: ['Artikel', 'Uhrzeit', 'Lagerbestand'] },
+              { id: 'review-ice-weather', question: 'Sollte ich bei den angekündigten warmen Tagen mehr Eis ordern?', must: ['keine konkrete Zusatzmenge', 'Bestände', 'Abschriften'] },
+              { id: 'review-chat-capabilities', question: 'Welche Aufgaben kann der Beratungs-Chat tatsächlich übernehmen?', must: ['führt keine Bestellung aus', 'vorhandenen', 'Daten'] },
+              { id: 'review-inputs', question: 'Welche Angaben sollte ich liefern, damit deine Empfehlungen belastbarer werden?', must: ['Zeitraum', 'gültigen EK', 'Lieferzeit'] },
+              { id: 'review-specific-change', question: 'Welche konkrete Änderung würdest du empfehlen und worauf stützt du sie?', must: ['Welchen Bereich', 'Umsatz', 'Marge'] },
+              { id: 'review-unclear-optimization', question: 'Kannst du das optimieren? Ich habe noch nicht gesagt, welchen Bereich ich meine.', must: ['Welchen Bereich', 'Umsatz', 'Schwund'] },
+              { id: 'review-evidence-vs-guess', question: 'Trenne bitte belegte Ergebnisse von Vermutungen.', must: ['Belegt', 'Vermutungen', 'ohne Beleg'] },
+              { id: 'review-simple-explanation', question: 'Erklär mir das so, dass ich es einem neuen Stationsmitarbeiter erklären kann.', must: ['alltagstaugliche', 'Welchen Begriff'] },
+              { id: 'review-contradiction', question: 'Vorhin klang deine Antwort anders. Kannst du den Widerspruch auflösen?', must: ['kopiere die beiden Aussagen', 'Zeitraum', 'Datenbasis'] }
             ];
             return cases.map(c => {
               const answer = String(advisorReply(c.question) || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
