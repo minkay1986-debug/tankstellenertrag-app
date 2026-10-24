@@ -11,7 +11,8 @@ Schema pro Zeile: `id`, `intent`, `question`, `must_not`, `notes`.
 
 ## Fragenkorpus (JSONL)
 
-```jsonl{"id":"Q001","intent":"loss_analysis","question":"Bei welchen Shop-Artikeln geht mir wahrscheinlich Ertrag verloren?","must_not":"Keine konkrete Ursache ohne Datenbeleg behaupten","notes":"Neu formulierte Variante; gezielt auf alltagssprachliche Formulierung und fachlich korrekte Zuordnung prüfen."}
+```jsonl
+{"id":"Q001","intent":"loss_analysis","question":"Bei welchen Shop-Artikeln geht mir wahrscheinlich Ertrag verloren?","must_not":"Keine konkrete Ursache ohne Datenbeleg behaupten","notes":"Neu formulierte Variante; gezielt auf alltagssprachliche Formulierung und fachlich korrekte Zuordnung prüfen."}
 {"id":"Q002","intent":"loss_analysis","question":"Warum bleibt am Monatsende trotz gutem Umsatz so wenig hängen?","must_not":"Rohertrag nicht mit Umsatz verwechseln","notes":"Neu formulierte Variante; gezielt auf alltagssprachliche Formulierung und fachlich korrekte Zuordnung prüfen."}
 {"id":"Q003","intent":"loss_analysis","question":"An welcher Stelle könnte ich unnötig Geld verschenken?","must_not":"Keine Verlustsumme erfinden","notes":"Neu formulierte Variante; gezielt auf alltagssprachliche Formulierung und fachlich korrekte Zuordnung prüfen."}
 {"id":"Q004","intent":"loss_analysis","question":"Welche Bereiche sollte ich zuerst auf mögliche Ertragsverluste untersuchen?","must_not":"Nur belegte Auffälligkeiten als solche nennen","notes":"Neu formulierte Variante; gezielt auf alltagssprachliche Formulierung und fachlich korrekte Zuordnung prüfen."}
