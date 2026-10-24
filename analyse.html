@@ -1127,37 +1127,37 @@ function advisorDirectAnswer(raw){
  }
 
  // Focused answers for remaining 100-question corpus misses. Keep claims bounded to actual UI/data.
- if(/\\b(welche angaben fehlen|welche daten fehlen|auswertung verlässlich|auswertung verlaesslich|wegen unvollständiger daten|wegen unvollstaendiger daten|daten.*vorsicht behandeln)\\b/.test(q)){
+ if(/\b(welche angaben fehlen|welche daten fehlen|auswertung verlässlich|auswertung verlaesslich|wegen unvollständiger daten|wegen unvollstaendiger daten|daten.*vorsicht behandeln)\b/.test(q)){
   return '<b>Welche Daten für eine verlässliche Auswertung nötig sind</b><p>Prüfe zuerst Zeitraum und Vollständigkeit von Umsatz, gültigem EK/Wareneinsatz und Warengruppenzuordnung. Für Bestands- oder Verlustfragen kommen Anfangsbestand, Wareneingänge, Endbestand sowie getrennte Schwund- und Abschriftendaten hinzu.</p><p>Ergebnisse mit fehlenden, ungeprüften oder nicht vergleichbaren Werten sind vorläufig. Ein fehlender Wert ist nicht dasselbe wie ein bestätigter Nullwert. Ich kann ohne Quellbelege nicht bestätigen, dass die Daten vollständig sind.</p>';
  }
- if(/\\b(bisherige monat|fairen vergleich|fairer vergleich|gleich vollständig|gleich vollstaendig|beide jahre gleich)\\b/.test(q)){
+ if(/\b(bisherige monat|fairen vergleich|fairer vergleich|gleich vollständig|gleich vollstaendig|beide jahre gleich)\b/.test(q)){
   return '<b>Vergleichbarkeit der Zeiträume prüfen</b><p>Ein laufender Monat ist meist noch nicht mit einem vollständigen Monat vergleichbar. Vergleiche möglichst dieselben abgeschlossenen Kalendertage oder dieselben Wochentage und berücksichtige Öffnungstage sowie fehlende Importe.</p><p>Für einen Vorjahresvergleich müssen beide Zeiträume gleich abgegrenzt und die benötigten Kennzahlen gleich vollständig sein. Ohne geprüfte Datenabdeckung kann ich nicht behaupten, dass beide Jahre gleich vollständig sind.</p>';
  }
- if(/\\b(wert ausdrücklich auf null|wert ausdrücklich auf null gesetzt|ausdrücklich auf null|warum wird er als problematisch markiert)\\b/.test(q)){
+ if(/\b(wert ausdrücklich auf null|wert ausdrücklich auf null gesetzt|ausdrücklich auf null|warum wird er als problematisch markiert)\b/.test(q)){
   return '<b>Expliziter Nullwert oder fehlender Wert?</b><p>Ein ausdrücklich gespeicherter Wert 0 ist nicht automatisch ein fehlender Wert. Die Prüfung sollte zwischen bestätigter Null, leerem Feld, Importfehler und noch ungeprüftem Wert unterscheiden.</p><p>Prüfe Quelle, Zeitraum und Importstatus. Wenn die Anwendung einen bestätigten Nullwert als problematisch markiert, sollte die Kennzeichnung den Grund nennen; ohne diese Angaben kann ich nicht feststellen, ob es sich um einen Fehler oder eine fachliche Plausibilitätswarnung handelt.</p>';
  }
- if(/\\b(welche ware läuft bald ab|welche ware laeuft bald ab|läuft bald ab|laeuft bald ab|zuerst kontrolliert werden)\\b/.test(q)){
+ if(/\b(welche ware läuft bald ab|welche ware laeuft bald ab|läuft bald ab|laeuft bald ab|zuerst kontrolliert werden)\b/.test(q)){
   return '<b>Ware mit kurzem MHD priorisieren</b><p>Für eine konkrete Liste brauche ich Artikel, MHD/Verfallsdatum, Menge und aktuellen Bestand. Prüfe zuerst die Ware mit dem frühesten Datum und ausreichend Bestand, dokumentiere die Kontrolle und beachte die geltenden Hygiene- und Kennzeichnungsvorgaben.</p><p>Ohne artikelgenaue MHD- und Bestandsdaten kann ich keine bestimmte Ware aus deiner Station nennen. Verkaufe oder verwende Ware nur, wenn sie dafür rechtlich und sicherheitlich geeignet ist.</p>';
  }
- if(/\\b(weniger getränke auf lager|weniger getraenke auf lager|getränke auf lager|getraenke auf lager|weniger .* auf lager)\\b/.test(q)){
+ if(/\b(weniger getränke auf lager|weniger getraenke auf lager|getränke auf lager|getraenke auf lager|weniger .* auf lager)\b/.test(q)){
   return '<b>Bestand erst anhand von Absatz und Lieferzeit reduzieren</b><p>Weniger Lagerbestand kann Kapitalbindung senken, aber auch Regallücken verursachen. Vergleiche je Getränk Artikelabsatz, aktuellen Bestand, offene Bestellungen, Lieferzeit, Mindestbestellmenge und saisonale Nachfrage.</p><p>Die aktuellen Monatsumsätze allein reichen nicht für eine konkrete Kürzung je Artikel. Teste Änderungen schrittweise und kontrolliere Verfügbarkeit sowie Abschriften; eine konkrete Menge nenne ich erst mit den nötigen Daten.</p>';
  }
- if(/\\b(saisonware|saison ware|im moment im blick|saisonartikel)\\b/.test(q)){
+ if(/\b(saisonware|saison ware|im moment im blick|saisonartikel)\b/.test(q)){
   return '<b>Saisonware gezielt beobachten</b><p>Welche Saisonartikel relevant sind, hängt von Kalender, regionaler Nachfrage, Stationsstandort und Sortiment ab. Als allgemeine Prüfliste kommen – je nach Jahreszeit und Kundschaft – Heißgetränke/Backwaren, Eis/Kaltgetränke oder Reise- und Winterzubehör infrage; das sind keine Prognosen für deine Station.</p><p>Vergleiche Verkäufe derselben Saison aus verfügbaren Vorperioden, Bestand, Lieferzeit und Abschriften. Historische Wetter-Lernhinweise sind in dieser Auswertung nicht verfügbar.</p>';
  }
- if(/\\b(wo finde ich die auswertung|an welcher stelle finde ich|wo gebe ich die zahlen|zahlen für die analyse eingeben|auf papier oder als pdf|als pdf ausgeben|steuerberatung|ersetzt.*steuerberatung)\\b/.test(q)){
+ if(/\b(wo finde ich die auswertung|an welcher stelle finde ich|wo gebe ich die zahlen|zahlen für die analyse eingeben|auf papier oder als pdf|als pdf ausgeben|steuerberatung|ersetzt.*steuerberatung)\b/.test(q)){
   if(/steuerberatung|steuerberater/.test(q)) return '<b>Nein – keine Steuerberatung</b><p>Die Auswertung unterstützt betriebswirtschaftliche Analysen und ersetzt keine individuelle Steuer- oder Rechtsberatung. Steuerliche Einordnung und verbindliche Entscheidungen bitte mit einer qualifizierten Steuerberatung klären.</p>';
   if(/papier|pdf/.test(q)) return '<b>Ergebnisse ausgeben</b><p>Wenn die aktuelle Ansicht eine Druck- oder Berichtsfunktion anbietet, nutze diese und wähle im Druckdialog „Als PDF speichern“. Ich kann nicht bestätigen, dass jede Ansicht in jeder App-Version einen eigenen PDF-Export hat.</p>';
   if(/zahlen|eingeben/.test(q)) return '<b>Wo Zahlen eingegeben werden</b><p>Suche im Bereich „Monatsdaten“ nach den Eingabefeldern bzw. Importfunktionen; dort gehören die Monatswerte hinein. Prüfe nach dem Import Zeitraum, Warengruppenzuordnung und EK-Werte in der Auswertung. Die genaue Anordnung kann je nach App-Version abweichen.</p>';
   return '<b>Monatsauswertung finden</b><p>Öffne die Monatsauswertung bzw. den Bereich „Mein Monat“ für die aktuelle Monatsübersicht. Für Warengruppen und Margen nutze „Analyse“, für Schwund und Abschriften das „Ertragsradar“ und für den zusammenfassenden Bericht „Beratungsbericht“.</p>';
  }
- if(/\\b(warum kannst du mir hier keine eindeutige antwort|keine eindeutige antwort geben|welche daten sprechen dafür|welche daten sprechen dafuer|wirklich der grund war|anhand welcher zahl|welcher zeitraum und welche kennzahl|welcher zeitraum und welche kennzahl|welche der angezeigten zahlen|genannten wert erklären|genannten wert erklaeren|welche kennzahl erklärst du|welche kennzahl erklaerst du)\\b/.test(q)){
+ if(/\b(warum kannst du mir hier keine eindeutige antwort|keine eindeutige antwort geben|welche daten sprechen dafür|welche daten sprechen dafuer|wirklich der grund war|anhand welcher zahl|welcher zeitraum und welche kennzahl|welcher zeitraum und welche kennzahl|welche der angezeigten zahlen|genannten wert erklären|genannten wert erklaeren|welche kennzahl erklärst du|welche kennzahl erklaerst du)\b/.test(q)){
   return '<b>Ich kläre erst Bezugsgröße und Beleglage</b><p>Damit ich nicht die falsche Zahl erkläre: Nenne bitte die Kennzahl oder kopiere den betreffenden Satz und gib den Zeitraum an. Ob eine Ursache belegt ist, lässt sich nur anhand der dazu passenden Daten beurteilen – etwa Vergleichszeiträumen, Artikel-/Warengruppenwerten und Importstatus.</p><p>Eine zeitliche Übereinstimmung allein beweist keine Ursache. Wenn die Daten keinen eindeutigen Schluss erlauben, kennzeichne ich die Erklärung als Hypothese statt als Tatsache.</p>';
  }
- if(/\\b(vorjahr|dieselben monate|gleichen monate vergleichen)\\b/.test(q)){
+ if(/\b(vorjahr|dieselben monate|gleichen monate vergleichen)\b/.test(q)){
   return '<b>Vorjahresvergleich mit gleichen Zeiträumen</b><p>Vergleiche denselben Monat bzw. dieselben abgeschlossenen Tage mit dem Vorjahr und nutze dieselbe Kennzahl und Datenabgrenzung. Bei einem laufenden Monat muss der Vorjahreszeitraum auf denselben Stichtag begrenzt werden.</p><p>Ohne tatsächlich geladene und vergleichbare Daten nenne ich keine Differenz. Umsatz, Rohertrag, Marge sowie Schwund/Abschriften sollten getrennt verglichen werden.</p>';
  }
- if(/\\b(nur die wichtigste maßnahme|nur die wichtigste massnahme|laut vorhandenen daten am ehesten|wenn dir daten fehlen|sag offen|statt etwas zu erfinden)\\b/.test(q)){
+ if(/\b(nur die wichtigste maßnahme|nur die wichtigste massnahme|laut vorhandenen daten am ehesten|wenn dir daten fehlen|sag offen|statt etwas zu erfinden)\b/.test(q)){
   return '<b>Eine priorisierte Maßnahme – soweit die Daten es tragen</b><p>Ohne belastbare Stationswerte kann ich keine konkrete Maßnahme als die wirksamste ausgeben. Als erster risikoarmer Schritt: prüfe fehlende oder ungeprüfte EK-Werte und gleiche Umsatz, Wareneinsatz und Zeitraum ab; danach priorisiere belegte Auffälligkeiten bei Schwund, Abschriften oder Bestand.</p><p>Ich trenne dabei belegte Werte von Vermutungen und sage ausdrücklich, wenn die Daten für eine Rangfolge nicht ausreichen.</p>';
  }
 
