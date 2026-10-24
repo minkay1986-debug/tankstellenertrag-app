@@ -64,6 +64,18 @@ Example request body (all values fictional):
 - Provider errors are reduced to generic responses.
 - The future product limit of three successful AI questions per station/month is not implemented here; it belongs in the authenticated production backend and must be enforced atomically.
 
+## Automated tests
+
+Run the local safety tests with Node.js 24 or newer:
+
+```sh
+npm test
+```
+
+The test suite covers disabled-by-default behavior, route/method checks, token authentication, malformed JSON, blank/overlong questions, explicit synthetic-test mode, missing AI binding, field allowlisting, preservation of valid zero values, provider failures, empty responses, and the successful response shape. The tests mock the AI binding and do not call Cloudflare or require API credentials.
+
+GitHub Actions runs this suite when files in this prototype change or when the draft PR is updated. This CI workflow has been added but has not yet been observed completing successfully; check its run status before relying on it.
+
 ## Next validation
 
-Before any live use, add automated tests for authentication, malformed input, context allowlisting, disabled-by-default behavior, model failure, and German response quality. Check the provider's current terms and data handling before sending any non-synthetic information.
+Run the automated tests and review the CI result. Then compare AI responses with the current rule-based chat using synthetic German questions and a fixed scoring rubric. Check the provider's current terms and data handling before sending any non-synthetic information. Do not connect the prototype to the live app.
