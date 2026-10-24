@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 
-const appPath = new URL("../../../../analyse.html", import.meta.url);
+const appPath = new URL("../../../analyse.html", import.meta.url);
 const corpusPath = new URL("../QUESTION-CORPUS.md", import.meta.url);
 
 async function loadApp() { return readFile(appPath, "utf8"); }
@@ -22,7 +22,7 @@ function extractFunction(source, name, nextName) {
 }
 function actualIntentFlags(source, raw) {
   const normFn = extractFunction(source, "advisorNorm", "advisorReply");
-  const normalized = vm.runInNewContext(`(${normFn}; advisorNorm)`)(raw);
+  const normalized = vm.runInNewContext(`(()=>{ ${normFn}; return advisorNorm; })()`)(raw);
   const start = source.indexOf("const intentText=String(q||'')");
   const endToken = "const isMargin=";
   const endStart = source.indexOf(endToken, start);
@@ -33,7 +33,7 @@ function actualIntentFlags(source, raw) {
   assert.notEqual(marginEnd, -1, "Could not find end of actual margin intent flag");
   const intentLayer = source.slice(start, marginEnd + 1);
   const wrapped = `(function(raw){ const q=String(advisorNorm(raw)||''); ${intentLayer}; return {q,semanticLoss,isHelp,isWeather,isTheft,isLoss,isEuroCompare,isMargin}; })`;
-  return vm.runInNewContext(wrapped.replace("const isMargin=", "const isMargin=") , {advisorNorm: vm.runInNewContext(`(${normFn}; advisorNorm)`) })(raw);
+  return vm.runInNewContext(`(()=>{ ${normFn}; return ${wrapped.slice(1, -1)}; })()`)(raw);
 }
 
 test("the synthetic question corpus contains 100 unique questions", async () => {
@@ -46,7 +46,7 @@ test("the synthetic question corpus contains 100 unique questions", async () => 
 test("actual advisor normalization handles case, accents, ß and punctuation", async () => {
   const source = await loadApp();
   const normFn = extractFunction(source, "advisorNorm", "advisorReply");
-  const norm = vm.runInNewContext(`(${normFn}; advisorNorm)`);
+  const norm = vm.runInNewContext(`(()=>{ ${normFn}; return advisorNorm; })()`);
   assert.equal(norm("  MARGE?? ÖL-Änderung!  "), "marge ol-anderung");
   assert.equal(norm("GROẞE Abschriften!!!"), "grosse abschriften");
   assert.equal(norm("  Was bleibt mir übrig?  "), "was bleibt mir ubrig");
