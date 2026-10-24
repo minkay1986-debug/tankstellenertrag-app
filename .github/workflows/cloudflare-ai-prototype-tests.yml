@@ -1,6 +1,12 @@
 name: Cloudflare AI Prototype Tests
 
 on:
+  push:
+    branches: ["test/ai-advisor-prototype-2026-10-24"]
+    paths:
+      - "prototypes/cloudflare-workers-ai/**"
+      - "prototypes/warengruppen-fachberater/knowledge-base.json"
+      - ".github/workflows/cloudflare-ai-prototype-tests.yml"
   pull_request:
     branches: [main]
     paths:
