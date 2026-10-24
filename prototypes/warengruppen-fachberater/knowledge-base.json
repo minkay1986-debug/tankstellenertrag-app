@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Fachwissensbestand für den TankstellenErtrag-Beratungs-Chat. Enthält allgemeine Prüfansätze sowie ausgewählte veröffentlichte Branchen- und Handelsquellen. Fremdbenchmarks sind ausdrücklich nicht als Tankstellen-Sollwerte zu verwenden; methodische Einschränkungen sind je Eintrag dokumentiert. Quellen werden nur verlinkt und in eigenen Worten zusammengefasst; keine Volltexte, Tabellen oder Abbildungen werden ohne Nutzungsrecht übernommen. Allgemeine Handels-/Forschungsbefunde werden als nicht tankstellenspezifisch gekennzeichnet. Wissenschaftliche Publikationen werden bibliografisch verlinkt und nur in eigenständiger Kurzfassung beschrieben; publizierte Prozentwerte aus Fallstudien sind keine Garantie für andere Betriebe.",
   "entries": [
     {
@@ -706,6 +706,539 @@
       "sourceUrl": "https://doi.org/10.1287/mksc.2013.0800",
       "sourceDate": "2013",
       "limitations": "Die berichteten Ergebnisse hängen von Kategorie, Daten und Modellannahmen ab. Nicht als zugesicherte Gewinnsteigerung oder direkte Tankstellenprognose verwenden."
+    },
+    {
+      "id": "sales-comparison-001",
+      "title": "Umsatz- und Vorjahresvergleiche korrekt interpretieren",
+      "keywords": [
+        "umsatzvergleich",
+        "vorjahresvergleich",
+        "vormonat",
+        "abweichung",
+        "entwicklung",
+        "trend",
+        "wachstum",
+        "rückgang",
+        "rueckgang",
+        "prozent",
+        "prozentual",
+        "euro",
+        "vergleichszeitraum",
+        "monatsvergleich"
+      ],
+      "tags": [
+        "umsatzanalyse",
+        "zeitvergleich",
+        "kennzahlen"
+      ],
+      "questionHints": [
+        "läuft es besser als letzten monat",
+        "wie viel prozent veränderung",
+        "umsatz im vergleich zum vorjahr",
+        "warum war der monat schwächer",
+        "abweichung zum vormonat berechnen"
+      ],
+      "answer": "Vergleiche nur gleiche oder nachvollziehbar angeglichene Zeiträume. Zeige absolute Differenz in Euro und relative Veränderung in Prozent getrennt. Prozentänderung = (aktueller Wert − Vergleichswert) / Vergleichswert × 100. Ist der Vergleichswert fehlend oder 0, ist die Prozentänderung nicht sinnvoll berechenbar; nicht durch null teilen und keinen Wert erfinden. Bei einem noch laufenden Monat muss die unterschiedliche Anzahl an Verkaufstagen oder der unvollständige Zeitraum kenntlich gemacht werden.",
+      "checklist": [
+        "Zeitraum und Datenvollständigkeit prüfen",
+        "Umsatzdefinition und Warengruppenabgrenzung gleich halten",
+        "Euro-Differenz und Prozentänderung getrennt zeigen",
+        "Bei fehlendem oder 0-Vergleichswert keine Prozentzahl ausgeben",
+        "Ursachen nur als Hypothesen nennen, solange sie nicht durch Zusatzdaten gestützt sind"
+      ],
+      "evidenceLabel": "Allgemeiner betriebswirtschaftlicher Prüfansatz; keine Tankstellenstudie",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Ein Vergleich zeigt eine Veränderung, erklärt aber nicht automatisch deren Ursache. Saison, Öffnungstage, Preise, Aktionen und Datenimporte können mitwirken."
+    },
+    {
+      "id": "margin-vs-profit-001",
+      "title": "Marge, Rohertrag und Gewinn sauber unterscheiden",
+      "keywords": [
+        "marge",
+        "rohertrag",
+        "gewinn",
+        "umsatz",
+        "wareneinsatz",
+        "kosten",
+        "deckungsbeitrag",
+        "profit",
+        "rentabilität",
+        "rentabilitaet",
+        "mehr verkaufen",
+        "mehr verdienen"
+      ],
+      "tags": [
+        "margenentwicklung",
+        "grundlagen",
+        "kennzahlinterpretation"
+      ],
+      "questionHints": [
+        "mehr umsatz aber nicht mehr geld",
+        "was bleibt nach einkauf übrig",
+        "ist mehr umsatz mehr gewinn",
+        "warum bleibt so wenig übrig",
+        "unterschied marge rohertrag gewinn"
+      ],
+      "answer": "Umsatz ist der Erlös aus Verkäufen. Rohertrag ist im vereinfachten Warenmodell Umsatz minus Wareneinsatz. Die Rohertragsmarge ist Rohertrag geteilt durch Umsatz, multipliziert mit 100. Gewinn ist nicht dasselbe wie Rohertrag: weitere betriebliche Kosten und die konkrete betriebswirtschaftliche Abgrenzung müssen berücksichtigt werden. Mehr Umsatz kann mit geringerem Rohertrag einhergehen, etwa bei niedrigeren Margen oder einem veränderten Warenmix; das ist anhand der Stationsdaten zu prüfen und nicht vorauszusetzen.",
+      "checklist": [
+        "Umsatz und Wareneinsatz für denselben Zeitraum abgleichen",
+        "Rohertrag in Euro und Marge in Prozent separat betrachten",
+        "Warengruppenmix und Preis-/Einkaufsänderungen untersuchen",
+        "Betriebskosten nicht als bereits im Rohertrag enthalten darstellen"
+      ],
+      "evidenceLabel": "Allgemeiner betriebswirtschaftlicher Prüfansatz; keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Die genaue Definition von Wareneinsatz, Retouren, Rabatten und Umsatzsteuer muss zum verwendeten Datenmodell passen."
+    },
+    {
+      "id": "ordering-reorder-point-001",
+      "title": "Nachbestellung aus Verbrauch, Lieferzeit und verfügbarem Bestand ableiten",
+      "keywords": [
+        "bestellmenge",
+        "nachbestellung",
+        "bestellpunkt",
+        "mindestbestand",
+        "sicherheitsbestand",
+        "reichweite",
+        "lieferzeit",
+        "verbrauch",
+        "absatz",
+        "bestand",
+        "überbestand",
+        "ueberbestand",
+        "bestellvorschlag"
+      ],
+      "tags": [
+        "disposition",
+        "bestelloptimierung",
+        "bestand"
+      ],
+      "questionHints": [
+        "was soll ich bestellen",
+        "wie viel soll ich nachbestellen",
+        "welche ware geht bald aus",
+        "wie verhindere ich überbestand",
+        "wie berechne ich den mindestbestand"
+      ],
+      "answer": "Eine belastbare Bestellentscheidung benötigt mindestens den aktuellen verfügbaren Bestand, erwarteten Absatz bis zur nächsten Lieferung, Lieferzeit und Lieferrhythmus. Als einfache Orientierung gilt: erwarteter Bedarf während der Lieferzeit plus begründeter Sicherheitsbestand. Die Bestellmenge muss außerdem Packungsgrößen, Mindestbestellmengen, bereits bestellte Ware, Haltbarkeit und Lagerkapazität berücksichtigen. Ohne diese Daten sollte der Chat Prüfschritte vorschlagen, aber keine exakte Menge vortäuschen.",
+      "checklist": [
+        "Verfügbaren Bestand und bereits offene Bestellungen erfassen",
+        "Absatz nach vergleichbaren Wochentagen und Saison prüfen",
+        "Lieferzeit und Lieferfrequenz berücksichtigen",
+        "Sicherheitsbestand anhand der Schwankung und Lieferzuverlässigkeit festlegen",
+        "Bei verderblicher Ware Absatz bis zum Ende der verkaufsfähigen Zeit begrenzen"
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz; keine universelle Bestellformel für alle Stationen",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Eine vereinfachte Bestellregel ersetzt keine Artikelstammdaten, Bestandsführung oder Lieferantenbedingungen. Ohne Artikelbestand und Absatzdaten keine konkrete Bestellmenge berechnen."
+    },
+    {
+      "id": "shelf-gap-measurement-001",
+      "title": "Regallücken als messbares Verfügbarkeitsproblem behandeln",
+      "keywords": [
+        "regallücke",
+        "regallücken",
+        "regal leer",
+        "out of stock",
+        "out-of-stock",
+        "nicht verfügbar",
+        "nicht verfuegbar",
+        "fehlender artikel",
+        "absatzverlust",
+        "verfügbarkeit",
+        "verfuegbarkeit",
+        "nachschub",
+        "bestandsfehler"
+      ],
+      "tags": [
+        "regalverfügbarkeit",
+        "disposition",
+        "retail-transfer"
+      ],
+      "questionHints": [
+        "was kosten mich regallücken",
+        "artikel fehlen ständig",
+        "wie vermeide ich leere regale",
+        "warum ist ware nicht verfügbar",
+        "wie messe ich regalverfügbarkeit"
+      ],
+      "answer": "Eine beobachtete Regallücke beweist noch keinen bestimmten Umsatzverlust. Dokumentiere für ausgewählte Artikel Zeitpunkt, Dauer, Regalbestand, Lagerbestand, erwartete Nachfrage und ob der Kunde eine Alternative gekauft hat. Trenne Ursachen wie zu geringe Bestellung, nicht ausgelöste Nachbestellung, Lieferausfall, verspätete Verräumung oder Bestandsfehler. Erst aus eigenen Beobachtungen und Absatzdaten lässt sich die wirtschaftliche Relevanz schätzen.",
+      "checklist": [
+        "Lücken mit Artikel, Zeit und Dauer protokollieren",
+        "Regalbestand und Lagerbestand getrennt prüfen",
+        "Liefer- und Verräumungsprozess kontrollieren",
+        "Absatz vergleichbarer Zeitfenster heranziehen",
+        "Keine pauschalen Euro-Verluste je Lücke behaupten"
+      ],
+      "evidenceLabel": "Fachkonzept aus dem Handel; keine Tankstellen-spezifische Verlustmessung",
+      "sourceTitle": "GS1 Germany – Supply Chain Management / Optimal Shelf Availability",
+      "sourceUrl": "https://www.gs1-germany.de/branchen-themen/scm-supply-chain-management/",
+      "sourceDate": null,
+      "limitations": "Die verlinkte Übersichtsseite beschreibt das Fachgebiet, liefert aber keinen festen Eurobetrag je Regallücke und keinen validierten Tankstellenbenchmark."
+    },
+    {
+      "id": "price-test-001",
+      "title": "Preissenkungen nach Rohertrag statt nur nach Absatz bewerten",
+      "keywords": [
+        "preis senken",
+        "preissenkung",
+        "preis erhöhen",
+        "preis erhoehen",
+        "preisstrategie",
+        "preiselastizität",
+        "preiselastizitaet",
+        "absatzreaktion",
+        "aktionspreis",
+        "rabatt",
+        "umsatz",
+        "rohertrag",
+        "deckungsbeitrag",
+        "kunden finden teuer"
+      ],
+      "tags": [
+        "preisstrategie",
+        "margenentwicklung",
+        "testdesign"
+      ],
+      "questionHints": [
+        "soll ich die preise senken",
+        "lohnt sich ein rabatt",
+        "wie reagieren kunden auf preise",
+        "verkaufe ich mehr wenn es billiger ist",
+        "preiselastizität messen"
+      ],
+      "answer": "Eine Preissenkung ist nicht automatisch wirtschaftlich sinnvoll, auch wenn mehr Stück verkauft werden. Vergleiche für einen klar abgegrenzten Artikel oder eine Warengruppe Preis, Absatz, Wareneinsatz und Rohertrag vor und während des Tests. Berücksichtige Saison, Aktionen, Verfügbarkeit und mögliche Verlagerung von Käufen zwischen Artikeln. Wenn möglich, nutze vergleichbare Artikel oder Zeitfenster als Kontrollvergleich. Eine einzelne Vorher-nachher-Beobachtung beweist keine Kausalität.",
+      "checklist": [
+        "Ausgangspreis und Stückrohertrag festhalten",
+        "Testdauer und betroffene Artikel vorab definieren",
+        "Absatz, Umsatz und Rohertrag in Euro messen",
+        "Lagerlücken, Saison und Parallelaktionen dokumentieren",
+        "Ergebnis nicht allein am Umsatz oder an verkauften Stückzahlen bewerten"
+      ],
+      "evidenceLabel": "Allgemeiner Testansatz; Forschung zum Einzelhandel ist nicht automatisch tankstellenspezifisch",
+      "sourceTitle": "van Donselaar et al. (2016) – Analysis and forecasting of demand during promotions for perishable items",
+      "sourceUrl": "https://doi.org/10.1016/j.ijpe.2015.10.022",
+      "sourceDate": "2016",
+      "limitations": "Forschungsarbeit untersucht verderbliche Produkte im Einzelhandel anhand von Daten einer niederländischen Lebensmittelhandelskette. Der Abstract ist zugänglich; Ergebnisse sind kein direkter Tankstellenbeleg und keine Garantie für den Effekt einer konkreten Preissenkung."
+    },
+    {
+      "id": "promotion-demand-forecast-001",
+      "title": "Aktionsabsatz und normale Nachfrage getrennt prognostizieren",
+      "keywords": [
+        "aktion",
+        "promotion",
+        "rabatt",
+        "sonderangebot",
+        "absatzprognose",
+        "nachfrageprognose",
+        "backwaren",
+        "verderb",
+        "saison",
+        "bestellmenge",
+        "verkaufsförderung",
+        "preisnachlass"
+      ],
+      "tags": [
+        "absatzplanung",
+        "preisstrategie",
+        "forschung",
+        "retail-transfer"
+      ],
+      "questionHints": [
+        "wie viel für eine aktion bestellen",
+        "warum war die aktion schwächer",
+        "wie plane ich aktionsware",
+        "aktionsverkauf prognostizieren",
+        "wie vermeide ich reste nach rabattaktionen"
+      ],
+      "answer": "Aktionsverkäufe sollten nicht unkritisch als normale Nachfrage fortgeschrieben werden. Für die Planung sind normale Basisnachfrage, Aktionszeitraum, Preisnachlass, mögliche Vorziehkäufe, Substitution zwischen Artikeln und verbleibende Haltbarkeit getrennt zu betrachten. Nach einer Aktion kann Absatz aus späteren Tagen vorgezogen worden sein. Vergleiche deshalb auch den Zeitraum nach der Aktion und dokumentiere Abschriften sowie nicht verfügbare Ware.",
+      "checklist": [
+        "Basisabsatz ohne Aktion abschätzen",
+        "Aktionszeitraum und Preisänderung dokumentieren",
+        "Ähnliche Aktionen und vergleichbare Wochentage heranziehen",
+        "Nachlaufeffekt und mögliche Kannibalisierung prüfen",
+        "Abschriften und Fehlmengen gemeinsam bewerten"
+      ],
+      "evidenceLabel": "Begutachteter Forschungsartikel; Einzelhandelsdaten, nicht Tankstellen-spezifisch",
+      "sourceTitle": "van Donselaar, Peters, de Jong & Broekmeulen (2016) – Analysis and forecasting of demand during promotions for perishable items",
+      "sourceUrl": "https://doi.org/10.1016/j.ijpe.2015.10.022",
+      "sourceDate": "2016",
+      "limitations": "Der öffentlich sichtbare Abstract beschreibt Daten einer niederländischen Lebensmittelhandelskette und die Prognose verderblicher Produkte. Keine direkte Validierung für Tankstellen oder Garantie eines bestimmten Einsparbetrags."
+    },
+    {
+      "id": "assortment-contribution-001",
+      "title": "Sortimentsentscheidungen mit Rohertrag, Platz und Ersatzkäufen prüfen",
+      "keywords": [
+        "sortimentsoptimierung",
+        "artikel auslisten",
+        "artikelrentabilität",
+        "artikelrentabilitaet",
+        "ladenhüter",
+        "ladenhueter",
+        "regalplatz",
+        "kannibalisierung",
+        "ersatzkauf",
+        "substitution",
+        "warengruppe",
+        "absatz",
+        "rohertrag",
+        "sortiment"
+      ],
+      "tags": [
+        "sortimentsanalyse",
+        "regalfläche",
+        "wissenschaftliche studie",
+        "retail-transfer"
+      ],
+      "questionHints": [
+        "welche artikel soll ich rausnehmen",
+        "welcher artikel lohnt sich nicht",
+        "was steht nur herum",
+        "welche produkte bringen am meisten",
+        "regalplatz besser nutzen"
+      ],
+      "answer": "Ein Artikel sollte nicht allein wegen geringer Stückzahl oder geringem Umsatz ausgelistet werden. Betrachte Rohertrag über den Zeitraum, Regalfläche, Verfügbarkeit, Abschriften, Rolle als Ergänzungsartikel und mögliche Ersatzkäufe. Wenn ein Artikel entfällt, kann der Umsatz zu einem anderen Artikel wechseln, ganz wegfallen oder zu einer anderen Warengruppe wandern. Diese Substitution muss als Möglichkeit geprüft und darf nicht als sicherer Effekt behauptet werden.",
+      "checklist": [
+        "Metrik und Zeitraum vor dem Ranking festlegen",
+        "Artikelumsatz, Rohertrag und Abschriften gemeinsam prüfen",
+        "Regalplatz und Ergänzungsfunktion berücksichtigen",
+        "Mögliche Ersatzkäufe und Wechsel innerhalb der Warengruppe untersuchen",
+        "Vor einer endgültigen Auslistung nach Möglichkeit kontrollierten Test durchführen"
+      ],
+      "evidenceLabel": "Begutachtete Operations-Research-Forschung; allgemeiner Einzelhandel, keine Tankstellenstudie",
+      "sourceTitle": "Hübner & Schaal (2017) – An integrated assortment and shelf-space optimization model with demand substitution and space-elasticity effects",
+      "sourceUrl": "https://doi.org/10.1016/j.ejor.2017.01.039",
+      "sourceDate": "2017",
+      "limitations": "Die Studie modelliert Sortiments- und Regalflächenentscheidungen mit realen Datensätzen aus dem Einzelhandel. Die publizierten Modellresultate sind keine garantierten Gewinne oder direkt übertragbaren Werte für eine einzelne Tankstelle."
+    },
+    {
+      "id": "data-readiness-001",
+      "title": "Vor jeder Antwort Datenverfügbarkeit und Kennzahlengranularität klären",
+      "keywords": [
+        "daten fehlen",
+        "fehlender wert",
+        "null",
+        "0",
+        "einkauf",
+        "wareneinsatz",
+        "artikel",
+        "warengruppe",
+        "import",
+        "huth",
+        "nicht angezeigt",
+        "berechnen",
+        "kennzahl",
+        "datenlücke",
+        "granularität",
+        "granularitaet"
+      ],
+      "tags": [
+        "datenqualität",
+        "import",
+        "kennzahlen",
+        "transparenz"
+      ],
+      "questionHints": [
+        "warum steht keine marge da",
+        "einkauf ist null",
+        "welche daten fehlen",
+        "kannst du artikel einzeln vergleichen",
+        "warum kann die app das nicht berechnen"
+      ],
+      "answer": "Bevor eine Zahl oder Rangliste ausgegeben wird, muss geklärt sein, ob die benötigten Daten tatsächlich vorhanden sind und auf derselben Ebene vorliegen. Ein expliziter Zahlenwert 0 ist nicht dasselbe wie ein fehlender oder nicht importierter Wert. Liegen nur Warengruppenwerte vor, darf der Chat keine Artikelrangliste vortäuschen. Nenne die konkret fehlende Größe und erkläre, welche Daten für eine belastbare Berechnung benötigt werden.",
+      "checklist": [
+        "Vorhanden, fehlend, ungültig und explizit 0 getrennt behandeln",
+        "Zeitraum und Einheit kontrollieren",
+        "Warengruppen- und Artikelebene nicht vermischen",
+        "Keine Kennzahl aus fehlendem Einkauf oder fehlendem Umsatz ableiten",
+        "Importstatus nicht aus dem Ergebnis erraten; tatsächlichen Status prüfen"
+      ],
+      "evidenceLabel": "Datenqualitätsregel für die Beratungslogik; keine externe Studie",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Die konkrete Datenverfügbarkeit muss aus dem Laufzeitstatus der App kommen. Dieser Wissenseintrag selbst kann keinen Importstatus oder fehlenden Wert erkennen."
+    },
+    {
+      "id": "clarification-strategy-001",
+      "title": "Bei unklarer Frage gezielt nachfragen statt allgemeine Antwort auszugeben",
+      "keywords": [
+        "unklare frage",
+        "rückfrage",
+        "rueckfrage",
+        "was meinst du",
+        "gut oder schlecht",
+        "letztes jahr",
+        "vorjahr",
+        "diese zahl",
+        "das",
+        "vergleich",
+        "welche warengruppe",
+        "welcher zeitraum",
+        "kontext",
+        "anschlussfrage"
+      ],
+      "tags": [
+        "gesprächsführung",
+        "intent-erkennung",
+        "transparenz"
+      ],
+      "questionHints": [
+        "ist das gut oder schlecht",
+        "und letztes jahr",
+        "warum ist das so",
+        "was soll ich ändern",
+        "kannst du das genauer erklären"
+      ],
+      "answer": "Wenn die Frage mehrere sinnvolle Bedeutungen hat oder ein Verweis wie „das“, „dort“ oder „letztes Jahr“ ohne ausreichenden Gesprächskontext nicht aufgelöst werden kann, soll der Chat nicht raten. Stelle eine kurze, konkrete Rückfrage. Bei „Ist das gut oder schlecht?“ frage nach der gemeinten Kennzahl oder beziehe dich nur dann auf die vorherige Antwort, wenn der Gesprächsverlauf tatsächlich verfügbar ist. Bei „Und letztes Jahr?“ kläre Zeitraum und Kennzahl, falls sie nicht eindeutig aus dem Kontext hervorgehen.",
+      "checklist": [
+        "Vorherige Nachricht nur nutzen, wenn sie tatsächlich im Gesprächszustand verfügbar ist",
+        "Fehlenden Bezug oder Zeitraum benennen",
+        "Eine kurze Frage stellen, die die nächste Analyse ermöglicht",
+        "Keine erfundene Erinnerung an frühere Antworten oder Stationswerte behaupten"
+      ],
+      "evidenceLabel": "Gestaltungsregel für zuverlässige Beratung; keine externe Studie",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Eine Wissensdatenbank allein stellt keinen Gesprächsspeicher bereit. Mehrstufige Dialoge benötigen eine separate, getestete Kontextverwaltung."
+    },
+    {
+      "id": "station-navigation-001",
+      "title": "Fragen zur App-Bedienung von betriebswirtschaftlicher Analyse trennen",
+      "keywords": [
+        "wo finde ich",
+        "wie benutze ich",
+        "bedienung",
+        "navigation",
+        "dashboard",
+        "auswertung",
+        "import",
+        "einstellungen",
+        "bericht",
+        "pdf",
+        "chat",
+        "app",
+        "seite",
+        "funktion",
+        "klick",
+        "öffnen",
+        "oeffnen"
+      ],
+      "tags": [
+        "produktnavigation",
+        "hilfe",
+        "intent-erkennung"
+      ],
+      "questionHints": [
+        "wo finde ich die auswertung",
+        "wie öffne ich den bericht",
+        "wo lade ich den import hoch",
+        "wie benutze ich das dashboard",
+        "wo kann ich die daten prüfen"
+      ],
+      "answer": "Eine Bedienfrage sollte direkt auf die vorhandene Oberfläche und Funktion antworten, nicht mit einer allgemeinen Warenwirtschaftsberatung. Nenne nur Menüpunkte und Funktionen, die in der aktuellen Version tatsächlich vorhanden sind. Wenn der konkrete Aufbau nicht bekannt oder nicht verifiziert ist, frage nach der geöffneten Seite oder bitte um einen Screenshot, statt einen nicht existierenden Button zu erfinden.",
+      "checklist": [
+        "Bedienfrage als eigenen Intent erkennen",
+        "Nur bestätigte Oberflächenbegriffe nennen",
+        "Keine Funktionen oder Buttons erfinden",
+        "Bei versionsabhängigem Aufbau kurz nach der aktuellen Ansicht fragen"
+      ],
+      "evidenceLabel": "Produkt-Hilfe-Regel; keine externe Studie",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Die Wissensdatenbank ersetzt keine versionsaktuelle UI-Dokumentation und kann keine Oberfläche sehen, die nicht im Gespräch oder Laufzeitkontext verfügbar ist."
+    },
+    {
+      "id": "forecast-vs-target-001",
+      "title": "Prognose, Zielwert und tatsächlichen Ist-Wert unterscheiden",
+      "keywords": [
+        "prognose",
+        "forecast",
+        "ziel",
+        "sollwert",
+        "istwert",
+        "absatzplanung",
+        "erwartung",
+        "planung",
+        "bestellplanung",
+        "sicherheitsbestand",
+        "nachfrage"
+      ],
+      "tags": [
+        "planung",
+        "prognose",
+        "dateninterpretation"
+      ],
+      "questionHints": [
+        "wie viel werde ich verkaufen",
+        "was soll ich für nächste woche planen",
+        "ist der absatz zu hoch angesetzt",
+        "warum bestelle ich zu viel",
+        "soll und ist vergleichen"
+      ],
+      "answer": "Ein Ist-Wert beschreibt gemessene Verkäufe; eine Prognose schätzt künftige Nachfrage; ein Ziel- oder Servicelevel ist eine Planungsentscheidung. Diese Größen dürfen nicht vermischt werden. Wenn ein gewünschtes Verfügbarkeitsniveau in die Prognose eingebaut wird, kann die Nachfrage systematisch überschätzt werden. Kennzeichne daher Prognoseannahmen und Zielvorgaben getrennt und vergleiche Prognosen später mit den tatsächlich beobachteten Werten.",
+      "checklist": [
+        "Ist-Daten, Prognose und Zielwert getrennt beschriften",
+        "Aktions- und Normalnachfrage unterscheiden",
+        "Prognosefehler regelmäßig gegen Ist-Absatz messen",
+        "Bei verderblicher Ware Haltbarkeit und Abschriften einbeziehen"
+      ],
+      "evidenceLabel": "Begutachteter wissenschaftlicher Forschungsartikel; allgemeine Einzelhandelsprognose",
+      "sourceTitle": "Fahimnia, Tan & Tahirov (2025) – Service-level anchoring in demand forecasting: The moderating impact of retail promotions and product perishability",
+      "sourceUrl": "https://www.sciencedirect.com/science/article/pii/S0169207024000748",
+      "sourceDate": "2025",
+      "limitations": "Der Artikel beschreibt ein Labor-Experiment zur Prognosebeurteilung und den Einfluss von Promotions und Verderblichkeit. Er liefert keinen spezifischen Tankstellen-Benchmark und belegt nicht, dass ein bestimmtes Verfahren an einer einzelnen Station wirkt."
+    },
+    {
+      "id": "price-demand-evidence-001",
+      "title": "Preiselastizität nicht aus allgemeiner Preiswahrnehmung ableiten",
+      "keywords": [
+        "preiselastizität",
+        "preiselastizitaet",
+        "preisempfindlichkeit",
+        "preiswahrnehmung",
+        "preisänderung",
+        "preisänderungen",
+        "absatzreaktion",
+        "preissenkung",
+        "preisnachlass",
+        "rabatt",
+        "umsatz",
+        "rohertrag"
+      ],
+      "tags": [
+        "preisstrategie",
+        "forschung",
+        "datenqualität"
+      ],
+      "questionHints": [
+        "wie preissensibel sind kunden",
+        "wie stark steigt absatz bei rabatt",
+        "lohnt sich preis senken",
+        "kunden finden das zu teuer",
+        "preiselastizität berechnen"
+      ],
+      "answer": "Preiswahrnehmung, tatsächliche Preiselastizität und wirtschaftlicher Effekt einer Preisänderung sind verschiedene Dinge. Eine Umfrage, in der Kunden einen Preis als hoch bewerten, beweist nicht, dass eine Senkung den Absatz oder den Rohertrag erhöht. Für eine stationsindividuelle Einschätzung werden vergleichbare Preis- und Absatzbeobachtungen benötigt; zugleich sind Konkurrenz, Warenverfügbarkeit, Aktionen und Substitution zu berücksichtigen.",
+      "checklist": [
+        "Umfrageaussagen nicht als gemessene Absatzreaktion behandeln",
+        "Preis und Stückabsatz vor/nach Änderung dokumentieren",
+        "Rohertrag in Euro als zentrale wirtschaftliche Größe mitbewerten",
+        "Mögliche Saison- und Aktionseffekte abgrenzen"
+      ],
+      "evidenceLabel": "Fachlicher Forschungsbezug; keine tankstellenspezifische Elastizität",
+      "sourceTitle": "van Donselaar et al. (2016) – Analysis and forecasting of demand during promotions for perishable items",
+      "sourceUrl": "https://doi.org/10.1016/j.ijpe.2015.10.022",
+      "sourceDate": "2016",
+      "limitations": "Die Publikation bezieht sich auf verderbliche Produkte im Lebensmittelhandel. Sie liefert keine Elastizität für Tankstellenartikel und keine pauschale Empfehlung zur Preissenkung."
     }
-  ]
+  ],
+  "updatedAt": "2026-10-24"
 }
