@@ -1,6 +1,6 @@
 {
-  "version": "0.1.0",
-  "description": "Starterbestand für den isolierten Warenwirtschafts-Fachberater. Keine personenbezogenen oder realen Stationsdaten. Einträge ohne verifizierte externe Quelle sind ausdrücklich allgemeine Prüfansätze, keine Studienergebnisse.",
+  "version": "0.2.0",
+  "description": "Fachwissensbestand für den TankstellenErtrag-Beratungs-Chat. Enthält allgemeine Prüfansätze sowie ausgewählte veröffentlichte Branchen- und Handelsquellen. Fremdbenchmarks sind ausdrücklich nicht als Tankstellen-Sollwerte zu verwenden; methodische Einschränkungen sind je Eintrag dokumentiert.",
   "entries": [
     {
       "id": "margin-diagnosis-001",
@@ -275,6 +275,219 @@
       "sourceUrl": null,
       "sourceDate": null,
       "limitations": "Dieser Eintrag enthält selbst keinen Branchenbenchmark und behauptet keinen repräsentativen Tankstellen-Durchschnitt."
+    },
+    {
+      "id": "source-bft-tankstellenmarkt-2025",
+      "title": "Branchenstudie Tankstellenmarkt 2025 (bft)",
+      "keywords": [
+        "bft",
+        "uniti",
+        "tankstellenstudie",
+        "branchenstudie",
+        "shopgeschäft",
+        "shop",
+        "gastronomie",
+        "convenience",
+        "pächter",
+        "pächterfragen",
+        "tankstellenmarkt",
+        "service",
+        "autowäsche",
+        "umsatzmix",
+        "geschäftsfelder"
+      ],
+      "tags": [
+        "tankstellenbranche",
+        "marktstruktur",
+        "shopgeschäft",
+        "strategie"
+      ],
+      "questionHints": [
+        "wie entwickelt sich das tankstellengeschäft",
+        "ist der shop für tankstellen wichtig",
+        "welche geschäftsfelder haben zukunft",
+        "welche branche zahlen gibt es"
+      ],
+      "answer": "Der bft beschreibt Tankstellen als sich wandelnde Versorgungs- und Convenience-Standorte. Die Studie behandelt Kraftstoff, Shop, Gastronomie, Serviceleistungen und neue Mobilitätsangebote. Sie eignet sich als Branchenkontext für strategische Fragen; aus allgemeinen Marktdaten folgt nicht automatisch, welche Maßnahme an einer einzelnen Station rentabel ist.",
+      "checklist": [
+        "Beim Übertragen einer Kennzahl prüfen, ob sie für freie Tankstellen, Markenstationen oder einen gemischten Bestand gilt.",
+        "Geschäftsfeld und Bezugsgröße der Kennzahl im Original prüfen.",
+        "Eigene Stationsdaten für eine betriebliche Entscheidung ergänzen."
+      ],
+      "evidenceLabel": "Veröffentlichte Branchenstudie eines Branchenverbands; keine randomisierte Wirksamkeitsstudie",
+      "sourceTitle": "bft – Branchenstudie Tankstellenmarkt 2025",
+      "sourceUrl": "https://www.bft.de/themen-markt-statistiken/marktanalysen-trends/branchenstudie-tankstellenmarkt-2025",
+      "sourceDate": "29.06.2026",
+      "limitations": "Die Veröffentlichung nennt als Grundlage unter anderem Sekundärdaten. Für betriebswirtschaftliche Kennzahlen werden Eurodata-Daten verwendet, die mehrheitlich markengebundene Stationen abbilden. Die Übertragbarkeit auf freie Stationen und Agenturmodelle muss deshalb geprüft werden."
+    },
+    {
+      "id": "source-uniti-jahreserhebung-2025",
+      "title": "UNITI-Jahreserhebung 2025 – Branchenentwicklung",
+      "keywords": [
+        "uniti",
+        "tankstellen",
+        "shop",
+        "convenience",
+        "carwash",
+        "autowäsche",
+        "zahlung",
+        "payment",
+        "bargeld",
+        "karte",
+        "ladepunkt",
+        "ladepunkte",
+        "pächter",
+        "tankstellenmarkt",
+        "jahreserhebung"
+      ],
+      "tags": [
+        "tankstellenbranche",
+        "markttrend",
+        "payment",
+        "shopgeschäft"
+      ],
+      "questionHints": [
+        "wie entwickelt sich shop und convenience",
+        "wie zahlen tankstellenkunden",
+        "welche trends gibt es bei tankstellen",
+        "was wächst an tankstellen"
+      ],
+      "answer": "Die UNITI-Jahreserhebung 2025 wird als Branchenstandortbestimmung zu Tankstellen und Payment vorgestellt. UNITI nennt Shop & Convenience sowie Carwash als wichtige Entwicklungsfelder. Solche Erhebungen helfen, Branchentrends einzuordnen; sie ersetzen keine stationsindividuelle Absatz- oder Rentabilitätsanalyse.",
+      "checklist": [
+        "Prüfen, ob der berichtete Wert Deutschland, ein bestimmtes Geschäftsfeld oder eine Teilgruppe beschreibt.",
+        "Bei Payment-Fragen Karten- und Barzahlungsanteile nicht mit Gewinn oder Rohertrag gleichsetzen.",
+        "Investitionsentscheidungen zusätzlich mit Kosten, Auslastung und Standortbedingungen bewerten."
+      ],
+      "evidenceLabel": "Veröffentlichte Branchen-Jahreserhebung; methodische Details je Einzelkennzahl prüfen",
+      "sourceTitle": "UNITI – Tankstellen in Deutschland stellen sich wirtschaftlich immer breiter auf",
+      "sourceUrl": "https://www.uniti.de/kommunikation/pressemitteilungen/artikel/tankstellen-in-deutschland-stellen-sich-wirtschaftlich-immer-breiter-auf",
+      "sourceDate": "15.01.2026",
+      "limitations": "Die öffentlich zugängliche Mitteilung fasst ausgewählte Ergebnisse zusammen. Stichprobe, Definitionen und Detailtabellen müssen vor der Nutzung einer einzelnen Kennzahl in einer konkreten Beratung anhand der vollständigen Erhebung geprüft werden."
+    },
+    {
+      "id": "source-ehi-inventurdifferenzen-2026",
+      "title": "EHI-Studie Inventurdifferenzen 2026",
+      "keywords": [
+        "ehi",
+        "inventurdifferenzen",
+        "schwund",
+        "verlust",
+        "fehlbestand",
+        "diebstahl",
+        "inventur",
+        "bestandsdifferenz",
+        "prävention",
+        "praevention",
+        "warenverlust",
+        "kontrolle",
+        "retail"
+      ],
+      "tags": [
+        "schwund",
+        "bestandskontrolle",
+        "fremdbenchmark",
+        "handel"
+      ],
+      "questionHints": [
+        "wie hoch ist schwund im einzelhandel",
+        "gibt es studien zu inventurdifferenzen",
+        "wie ordne ich inventurverluste ein",
+        "wie schwund vermeiden"
+      ],
+      "answer": "Die EHI-Studie untersucht Inventurdifferenzen und Präventionsmaßnahmen im stationären deutschen Einzelhandel. Für das Berichtsjahr 2025 nennt EHI eine geschätzte, zu Einkaufspreisen bewertete Inventurdifferenz von 0,64 Prozent des Nettoumsatzes? Diese Kennzahl bezieht sich auf die Studie 2025 und nicht auf die Ausgabe 2026. Die Ausgabe 2026 berichtet eine Gesamtschadenssumme von 5,11 Milliarden Euro für 2025. Nationale Gesamtsummen oder branchenübergreifende Quoten dürfen nicht als Sollwert einer einzelnen Tankstelle verwendet werden.",
+      "checklist": [
+        "Erst klären, welche Ausgabe und welches Berichtsjahr gemeint sind.",
+        "Die Bezugsgröße prüfen: Inventurdifferenz zu EK im Verhältnis zum Nettoumsatz ist nicht identisch mit Abschriften oder erfasstem Schwund.",
+        "Keine Ursache wie Diebstahl aus einer einzelnen Bestandsdifferenz ableiten.",
+        "Tankstellen-spezifische Vergleichsdaten nur nutzen, wenn die Quelle diese ausdrücklich ausweist."
+      ],
+      "evidenceLabel": "Veröffentlichte Handelsstudie mit Erhebung bei mehreren Handelsunternehmen; nicht tankstellenspezifisch",
+      "sourceTitle": "EHI – Studie: Inventurdifferenzen 2026",
+      "sourceUrl": "https://www.ehi.org/produkt/studie-inventurdifferenzen-2026-pdf/",
+      "sourceDate": "2026 (Berichtsjahr 2025)",
+      "limitations": "Die Erhebung umfasst 84 Unternehmen beziehungsweise Vertriebsschienen und 17.426 Verkaufsstellen. Es ist kein repräsentativer Tankstellenbenchmark. Die 0,64-%-Kennzahl gehört zur EHI-Ausgabe 2025 über das Berichtsjahr 2024, nicht zur Ausgabe 2026."
+    },
+    {
+      "id": "source-ehi-inventurdifferenzen-2025",
+      "title": "EHI-Studie Inventurdifferenzen 2025 – Vergleichsmaßstab mit Einschränkungen",
+      "keywords": [
+        "ehi",
+        "inventurdifferenzen",
+        "0,64",
+        "0.64",
+        "schwundquote",
+        "inventurverluste",
+        "handel",
+        "benchmark",
+        "ek",
+        "netto",
+        "nutzungsgrenze"
+      ],
+      "tags": [
+        "schwund",
+        "benchmark",
+        "fremdbenchmark",
+        "handel"
+      ],
+      "questionHints": [
+        "welche schwundquote ist normal",
+        "gibt es eine durchschnittliche inventurdifferenz",
+        "wie vergleiche ich schwundwerte"
+      ],
+      "answer": "EHI ermittelt für das Berichtsjahr 2024 durchschnittliche Inventurdifferenzen von 0,64 Prozent des Nettoumsatzes, bewertet zu Einkaufspreisen. Das ist ein Durchschnitt aus dem stationären Einzelhandel und keine Zielquote für Tankstellen. Für eine Tankstelle kann dieser Wert höchstens als vorsichtiger Kontext dienen, nicht als Diagnose oder verbindlicher Grenzwert.",
+      "checklist": [
+        "Definition und Bezugsgröße genau übernehmen.",
+        "Warengruppen- und Betriebstypunterschiede berücksichtigen.",
+        "Den eigenen Verlauf und vollständige Inventurdaten höher gewichten als einen fremden Durchschnitt."
+      ],
+      "evidenceLabel": "Veröffentlichte Handelsstudie; nicht tankstellenspezifisch",
+      "sourceTitle": "EHI – Studie: Inventurdifferenzen 2025",
+      "sourceUrl": "https://www.ehi.org/produkt/studie-inventurdifferenzen-2025-pdf/",
+      "sourceDate": "2025 (Berichtsjahr 2024)",
+      "limitations": "Nicht unmittelbar auf Tankstellen übertragbar. Die Studie umfasst 98 Unternehmen beziehungsweise Vertriebsschienen mit 17.433 Verkaufsstellen; keine Aussage, dass diese eine repräsentative Tankstellenstichprobe bilden."
+    },
+    {
+      "id": "source-bft-shop-customer-context-2024",
+      "title": "B&G Shopper Monitor 2024 – Preiswahrnehmung bei Tankstellenshops (zitiert im bft-Fachmagazin)",
+      "keywords": [
+        "bft",
+        "shoppreise",
+        "preiswahrnehmung",
+        "kundenverhalten",
+        "süßwaren",
+        "suesswaren",
+        "snacks",
+        "getränke",
+        "getraenke",
+        "preise",
+        "preissensibilität",
+        "preissensibilitaet",
+        "shop",
+        "shopumsatz",
+        "kundschaft"
+      ],
+      "tags": [
+        "kundenverhalten",
+        "preisstrategie",
+        "sekundärquelle"
+      ],
+      "questionHints": [
+        "finden kunden tankstellenshops teuer",
+        "wie preissensibel sind tankstellenkunden",
+        "soll ich preise senken",
+        "wie beurteilen kunden shoppreise"
+      ],
+      "answer": "Eine im bft-Fachmagazin wiedergegebene Auswertung des B&G Shopper Monitor 2024 beschreibt, dass Verbraucher die Preise für Süßwaren, Snacks und Getränke in normalen Tankstellenshops häufig als teuer oder sehr teuer einschätzen. Das ist ein Hinweis auf Preiswahrnehmung, aber kein Beleg, dass eine Preissenkung den Gewinn erhöht. Preisentscheidungen müssen Marge, Absatzreaktion, Wettbewerb und Einkaufspreise gemeinsam berücksichtigen.",
+      "checklist": [
+        "Preiswahrnehmung nicht mit tatsächlicher Zahlungsbereitschaft gleichsetzen.",
+        "Bei einer Preisänderung Absatz, Rohertrag in Euro und Marge getrennt beobachten.",
+        "Die zitierte Stichprobe und Originalfrage prüfen, bevor Prozentwerte weiterverwendet werden."
+      ],
+      "evidenceLabel": "Sekundärbericht über eine Markt-/Shopper-Befragung; Originalstudie vor Zahlenverwendung prüfen",
+      "sourceTitle": "bft-Fachmagazin 2025/2 – Trends und Kundenverhalten, Fokus Tankstellen (B&G Shopper Monitor 2024)",
+      "sourceUrl": "https://www.bft.de/download_file/force/623",
+      "sourceDate": "2025 (zitiert wird B&G Shopper Monitor 2024)",
+      "limitations": "Öffentlich sichtbarer Fachmagazin-Auszug ist eine Sekundärquelle. Die dargestellten Preiswahrnehmungen sind keine experimentelle Messung der Preiselastizität und belegen keine kausale Wirkung einer Preissenkung."
     }
   ]
 }
