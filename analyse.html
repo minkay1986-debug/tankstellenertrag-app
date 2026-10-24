@@ -1057,10 +1057,10 @@ function advisorDirectAnswer(raw){
  if(/\b(welche gruende|was koennte.*gruende|gruende.*(niedrige|schlechte|gesunkene).*marge|warum.*marge.*(niedrig|schlecht|gesunken))\b/.test(q)){
   return '<b>Mögliche Gründe für eine niedrige Marge</b><p>Typische Prüfansätze sind gestiegene Einkaufspreise bei unveränderten Verkaufspreisen, Rabatte/Aktionen, ein veränderter Verkaufsmix, fehlerhafte oder veraltete EK-Zuordnungen sowie falsch zugeordnete Umsätze oder Einheiten.</p><p>Das sind mögliche Erklärungen, keine festgestellten Ursachen deiner Station. Vergleiche für denselben Zeitraum Umsatz, EK und Marge je Warengruppe mit dem Vormonat und prüfe zuerst fehlende oder ungeprüfte EK-Werte. Wenn du mir den betroffenen Monat oder die Warengruppe nennst, grenze ich die Prüfung ein.</p>';
  }
- if(/\b(wo lohnt es sich als erstes|wo sollte ich als erstes|wo zuerst genauer hinsehen|an welcher stelle.*geld|geld verschenken|wo verliere ich am ehesten ertrag|wo geht mir ertrag verloren)\b/.test(q)){
+ if(/\b(wo lohnt es sich als erstes|wo sollte ich als erstes|wo zuerst genauer hinsehen|an welcher stelle.*geld|geld verschenken|wo verliere ich am ehesten ertrag|wo geht mir ertrag verloren|bei welchen shop artikeln.*ertrag verloren)\b/.test(q)){
   return '<b>Diese drei Prüfungen zuerst</b><ol><li><b>EK und Marge je Warengruppe:</b> suche nach fehlenden EK-Werten und deutlichen Veränderungen.</li><li><b>Schwund und Abschriften:</b> getrennt betrachten und mit Bestandsbewegungen abgleichen.</li><li><b>Monatsvergleich:</b> Umsatz und Rohertrag mit dem Vormonat vergleichen und anschließend auffällige Gruppen prüfen.</li></ol><p>Das ist eine allgemeine Prüfreihenfolge, keine Behauptung, dass bei dir bereits ein Verlust vorliegt. Für eine belastbare Priorisierung müssen Stationsdaten und Vergleichsmonat geladen sein.</p>';
  }
- if(/\b(verglichen mit dem vormonat|gegenueber dem vormonat|gegenuber dem vormonat|zum vormonat).*(besser|schlechter|geschaeft|gelaufen|veraendert|unterschied|prozent|euro|betrag)|\b(wie viel prozent unterschied.*vormonat|veranderung als eurobetrag|veraenderung als eurobetrag)\b/.test(q)){
+ if(/\b(verglichen mit dem vormonat|gegenueber dem vormonat|gegenuber dem vormonat|zum vormonat).*(besser|schlechter|geschaeft|gelaufen|veraendert|unterschied|prozent|euro|betrag)|\b(wie viel prozent unterschied.*vormonat|veranderung als eurobetrag|veraenderung als eurobetrag|eurobetrag.*nicht in prozent)\b/.test(q)){
   return '<b>Monatsvergleich</b><p>Ich kann das nur belastbar beurteilen, wenn für den aktuellen und den vorherigen Monat vergleichbare Daten vorliegen. Außerdem muss klar sein, welche Kennzahl gemeint ist – zum Beispiel Shop-Umsatz, Rohertrag, Marge oder Schwund/Abschriften.</p><p>Im aktuellen Testzustand sind keine echten Stationswerte geladen; deshalb nenne ich keinen Prozent- oder Euro-Unterschied. Lade beide Monatsdaten und nenne mir die Kennzahl, dann lässt sich die Veränderung berechnen.</p>';
  }
  if(/\b(wie viel prozent marge macht mein shop|wie hoch ist meine marge|shop marge|marge in prozent)\b/.test(q)){
@@ -1069,7 +1069,7 @@ function advisorDirectAnswer(raw){
    return '<b>Shop-Marge derzeit nicht belastbar berechenbar</b><p>Für die Quote brauche ich Shop-Umsatz und gültigen Wareneinsatz (EK) für denselben Zeitraum. In der aktuellen Sitzung fehlen dafür verwertbare Werte; 0,00 € in einer leeren Auswertung ist kein Nachweis für tatsächlich null Umsatz oder null Einkauf.</p><p>Bitte lade die Monatsabrechnung und den zugehörigen EK-Import und prüfe, ob Zeitraum und Warengruppen zusammenpassen. Danach kann ich die Marge berechnen.</p>';
   }
  }
- if(/\b(september.*(hinter den erwartungen|schlechter|zurueck)|was koennte erklaeren.*september)\b/.test(q)){
+ if(/\b(september.*(hinter den erwartungen|schlechter|zurueck)|was (konnte|koennte) erklaeren.*september)\b/.test(q)){
   const sep=String(Number(month().slice(0,4))- (Number(month().slice(5,7))<9?1:0))+'-09';
   const current=data&&data.months&&data.months[sep];
   if(!current){
