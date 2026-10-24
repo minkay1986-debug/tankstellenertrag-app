@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-24T17:22:53Z",
+  "branch": "test/ai-advisor-prototype-2026-10-24",
+  "sourceBenchmarkRun": 40115525176,
+  "summary": {
+    "total": 22,
+    "reviewed": 22,
+    "passed": 22,
+    "failed": 0,
+    "totalScore": 214,
+    "maxScore": 220,
+    "average": 9.73,
+    "criticalFailures": 0,
+    "reviewType": "manual expert estimate"
+  },
+  "results": [
+    {
+      "id": "direct-margin-vs-gross-profit",
+      "topic": "Marge vs. Rohertrag",
+      "score": 10,
+      "pass": true,
+      "comment": "Definitionen und Rechenbeispiel korrekt; Stationswert klar abgegrenzt."
+    },
+    {
+      "id": "direct-more-sales-not-automatic-profit",
+      "topic": "Mehr Absatz = mehr Ertrag",
+      "score": 10,
+      "pass": true,
+      "comment": "Wareneinsatz, Rabatte, Produktmix und Abschriften berücksichtigt."
+    },
+    {
+      "id": "direct-lost-profit-priority",
+      "topic": "Ertragsverluste zuerst prüfen",
+      "score": 9,
+      "pass": true,
+      "comment": "Sinnvolle Prüfreihenfolge; Priorisierung stärker an vorhandene Daten binden."
+    },
+    {
+      "id": "direct-low-margin-causes",
+      "topic": "Mögliche Gründe niedriger Marge",
+      "score": 10,
+      "pass": true,
+      "comment": "Hypothesen klar als nicht bewiesene Ursachen markiert."
+    },
+    {
+      "id": "direct-priority",
+      "topic": "Erste Prüfprioritäten",
+      "score": 9,
+      "pass": true,
+      "comment": "Fachlich sinnvoll, aber redundant zu Ertragsverluste zuerst prüfen."
+    },
+    {
+      "id": "direct-missing-month-comparison",
+      "topic": "Fehlender Monatsvergleich",
+      "score": 10,
+      "pass": true,
+      "comment": "Vergleichbare Zeiträume und konkrete Kennzahl erforderlich; keine erfundene Differenz."
+    },
+    {
+      "id": "direct-order-quantity",
+      "topic": "Bestellmenge",
+      "score": 10,
+      "pass": true,
+      "comment": "Benötigte Daten und Grenzen klar benannt."
+    },
+    {
+      "id": "direct-expiry-waste",
+      "topic": "Verderb und Abschriften",
+      "score": 9,
+      "pass": true,
+      "comment": "Trennung gut; Mindestbestand und Lieferfrequenz könnten ergänzt werden."
+    },
+    {
+      "id": "direct-shelf-gaps",
+      "topic": "Regallücken",
+      "score": 10,
+      "pass": true,
+      "comment": "Praktische Prüfung ohne unbelegte Verlustsumme."
+    },
+    {
+      "id": "direct-assortment",
+      "topic": "Sortimentsbewertung",
+      "score": 10,
+      "pass": true,
+      "comment": "Nicht nur Umsatz, auch Rohertrag, Abschriften und Sortimentsfunktion."
+    },
+    {
+      "id": "direct-pricing",
+      "topic": "Preisänderungen",
+      "score": 10,
+      "pass": true,
+      "comment": "Stückrohertrag und Gesamtwirkung korrekt unterschieden."
+    },
+    {
+      "id": "direct-clarification",
+      "topic": "Gezielte Rückfrage",
+      "score": 10,
+      "pass": true,
+      "comment": "Fragt nach der entscheidenden fehlenden Bezugsgröße."
+    },
+    {
+      "id": "review-ek-zero",
+      "topic": "EK = 0",
+      "score": 10,
+      "pass": true,
+      "comment": "Bestätigte Null von fehlendem/fehlerhaftem Import unterschieden."
+    },
+    {
+      "id": "review-shelf-recording",
+      "topic": "Regallücken dokumentieren",
+      "score": 10,
+      "pass": true,
+      "comment": "Praktisch umsetzbar; keine automatische Überwachung behauptet."
+    },
+    {
+      "id": "review-ice-weather",
+      "topic": "Eisbestellung bei warmem Wetter",
+      "score": 10,
+      "pass": true,
+      "comment": "Wetter als möglicher Einfluss, keine unbelegte Absatzprognose."
+    },
+    {
+      "id": "review-chat-capabilities",
+      "topic": "Chat-Fähigkeiten",
+      "score": 9,
+      "pass": true,
+      "comment": "Grenzen benannt; konkrete Funktionen versionsbezogen halten."
+    },
+    {
+      "id": "review-inputs",
+      "topic": "Angaben für bessere Empfehlungen",
+      "score": 10,
+      "pass": true,
+      "comment": "Benötigte Angaben passend nach Fragestellung differenziert."
+    },
+    {
+      "id": "review-specific-change",
+      "topic": "Konkrete Änderung erfragen",
+      "score": 10,
+      "pass": true,
+      "comment": "Keine Maßnahme ohne geklärte Zielgröße vorweggenommen."
+    },
+    {
+      "id": "review-unclear-optimization",
+      "topic": "Unklare Optimierung",
+      "score": 9,
+      "pass": true,
+      "comment": "Sicher, aber teilweise redundant zur vorherigen Rückfrage."
+    },
+    {
+      "id": "review-evidence-vs-guess",
+      "topic": "Belege vs. Vermutungen",
+      "score": 10,
+      "pass": true,
+      "comment": "Datenbasis, Zeitraum und Hypothesen sauber getrennt."
+    },
+    {
+      "id": "review-simple-explanation",
+      "topic": "Einfache Erklärung",
+      "score": 9,
+      "pass": true,
+      "comment": "Verständlich; bei bekanntem Bezug könnte direkt vereinfacht werden."
+    },
+    {
+      "id": "review-contradiction",
+      "topic": "Widerspruch auflösen",
+      "score": 10,
+      "pass": true,
+      "comment": "Verlangt beide Aussagen und Bezugsgrößen statt zu raten."
+    }
+  ],
+  "limitations": [
+    "Die 22 Direktantwort-Prüfungen sind nicht identisch mit Q001–Q100 des Fragenkorpus.",
+    "Die 100 Korpusfragen bleiben separat manuell unbewertet.",
+    "Punktzahlen sind eine fachliche Einschätzung des gespeicherten Antworttexts, keine externe Zertifizierung."
+  ]
+}
