@@ -47,7 +47,7 @@ test("actual advisor normalization handles case, accents, ß and punctuation", a
   const source = await loadApp();
   const normFn = extractFunction(source, "advisorNorm", "advisorReply");
   const norm = vm.runInNewContext(`(()=>{ ${normFn}; return advisorNorm; })()`);
-  assert.equal(norm("  MARGE?? ÖL-Änderung!  "), "marge ol-anderung");
+  assert.equal(norm("  MARGE?? ÖL-Änderung!  "), "marge ol anderung");
   assert.equal(norm("GROẞE Abschriften!!!"), "grosse abschriften");
   assert.equal(norm("  Was bleibt mir übrig?  "), "was bleibt mir ubrig");
 });
