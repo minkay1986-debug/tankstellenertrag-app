@@ -98,6 +98,12 @@ jobs:
           if (!block) throw new Error('Question corpus JSONL block not found');
           const questions = block[1].split('\n').filter(Boolean).map(line => JSON.parse(line));
           if (questions.length !== 100) throw new Error('Expected 100 questions, got ' + questions.length);
+          const requiredFields = ['id', 'intent', 'question', 'must_not', 'notes', 'expected_behavior', 'required_context', 'critical_failures', 'evaluation'];
+          const incomplete = questions.filter(q => requiredFields.some(k => q[k] == null || q[k] === '') ||
+            !q.evaluation || ['intent_recognition','factual_grounding','data_integrity','usefulness_and_clarity','safety_and_boundaries'].some(k => !(k in q.evaluation)));
+          if (incomplete.length) throw new Error('Questions missing evaluation criteria/context: ' + incomplete.map(q => q.id).join(', '));
+          const ids = questions.map(q => q.id);
+          if (new Set(ids).size !== ids.length) throw new Error('Duplicate question IDs detected');
           const browser = await chromium.launch({ headless: true });
           const page = await browser.newPage();
           const errors = [];
