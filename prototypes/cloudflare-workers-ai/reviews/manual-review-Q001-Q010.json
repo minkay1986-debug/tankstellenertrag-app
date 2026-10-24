@@ -1,0 +1,186 @@
+{
+  "title": "Beratungschat – manuelle Erstbewertung Q001–Q010",
+  "commitUnderTest": "b3b0c9eabdac4aff31f6299fd4cb131fde1b4041",
+  "evaluatedArtifact": "advisor-benchmark-and-visual-review from browser run 40104629279",
+  "evaluatedSystem": "bestehender regelbasierter Chat (advisorReply/advisorKnowledgeHtml), nicht Cloudflare-KI",
+  "dataCondition": "Browser-Benchmark lief im Standardzustand ohne echte Stationsdaten; angezeigte Nullwerte daher nicht als echte Betriebswerte interpretieren.",
+  "rubric": {
+    "criteria": [
+      "intent_recognition",
+      "factual_grounding",
+      "data_integrity",
+      "usefulness_and_clarity",
+      "safety_and_boundaries"
+    ],
+    "maxScore": 10,
+    "passThreshold": 8,
+    "criticalFailureCap": 4
+  },
+  "summary": {
+    "total": 10,
+    "reviewed": 10,
+    "passed": 7,
+    "failed": 3,
+    "criticalFailures": 0,
+    "unreviewed": 90,
+    "meanScore": 8.5
+  },
+  "limitations": [
+    "Diese erste Bewertung ist eine fachliche Stichprobe, keine unabhängige externe Prüfung.",
+    "Die Bewertung testet nicht das echte KI-Modell.",
+    "Die 90 übrigen Fragen sind noch nicht bewertet.",
+    "Leerer Browserzustand begrenzt Aussagen zu konkreten Zahlen und Datenvergleichen."
+  ],
+  "results": [
+    {
+      "id": "Q001",
+      "score": {
+        "intent_recognition": 1,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 7,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "fail",
+        "reviewerNotes": "Erkennt Warengruppen/Marge und vermeidet unbelegte Ursachen; bei vollständig fehlenden Daten liefert die Antwort aber vor allem einen langen Datenstatus statt konkreter nächster Prüfung."
+      }
+    },
+    {
+      "id": "Q002",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 8,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Erklärt, dass Monatsaggregate keine Ursache beweisen, und nennt sinnvolle Prüfpunkte; die unplausiblen Nullwerte im leeren Testzustand werden nicht ganz klar als fehlende Stationsdaten gerahmt."
+      }
+    },
+    {
+      "id": "Q003",
+      "score": {
+        "intent_recognition": 1,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 7,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "fail",
+        "reviewerNotes": "Fragt nach, weil die Formulierung breit ist, aber die Frage ist für eine erste allgemeine Einordnung ausreichend verständlich; unnötig breite Menüantwort."
+      }
+    },
+    {
+      "id": "Q004",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 2,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 9,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Gute Trennung von erfassten Werten und unerklärtem Verlust sowie fehlender Bestandsabgleich; für die einfache Frage deutlich zu lang."
+      }
+    },
+    {
+      "id": "Q005",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 2,
+        "usefulness_and_clarity": 2,
+        "safety_and_boundaries": 2,
+        "total": 10,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Nennt Datenlücken, trennt Schwund/Abschriften und vermeidet Diebstahlschluss; ohne Vergleichsdaten keine belastbare Aussage zur Auffälligkeit."
+      }
+    },
+    {
+      "id": "Q006",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 2,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 9,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Nennt nur erfasste Abschriften/Schwund und macht die Grenze klar; sollte deutlicher sagen, dass die tatsächliche Summe wegen Datenlage nicht belastbar bestätigt ist."
+      }
+    },
+    {
+      "id": "Q007",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 2,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 9,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Erfindet keine Rangfolge und weist auf fehlende EK-/Vergleichsdaten hin; nächster konkreter Schritt könnte knapper und direkter sein."
+      }
+    },
+    {
+      "id": "Q008",
+      "score": {
+        "intent_recognition": 1,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 7,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "fail",
+        "reviewerNotes": "Die Frage ist tatsächlich breit, aber Chat hätte zuerst eine priorisierte allgemeine Prüfreihenfolge geben können; Antwort wirkt wie ein Navigationsmenü."
+      }
+    },
+    {
+      "id": "Q009",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 2,
+        "usefulness_and_clarity": 2,
+        "safety_and_boundaries": 2,
+        "total": 10,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Verzichtet auf erfundene Branchenbenchmarks und weist auf Grenzen der Daten hin; sicher und nützlich, obwohl kein externer Branchenvergleich geliefert wird."
+      }
+    },
+    {
+      "id": "Q010",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 2,
+        "safety_and_boundaries": 2,
+        "total": 9,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Stellt Schwund und Abschriften separat dar und behauptet nicht, dass null erfasste Werte null tatsächlichen Verlust bedeuten; leere Testdaten bleiben eine Einschränkung."
+      }
+    }
+  ]
+}
