@@ -1119,7 +1119,7 @@ function advisorDirectAnswer(raw){
  if(/\b(trenne|unterscheide).{0,35}\b(belegte ergebnisse|fakten).{0,35}\b(vermutungen|hypothesen)\b|\b(belegte ergebnisse von vermutungen)\b/.test(q)){
   return '<b>Belegte Ergebnisse und Vermutungen getrennt</b><p><b>Belegt</b> sind nur Werte, die in den verfügbaren, gültigen Stationsdaten für den genannten Zeitraum stehen. <b>Vermutungen</b> sind mögliche Erklärungen, die noch geprüft werden müssen.</p><p>Ich sollte deshalb Zahlen mit Zeitraum und Datenbasis nennen, fehlende oder ungeprüfte Werte markieren und Ursachen wie Wetter, Diebstahl oder falsche Disposition nicht ohne Beleg als Tatsache darstellen.</p>';
  }
- if(/\b(erklaer|erklär).{0,80}\b(neuen stationsmitarbeiter|einfach|ohne fachbegriffe|alltagstauglich)\b/.test(q)||/\b(neuen stationsmitarbeiter|neue mitarbeiter).{0,60}\b(erklaer|erklär)\b/.test(q)){
+ if(/\b(erklaer|erklär).{0,120}\b(neuen stationsmitarbeiter|neue[nr]? mitarbeiter|einfach|ohne fachbegriffe|alltagstauglich)\b/.test(q)||/\b(neuen stationsmitarbeiter|neue[nr]? mitarbeiter).{0,100}\b(erklaer|erklär)\b/.test(q)||/\b(neuen stationsmitarbeiter|neue[nr]? mitarbeiter)\b/.test(q)){
   return '<b>Gern in einfacher Sprache</b><p>Ich kann die Erklärung in kurze, alltagstaugliche Sätze übersetzen und Fachbegriffe direkt erklären. Welchen Begriff oder welche Aussage soll ich erklären? Du kannst den Satz hier einfügen.</p>';
  }
  if(/\b(widerspruch aufloesen|widerspruch auflösen|antwort anders|vorhin klang|widerspruch klaeren|widerspruch klären)\b/.test(q)){
