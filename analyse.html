@@ -1002,35 +1002,37 @@ function advisorKnowledgeHtml(raw){
  const original=advisorNorm(raw);
  if(!original||!Array.isArray(advisorKnowledgeEntries)||!advisorKnowledgeEntries.length)return '';
  const expanded=advisorNorm(advisorExpandQuery(raw));
- const tokens=s=>[...new Set(s.split(/\\s+/).filter(t=>t.length>=3))];
+ const tokens=s=>[...new Set(s.split(/\s+/).filter(t=>t.length>=3))];
  const originalTokens=tokens(original);
- const expandedTokens=new Set(tokens(expanded));
+ const expandedOnly=tokens(expanded).filter(t=>!originalTokens.includes(t));
  const stop=new Set(['warum','wieso','weshalb','kannst','bitte','zeige','zeig','meine','mein','einen','einer','eine','diese','dieser','dieses','wird','soll','sollte','habe','haben','ist','sind','mir','mich','ich','den','dem','das','und','oder','fuer','bei','von','mit','nicht','mehr','weniger','was','wie','welche','welcher','welches','kann','muss','noch','dann','jetzt']);
  const meaningful=originalTokens.filter(t=>!stop.has(t));
+ const expandedMeaningful=expandedOnly.filter(t=>!stop.has(t));
  const ranked=advisorKnowledgeEntries.map(e=>{
   const fields=[e.title||'',...(e.keywords||[]),...(e.tags||[]),...(e.questionHints||[])].map(advisorNorm);
-  let score=0, originalHits=0, phraseHit=false;
+  let score=0, originalHits=0, expandedHits=0, phraseHit=false;
   for(const field of fields){
    if(!field)continue;
    if(field.length>=5&&original.includes(field)){score+=7;phraseHit=true}
+   const fieldTokens=field.split(/\s+/);
    for(const token of meaningful){
     if(field===token){score+=4;originalHits++}
-    else if(field.split(/\\s+/).includes(token)){score+=3;originalHits++}
+    else if(fieldTokens.includes(token)){score+=3;originalHits++}
    }
-   for(const token of tokens(field)){
-    if(token.length>=5&&expandedTokens.has(token)&&!meaningful.includes(token))score+=0.35;
+   for(const token of expandedMeaningful){
+    if(token.length>=4&&fieldTokens.includes(token)){score+=2;expandedHits++}
    }
   }
-  const uniqueHits=new Set(fields.flatMap(f=>meaningful.filter(t=>f.split(/\\s+/).includes(t)))).size;
-  // Require at least one strong original-query match; expansion-only overlap is never enough.
-  const eligible=phraseHit||originalHits>=1&&uniqueHits>=1;
-  return {e,score,originalHits,uniqueHits,phraseHit,eligible};
- }).filter(x=>x.eligible&&x.score>=3)
+  const uniqueHits=new Set(fields.flatMap(field=>meaningful.filter(t=>field.split(/\s+/).includes(t)))).size;
+  const uniqueExpandedHits=new Set(fields.flatMap(field=>expandedMeaningful.filter(t=>t.length>=4&&field.split(/\s+/).includes(t)))).size;
+  // Direct query matches win. Semantic expansion can qualify only with multiple distinct mapped terms.
+  const eligible=phraseHit||(originalHits>=1&&uniqueHits>=1)||(uniqueExpandedHits>=2&&expandedMeaningful.length>0);
+  return {e,score,originalHits,uniqueHits,expandedHits,uniqueExpandedHits,phraseHit,eligible};
+ }).filter(x=>x.eligible&&x.score>=4)
  .sort((a,b)=>b.score-a.score);
  if(!ranked.length)return '';
- // Avoid displaying weak or near-tied, unrelated entries.
  const best=ranked[0].score;
- const selected=ranked.filter((x,i)=>i===0&&(x.score>=4)||i>0&&x.score>=5&&x.score>=best*0.72&&x.uniqueHits>=ranked[0].uniqueHits).slice(0,2);
+ const selected=ranked.filter((x,i)=>i===0&&x.score>=4||i>0&&x.score>=5&&x.score>=best*0.72&&(x.uniqueHits>=ranked[0].uniqueHits||x.uniqueExpandedHits>=ranked[0].uniqueExpandedHits)).slice(0,2);
  if(!selected.length)return '';
  const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  let html='<div class="panel" style="margin-top:12px"><h3>Fachwissen & Prüfansätze</h3><p class="small">Zusätzliche Hinweise aus dem hinterlegten Fachwissensbestand. Sie ergänzen die Kennzahlenanalyse, ersetzen aber keinen Nachweis für eine konkrete Ursache.</p>';
