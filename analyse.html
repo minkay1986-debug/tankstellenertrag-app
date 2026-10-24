@@ -987,7 +987,7 @@ function advisorExpandQuery(raw){
  const rules=[
   [/\b(verdien\w*|ubrig|bleibt mir|bleibt vom|am monatsende|wenig ubrig|viel verkauft|verkaufe viel|bringt kaum|mehr umsatz|mehr verkauft|kaum mehr|weniger gewinn|weniger ertrag|lohnt sich nicht)\b/g,' marge rohertrag wareneinsatz ertrag gewinn rentabilitaet'],
   [/\b(geld verloren|geld verlieren|kostet mich|geht verloren|schwund|geklaut|gestohlen|fehlt in der kasse|inventur|verlust)\b/g,' verlust bestandsdifferenz fehlbestand inventurdifferenzen diebstahl abschriften'],
-  [/\b(abgelaufen|mhd|verdirbt|wegwerfen|weggeworfen|alt geworden|nicht mehr frisch|backwaren ubrig|backwaren bleiben|muss weg|abschriften)\b/g,' abschriften verderb haltbarkeit lebensmittelverluste backwaren bestellplanung absatzprognose'],
+  [/\b(abgelaufen\\w*|mhd|verdirbt|wegwerfen|weggeworfen|alt geworden|nicht mehr frisch|backwaren ubrig|backwaren bleiben|muss weg|abschriften)\b/g,' abschriften verderb haltbarkeit lebensmittelverluste backwaren bestellplanung absatzprognose'],
   [/\b(leeres regal|regalluck\w*|nicht da|nicht verfugbar|standig ausverkauft|artikel fehlt|artikel nicht da|regal leer|fehlt im regal)\b/g,' regalverfuegbarkeit out of stock nachschub fehlbestand absatzverlust'],
   [/\b(was soll ich .* bestellen|bestell\w*|zu viel bestellt|zu wenig bestellt|liegt zu lange|zu viel auf lager|zu viel bestellt|bestellmenge|uberbestand|nachbestellen)\b/g,' bestellmenge lieferzeit sicherheitsbestand disposition nachfrage lagerumschlag'],
   [/\b(preis\w* senken|\w*preise? zu senken|billiger machen|teurer machen|preise andern|kunden finden teuer|zu teuer|preis erhohen|preis erhoehen|preis runter|preis hoch)\b/g,' preisstrategie preiselastizitaet absatzreaktion rohertrag preiswahrnehmung'],
