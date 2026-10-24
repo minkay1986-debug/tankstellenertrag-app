@@ -7,13 +7,6 @@ on:
       - "prototypes/cloudflare-workers-ai/**"
       - ".github/workflows/cloudflare-ai-prototype-tests.yml"
       - "docs/AI-ADVISOR-TESTBRANCH.md"
-      - "docs/AI-ADVISOR-TESTBRANCH.md"
-  push:
-    branches:
-      - "test/ai-advisor-prototype-2026-10-24"
-    paths:
-      - "prototypes/cloudflare-workers-ai/**"
-      - ".github/workflows/cloudflare-ai-prototype-tests.yml"
   workflow_dispatch:
 
 permissions:
