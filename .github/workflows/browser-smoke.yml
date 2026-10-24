@@ -136,6 +136,8 @@ jobs:
               { id: 'direct-margin-vs-gross-profit', question: 'Kannst du Marge und Rohertrag verständlich auseinanderhalten?', must: ['Eurobetrag', 'Anteil am Umsatz'] },
               { id: 'direct-more-sales-not-automatic-profit', question: 'Wenn ich mehr verkaufe, verdiene ich dann automatisch mehr?', must: ['nicht automatisch', 'Wareneinsatz'] },
               { id: 'direct-low-margin-causes', question: 'Welche Gründe könnten hinter meiner niedrigen Marge stecken?', must: ['Einkaufspreise', 'keine festgestellten Ursachen'] },
+              { id: 'direct-lost-profit-priority', question: 'Bei welchen Shop-Artikeln geht mir wahrscheinlich Ertrag verloren?', must: ['EK und Marge', 'Schwund und Abschriften'] },
+              { id: 'direct-low-margin-causes', question: 'Welche Gründe könnten hinter meiner niedrigen Marge stecken?', must: ['Einkaufspreise', 'keine festgestellten Ursachen'] },
               { id: 'direct-priority', question: 'Wo lohnt es sich, als Erstes genauer hinzusehen?', must: ['EK und Marge', 'Schwund und Abschriften'] },
               { id: 'direct-missing-month-comparison', question: 'Verglichen mit dem Vormonat: ist mein Geschäft besser gelaufen?', must: ['keine echten Stationswerte', 'Kennzahl'] }
             ];
