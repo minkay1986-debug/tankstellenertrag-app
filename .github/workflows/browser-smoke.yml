@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'analyse.html'
+      - 'prototypes/cloudflare-workers-ai/QUESTION-CORPUS.md'
+      - 'prototypes/warengruppen-fachberater/knowledge-base.json'
       - '.github/workflows/browser-smoke.yml'
   workflow_dispatch:
 
@@ -110,7 +112,7 @@ jobs:
                 answer: answerText, knowledge: knowledgeText,
                 answerEmpty: !answerText,
                 knowledgeHit: Boolean(knowledgeText),
-                technicalError: /technischer fehler|failed|undefined|null/.test(answerText.toLowerCase())
+                technicalError: /technischer fehler|failed to fetch|networkerror|uncaught (?:type|reference)?error|referenceerror|typeerror|cannot read properties of|is not defined/.test(answerText.toLowerCase())
               };
             } catch (error) {
               return { id:item.id, intent:item.intent, question:item.question, must_not:item.must_not, answer:'', knowledge:'', answerEmpty:true, knowledgeHit:false, technicalError:true, error:String(error?.message || error) };
