@@ -1047,6 +1047,25 @@ function advisorNorm(v){return String(v||'').toLowerCase().normalize('NFD').repl
 function advisorDirectAnswer(raw){
  const q=advisorNorm(raw);
  const html=s=>'<p>'+s+'</p>';
+ // Keep high-level clarification, product-capability and concept questions out of metric-driven loss analysis.
+ if(/\b(welche artikel koennte ich bei der naechsten bestellung reduzieren|welche artikel.*bestellung reduzieren|artikel bei der bestellung reduzieren)\b/.test(q)){
+  return '<b>Bestellmengen gezielt reduzieren</b><p>Reduziere nicht pauschal nach Umsatz. Prüfe je Artikel Absatz im vergleichbaren Zeitraum, aktuellen Bestand, offene Bestellungen, Lieferzeit, Mindestbestellmenge und bei Frischware MHD. Priorisiere Artikel mit wiederholtem Überbestand oder Abschriften, sofern die Daten das belegen.</p><p>Im aktuellen Testzustand liegen keine echten Artikel- und Bestandsdaten vor. Deshalb nenne ich keine konkrete Reduktionsliste. Schwacher Monatsumsatz allein beweist keinen Ladenhüter.</p>';
+ }
+ if(/\b(unterschied zwischen schwund und einer inventurdifferenz|schwund und einer inventurdifferenz)\b/.test(q)){
+  return '<b>Schwund und Inventurdifferenz sind nicht dasselbe</b><p><b>Schwund</b> bezeichnet Warenverluste, die beispielsweise durch Bruch, Verderb, Fehlentnahmen oder Diebstahl entstehen können; die Ursache muss jeweils geprüft werden. Eine <b>Inventurdifferenz</b> ist zunächst die Abweichung zwischen rechnerischem Bestand und gezähltem Ist-Bestand.</p><p>Eine Inventurdifferenz kann mit Schwund zusammenhängen, aber auch durch falsche Wareneingänge, Buchungen, Retouren oder Zählfehler entstehen. Sie ist allein kein Beweis für Diebstahl.</p>';
+ }
+ if(/\b(kann die anwendung bestellungen direkt an meiner kasse ausloesen|bestellungen direkt an meiner kasse ausloesen|bestellungen direkt.*kasse)\b/.test(q)){
+  return '<b>Bestellungen direkt an der Kasse auslösen?</b><p>Der Beratungs-Chat ist eine Analyse- und Beratungshilfe. Er führt keine Bestellung aus und sollte keine direkte Bestellfunktion behaupten, solange eine solche Schnittstelle nicht ausdrücklich implementiert und geprüft ist.</p><p>Er kann – soweit passende Artikeldaten vorhanden sind – bei der Vorbereitung einer Bestellentscheidung helfen. Bestellung und Freigabe bleiben außerhalb des Chats.</p>';
+ }
+ if(/\b(was genau soll ich verbessern.*umsatz.*marge.*bestand|was soll ich verbessern.*umsatz.*marge.*bestand)\b/.test(q)){
+  return '<b>Welchen Bereich möchtest du zuerst verbessern?</b><p>Wähle bitte ein Ziel: <b>Umsatz</b> (Absatz und Nachfrage), <b>Marge/Rohertrag</b> (Einkauf, Verkaufspreis und Produktmix) oder <b>Bestand</b> (Überbestand, Regallücken und Abschriften).</p><p>Ohne diese Priorität und passende Stationsdaten wäre eine konkrete Empfehlung geraten.</p>';
+ }
+ if(/\b(wie wirken sich wareneinsatz schwund und abschriften jeweils auf den ertrag aus|wareneinsatz schwund und abschriften jeweils auf den ertrag)\b/.test(q)){
+  return '<b>Wie Wareneinsatz, Schwund und Abschriften den Ertrag beeinflussen</b><ul><li><b>Wareneinsatz:</b> Einkaufskosten der verkauften Ware; er wird bei der Rohertragsrechnung vom Umsatz abgezogen.</li><li><b>Schwund:</b> Warenverluste bzw. Bestandsverluste; die genaue betriebliche Verbuchung hängt vom Kontierungs- und Auswertungsmodell ab.</li><li><b>Abschriften:</b> Wertminderungen oder ausgebuchte Ware, etwa bei Verderb oder Beschädigung; nicht doppelt zählen, wenn sie bereits im Wareneinsatz oder einer anderen Kennzahl enthalten sind.</li></ul><p>Die genaue Auswirkung auf Gewinn hängt von der Buchungslogik ab. Für eine belastbare Auswertung müssen die Kategorien eindeutig abgegrenzt sein, damit derselbe Verlust nicht doppelt abgezogen wird.</p>';
+ }
+ if(/\b(wenn dir daten fehlen.*sag offen.*statt etwas zu erfinden|sag offen.*was du nicht sicher weisst.*statt etwas zu erfinden|statt etwas zu erfinden)\b/.test(q)){
+  return '<b>So gehe ich mit fehlenden Daten um</b><p>Ich sollte fehlende oder ungeprüfte Werte ausdrücklich kennzeichnen, sie nicht stillschweigend als null behandeln und keine Ursache als Tatsache ausgeben, wenn sie nicht belegt ist.</p><p>Ich nenne, was die vorhandenen Daten zeigen, welche Schlussfolgerung noch unsicher ist und welche konkreten Angaben zur Prüfung fehlen. Ohne ausreichende Daten gebe ich keine erfundene Zahl oder scheinbar sichere Rangfolge aus.</p>';
+ }
  // Answer straightforward educational questions directly instead of dumping dashboard metrics.
  // Route common operational questions to focused, evidence-bounded guidance.
  // Do not invent station-specific causes, sales forecasts, or order quantities when required data is absent.
