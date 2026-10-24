@@ -989,7 +989,7 @@ function advisorKnowledgeHtml(raw){
  for(const {e} of ranked){
   html+='<div style="border-top:1px solid var(--line);padding-top:10px;margin-top:10px"><b>'+safe(e.title)+'</b><p>'+safe(e.answer)+'</p>';
   if(Array.isArray(e.checklist)&&e.checklist.length)html+='<ul>'+e.checklist.map(s=>'<li>'+safe(s)+'</li>').join('')+'</ul>';
-  html+='<p class="small"><b>Quellenstatus:</b> '+safe(e.evidenceLabel||'Nicht klassifiziert')+'<br><b>Quelle:</b> '+safe(e.sourceTitle||'Keine verifizierte externe Quelle hinterlegt')+'<br><b>Grenze:</b> '+safe(e.limitations||'Anwendbarkeit im Einzelfall prüfen.')+'</p></div>';
+  html+='<p class="small"><b>Quellenstatus:</b> '+safe(e.evidenceLabel||'Nicht klassifiziert')+'<br><b>Quelle:</b> '+safe(e.sourceTitle||'Keine verifizierte externe Quelle hinterlegt')+(e.sourceUrl&&/^https:\/\//i.test(e.sourceUrl)?' · <a href="'+safe(e.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Originalquelle öffnen</a>':'')+'<br><b>Stand:</b> '+safe(e.sourceDate||'Nicht angegeben')+'<br><b>Grenze:</b> '+safe(e.limitations||'Anwendbarkeit im Einzelfall prüfen.')+'</p></div>';
  }
  return html+'</div>';
 }
