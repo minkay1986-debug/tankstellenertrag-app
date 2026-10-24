@@ -982,15 +982,17 @@ let advisorKnowledgeEntries=[];
 fetch('./prototypes/warengruppen-fachberater/knowledge-base.json').then(r=>{if(!r.ok)throw new Error('knowledge base unavailable');return r.json()}).then(kb=>{advisorKnowledgeEntries=Array.isArray(kb.entries)?kb.entries:[]}).catch(()=>{advisorKnowledgeEntries=[]});
 function advisorExpandQuery(raw){
  const q=advisorNorm(raw);
+ // advisorNorm entfernt Umlaute bereits (ü -> u, ä -> a, ö -> o).
+ // Deshalb müssen die Muster ebenfalls normalisiert/ASCII sein.
  const rules=[
-  [/\b(verdien|verdient|übrig|uebrig|bleibt mir|bleibt vom|am monatsende|wenig übrig|wenig uebrig|viel verkauft|verkaufe viel|bringt kaum)\b/g,' marge rohertrag wareneinsatz ertrag gewinn rentabilitaet'],
-  [/\b(geld verloren|geld verlieren|kostet mich|geht verloren|schwund|geklaut|gestohlen|fehlt in der kasse|inventur)\b/g,' verlust bestandsdifferenz fehlbestand inventurdifferenzen diebstahl abschriften'],
-  [/\b(abgelaufen|mhd|verdirbt|wegwerfen|weggeworfen|alt geworden|nicht mehr frisch|backwaren übrig|backwaren uebrig)\b/g,' abschriften verderb haltbarkeit lebensmittelverluste backwaren bestellplanung absatzprognose'],
-  [/\b(leeres regal|regallücke|regalluecke|nicht da|nicht verfügbar|nicht verfuegbar|ständig ausverkauft|staendig ausverkauft|artikel fehlt)\b/g,' regalverfuegbarkeit out of stock nachschub fehlbestand absatzverlust'],
-  [/\b(was soll ich bestellen|zu viel bestellt|zu wenig bestellt|liegt zu lange|zu viel auf lager|zu viel auf lager)\b/g,' bestellmenge lieferzeit sicherheitsbestand disposition nachfrage lagerumschlag'],
-  [/\b(preis senken|billiger machen|teurer machen|preise ändern|preise aendern|kunden finden teuer|zu teuer|preis erhöhen|preis erhoehen)\b/g,' preisstrategie preiselastizitaet absatzreaktion rohertrag preiswahrnehmung'],
-  [/\b(rausnehmen|auslisten|was fliegt raus|verkauft sich nicht|steht nur rum|steht nur herum|regalplatz verschwenden|welcher artikel lohnt)\b/g,' sortiment sortimentsoptimierung artikelrentabilitaet rohertrag kannibalisierung regalplatz'],
-  [/\b(warum läuft|warum laeuft|schlechter als|weniger als letztes|mehr verkaufen|mehr verdienen|verbessern)\b/g,' umsatz absatz marge rohertrag vergleich diagnose ursachenanalyse']
+  [/\b(verdien\w*|ubrig|bleibt mir|bleibt vom|am monatsende|wenig ubrig|viel verkauft|verkaufe viel|bringt kaum|mehr umsatz|mehr verkauft|kaum mehr|weniger gewinn|weniger ertrag|lohnt sich nicht)\b/g,' marge rohertrag wareneinsatz ertrag gewinn rentabilitaet'],
+  [/\b(geld verloren|geld verlieren|kostet mich|geht verloren|schwund|geklaut|gestohlen|fehlt in der kasse|inventur|verlust)\b/g,' verlust bestandsdifferenz fehlbestand inventurdifferenzen diebstahl abschriften'],
+  [/\b(abgelaufen|mhd|verdirbt|wegwerfen|weggeworfen|alt geworden|nicht mehr frisch|backwaren ubrig|backwaren bleiben|muss weg|abschriften)\b/g,' abschriften verderb haltbarkeit lebensmittelverluste backwaren bestellplanung absatzprognose'],
+  [/\b(leeres regal|regallucke|nicht da|nicht verfugbar|standig ausverkauft|artikel fehlt|artikel nicht da|regal leer|fehlt im regal)\b/g,' regalverfuegbarkeit out of stock nachschub fehlbestand absatzverlust'],
+  [/\b(was soll ich bestellen|zu viel bestellt|zu wenig bestellt|liegt zu lange|zu viel auf lager|zu viel bestellt|bestellmenge|uberbestand|nachbestellen)\b/g,' bestellmenge lieferzeit sicherheitsbestand disposition nachfrage lagerumschlag'],
+  [/\b(preis senken|billiger machen|teurer machen|preise andern|kunden finden teuer|zu teuer|preis erhohen|preis erhoehen|preis runter|preis hoch)\b/g,' preisstrategie preiselastizitaet absatzreaktion rohertrag preiswahrnehmung'],
+  [/\b(rausnehmen|auslisten|was fliegt raus|verkauft sich nicht|steht nur rum|steht nur herum|regalplatz verschwenden|welcher artikel lohnt|sortiment optimieren|ladenhuter)\b/g,' sortiment sortimentsoptimierung artikelrentabilitaet rohertrag kannibalisierung regalplatz'],
+  [/\b(warum laeuft|warum laeuft es|schlechter als|weniger als letztes|mehr verkaufen|mehr verdienen|verdienen trotz|marge schlechter|marge gesunken|marge ist schlechter|am monatsende|kaum mehr ubrig)\b/g,' umsatz absatz marge rohertrag vergleich diagnose ursachenanalyse']
  ];
  const extra=[];
  for(const [pattern,terms] of rules)if(pattern.test(q))extra.push(terms);
