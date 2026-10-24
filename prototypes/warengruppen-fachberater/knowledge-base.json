@@ -1,6 +1,6 @@
 {
-  "version": "0.3.0",
-  "description": "Fachwissensbestand für den TankstellenErtrag-Beratungs-Chat. Enthält allgemeine Prüfansätze sowie ausgewählte veröffentlichte Branchen- und Handelsquellen. Fremdbenchmarks sind ausdrücklich nicht als Tankstellen-Sollwerte zu verwenden; methodische Einschränkungen sind je Eintrag dokumentiert. Quellen werden nur verlinkt und in eigenen Worten zusammengefasst; keine Volltexte, Tabellen oder Abbildungen werden ohne Nutzungsrecht übernommen. Allgemeine Handels-/Forschungsbefunde werden als nicht tankstellenspezifisch gekennzeichnet.",
+  "version": "0.4.0",
+  "description": "Fachwissensbestand für den TankstellenErtrag-Beratungs-Chat. Enthält allgemeine Prüfansätze sowie ausgewählte veröffentlichte Branchen- und Handelsquellen. Fremdbenchmarks sind ausdrücklich nicht als Tankstellen-Sollwerte zu verwenden; methodische Einschränkungen sind je Eintrag dokumentiert. Quellen werden nur verlinkt und in eigenen Worten zusammengefasst; keine Volltexte, Tabellen oder Abbildungen werden ohne Nutzungsrecht übernommen. Allgemeine Handels-/Forschungsbefunde werden als nicht tankstellenspezifisch gekennzeichnet. Wissenschaftliche Publikationen werden bibliografisch verlinkt und nur in eigenständiger Kurzfassung beschrieben; publizierte Prozentwerte aus Fallstudien sind keine Garantie für andere Betriebe.",
   "entries": [
     {
       "id": "margin-diagnosis-001",
@@ -574,6 +574,138 @@
       "sourceUrl": "https://www.igcv.fraunhofer.de/de/forschung/referenzprojekte/reif_kuenstliche_intelligenz_nachhaltigkeit_lebensmittelindustrie.html",
       "sourceDate": "Projektlaufzeit 03/2020–02/2023; Webseite geprüft am 24.10.2026",
       "limitations": "Forschungsprojekt mit Fokus auf Lebensmittel-Wertschöpfungsketten, nicht ein Beleg für konkrete Tankstellen-KPIs. Allgemeine Aussagen und Einsparungspotenziale nicht als garantierte Ergebnisse oder Stationsbenchmarks ausgeben."
+    },
+    {
+      "id": "source-hubner-schaal-assortment-2017",
+      "title": "Forschung: Sortiment, Regalfläche und Warenverfügbarkeit gemeinsam planen",
+      "keywords": [
+        "sortiment",
+        "regalfläche",
+        "regalflaeche",
+        "regalplatz",
+        "platzierung",
+        "artikelmix",
+        "warengruppe",
+        "rentabilität",
+        "rentabilitaet",
+        "profitabilität",
+        "profitabilitaet",
+        "hübner",
+        "hubner",
+        "schaal",
+        "sortimentsoptimierung",
+        "warenverfügbarkeit"
+      ],
+      "tags": [
+        "sortimentsoptimierung",
+        "wissenschaftliche studie",
+        "retail-transfer"
+      ],
+      "questionHints": [
+        "welche artikel lohnen sich",
+        "wie sortiment verbessern",
+        "welche produkte auslisten",
+        "regalplatz rentabel nutzen"
+      ],
+      "answer": "Die begutachtete Operations-Research-Studie von Hübner und Schaal modelliert Sortimentsauswahl und begrenzte Regalfläche gemeinsam und berücksichtigt unsichere Nachfrage sowie mögliche Ersatzkäufe bei Nichtverfügbarkeit. Die Kernaussage für die Beratung: Artikel nicht isoliert nach Umsatz bewerten; Platz, Rohertrag, Nachfrageunsicherheit und mögliche Ersatzkäufe können gemeinsam relevant sein. Die im Paper berichteten Modell- und Fallstudienergebnisse sind keine garantierte Gewinnsteigerung für Tankstellen.",
+      "checklist": [
+        "Artikel nach Rohertrag in Euro, Absatz, Platzbedarf und Verfügbarkeit bewerten.",
+        "Bei ähnlichen Artikeln mögliche Substitution prüfen, statt nur Einzelumsätze zu vergleichen.",
+        "Sortimentsänderungen erst als Szenario rechnen und anschließend mit eigenen Daten validieren.",
+        "Studienergebnisse aus anderen Handelsformaten nicht als Tankstellen-Benchmark ausgeben."
+      ],
+      "evidenceLabel": "Begutachteter wissenschaftlicher Fachartikel; Retail-Fallstudien, keine Tankstellenstudie",
+      "sourceTitle": "Hübner & Schaal (2017) – An integrated assortment and shelf-space optimization model",
+      "sourceUrl": "https://doi.org/10.1016/j.ejor.2017.01.039",
+      "sourceDate": "16.08.2017",
+      "limitations": "Die Ergebnisse beruhen auf Modellen und Datensätzen aus anderen Handelskontexten. Zahlen zu möglichen Gewinnverbesserungen sind nicht direkt auf freie Tankstellen übertragbar und werden nicht als Versprechen verwendet."
+    },
+    {
+      "id": "source-garcia-arca-on-shelf-availability-2020",
+      "title": "Forschung: Regalverfügbarkeit und Logistikprozesse",
+      "keywords": [
+        "regallücke",
+        "regallücken",
+        "out of stock",
+        "out-of-stock",
+        "nicht verfügbar",
+        "nicht verfuegbar",
+        "warenverfügbarkeit",
+        "regalverfügbarkeit",
+        "lieferfähigkeit",
+        "lieferfaehigkeit",
+        "logistik",
+        "nachschub",
+        "fehlbestand",
+        "absatzverlust"
+      ],
+      "tags": [
+        "regalverfügbarkeit",
+        "disposition",
+        "wissenschaftliche studie",
+        "retail-transfer"
+      ],
+      "questionHints": [
+        "warum fehlen artikel im regal",
+        "wie verhindere ich leere regale",
+        "was bringt bessere warenverfügbarkeit"
+      ],
+      "answer": "Eine 2020 veröffentlichte Fachstudie untersucht eine beteiligungsorientierte Methode zur Verbesserung der Regalverfügbarkeit und zur Rationalisierung von Logistikabläufen anhand eines großen spanischen Handelsunternehmens. Für Tankstellen ist der übertragbare Ansatz, Ursachen von Nichtverfügbarkeit systematisch zu erfassen und Prozesse zu prüfen; die Studie liefert keinen festen Euro-Verlust pro Regallücke für Tankstellen.",
+      "checklist": [
+        "Nichtverfügbarkeit nach Artikel, Zeitpunkt und Dauer protokollieren.",
+        "Ursache trennen: Lieferproblem, Disposition, Buchungsfehler oder Ware nicht im Regal.",
+        "Verbesserungen zunächst in einem begrenzten Zeitraum messen.",
+        "Keine pauschalen Verlustwerte ohne eigene Absatz- und Margendaten berechnen."
+      ],
+      "evidenceLabel": "Wissenschaftlicher Fachartikel; Fallanwendung im allgemeinen Einzelhandel",
+      "sourceTitle": "García-Arca et al. (2020) – On-shelf availability and logistics rationalization",
+      "sourceUrl": "https://doi.org/10.1016/j.jretconser.2019.101889",
+      "sourceDate": "Januar 2020",
+      "limitations": "Fallstudie aus einem anderen Handelskontext. Keine repräsentative Tankstellenstichprobe und kein universeller Verlustbetrag je Regallücke."
+    },
+    {
+      "id": "source-rooderkerk-assortment-2013",
+      "title": "Forschung: Sortimentsoptimierung und Kannibalisierung",
+      "keywords": [
+        "sortiment",
+        "sortimentsoptimierung",
+        "artikelmix",
+        "kannibalisierung",
+        "ersatzkauf",
+        "substitution",
+        "preis",
+        "preisstrategie",
+        "preiselastizität",
+        "preiselastizitaet",
+        "artikelrentabilität",
+        "artikelrentabilitaet",
+        "warengruppe",
+        "rohertrag"
+      ],
+      "tags": [
+        "sortimentsoptimierung",
+        "preisstrategie",
+        "wissenschaftliche studie",
+        "retail-transfer"
+      ],
+      "questionHints": [
+        "welche artikel konkurrieren miteinander",
+        "soll ich ähnliche artikel auslisten",
+        "wie wirkt sich sortiment auf gewinn aus",
+        "preise und sortiment gemeinsam betrachten"
+      ],
+      "answer": "Die begutachtete Studie von Rooderkerk, Van Heerde und Bijmolt entwickelt ein Verfahren, um Sortimente auf Kategorieebene unter Berücksichtigung von Kundenpräferenzen und möglicher Kannibalisierung zwischen Artikeln zu optimieren. Für die Tankstellenberatung ist wichtig: Ein Artikel kann Verkäufe anderer Artikel verdrängen, während Auslistungen auch Ersatzkäufe auslösen können. Die Ergebnisse der untersuchten Produktkategorie sind nicht als universeller Effekt für Tankstellenshops zu lesen.",
+      "checklist": [
+        "Ähnliche Artikel nach Preis, Marke, Größe und Funktion gruppieren.",
+        "Vor einer Auslistung prüfen, ob Verkäufe auf verbleibende Artikel übergehen könnten.",
+        "Umsatzverlagerung und gesamten Rohertrag der Warengruppe betrachten.",
+        "Preisänderungen nicht ohne eigene Absatzdaten als wirksam oder unwirksam bewerten."
+      ],
+      "evidenceLabel": "Begutachteter wissenschaftlicher Fachartikel; Produktkategorie im Einzelhandel untersucht",
+      "sourceTitle": "Rooderkerk, Van Heerde & Bijmolt (2013) – Optimizing Retail Assortments",
+      "sourceUrl": "https://doi.org/10.1287/mksc.2013.0800",
+      "sourceDate": "2013",
+      "limitations": "Die berichteten Ergebnisse hängen von Kategorie, Daten und Modellannahmen ab. Nicht als zugesicherte Gewinnsteigerung oder direkte Tankstellenprognose verwenden."
     }
   ]
 }
