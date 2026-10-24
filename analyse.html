@@ -1048,6 +1048,26 @@ function advisorDirectAnswer(raw){
  const q=advisorNorm(raw);
  const html=s=>'<p>'+s+'</p>';
  // Answer straightforward educational questions directly instead of dumping dashboard metrics.
+ // Route common operational questions to focused, evidence-bounded guidance.
+ // Do not invent station-specific causes, sales forecasts, or order quantities when required data is absent.
+ if(/\\b(was soll ich bestellen|wie viel soll ich bestellen|bestellmenge|zu viel bestellt|zu wenig bestellt|nachbestellen|uberbestand|zu viel auf lager|ladenhuter|liegt zu lange im regal)\\b/.test(q)){
+  return '<b>Bestellmenge nicht aus dem Bauch heraus festlegen</b><p>Für eine belastbare Empfehlung brauche ich mindestens Artikelabsatz im vergleichbaren Zeitraum, aktuellen Bestand, Lieferzeit und Bestellrhythmus. Bei schnell verderblicher Ware kommen Haltbarkeit und erwartete Nachfrage hinzu.</p><p><b>Prüfe zuerst:</b> Absatz je Artikel, Bestand und offene Lieferungen; gleiche Wochentage und Aktionen berücksichtigen. Ohne diese Werte nenne ich keine scheinbar exakte Bestellmenge.</p>';
+ }
+ if(/\\b(abgelaufen|mhd|verdirbt|verderb|wegwerfen|weggeworfen|abschriften|backwaren ubrig|backwaren bleiben|nicht mehr frisch)\\b/.test(q)){
+  return '<b>Verderb und Abschriften eingrenzen</b><p>Trenne dokumentierte Abschriften von vermutetem Verderb. Prüfe Artikel, Menge, Datum/Uhrzeit, Einkaufsmenge und Absatz bis zum Ablauf. Bei Backwaren sind insbesondere Tagesabsatz, Produktions-/Liefermenge und Restmenge je Wochentag hilfreich.</p><p>Ohne diese Daten lässt sich die Ursache nicht sicher feststellen. Teste kleinere Nachbestell- oder Produktionsmengen schrittweise und vergleiche Abschriften und Verfügbarkeit, statt pauschal den Bestand zu reduzieren.</p>';
+ }
+ if(/\\b(regal leer|regalluck|nicht verfugbar|standig ausverkauft|artikel fehlt|artikel nicht da|fehlt im regal|ausverkauft)\\b/.test(q)){
+  return '<b>Regallücken gezielt prüfen</b><p>Eine leere Regalfläche kann durch zu geringe Disposition, verspätete Lieferung, nicht eingeräumte Ware oder eine falsche Bestandsbuchung entstehen. Prüfe zuerst Regalbestand gegen Lagerbestand, letzte Lieferung, Lieferzeit und Absatz des Artikels.</p><p>Ein möglicher Umsatzverlust ist ohne Nachfrage- und Verfügbarkeitsdaten nicht bezifferbar. Dokumentiere betroffene Artikel und Zeitfenster, bevor du eine Ursache festlegst.</p>';
+ }
+ if(/\\b(sortiment optimieren|welcher artikel lohnt|was soll raus|was fliegt raus|auslisten|verkauft sich nicht|steht nur rum|regalplatz|ladenhuter)\\b/.test(q)){
+  return '<b>Sortiment nicht nur nach Umsatz bewerten</b><p>Prüfe je Artikel Absatz, Rohertrag in Euro, Marge, Abschriften, Lagerdauer und belegten Regalplatz. Ein Artikel mit kleiner Marge kann trotzdem einen relevanten Rohertrag beitragen; eine hohe Marge allein beweist keinen hohen Gewinnbeitrag.</p><p>Vor dem Auslisten außerdem Mindestsortiment, Kundenbedarf, Saison und mögliche Verbundkäufe prüfen. Ohne artikelgenaue Daten kann ich keine konkrete Streichliste seriös nennen.</p>';
+ }
+ if(/\\b(preis senken|preise senken|billiger machen|preis erhohen|preis erhoehen|preis runter|preis hoch|kunden finden teuer|zu teuer|preise andern)\\b/.test(q)){
+  return '<b>Preisänderung erst rechnerisch und dann kontrolliert testen</b><p>Ein niedrigerer Verkaufspreis senkt zunächst den Rohertrag je Stück. Ob mehr Absatz das ausgleicht, hängt von der tatsächlichen Nachfrageänderung und den Einkaufskosten ab. Eine höhere Marge allein sagt nicht, ob der Gesamtrohertrag steigt.</p><p>Vergleiche für denselben Artikel Verkaufspreis, EK, Stückabsatz und Rohertrag vor und nach einer Änderung; Aktionen, Wochentage und Saison möglichst berücksichtigen. Ohne solche Daten lässt sich die beste Preisänderung nicht vorhersagen.</p>';
+ }
+ if(/\\b(erklar das einfacher|einfacher erklaren|was meinst du damit|welche zahl meinst du|welche kennzahl meinst du|du hast vorhin|vorhin gesagt|das verstehe ich nicht|ich verstehe nicht)\\b/.test(q)){
+  return '<b>Ich erkläre es gern einfacher</b><p>Damit ich mich auf die richtige Aussage beziehe: Meinst du Umsatz, Rohertrag in Euro, Marge in Prozent oder Schwund/Abschriften? Wenn du einen Satz aus meiner vorherigen Antwort meinst, kopiere ihn bitte kurz hier hinein; dann erkläre ich ihn ohne Fachbegriffe.</p>';
+ }
  if(/\b(marge und rohertrag|rohertrag und marge|marge.*rohertrag.*(erklaer|unterschied|auseinander)|rohertrag.*marge.*(erklaer|unterschied|auseinander))\b/.test(q)){
   return '<b>Marge und Rohertrag – kurz erklärt</b><p><b>Rohertrag</b> ist ein Eurobetrag: Umsatz minus Wareneinsatz. Beispiel: 100 € Umsatz minus 60 € Einkauf ergeben 40 € Rohertrag.</p><p><b>Marge</b> ist der Rohertrag als Anteil am Umsatz. Im Beispiel sind das 40 % Marge. Die 40 € sind also der Betrag, die 40 % die Quote.</p><p>Das Beispiel ist rein rechnerisch und kein Wert deiner Station. Für deine tatsächliche Shop-Marge brauche ich gültige Umsatz- und EK-Daten für denselben Zeitraum.</p>';
  }
