@@ -22,7 +22,7 @@ export default {
 
     // A separate random test token must be configured as a secret before use.
     const expectedToken = env.PROTOTYPE_TEST_TOKEN;
-    const suppliedToken = request.headers.get("Authorization")?.replace(/^Bearer\\s+/i, "");
+    const suppliedToken = request.headers.get("Authorization")?.replace(/^Bearer\s+/i, "");
     if (!expectedToken || !suppliedToken || suppliedToken !== expectedToken) {
       return Response.json({ error: "unauthorized" }, { status: 401 });
     }
