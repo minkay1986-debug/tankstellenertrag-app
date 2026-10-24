@@ -1104,7 +1104,7 @@ function advisorDirectAnswer(raw){
  if(/\\b(leere? regalfaecher|leere? regalfacher|regalluecken systematisch|regallucken systematisch|regalfaecher erfassen|regalfacher erfassen)\\b/.test(q)){
   return '<b>Regallücken systematisch erfassen</b><p>Erfasse bei jeder Kontrolle Artikel, Uhrzeit, Regalbestand, Lagerbestand und ob eine Lieferung offen oder verspätet ist. Wiederhole die Kontrolle zu festen Zeiten und notiere, wann das Fach wieder aufgefüllt wurde.</p><p>Vergleiche die Beobachtungen anschließend mit Absatz, Lieferzeit und Bestandsbuchungen. Ohne diese Daten lässt sich die Ursache nicht sicher bestimmen; eine automatische Regal- oder Kassenüberwachung behaupte ich nicht.</p>';
  }
- if(/\\b(warme[nr]? tage|warmes wetter|mehr eis ordern|eis bestellen|eis nachbestellen)\\b/.test(q)){
+ if(/\\b(warm.{0,12}tag|warmes wetter|mehr eis ordern|eis bestellen|eis nachbestellen)\\b/.test(q)){
   return '<b>Eisbestellung bei warmem Wetter vorsichtig planen</b><p>Warme Tage können die Nachfrage nach Eis beeinflussen, belegen aber allein keinen zusätzlichen Absatz. Vergleiche möglichst Verkäufe an ähnlichen Wochentagen, aktuelle Bestände, Lieferzeit, Mindestbestellmenge und Haltbarkeit.</p><p>Ohne diese Werte empfehle ich keine konkrete Zusatzmenge. Nutze zunächst eine kleine, überprüfbare Anpassung und vergleiche danach Absatz und Abschriften. Ich verwende dafür keine historische Wetter-Lernfunktion.</p>';
  }
  if(/\\b(welche aufgaben|was kann der beratungs.chat|was kann der beratungs chat|funktionen.*beratungs.chat|tatsaechlich uebernehmen|tatsächlich übernehmen)\\b/.test(q)){
