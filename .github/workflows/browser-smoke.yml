@@ -79,13 +79,70 @@ jobs:
           await browser.close();
           NODE
 
+      - name: Run 100-question advisor benchmark against actual chat functions
+        run: |
+          node --input-type=module <<'NODE'
+          import { chromium } from 'playwright';
+          import { readFile, writeFile } from 'node:fs/promises';
+          const raw = await readFile('prototypes/cloudflare-workers-ai/QUESTION-CORPUS.md', 'utf8');
+          const block = raw.match(/```jsonl\n([\s\S]*?)\n```/);
+          if (!block) throw new Error('Question corpus JSONL block not found');
+          const questions = block[1].split('\n').filter(Boolean).map(line => JSON.parse(line));
+          if (questions.length !== 100) throw new Error('Expected 100 questions, got ' + questions.length);
+          const browser = await chromium.launch({ headless: true });
+          const page = await browser.newPage();
+          const errors = [];
+          page.on('pageerror', e => errors.push(e.message));
+          const response = await page.goto('http://127.0.0.1:4173/analyse.html', { waitUntil: 'domcontentloaded' });
+          if (!response?.ok()) throw new Error('analyse.html failed to load');
+          await page.waitForTimeout(1000);
+          const results = await page.evaluate((questions) => questions.map(item => {
+            try {
+              const answer = advisorReply(item.question) || '';
+              const knowledgeHtml = advisorKnowledgeHtml(item.question) || '';
+              const strip = s => s.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+              const answerText = strip(answer);
+              const knowledgeText = strip(knowledgeHtml);
+              const combined = (answerText + ' ' + knowledgeText).trim();
+              return {
+                id: item.id, intent: item.intent, question: item.question,
+                must_not: item.must_not, notes: item.notes,
+                answer: answerText, knowledge: knowledgeText,
+                answerEmpty: !answerText,
+                knowledgeHit: Boolean(knowledgeText),
+                technicalError: /technischer fehler|failed|undefined|null/.test(answerText.toLowerCase())
+              };
+            } catch (error) {
+              return { id:item.id, intent:item.intent, question:item.question, must_not:item.must_not, answer:'', knowledge:'', answerEmpty:true, knowledgeHit:false, technicalError:true, error:String(error?.message || error) };
+            }
+          }), questions);
+          const summary = {
+            generatedAt: new Date().toISOString(),
+            page: 'analyse.html on isolated PR test branch',
+            mode: 'actual advisorReply/advisorKnowledgeHtml; default synthetic-free browser state; no customer data',
+            questionCount: results.length,
+            emptyAnswers: results.filter(x=>x.answerEmpty).length,
+            knowledgeHits: results.filter(x=>x.knowledgeHit).length,
+            technicalErrors: results.filter(x=>x.technicalError).length,
+            browserErrors: errors,
+            results
+          };
+          await writeFile('advisor-100-question-benchmark.json', JSON.stringify(summary, null, 2));
+          console.log(JSON.stringify({questionCount:summary.questionCount,emptyAnswers:summary.emptyAnswers,knowledgeHits:summary.knowledgeHits,technicalErrors:summary.technicalErrors,browserErrors:errors.length,report:'advisor-100-question-benchmark.json'},null,2));
+          if (results.length !== 100 || summary.emptyAnswers || summary.technicalErrors || errors.length) {
+            throw new Error('Benchmark found empty answers, technical errors, or browser errors; inspect uploaded JSON report.');
+          }
+          await browser.close();
+          NODE
+
       - name: Upload desktop and mobile visual snapshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ocean-blue-glass-visual-review
+          name: advisor-benchmark-and-visual-review
           path: |
             ocean-glass-desktop.png
             ocean-glass-mobile.png
+            advisor-100-question-benchmark.json
           if-no-files-found: warn
           retention-days: 7
