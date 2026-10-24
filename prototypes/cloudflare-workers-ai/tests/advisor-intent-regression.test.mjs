@@ -52,6 +52,29 @@ test("actual advisor normalization handles case, accents, ß and punctuation", a
   assert.equal(norm("  Was bleibt mir übrig?  "), "was bleibt mir ubrig");
 });
 
+test("actual query expansion recognizes normalized German everyday wording", async () => {
+  const source = await loadApp();
+  const normFn = extractFunction(source, "advisorNorm", "advisorReply");
+  const expandFn = extractFunction(source, "advisorExpandQuery", "advisorKnowledgeHtml");
+  const expand = vm.runInNewContext(`(()=>{ ${normFn}; ${expandFn}; return advisorExpandQuery; })()`);
+  const cases = [
+    ["Warum bleibt weniger übrig?", ["marge", "rohertrag", "wareneinsatz"]],
+    ["Ich verdiene trotz mehr Umsatz nicht mehr", ["marge", "rohertrag", "gewinn"]],
+    ["Meine Marge ist schlechter geworden", ["marge", "rohertrag"]],
+    ["Was mache ich mit abgelaufenen Backwaren?", ["abschriften", "verderb", "backwaren"]],
+    ["Ich habe ständig Regallücken", ["regallucke", "regalverfuegbarkeit", "absatzverlust"]],
+    ["Was soll ich nächste Woche bestellen?", ["bestellmenge", "disposition"]],
+    ["Lohnt es sich, die Getränkepreise zu senken?", ["preisstrategie", "preiselastizitaet"]],
+    ["Welche Artikel sollte ich auslisten?", ["sortimentsoptimierung", "artikelrentabilitaet"]]
+  ];
+  for (const [question, expectedTerms] of cases) {
+    const expanded = expand(question);
+    for (const term of expectedTerms) {
+      assert.ok(expanded.includes(term), `Expected "${term}" in expansion for: ${question}; got: ${expanded}`);
+    }
+  }
+});
+
 test("actual advisor intent layer recognizes core intents and common wording variants", async () => {
   const source = await loadApp();
   const cases = [
