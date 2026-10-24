@@ -880,7 +880,8 @@
       "sourceTitle": "GS1 Germany – Supply Chain Management / Optimal Shelf Availability",
       "sourceUrl": "https://www.gs1-germany.de/branchen-themen/scm-supply-chain-management/",
       "sourceDate": null,
-      "limitations": "Die verlinkte Übersichtsseite beschreibt das Fachgebiet, liefert aber keinen festen Eurobetrag je Regallücke und keinen validierten Tankstellenbenchmark."
+      "limitations": "Die verlinkte Übersichtsseite beschreibt das Fachgebiet, liefert aber keinen festen Eurobetrag je Regallücke und keinen validierten Tankstellenbenchmark.",
+      "sourceDateStatus": "not_stated_in_linked_source"
     },
     {
       "id": "price-test-001",
