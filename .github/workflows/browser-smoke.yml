@@ -1,6 +1,13 @@
 name: Browser smoke test (analyse.html)
 
 on:
+  push:
+    branches: ["test/ai-advisor-prototype-2026-10-24"]
+    paths:
+      - 'analyse.html'
+      - 'prototypes/cloudflare-workers-ai/QUESTION-CORPUS.md'
+      - 'prototypes/warengruppen-fachberater/knowledge-base.json'
+      - '.github/workflows/browser-smoke.yml'
   pull_request:
     branches: [main]
     paths:
