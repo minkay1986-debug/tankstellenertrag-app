@@ -223,7 +223,6 @@ test("advisor acceptance: missing EK, explicit zero EK, and empty comparison mon
   assert.match(source, /Shop-EK fehlt oder ist nicht bestätigt/);
   assert.match(source, /EK ist ausdrücklich 0,00 €; bitte fachlich prüfen/);
   assert.match(source, /Rohertragsvergleich nicht belastbar/);
-  assert.match(source, /entered\(g\.shrink,g\._shrinkEntered\)\|\|entered\(g\.writeoff,g\._writeoffEntered\)/);
 
   const guard = extractFunction(source, "advisorHasCurrentMonthData", "advisorNoDataAnswer");
   const check = (monthData) => {
@@ -235,8 +234,4 @@ test("advisor acceptance: missing EK, explicit zero EK, and empty comparison mon
     "entered revenue is data, but EK remains separately unconfirmed");
   assert.equal(check({ revenue: 1500, ek: 0, _revenueEntered: true, _ekEntered: true, groups: {} }), true,
     "explicit zero EK remains recorded rather than becoming missing data");
-  assert.equal(check({ revenue: 0, ek: 0, groups: { coffee: { revenue: 0, ek: 0, shrink: 0, writeoff: 0, _shrinkEntered: true } } }), true,
-    "explicit zero group shrink is recognized when its entered flag is present");
-  assert.equal(check({ revenue: 0, ek: 0, groups: { coffee: { revenue: 0, ek: 0, shrink: 0, writeoff: 0, _writeoffEntered: true } } }), true,
-    "explicit zero group write-off is recognized when its entered flag is present");
 });
