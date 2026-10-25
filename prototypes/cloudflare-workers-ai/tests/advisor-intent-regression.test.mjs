@@ -244,7 +244,7 @@ test("open-world wording: unseen everyday phrasings map to the right broad inten
     ["Am Monatsende bleibt kaum was hängen.", ["isMargin"]],
     ["Der Laden brummt, aber auf dem Konto merkt man nichts.", ["isMargin"]],
     ["Bei den Getränken stimmt irgendwas mit dem Einkauf nicht.", ["isMargin", "isDataQuality"]],
-    ["Warum sieht der Oktober viel schlechter aus als September?", ["isMargin", "isYear"]].slice(0,1),
+    ["Warum sieht der Oktober viel schlechter aus als September?", ["isMargin"]],
     ["Kannst du mir sagen, was sich seit dem letzten Monat verändert hat?", ["isEuroCompare"]],
     ["Ich weiß nicht, ob die Zahlen aus dem Import vollständig sind.", ["isDataQuality"]],
     ["Die Regale sind dauernd leer, obwohl genug Ware bestellt wird.", ["isOrder", "isAssortment"]],
