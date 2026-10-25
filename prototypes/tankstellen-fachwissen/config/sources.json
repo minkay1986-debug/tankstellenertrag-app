@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "policy": "allowlist_only",
+  "sources": [
+    {
+      "id": "uniti-publications",
+      "publisher": "UNITI Bundesverband EnergieMittelstand e.V.",
+      "start_url": "https://www.uniti.de/",
+      "allowed_hosts": ["www.uniti.de", "uniti.de"],
+      "scope": "Öffentliche Fachpublikationen mit direktem Bezug zu Tankstellenbetrieb und Shop-Warenwirtschaft",
+      "status": "pending_review",
+      "notes": "Vor automatisierter Sammlung Nutzungsbedingungen, robots.txt und konkrete Zielseiten prüfen. Keine Mitgliederinhalte oder geschützte Dokumente umgehen."
+    },
+    {
+      "id": "bft",
+      "publisher": "Bundesverband Freier Tankstellen e.V.",
+      "start_url": "https://www.bft.de/",
+      "allowed_hosts": ["www.bft.de", "bft.de"],
+      "scope": "Öffentliche Fachinformationen mit direktem Bezug zu Tankstellenbetrieb und Shop-Warenwirtschaft",
+      "status": "pending_review",
+      "notes": "Vor automatisierter Sammlung Nutzungsbedingungen, robots.txt und konkrete Zielseiten prüfen."
+    }
+  ],
+  "crawl": {
+    "maxPagesPerRun": 5,
+    "maxBytesPerPage": 1500000,
+    "timeoutMs": 10000,
+    "respectRobotsTxt": true,
+    "followOffsiteLinks": false,
+    "requireManualApprovalBeforeEvidence": true
+  }
+}
