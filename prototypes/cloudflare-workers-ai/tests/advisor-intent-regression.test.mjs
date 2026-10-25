@@ -219,9 +219,9 @@ test("advisor acceptance: missing EK, explicit zero EK, and empty comparison mon
   const source = await loadApp();
   assert.match(source, /p=pk&&advisorHasCurrentMonthData\(pk\)\?calc\(pk\):null/);
   assert.match(source, /y=data\.months&&data\.months\[py\]&&advisorHasCurrentMonthData\(py\)\?calc\(py\):null/);
-  assert.match(source, /currentGrossReliable=currentEkKnown&&d\.ek>0/);
-  assert.match(source, /Shop-EK fehlt oder ist nicht bestätigt/);
-  assert.match(source, /EK ist ausdrücklich 0,00 €; bitte fachlich prüfen/);
+  assert.match(source, /grossReliable=ekKnown&&d\\.ek>0/);
+  assert.match(source, /EK fehlt\/nicht bestätigt/);
+  assert.match(source, /EK ist 0,00 €; bitte prüfen/);
   assert.match(source, /Rohertragsvergleich nicht belastbar/);
 
   const guard = extractFunction(source, "advisorHasCurrentMonthData", "advisorNoDataAnswer");
