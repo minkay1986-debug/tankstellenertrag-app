@@ -1233,7 +1233,7 @@ function advisorHasCurrentMonthData(k=month()){
  const sources=x.sourceMonthly===true||x.sourceEK===true||x.sourceShrink===true||x.sourceInventory===true;
  const groups=Object.values(x.groups||{}).some(g=>{
   if(!g)return false;
-  return entered(g.revenue,g._revenueEntered)||entered(g.ek,g._ekEntered)||entered(g.shrink,g._shrinkEntered)||entered(g.writeoff,g._writeoffEntered)||entered(g.stock,g._stockEntered);
+  return entered(g.revenue,g._revenueEntered)||entered(g.ek,g._ekEntered)||Number(g.shrink)>0||Number(g.writeoff)>0||Number(g.stock)>0;
  });
  return top||sources||groups;
 }
