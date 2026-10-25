@@ -105,7 +105,7 @@ test("zero, missing data and causality guardrails are explicitly represented in 
 test("legal, tax and personnel questions receive only the fixed scope notice first", async () => {
   const source = await loadApp();
   const normFn = extractFunction(source, "advisorNorm", "advisorDirectAnswer");
-  const directFn = extractFunction(source, "advisorDirectAnswer", "advisorReply");
+  const directFn = extractFunction(source, "advisorDirectAnswer", "advisorHasCurrentMonthData");
   const direct = vm.runInNewContext(`(()=>{ ${normFn}; ${directFn}; return advisorDirectAnswer; })()`);
   const notice = "Dieser Fachbereich ist noch nicht Teil unserer Beratung.";
   for (const question of [
@@ -126,7 +126,7 @@ test("legal, tax and personnel questions receive only the fixed scope notice fir
 test("ordinary inventory and shrinkage questions are not blocked by the scope notice", async () => {
   const source = await loadApp();
   const normFn = extractFunction(source, "advisorNorm", "advisorDirectAnswer");
-  const directFn = extractFunction(source, "advisorDirectAnswer", "advisorReply");
+  const directFn = extractFunction(source, "advisorDirectAnswer", "advisorHasCurrentMonthData");
   const direct = vm.runInNewContext(`(()=>{ ${normFn}; ${directFn}; return advisorDirectAnswer; })()`);
   for (const question of [
     "Wie prüfe ich Inventurdifferenzen?",
