@@ -213,3 +213,30 @@ test("advisor no-data guard preserves explicit zeros and rejects untouched defau
   assert.equal(check({ revenue: 0, ek: 0, groups: {}, sourceEK: true }), true,
     "EK import marker must count as a data source");
 });
+
+
+test("advisor acceptance: missing EK, explicit zero EK, and empty comparison months are not conflated", async () => {
+  const source = await loadApp();
+  assert.match(source, /p=pk&&advisorHasCurrentMonthData\(pk\)\?calc\(pk\):null/);
+  assert.match(source, /y=data\.months&&data\.months\[py\]&&advisorHasCurrentMonthData\(py\)\?calc\(py\):null/);
+  assert.match(source, /currentGrossReliable=currentEkKnown&&d\.ek>0/);
+  assert.match(source, /Shop-EK fehlt oder ist nicht bestätigt/);
+  assert.match(source, /EK ist ausdrücklich 0,00 €; bitte fachlich prüfen/);
+  assert.match(source, /Rohertragsvergleich nicht belastbar/);
+  assert.match(source, /entered\(g\.shrink,g\._shrinkEntered\)\|\|entered\(g\.writeoff,g\._writeoffEntered\)/);
+
+  const guard = extractFunction(source, "advisorHasCurrentMonthData", "advisorNoDataAnswer");
+  const check = (monthData) => {
+    const data = { months: { "2026-10": monthData } };
+    const fn = vm.runInNewContext(`(()=>{ const data = ${JSON.stringify(data)}; const month = () => "2026-10"; ${guard}; return advisorHasCurrentMonthData; })()`);
+    return fn();
+  };
+  assert.equal(check({ revenue: 1500, ek: 0, _revenueEntered: true, _ekEntered: false, groups: {} }), true,
+    "entered revenue is data, but EK remains separately unconfirmed");
+  assert.equal(check({ revenue: 1500, ek: 0, _revenueEntered: true, _ekEntered: true, groups: {} }), true,
+    "explicit zero EK remains recorded rather than becoming missing data");
+  assert.equal(check({ revenue: 0, ek: 0, groups: { coffee: { revenue: 0, ek: 0, shrink: 0, writeoff: 0, _shrinkEntered: true } } }), true,
+    "explicit zero group shrink is recognized when its entered flag is present");
+  assert.equal(check({ revenue: 0, ek: 0, groups: { coffee: { revenue: 0, ek: 0, shrink: 0, writeoff: 0, _writeoffEntered: true } } }), true,
+    "explicit zero group write-off is recognized when its entered flag is present");
+});
