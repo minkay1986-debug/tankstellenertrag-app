@@ -235,3 +235,61 @@ test("advisor acceptance: missing EK, explicit zero EK, and empty comparison mon
   assert.equal(check({ revenue: 1500, ek: 0, _revenueEntered: true, _ekEntered: true, groups: {} }), true,
     "explicit zero EK remains recorded rather than becoming missing data");
 });
+
+
+test("open-world wording: unseen everyday phrasings map to the right broad intents", async () => {
+  const source = await loadApp();
+  const cases = [
+    ["Am Monatsende bleibt kaum was hängen.", ["isMargin"]],
+    ["Der Laden brummt, aber auf dem Konto merkt man nichts.", ["isMargin"]],
+    ["Bei den Getränken stimmt irgendwas mit dem Einkauf nicht.", ["isMargin", "isDataQuality"]],
+    ["Warum sieht der Oktober viel schlechter aus als September?", ["isMargin", "isYear"]].slice(0,1),
+    ["Kannst du mir sagen, was sich seit dem letzten Monat verändert hat?", ["isEuroCompare"]],
+    ["Ich weiß nicht, ob die Zahlen aus dem Import vollständig sind.", ["isDataQuality"]],
+    ["Die Regale sind dauernd leer, obwohl genug Ware bestellt wird.", ["isOrder", "isAssortment"]],
+    ["Soll ich den Preis hochsetzen oder verliere ich dann Kunden?", ["isPrice", "isSales"]],
+    ["Mach mir eine kurze Auswertung und sag, welche Angaben du noch brauchst.", ["isHelp", "isDataQuality"]],
+    ["Der Umsatz ist gestiegen, aber der Rohertrag gesunken.", ["isSales", "isMargin"]],
+    ["Und wie war das bei Kaffee?", ["isMargin"]],
+    ["Vergleiche bitte Umsatz und Marge mit dem gleichen Monat im Vorjahr.", ["isSales", "isMargin", "isYear"]],
+  ];
+  for (const [question, expectedFlags] of cases) {
+    const flags = actualIntentFlags(source, question);
+    for (const flag of expectedFlags) {
+      assert.equal(flags[flag], true, `Open-world phrase should activate ${flag}: ${question}; flags=${JSON.stringify(flags)}`);
+    }
+  }
+});
+
+test("open-world safety: unknown or underspecified questions are not treated as proof", async () => {
+  const source = await loadApp();
+  const normFn = extractFunction(source, "advisorNorm", "advisorDirectAnswer");
+  const directFn = extractFunction(source, "advisorDirectAnswer", "advisorHasCurrentMonthData");
+  const direct = vm.runInNewContext(`(()=>{ ${normFn}; ${directFn}; return advisorDirectAnswer; })()`);
+  for (const question of [
+    "Wer ist schuld, dass Ware fehlt?",
+    "Die Marge ist schlecht, also klaut doch bestimmt jemand, oder?",
+    "Sag einfach, welche Warengruppe die Ursache ist.",
+  ]) {
+    const answer = direct(question);
+    assert.ok(!/beweist.{0,40}diebstahl|bestimmt.{0,40}klaut/i.test(answer),
+      `Direct answer must not affirm an unsupported accusation: ${question}`);
+  }
+  const flags = actualIntentFlags(source, "Die Marge ist schlecht, also klaut doch bestimmt jemand, oder?");
+  assert.equal(flags.isTheft, true, "explicit theft wording should be recognized for safe handling");
+});
+
+test("open-world compound questions retain simultaneous intents instead of forcing one category", async () => {
+  const source = await loadApp();
+  const cases = [
+    ["Warum ist der Umsatz besser, aber der Rohertrag schlechter und was fehlt für den Vergleich?", ["isSales", "isMargin", "isDataQuality"]],
+    ["Was soll ich nachbestellen und lohnt sich ein anderer Preis?", ["isOrder", "isPrice"]],
+    ["Prüfe Schwund und sag mir, ob die Daten für den Vorjahresvergleich reichen.", ["isLoss", "isDataQuality"]],
+  ];
+  for (const [question, expectedFlags] of cases) {
+    const flags = actualIntentFlags(source, question);
+    for (const flag of expectedFlags) {
+      assert.equal(flags[flag], true, `Compound question should preserve ${flag}: ${question}`);
+    }
+  }
+});
