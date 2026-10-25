@@ -185,3 +185,31 @@ test("advisor explicitly distinguishes unentered month data from recorded zero",
   assert.ok(source.includes("x.sourceMonthly===true||x.sourceEK===true"));
   assert.match(source, /nicht als Nachweis für tatsächlich null Umsatz/);
 });
+
+
+test("advisor no-data guard preserves explicit zeros and rejects untouched defaults", async () => {
+  const source = await loadApp();
+  const guard = extractFunction(source, "advisorHasCurrentMonthData", "advisorNoDataAnswer");
+  const check = (monthData) => {
+    const data = { months: monthData ? { "2026-10": monthData } : {} };
+    const fn = vm.runInNewContext(`(()=>{ const data = ${JSON.stringify(data)}; const month = () => "2026-10"; ${guard}; return advisorHasCurrentMonthData; })()`);
+    return fn();
+  };
+  assert.equal(check(null), false, "no month record must not count as data");
+  assert.equal(check({ revenue: 0, ek: 0, shrink: 0, writeoff: 0, stock: 0, groups: {} }), false,
+    "default zero-filled month must not count as data");
+  assert.equal(check({ revenue: 0, _revenueEntered: true, ek: 0, shrink: 0, writeoff: 0, stock: 0, groups: {} }), true,
+    "explicitly entered zero revenue must count as data");
+  assert.equal(check({ revenue: 0, ek: 0, _ekEntered: true, shrink: 0, writeoff: 0, stock: 0, groups: {} }), true,
+    "explicitly entered zero EK must be distinguished from missing EK");
+  assert.equal(check({ revenue: 0, ek: 0, shrink: 0, _shrinkEntered: true, writeoff: 0, stock: 0, groups: {} }), true,
+    "explicitly entered zero shrink must count as data");
+  assert.equal(check({ revenue: 0, ek: 0, shrink: 0, writeoff: 0, _writeoffEntered: true, stock: 0, groups: {} }), true,
+    "explicitly entered zero write-off must count as data");
+  assert.equal(check({ revenue: 0, ek: 0, sourceMonthly: true, groups: {} }), true,
+    "monthly import marker must count as a data source");
+  assert.equal(check({ revenue: 1200, ek: 0, groups: {} }), true,
+    "partial imports with real values must remain available");
+  assert.equal(check({ revenue: 0, ek: 0, groups: {}, sourceEK: true }), true,
+    "EK import marker must count as a data source");
+});
