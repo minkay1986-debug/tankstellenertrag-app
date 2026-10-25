@@ -32,8 +32,9 @@ function actualIntentFlags(source, raw) {
   const marginEnd = source.indexOf(";", marginStart);
   assert.notEqual(marginEnd, -1, "Could not find end of actual margin intent flag");
   const intentLayer = source.slice(start, marginEnd + 1);
-  const wrapped = `(function(raw){ const q=String(advisorNorm(raw)||''); ${intentLayer}; return {q,semanticLoss,isHelp,isWeather,isTheft,isLoss,isEuroCompare,isMargin,isYear,isSales,isDataQuality}; })`;
-  return vm.runInNewContext(`(()=>{ ${normFn}; return ${wrapped.slice(1, -1)}; })()`)(raw);
+  const expandFn = extractFunction(source, "advisorExpandQuery", "advisorKnowledgeHtml");
+  const wrapped = `(function(raw){ const q=String(advisorExpandQuery(raw)||''); ${intentLayer}; return {q,semanticLoss,isHelp,isWeather,isTheft,isLoss,isEuroCompare,isMargin,isYear,isSales,isDataQuality,isOrder,isAssortment,isPrice}; })`;
+  return vm.runInNewContext(`(()=>{ ${normFn}; ${expandFn}; return ${wrapped.slice(1, -1)}; })()`)(raw);
 }
 
 test("the synthetic question corpus contains 100 unique questions", async () => {
