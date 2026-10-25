@@ -3,6 +3,8 @@
 create table if not exists public.advisor_feedback (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  -- Until a verified station-membership table exists, one authenticated account is one isolated station tenant.
+  station_id uuid not null default auth.uid(),
   question text not null check (char_length(question) between 1 and 1200),
   answer text not null check (char_length(answer) <= 5000),
   rating text not null check (rating in ('helpful','unhelpful')),
@@ -23,18 +25,18 @@ grant select, insert, delete on public.advisor_feedback to authenticated;
 drop policy if exists advisor_feedback_select_own on public.advisor_feedback;
 create policy advisor_feedback_select_own
   on public.advisor_feedback for select to authenticated
-  using (user_id = (select auth.uid()));
+  using (user_id = (select auth.uid()) and station_id = (select auth.uid()));
 
 drop policy if exists advisor_feedback_insert_own on public.advisor_feedback;
 create policy advisor_feedback_insert_own
   on public.advisor_feedback for insert to authenticated
-  with check (user_id = (select auth.uid()));
+  with check (user_id = (select auth.uid()) and station_id = (select auth.uid()));
 
 drop policy if exists advisor_feedback_delete_own on public.advisor_feedback;
 create policy advisor_feedback_delete_own
   on public.advisor_feedback for delete to authenticated
   using (user_id = (select auth.uid()));
 
--- No policy exposes one customer's feedback to another customer.
+-- Isolation: each signed-in station account can access only its own tenant rows.
 -- Shared learning must be a separate, reviewed/admin-only workflow; feedback is not
 -- automatically promoted to a general rule or injected into model prompts.
