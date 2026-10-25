@@ -32,7 +32,7 @@ function actualIntentFlags(source, raw) {
   const marginEnd = source.indexOf(";", marginStart);
   assert.notEqual(marginEnd, -1, "Could not find end of actual margin intent flag");
   const intentLayer = source.slice(start, marginEnd + 1);
-  const wrapped = `(function(raw){ const q=String(advisorNorm(raw)||''); ${intentLayer}; return {q,semanticLoss,isHelp,isWeather,isTheft,isLoss,isEuroCompare,isMargin}; })`;
+  const wrapped = `(function(raw){ const q=String(advisorNorm(raw)||''); ${intentLayer}; return {q,semanticLoss,isHelp,isWeather,isTheft,isLoss,isEuroCompare,isMargin,isDataQuality}; })`;
   return vm.runInNewContext(`(()=>{ ${normFn}; return ${wrapped.slice(1, -1)}; })()`)(raw);
 }
 
@@ -133,5 +133,35 @@ test("ordinary inventory and shrinkage questions are not blocked by the scope no
     "Wie erkläre ich meinem Mitarbeiter die Schwundkontrolle?"
   ]) {
     assert.ok(!direct(question).includes("Dieser Fachbereich ist noch nicht Teil unserer Beratung."), `Inventory question incorrectly blocked: ${question}`);
+  }
+});
+
+test("actual advisor recognizes data-quality wording without broad false positives", async () => {
+  const source = await loadApp();
+  const cases = [
+    ["Der Einkauf ist null. Ist das richtig?", true],
+    ["Welche Daten fehlen noch?", true],
+    ["Welche Werte fehlen noch?", true],
+    ["Sind die Werte für beide Jahre vollständig?", true],
+    ["Der Einkaufspreis fehlt im Import.", true],
+    ["Sind die Daten für den Vorjahresvergleich vergleichbar?", true],
+    ["Warum bleibt von meinem Umsatz so wenig übrig?", false],
+    ["Wie reduziere ich Schwund?", false],
+  ];
+  for (const [question, expected] of cases) {
+    const flags = actualIntentFlags(source, question);
+    assert.equal(flags.isDataQuality, expected, `Unexpected data-quality intent for: ${question}`);
+  }
+});
+
+test("personnel wording alone does not activate theft intent", async () => {
+  const source = await loadApp();
+  for (const question of [
+    "Wie plane ich den Personaleinsatz?",
+    "Wie erkläre ich meinem Mitarbeiter die Schwundkontrolle?",
+    "Wie organisiere ich die Schichtübergabe?",
+  ]) {
+    const flags = actualIntentFlags(source, question);
+    assert.equal(flags.isTheft, false, `Personnel-only wording must not imply theft: ${question}`);
   }
 });
