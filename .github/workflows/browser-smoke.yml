@@ -79,6 +79,41 @@ jobs:
           await browser.close();
           NODE
 
+
+      - name: Test advisor chat scope and local knowledge
+        run: |
+          node --input-type=module <<'NODE'
+          import { chromium } from 'playwright';
+          const browser = await chromium.launch({ headless: true });
+          const page = await browser.newPage();
+          const errors = [];
+          page.on('pageerror', e => errors.push(e.message));
+          await page.goto('http://127.0.0.1:4173/analyse.html', { waitUntil: 'domcontentloaded' });
+          await page.locator('#advisorChatForm').waitFor({ state: 'attached', timeout: 15000 });
+          await page.waitForTimeout(1000);
+          async function ask(question) {
+            await page.locator('#advisorChatInput').fill(question);
+            await page.locator('#advisorChatForm button[type="submit"]').click();
+            const replies = page.locator('#advisorChatMessages .chat-message.assistant');
+            await replies.last().locator('div').last().waitFor();
+            await page.waitForFunction(() => {
+              const els = document.querySelectorAll('#advisorChatMessages .chat-message.assistant');
+              const last = els[els.length - 1];
+              return last && !last.innerText.includes('Ich prüfe deine Frage …');
+            }, { timeout: 10000 });
+            return await replies.last().innerText();
+          }
+          for (const q of ['Frage zum Recht', 'Frage zu Steuern', 'Frage zu Personal']) {
+            const answer = await ask(q);
+            if (!answer.includes('nicht Teil von TankstellenErtrag')) throw new Error('Scope guard failed for "' + q + '": ' + answer);
+          }
+          const operational = await ask('Wie optimiere ich meinen Wareneinsatz?');
+          if (operational.includes('nicht Teil von TankstellenErtrag')) throw new Error('Operational question incorrectly blocked');
+          if (errors.length) throw new Error('Runtime errors during chat test: ' + errors.join(' | '));
+          console.log(JSON.stringify({ legalTaxHrQuestionsBlocked: 3, operationalQuestionAnswered: true, runtimeErrors: errors.length }));
+          await browser.close();
+          NODE
+
       - name: Upload desktop and mobile visual snapshots
         if: always()
         uses: actions/upload-artifact@v4
