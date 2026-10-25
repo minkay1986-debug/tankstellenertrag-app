@@ -185,7 +185,8 @@ test("empty month data is not mistaken for recorded zero values", async () => {
     groups: Object.fromEntries(["susswaren", "backshop", "kaffee"].map(id => [id, { revenue: 0, ek: 0, shrink: 0, writeoff: 0, stock: 0, _ekEntered: false }]))
   } } }, month: () => "2026-10" };
   const context = vm.createContext(sandbox);
-  vm.runInContext(normFn + ";" + noDataFn + ";" + hasDataFn, context);
+  vm.runInContext(normFn + ";" + noDataFn, context);
+  vm.runInContext(hasDataFn, context);
   assert.equal(vm.runInContext("advisorHasCurrentMonthData()", context), false);
   const answer = vm.runInContext("advisorNoDataAnswer('Wie hoch ist meine Shop-Marge?')", context);
   assert.match(answer, /keine bestätigten Stationswerte erkennbar/);
@@ -206,6 +207,7 @@ test("explicitly entered zero and imported month data remain valid data", async 
   const imported = vm.createContext({ data: { months: { "2026-10": {
     revenue: 0, ek: 0, sourceMonthly: true, groups: {}
   } } }, month: () => "2026-10" });
-  vm.runInContext(normFn + ";" + noDataFn + ";" + hasDataFn, imported);
+  vm.runInContext(normFn + ";" + noDataFn, imported);
+  vm.runInContext(hasDataFn, imported);
   assert.equal(vm.runInContext("advisorHasCurrentMonthData()", imported), true);
 });
