@@ -90,7 +90,13 @@ jobs:
           page.on('pageerror', e => errors.push(e.message));
           await page.goto('http://127.0.0.1:4173/analyse.html', { waitUntil: 'domcontentloaded' });
           await page.locator('#advisorChatForm').waitFor({ state: 'attached', timeout: 15000 });
-          await page.waitForTimeout(1000);
+          await page.evaluate(() => {
+            document.querySelector('#app').style.display = 'block';
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelector('#advisorChat').classList.add('active');
+            if (typeof initAdvisorChat === 'function') initAdvisorChat();
+          });
+          await page.waitForTimeout(500);
           async function ask(question) {
             await page.locator('#advisorChatInput').fill(question);
             await page.locator('#advisorChatForm button[type="submit"]').click();
