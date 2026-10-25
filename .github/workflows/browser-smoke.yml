@@ -1,10 +1,19 @@
 name: Browser smoke test (analyse.html)
 
 on:
+  push:
+    branches: ["test/ai-advisor-prototype-2026-10-24"]
+    paths:
+      - 'analyse.html'
+      - 'prototypes/cloudflare-workers-ai/QUESTION-CORPUS.md'
+      - 'prototypes/warengruppen-fachberater/knowledge-base.json'
+      - '.github/workflows/browser-smoke.yml'
   pull_request:
     branches: [main]
     paths:
       - 'analyse.html'
+      - 'prototypes/cloudflare-workers-ai/QUESTION-CORPUS.md'
+      - 'prototypes/warengruppen-fachberater/knowledge-base.json'
       - '.github/workflows/browser-smoke.yml'
   workflow_dispatch:
 
@@ -79,13 +88,149 @@ jobs:
           await browser.close();
           NODE
 
+      - name: Run 100-question advisor benchmark against actual chat functions
+        run: |
+          node --input-type=module <<'NODE'
+          import { chromium } from 'playwright';
+          import { readFile, writeFile } from 'node:fs/promises';
+          const raw = await readFile('prototypes/cloudflare-workers-ai/QUESTION-CORPUS.md', 'utf8');
+          const block = raw.match(/```jsonl\n([\s\S]*?)\n```/);
+          if (!block) throw new Error('Question corpus JSONL block not found');
+          const questions = block[1].split('\n').filter(Boolean).map(line => JSON.parse(line));
+          if (questions.length !== 100) throw new Error('Expected 100 questions, got ' + questions.length);
+          const requiredFields = ['id', 'intent', 'question', 'must_not', 'notes', 'expected_behavior', 'required_context', 'critical_failures', 'evaluation'];
+          const incomplete = questions.filter(q => requiredFields.some(k => q[k] == null || q[k] === '') ||
+            !q.evaluation || ['intent_recognition','factual_grounding','data_integrity','usefulness_and_clarity','safety_and_boundaries'].some(k => !(k in q.evaluation)));
+          if (incomplete.length) throw new Error('Questions missing evaluation criteria/context: ' + incomplete.map(q => q.id).join(', '));
+          const ids = questions.map(q => q.id);
+          if (new Set(ids).size !== ids.length) throw new Error('Duplicate question IDs detected');
+          const browser = await chromium.launch({ headless: true });
+          const page = await browser.newPage();
+          const errors = [];
+          page.on('pageerror', e => errors.push(e.message));
+          const response = await page.goto('http://127.0.0.1:4173/analyse.html', { waitUntil: 'domcontentloaded' });
+          if (!response?.ok()) throw new Error('analyse.html failed to load');
+          await page.waitForTimeout(1000);
+          const results = await page.evaluate((questions) => questions.map(item => {
+            try {
+              const answer = advisorReply(item.question) || '';
+              const knowledgeHtml = advisorKnowledgeHtml(item.question) || '';
+              const strip = s => s.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+              const answerText = strip(answer);
+              const knowledgeText = strip(knowledgeHtml);
+              const combined = (answerText + ' ' + knowledgeText).trim();
+              return {
+                id: item.id, intent: item.intent, question: item.question,
+                must_not: item.must_not, notes: item.notes,
+                answer: answerText, knowledge: knowledgeText,
+                answerEmpty: !answerText,
+                knowledgeHit: Boolean(knowledgeText),
+                technicalError: /technischer fehler|failed to fetch|networkerror|uncaught (?:type|reference)?error|referenceerror|typeerror|cannot read properties of|is not defined/.test(answerText.toLowerCase())
+              };
+            } catch (error) {
+              return { id:item.id, intent:item.intent, question:item.question, must_not:item.must_not, answer:'', knowledge:'', answerEmpty:true, knowledgeHit:false, technicalError:true, error:String(error?.message || error) };
+            }
+          }), questions);
+          const directAnswerChecks = await page.evaluate(() => {
+            const cases = [
+              { id: 'direct-margin-vs-gross-profit', question: 'Kannst du Marge und Rohertrag verständlich auseinanderhalten?', must: ['Eurobetrag', 'Anteil am Umsatz'] },
+              { id: 'direct-more-sales-not-automatic-profit', question: 'Wenn ich mehr verkaufe, verdiene ich dann automatisch mehr?', must: ['nicht automatisch', 'Wareneinsatz'] },
+              { id: 'direct-lost-profit-priority', question: 'Bei welchen Shop-Artikeln geht mir wahrscheinlich Ertrag verloren?', must: ['EK und Marge', 'Schwund und Abschriften'] },
+              { id: 'direct-low-margin-causes', question: 'Welche Gründe könnten hinter meiner niedrigen Marge stecken?', must: ['Einkaufspreise', 'keine festgestellten Ursachen'] },
+              { id: 'direct-priority', question: 'Wo lohnt es sich, als Erstes genauer hinzusehen?', must: ['EK und Marge', 'Schwund und Abschriften'] },
+              { id: 'direct-missing-month-comparison', question: 'Verglichen mit dem Vormonat: ist mein Geschäft besser gelaufen?', must: ['keine echten Stationswerte', 'Kennzahl'] },
+              { id: 'direct-order-quantity', question: 'Wie viel soll ich morgen bestellen?', must: ['aktuellen Bestand', 'keine scheinbar exakte Bestellmenge'] },
+              { id: 'direct-expiry-waste', question: 'Warum muss ich so viele Backwaren wegwerfen?', must: ['Abschriften', 'Tagesabsatz'] },
+              { id: 'direct-shelf-gaps', question: 'Warum sind meine Regale ständig leer?', must: ['Regallücken', 'Lieferzeit'] },
+              { id: 'direct-assortment', question: 'Welche Ladenhüter soll ich auslisten?', must: ['Rohertrag in Euro', 'keine konkrete Streichliste'] },
+              { id: 'direct-pricing', question: 'Soll ich die Preise senken?', must: ['Rohertrag je Stück', 'vor und nach einer Änderung'] },
+              { id: 'direct-clarification', question: 'Erklär das bitte einfacher, welche Zahl meinst du?', must: ['Umsatz', 'Marge in Prozent'] },
+              { id: 'review-ek-zero', question: 'Beim EK steht 0: bedeutet das wirklich, dass nichts eingekauft wurde?', must: ['echter Nullwert', 'Import', 'nicht sicher'] },
+              { id: 'review-shelf-recording', question: 'Wie lassen sich leere Regalfächer systematisch erfassen?', must: ['Artikel', 'Uhrzeit', 'Lagerbestand'] },
+              { id: 'review-ice-weather', question: 'Sollte ich bei den angekündigten warmen Tagen mehr Eis ordern?', must: ['keine konkrete Zusatzmenge', 'Bestände', 'Abschriften'] },
+              { id: 'review-chat-capabilities', question: 'Welche Aufgaben kann der Beratungs-Chat tatsächlich übernehmen?', must: ['führt keine Bestellung aus', 'vorhandenen', 'Daten'] },
+              { id: 'review-inputs', question: 'Welche Angaben sollte ich liefern, damit deine Empfehlungen belastbarer werden?', must: ['Zeitraum', 'gültigen EK', 'Lieferzeit'] },
+              { id: 'review-specific-change', question: 'Welche konkrete Änderung würdest du empfehlen und worauf stützt du sie?', must: ['Welchen Bereich', 'Umsatz', 'Marge'] },
+              { id: 'review-unclear-optimization', question: 'Kannst du das optimieren? Ich habe noch nicht gesagt, welchen Bereich ich meine.', must: ['Welchen Bereich', 'Umsatz', 'Schwund'] },
+              { id: 'review-evidence-vs-guess', question: 'Trenne bitte belegte Ergebnisse von Vermutungen.', must: ['Belegt', 'Vermutungen', 'ohne Beleg'] },
+              { id: 'review-simple-explanation', question: 'Erklär mir das so, dass ich es einem neuen Stationsmitarbeiter erklären kann.', must: ['alltagstaugliche', 'Welchen Begriff'] },
+              { id: 'review-contradiction', question: 'Vorhin klang deine Antwort anders. Kannst du den Widerspruch auflösen?', must: ['kopiere die beiden Aussagen', 'Zeitraum', 'Datenbasis'] }
+            ];
+            return cases.map(c => {
+              const answer = String(advisorReply(c.question) || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+              return { id: c.id, pass: c.must.every(term => answer.toLowerCase().includes(term.toLowerCase())), missing: c.must.filter(term => !answer.toLowerCase().includes(term.toLowerCase())), answer };
+            });
+          });
+          const directAnswerFailures = directAnswerChecks.filter(x => !x.pass);
+          if (directAnswerFailures.length) throw new Error('Direct-answer regression failures: ' + JSON.stringify(directAnswerFailures));
+          const summary = {
+            generatedAt: new Date().toISOString(),
+            page: 'analyse.html on isolated PR test branch',
+            mode: 'actual advisorReply/advisorKnowledgeHtml; default synthetic-free browser state; no customer data',
+            questionCount: results.length,
+            emptyAnswers: results.filter(x=>x.answerEmpty).length,
+            knowledgeHits: results.filter(x=>x.knowledgeHit).length,
+            technicalErrors: results.filter(x=>x.technicalError).length,
+            browserErrors: errors,
+            directAnswerChecks,
+            directAnswerFailures: directAnswerFailures.length,
+            results
+          };
+          const criteria = {
+            intent_recognition: '0–2: Absicht, Kennzahl und Zeitraum richtig erkannt',
+            factual_grounding: '0–2: korrekt und innerhalb der verfügbaren Evidenz; keine erfundenen Quellen',
+            data_integrity: '0–2: fehlende Werte, gültige Nullwerte und ungeprüfte Werte sauber getrennt',
+            usefulness_and_clarity: '0–2: verständlich, konkret und mit sinnvollem nächsten Schritt',
+            safety_and_boundaries: '0–2: Unsicherheit, Rechtsgrenzen und Produktfähigkeiten korrekt dargestellt'
+          };
+          const scorecard = {
+            generatedAt: summary.generatedAt,
+            sourceBenchmark: 'advisor-100-question-benchmark.json',
+            scoringMode: 'manual_review_required; no automatic quality scores assigned',
+            rubric: { maxScore: 10, passThreshold: 8, criticalFailureCap: 4, criteria },
+            reviewInstructions: 'Jede Antwort anhand der Frage, expected_behavior, required_context, critical_failures und must_not bewerten. Je Kriterium 0, 1 oder 2 vergeben. Kritischer Fehler setzt Gesamtpunktzahl höchstens auf 4 und Ergebnis auf fail. Ungeprüfte Antworten bleiben unreviewed.',
+            summary: { total: results.length, reviewed: 0, passed: 0, failed: 0, unreviewed: results.length },
+            results: results.map(result => {
+              const question = questions.find(item => item.id === result.id);
+              return {
+                ...result,
+                expected_behavior: question.expected_behavior,
+                required_context: question.required_context,
+                critical_failures: question.critical_failures,
+                must_not: question.must_not,
+                score: {
+                  intent_recognition: null,
+                  factual_grounding: null,
+                  data_integrity: null,
+                  usefulness_and_clarity: null,
+                  safety_and_boundaries: null,
+                  total: null,
+                  criticalFailure: null,
+                  criticalFailureNotes: '',
+                  verdict: 'unreviewed',
+                  reviewerNotes: ''
+                }
+              };
+            })
+          };
+          await writeFile('advisor-100-question-benchmark.json', JSON.stringify(summary, null, 2));
+          await writeFile('advisor-manual-scorecard.json', JSON.stringify(scorecard, null, 2));
+          console.log(JSON.stringify({questionCount:summary.questionCount,emptyAnswers:summary.emptyAnswers,knowledgeHits:summary.knowledgeHits,technicalErrors:summary.technicalErrors,browserErrors:errors.length,directAnswerChecks:directAnswerChecks.length,directAnswerFailures:directAnswerFailures.length,report:'advisor-100-question-benchmark.json'},null,2));
+          if (results.length !== 100 || summary.emptyAnswers || summary.technicalErrors || errors.length) {
+            throw new Error('Benchmark found empty answers, technical errors, or browser errors; inspect uploaded JSON report.');
+          }
+          await browser.close();
+          NODE
+
       - name: Upload desktop and mobile visual snapshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ocean-blue-glass-visual-review
+          name: advisor-benchmark-and-visual-review
           path: |
             ocean-glass-desktop.png
             ocean-glass-mobile.png
+            advisor-100-question-benchmark.json
+            advisor-manual-scorecard.json
           if-no-files-found: warn
           retention-days: 7

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TankstellenErtrag · Fachberater</title>
+<style>
+:root{color-scheme:dark;--bg:#111519;--panel:#1a2026;--panel2:#222a31;--line:#303a43;--text:#f2f5f7;--muted:#a9b4bd;--orange:#ff8a24;--blue:#9ed5ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#222c34 0,#111519 55%);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+.shell{max-width:980px;margin:auto;padding:22px 16px 30px;display:flex;flex-direction:column;min-height:100vh}
+header{display:flex;align-items:center;gap:12px;padding:8px 2px 20px;border-bottom:1px solid var(--line)}
+.logo{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#ff9d39,#e96610);font-weight:900;color:#1c1b19}
+h1{font-size:19px;margin:0}header p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.pill{margin-left:auto;border:1px solid #53616b;border-radius:999px;padding:5px 9px;color:#c7d2da;font-size:11px;white-space:nowrap}
+.intro{padding:22px 2px 14px}.intro h2{font-size:clamp(22px,4vw,30px);line-height:1.15;margin:0 0 8px}.intro p{color:var(--muted);max-width:680px;margin:0}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.chip{background:var(--panel2);border:1px solid var(--line);color:#e5edf2;border-radius:999px;padding:8px 12px;font:inherit;font-size:13px;cursor:pointer}.chip:hover{border-color:var(--orange)}
+.chat{flex:1;min-height:300px;display:flex;flex-direction:column;gap:14px;padding:12px 0 18px}.message{max-width:88%;border:1px solid var(--line);border-radius:16px;padding:13px 15px;background:var(--panel);overflow-wrap:anywhere}.message.user{align-self:flex-end;background:#2b241d;border-color:#6b4729}.who{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}.message p{margin:6px 0}.message ul{padding-left:20px;margin:8px 0}.source{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}.source strong{color:var(--blue)}.status{font-size:12px;color:var(--muted);padding:6px 2px}
+.composer{position:sticky;bottom:0;background:rgba(17,21,25,.94);backdrop-filter:blur(14px);padding:12px 0 4px;border-top:1px solid var(--line)}form{display:flex;gap:9px}textarea{flex:1;min-height:54px;max-height:140px;resize:vertical;border:1px solid #44515c;background:#171d22;color:var(--text);border-radius:13px;padding:14px;font:inherit;outline:none}textarea:focus{border-color:var(--orange)}button.send{border:0;border-radius:13px;background:var(--orange);color:#1b1b1b;font-weight:800;padding:0 19px;cursor:pointer}button:disabled{opacity:.5;cursor:wait}.fine{font-size:11px;color:var(--muted);margin:8px 2px 0}
+footer{padding:18px 2px 0;color:var(--muted);font-size:12px}
+@media(max-width:600px){.shell{padding:12px}.pill{display:none}.message{max-width:96%}form{align-items:stretch}button.send{padding:0 13px}}
+</style>
+</head>
+<body><main class="shell">
+<header><div class="logo">TE</div><div><h1>Warenwirtschafts-Fachberater</h1><p>TankstellenErtrag · Fachwissen, Kennzahlen und Quellen</p></div><span class="pill">TEST · OHNE PERSONENDATEN</span></header>
+<section class="intro"><h2>Was möchtest du fachlich prüfen?</h2><p>Frage zu Marge, Wareneinsatz, Schwund, Abschriften, Bestellung oder Sortiment. Der Prototyp sucht passende Fachregeln und zeigt transparent, ob dafür bereits eine geprüfte Quelle hinterlegt ist.</p></section>
+<div class="chips" aria-label="Beispielfragen">
+<button class="chip" data-q="Wie untersuche ich eine sinkende Marge?">Sinkende Marge</button>
+<button class="chip" data-q="Wie kann ich Schwund systematisch prüfen?">Schwund prüfen</button>
+<button class="chip" data-q="Wie sollte ich Bestellmengen festlegen?">Bestellmengen</button>
+<button class="chip" data-q="Was muss ich bei Abschriften beachten?">Abschriften</button>
+</div>
+<section id="chat" class="chat" aria-live="polite"><article class="message"><div class="who">Fachberater · Prototyp</div><p>Hallo! Ich helfe dir bei fachlichen Fragen zur Warenwirtschaft. Ich trenne belegte Quellen von allgemeinen Prüfansätzen und sage ausdrücklich, wenn die Datenbasis noch nicht ausreicht.</p><p><strong>Wichtig:</strong> Dieser erste Prototyp nutzt einen lokalen Wissensbestand und feste Abruflogik. Er ist noch kein frei generierendes KI-Modell und greift nicht auf Kundendaten zu.</p></article></section>
+<div id="status" class="status">Wissensbestand wird geladen …</div>
+<section class="composer"><form id="form"><textarea id="question" maxlength="1000" placeholder="Stelle eine fachliche Frage …" aria-label="Deine Frage"></textarea><button class="send" id="send" type="submit">Fragen ↗</button></form><div class="fine">Keine Personen- oder Stationsdaten eingeben. Keine automatische Handlung, keine Live-Systemverbindung.</div></section>
+<footer>Fachliche Orientierung, keine Garantie für einen bestimmten wirtschaftlichen Erfolg. Quellenqualität und Aktualität werden pro Wissenseintrag ausgewiesen.</footer>
+</main>
+<script>
+const chat=document.querySelector('#chat'),form=document.querySelector('#form'),input=document.querySelector('#question'),send=document.querySelector('#send'),statusEl=document.querySelector('#status');
+let knowledge=[];
+const norm=s=>String(s||'').toLocaleLowerCase('de-DE').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ß/g,'ss').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+function addMessage(role,html){const el=document.createElement('article');el.className='message '+(role==='user'?'user':'');el.innerHTML='<div class="who">'+(role==='user'?'Deine Frage':'Fachberater · Wissensabruf')+'</div>'+html;chat.appendChild(el);el.scrollIntoView({behavior:'smooth',block:'nearest'});return el}
+function scoreEntry(q,entry){const query=norm(q),terms=[...(entry.keywords||[]),...(entry.tags||[]),...(entry.title||'').split(' ')].map(norm).filter(Boolean);let score=0;for(const term of terms){if(query.includes(term))score+=term.includes(' ')?4:2;for(const token of term.split(' ')){if(token.length>3&&query.split(' ').includes(token))score+=1}}for(const phrase of entry.questionHints||[])if(query.includes(norm(phrase)))score+=5;return score}
+function renderAnswer(q){const ranked=knowledge.map(e=>({e,score:scoreEntry(q,e)})).sort((a,b)=>b.score-a.score).filter(x=>x.score>0).slice(0,3);if(!ranked.length)return '<p>Ich finde in meinem aktuellen Wissensbestand noch keinen ausreichend passenden Eintrag. Ich möchte keine fachliche Aussage erfinden.</p><p><strong>Nächster Schritt:</strong> Formuliere die Frage konkreter oder erweitere den Wissensbestand um geprüfte Literatur, Studien oder eine freigegebene Beratungsregel.</p><div class="source"><strong>Quellenstatus:</strong> Kein passender Eintrag gefunden. Keine externe Suche durchgeführt.</div>';
+let out='<p>Ich habe folgende fachliche Ansatzpunkte gefunden. Sie sind Prüfschritte, keine automatische Diagnose.</p>';for(const {e} of ranked){out+='<h3 style="font-size:15px;margin:12px 0 4px">'+escapeHtml(e.title)+'</h3><p>'+escapeHtml(e.answer)+'</p>';if(e.checklist?.length)out+='<ul>'+e.checklist.map(s=>'<li>'+escapeHtml(s)+'</li>').join('')+'</ul>';out+='<div class="source"><strong>Einordnung:</strong> '+escapeHtml(e.evidenceLabel||'Nicht klassifiziert')+'<br><strong>Quelle:</strong> '+escapeHtml(e.sourceTitle||'Keine externe Quelle hinterlegt')+(e.sourceUrl?' · <a href="'+safeUrl(e.sourceUrl)+'" target="_blank" rel="noopener noreferrer" style="color:var(--blue)">Quelle öffnen</a>':'')+'<br><strong>Stand:</strong> '+escapeHtml(e.sourceDate||'Nicht angegeben')+'<br>'+escapeHtml(e.limitations||'Anwendbarkeit im Einzelfall prüfen.')+'</div>'}out+='<p><strong>Für eine konkrete Bewertung</strong> wären die relevanten Zeiträume, Warengruppen und vollständigen Kennzahlen nötig. Diese Demo verarbeitet sie nicht automatisch aus deiner App.</p>';return out}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function safeUrl(s){try{const u=new URL(s);return ['https:'].includes(u.protocol)?u.href:'#'}catch{return '#'}}
+function ask(q){q=String(q||'').trim();if(!q)return;addMessage('user','<p>'+escapeHtml(q)+'</p>');addMessage('assistant',renderAnswer(q));input.value='';}
+form.addEventListener('submit',e=>{e.preventDefault();ask(input.value)});document.querySelectorAll('[data-q]').forEach(b=>b.addEventListener('click',()=>{input.value=b.dataset.q;ask(input.value)}));
+fetch('./knowledge-base.json').then(r=>{if(!r.ok)throw new Error('Wissensbestand nicht erreichbar');return r.json()}).then(d=>{knowledge=d.entries||[];statusEl.textContent=knowledge.length+' Wissenseinträge geladen · '+knowledge.filter(e=>e.sourceUrl).length+' mit hinterlegtem Quellenlink';}).catch(()=>{statusEl.textContent='Wissensdatei konnte nicht geladen werden. Bitte über einen lokalen Webserver oder GitHub Pages öffnen.'});
+</script></body></html>

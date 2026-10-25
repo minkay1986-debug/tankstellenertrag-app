@@ -1,0 +1,487 @@
+{
+  "title": "Beratungschat – manuelle Erstbewertung Q001–Q030",
+  "commitUnderTest": "b3b0c9eabdac4aff31f6299fd4cb131fde1b4041",
+  "evaluatedArtifact": "advisor-benchmark-and-visual-review from browser run 40104629279",
+  "evaluatedSystem": "bestehender regelbasierter Chat (advisorReply/advisorKnowledgeHtml), nicht Cloudflare-KI",
+  "dataCondition": "Browser-Benchmark lief im Standardzustand ohne echte Stationsdaten; angezeigte Nullwerte daher nicht als echte Betriebswerte interpretieren.",
+  "rubric": {
+    "criteria": [
+      "intent_recognition",
+      "factual_grounding",
+      "data_integrity",
+      "usefulness_and_clarity",
+      "safety_and_boundaries"
+    ],
+    "maxScore": 10,
+    "passThreshold": 8,
+    "criticalFailureCap": 4
+  },
+  "summary": {
+    "total": 100,
+    "reviewed": 30,
+    "passed": 16,
+    "failed": 14,
+    "criticalFailures": 0,
+    "unreviewed": 70,
+    "meanScore": 7.6
+  },
+  "limitations": [
+    "Diese Bewertung ist eine manuelle Erstprüfung durch das Modell, keine unabhängige externe Prüfung.",
+    "Die Bewertung testet nicht das echte Cloudflare-KI-Modell, sondern den bestehenden regelbasierten Chat.",
+    "Der Browser-Benchmark lief ohne echte Stationsdaten; angezeigte Nullwerte sind keine echten Betriebswerte.",
+    "Die restlichen 70 Fragen sind noch nicht bewertet.",
+    "Die Bewertungen sind zur Priorisierung von Fehlern gedacht; vor einer Freigabe sollte eine menschliche Fachprüfung der kritischen Fälle erfolgen."
+  ],
+  "results": [
+    {
+      "id": "Q001",
+      "score": {
+        "intent_recognition": 1,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 7,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "fail",
+        "reviewerNotes": "Erkennt Warengruppen/Marge und vermeidet unbelegte Ursachen; bei vollständig fehlenden Daten liefert die Antwort aber vor allem einen langen Datenstatus statt konkreter nächster Prüfung."
+      }
+    },
+    {
+      "id": "Q002",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 8,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Erklärt, dass Monatsaggregate keine Ursache beweisen, und nennt sinnvolle Prüfpunkte; die unplausiblen Nullwerte im leeren Testzustand werden nicht ganz klar als fehlende Stationsdaten gerahmt."
+      }
+    },
+    {
+      "id": "Q003",
+      "score": {
+        "intent_recognition": 1,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 7,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "fail",
+        "reviewerNotes": "Fragt nach, weil die Formulierung breit ist, aber die Frage ist für eine erste allgemeine Einordnung ausreichend verständlich; unnötig breite Menüantwort."
+      }
+    },
+    {
+      "id": "Q004",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 2,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 9,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Gute Trennung von erfassten Werten und unerklärtem Verlust sowie fehlender Bestandsabgleich; für die einfache Frage deutlich zu lang."
+      }
+    },
+    {
+      "id": "Q005",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 2,
+        "usefulness_and_clarity": 2,
+        "safety_and_boundaries": 2,
+        "total": 10,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Nennt Datenlücken, trennt Schwund/Abschriften und vermeidet Diebstahlschluss; ohne Vergleichsdaten keine belastbare Aussage zur Auffälligkeit."
+      }
+    },
+    {
+      "id": "Q006",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 2,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 9,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Nennt nur erfasste Abschriften/Schwund und macht die Grenze klar; sollte deutlicher sagen, dass die tatsächliche Summe wegen Datenlage nicht belastbar bestätigt ist."
+      }
+    },
+    {
+      "id": "Q007",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 2,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 9,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Erfindet keine Rangfolge und weist auf fehlende EK-/Vergleichsdaten hin; nächster konkreter Schritt könnte knapper und direkter sein."
+      }
+    },
+    {
+      "id": "Q008",
+      "score": {
+        "intent_recognition": 1,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 7,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "fail",
+        "reviewerNotes": "Die Frage ist tatsächlich breit, aber Chat hätte zuerst eine priorisierte allgemeine Prüfreihenfolge geben können; Antwort wirkt wie ein Navigationsmenü."
+      }
+    },
+    {
+      "id": "Q009",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 2,
+        "usefulness_and_clarity": 2,
+        "safety_and_boundaries": 2,
+        "total": 10,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Verzichtet auf erfundene Branchenbenchmarks und weist auf Grenzen der Daten hin; sicher und nützlich, obwohl kein externer Branchenvergleich geliefert wird."
+      }
+    },
+    {
+      "id": "Q010",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 2,
+        "safety_and_boundaries": 2,
+        "total": 9,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Stellt Schwund und Abschriften separat dar und behauptet nicht, dass null erfasste Werte null tatsächlichen Verlust bedeuten; leere Testdaten bleiben eine Einschränkung."
+      }
+    },
+    {
+      "id": "Q011",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 1,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 7,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "fail",
+        "reviewerNotes": "Nennt die vorhandenen Kennzahlen, aber der Kern der Frage – konkreter Prozentwert – bleibt wegen fehlender Daten zu indirekt beantwortet."
+      }
+    },
+    {
+      "id": "Q012",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 8,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Rohertrag wird korrekt als Kennzahl benannt und von Marge getrennt; wegen leerem Testzustand keine konkrete Erklärung oder Formel."
+      }
+    },
+    {
+      "id": "Q013",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 2,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 9,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Erfindet keine Gewinner-Warengruppe und zeigt fehlende EK-Daten; der Antworttext bleibt ein langes Standard-Dashboard."
+      }
+    },
+    {
+      "id": "Q014",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 2,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 9,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Keine falsche Rangfolge ohne valide Margenwerte; nützlich, aber die konkrete Nichtberechenbarkeit sollte zuerst und knapper kommen."
+      }
+    },
+    {
+      "id": "Q015",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 2,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 9,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Erfindet keine Entwicklung ohne Vergleichsdaten; Antwort ist überladen und beantwortet die Ja/Nein-Frage nicht direkt genug."
+      }
+    },
+    {
+      "id": "Q016",
+      "score": {
+        "intent_recognition": 1,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 7,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "fail",
+        "reviewerNotes": "Die Frage nach möglichen Ursachen wird nicht wirklich allgemein beantwortet; sie wird in Kennzahlenübersicht umgeleitet."
+      }
+    },
+    {
+      "id": "Q017",
+      "score": {
+        "intent_recognition": 0,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 0,
+        "safety_and_boundaries": 2,
+        "total": 5,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "fail",
+        "reviewerNotes": "Verfehlt die klare Bitte, Marge und Rohertrag verständlich zu erklären; stattdessen folgt ein Kennzahlen-Dump."
+      }
+    },
+    {
+      "id": "Q018",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 2,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 9,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Weist für Kaffee auf fehlenden EK hin und vermeidet eine erfundene Marge; Formel oder kurzer Rechenweg fehlen."
+      }
+    },
+    {
+      "id": "Q019",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 2,
+        "data_integrity": 2,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 9,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Behauptet keine Artikelrangliste ohne Daten; die gewünschte bedingte Aussage wird nur indirekt erfüllt."
+      }
+    },
+    {
+      "id": "Q020",
+      "score": {
+        "intent_recognition": 0,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 0,
+        "safety_and_boundaries": 2,
+        "total": 5,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "fail",
+        "reviewerNotes": "Beantwortet die allgemeine Frage nicht: höherer Absatz bedeutet nicht automatisch höheren Ertrag; es fehlen die erklärenden Faktoren."
+      }
+    },
+    {
+      "id": "Q021",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 1,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 2,
+        "safety_and_boundaries": 2,
+        "total": 8,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Liefert den angezeigten Umsatz und sinnvolle nächste Prüfungen; der Nullwert muss als leerer/unbestätigter Datenzustand klarer kenntlich sein."
+      }
+    },
+    {
+      "id": "Q022",
+      "score": {
+        "intent_recognition": 0,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 0,
+        "safety_and_boundaries": 2,
+        "total": 5,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "fail",
+        "reviewerNotes": "Die Frage ist klar auf den Vormonatsvergleich gerichtet; die generische Rückfrage-/Menüantwort verfehlt die Absicht."
+      }
+    },
+    {
+      "id": "Q023",
+      "score": {
+        "intent_recognition": 2,
+        "factual_grounding": 1,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 2,
+        "safety_and_boundaries": 2,
+        "total": 8,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Nennt aktuellen Umsatz und fehlenden Vergleichsmonat, aber Vorjahresvergleich sollte ausdrücklich als nicht berechenbar markiert sein."
+      }
+    },
+    {
+      "id": "Q024",
+      "score": {
+        "intent_recognition": 1,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 0,
+        "safety_and_boundaries": 2,
+        "total": 6,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "fail",
+        "reviewerNotes": "Fragt unnötig breit nach, statt bekannte allgemeine Ursachen als Hypothesen zu nennen und fehlende Septemberdaten gezielt anzufordern."
+      }
+    },
+    {
+      "id": "Q025",
+      "score": {
+        "intent_recognition": 1,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 7,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "fail",
+        "reviewerNotes": "Nennt keinen Monatsverlauf und nur aktuellen Wert; bei fehlender Historie sollte die Grenze direkt benannt und Datenbedarf genannt werden."
+      }
+    },
+    {
+      "id": "Q026",
+      "score": {
+        "intent_recognition": 1,
+        "factual_grounding": 2,
+        "data_integrity": 2,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 8,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "pass",
+        "reviewerNotes": "Warengruppen-/Marge-Ausgabe erkennt den Datenmangel, beantwortet aber nicht sauber Umsatzanteil versus Ertragsbeitrag."
+      }
+    },
+    {
+      "id": "Q027",
+      "score": {
+        "intent_recognition": 1,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 7,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "fail",
+        "reviewerNotes": "Gibt allgemeine Plattformnavigation statt zu prüfen, ob Kaffee gegenüber dem Vergleichszeitraum besser lief."
+      }
+    },
+    {
+      "id": "Q028",
+      "score": {
+        "intent_recognition": 0,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 0,
+        "safety_and_boundaries": 2,
+        "total": 5,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "fail",
+        "reviewerNotes": "Die Frage nach Prozentdifferenz ist eindeutig genug; Antwort weicht mit generischem Menü aus statt gezielt den Vergleichszeitraum/Datenbedarf zu nennen."
+      }
+    },
+    {
+      "id": "Q029",
+      "score": {
+        "intent_recognition": 0,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 0,
+        "safety_and_boundaries": 2,
+        "total": 5,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "fail",
+        "reviewerNotes": "Eurobetrag statt Prozent ist eine klare Ausgabepräferenz, aber Antwort erkennt die Aufgabe nicht und liefert keinen gezielten Datenbedarf."
+      }
+    },
+    {
+      "id": "Q030",
+      "score": {
+        "intent_recognition": 1,
+        "factual_grounding": 2,
+        "data_integrity": 1,
+        "usefulness_and_clarity": 1,
+        "safety_and_boundaries": 2,
+        "total": 7,
+        "criticalFailure": false,
+        "criticalFailureNotes": "",
+        "verdict": "fail",
+        "reviewerNotes": "Nennt passende Auswertungsbereiche, aber die Rangfolge vorne/hinten wird nicht geliefert oder gezielt als mangels Kennzahl nicht berechenbar erklärt."
+      }
+    }
+  ]
+}
