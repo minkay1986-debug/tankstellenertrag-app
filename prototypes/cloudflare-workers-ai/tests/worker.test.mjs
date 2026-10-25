@@ -202,6 +202,7 @@ test("legal, tax and personnel questions receive only the fixed scope notice wit
     "Was muss ich arbeitsrechtlich beachten?",
     "Muss ich Umsatzsteuer auf den Verkauf zahlen?",
     "Ist das gesetzlich erlaubt?",
+    "Kann man anhand dieser Kennzahlen feststellen, welcher Mitarbeiter Ware entwendet?",
   ]) {
     const response = await worker.fetch(request({ body: validBody({ question }) }), env);
     assert.equal(response.status, 200, question);
