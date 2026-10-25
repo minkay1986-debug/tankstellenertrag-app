@@ -190,3 +190,38 @@ test("system prompt requires natural understanding, targeted clarification, and 
   assert.match(systemPrompt, /Ein fehlender Einkaufspreis ist nicht dasselbe wie null Einkaufskosten/);
   assert.match(systemPrompt, /keine Ursache/);
 });
+
+test("legal, tax and personnel questions receive only the fixed scope notice without AI inference", async () => {
+  let modelCalls = 0;
+  const env = fakeEnv({
+    AI: { run: async () => { modelCalls++; return { response: "This must not run" }; } },
+  });
+  for (const question of [
+    "Darf ich meinem Mitarbeiter kündigen?",
+    "Wie versteuere ich das?",
+    "Was muss ich arbeitsrechtlich beachten?",
+    "Muss ich Umsatzsteuer auf den Verkauf zahlen?",
+    "Ist das gesetzlich erlaubt?",
+  ]) {
+    const response = await worker.fetch(request({ body: validBody({ question }) }), env);
+    assert.equal(response.status, 200, question);
+    const payload = await response.json();
+    assert.equal(payload.scopeNotice, true, question);
+    assert.match(payload.answer, /^Dieser Fachbereich ist noch nicht Teil unserer Beratung\./, question);
+    assert.equal(payload.model, undefined, "Scope notices must not be attributed to the AI model");
+  }
+  assert.equal(modelCalls, 0, "Out-of-scope questions must be intercepted before model inference");
+});
+
+test("ordinary inventory and shrinkage questions still reach the AI prototype", async () => {
+  let modelCalls = 0;
+  const env = fakeEnv({
+    AI: { run: async () => { modelCalls++; return { response: "Prüfe Soll- und Istbestand." }; } },
+  });
+  const response = await worker.fetch(request({
+    body: validBody({ question: "Wie prüfe ich Inventurdifferenzen und reduziere Schwund?" }),
+  }), env);
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).answer, "Prüfe Soll- und Istbestand.");
+  assert.equal(modelCalls, 1);
+});
