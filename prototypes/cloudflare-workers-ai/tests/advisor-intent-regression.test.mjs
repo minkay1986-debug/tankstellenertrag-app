@@ -32,7 +32,7 @@ function actualIntentFlags(source, raw) {
   const marginEnd = source.indexOf(";", marginStart);
   assert.notEqual(marginEnd, -1, "Could not find end of actual margin intent flag");
   const intentLayer = source.slice(start, marginEnd + 1);
-  const wrapped = `(function(raw){ const q=String(advisorNorm(raw)||''); ${intentLayer}; return {q,semanticLoss,isHelp,isWeather,isTheft,isLoss,isEuroCompare,isMargin,isDataQuality}; })`;
+  const wrapped = `(function(raw){ const q=String(advisorNorm(raw)||''); ${intentLayer}; return {q,semanticLoss,isHelp,isWeather,isTheft,isLoss,isEuroCompare,isMargin,isYear,isSales,isDataQuality}; })`;
   return vm.runInNewContext(`(()=>{ ${normFn}; return ${wrapped.slice(1, -1)}; })()`)(raw);
 }
 
@@ -164,4 +164,12 @@ test("personnel wording alone does not activate theft intent", async () => {
     const flags = actualIntentFlags(source, question);
     assert.equal(flags.isTheft, false, `Personnel-only wording must not imply theft: ${question}`);
   }
+});
+
+test("multi-intent wording preserves both metrics and the prior-year comparison", async () => {
+  const source = await loadApp();
+  const flags = actualIntentFlags(source, "Vergleiche Umsatz UND Marge zum Vorjahr.");
+  assert.equal(flags.isSales, true, "Umsatz intent must be detected");
+  assert.equal(flags.isMargin, true, "Margin intent must be detected");
+  assert.equal(flags.isYear, true, "Prior-year intent must be detected");
 });
