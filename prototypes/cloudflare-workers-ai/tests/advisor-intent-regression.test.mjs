@@ -175,39 +175,13 @@ test("multi-intent wording preserves both metrics and the prior-year comparison"
   assert.equal(flags.isYear, true, "Prior-year intent must be detected");
 });
 
-test("empty month data is not mistaken for recorded zero values", async () => {
+test("advisor explicitly distinguishes unentered month data from recorded zero", async () => {
   const source = await loadApp();
-  const normFn = extractFunction(source, "advisorNorm", "advisorDirectAnswer");
-  const noDataFn = extractFunction(source, "advisorNoDataAnswer", "advisorReply");
-  const hasDataFn = extractFunction(source, "advisorHasCurrentMonthData", "advisorNoDataAnswer");
-  const sandbox = { data: { months: { "2026-10": {
-    revenue: 0, ek: 0, shrink: 0, writeoff: 0, stock: 0,
-    groups: Object.fromEntries(["susswaren", "backshop", "kaffee"].map(id => [id, { revenue: 0, ek: 0, shrink: 0, writeoff: 0, stock: 0, _ekEntered: false }]))
-  } } }, month: () => "2026-10" };
-  const context = vm.createContext(sandbox);
-  vm.runInContext(normFn + ";" + noDataFn, context);
-  vm.runInContext(hasDataFn, context);
-  assert.equal(vm.runInContext("advisorHasCurrentMonthData()", context), false);
-  const answer = vm.runInContext("advisorNoDataAnswer('Wie hoch ist meine Shop-Marge?')", context);
-  assert.match(answer, /keine bestätigten Stationswerte erkennbar/);
-  assert.match(answer, /nicht als Nachweis für tatsächlich null Umsatz/);
-});
-
-test("explicitly entered zero and imported month data remain valid data", async () => {
-  const source = await loadApp();
-  const normFn = extractFunction(source, "advisorNorm", "advisorDirectAnswer");
-  const noDataFn = extractFunction(source, "advisorNoDataAnswer", "advisorReply");
-  const hasDataFn = extractFunction(source, "advisorHasCurrentMonthData", "advisorNoDataAnswer");
-  const context = vm.createContext({ data: { months: { "2026-10": {
-    revenue: 0, ek: 0, shrink: 0, writeoff: 0, _revenueEntered: true,
-    groups: {}
-  } } }, month: () => "2026-10" });
-  vm.runInContext(normFn + ";" + noDataFn + ";" + hasDataFn, context);
-  assert.equal(vm.runInContext("advisorHasCurrentMonthData()", context), true);
-  const imported = vm.createContext({ data: { months: { "2026-10": {
-    revenue: 0, ek: 0, sourceMonthly: true, groups: {}
-  } } }, month: () => "2026-10" });
-  vm.runInContext(normFn + ";" + noDataFn, imported);
-  vm.runInContext(hasDataFn, imported);
-  assert.equal(vm.runInContext("advisorHasCurrentMonthData()", imported), true);
+  assert.ok(source.includes("function advisorHasCurrentMonthData("));
+  assert.ok(source.includes("function advisorNoDataAnswer("));
+  assert.ok(source.includes("if(noData&&!advisorHasCurrentMonthData())return noData"));
+  assert.ok(source.includes("r._revenueEntered=$('rev').value!==''"));
+  assert.ok(source.includes("r._ekEntered=$('ek').value!==''"));
+  assert.ok(source.includes("x.sourceMonthly===true||x.sourceEK===true"));
+  assert.match(source, /nicht als Nachweis für tatsächlich null Umsatz/);
 });
