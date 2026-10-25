@@ -1047,6 +1047,13 @@ function advisorNorm(v){return String(v||'').toLowerCase().normalize('NFD').repl
 function advisorDirectAnswer(raw){
  const q=advisorNorm(raw);
  const html=s=>'<p>'+s+'</p>';
+
+ // Vorrangregel: Rechts-, Steuer- und Personalberatung ist derzeit nicht Teil des Beratungsumfangs.
+ // Diese Prüfung greift vor allen fachlichen Antworten; reine Warenwirtschaft bleibt davon unberührt.
+ if(/\b(rechtsberatung|rechtslage|rechtlich|arbeitsrecht|arbeitsvertrag|kuendig|kündig|abmahnung|arbeitszeitgesetz|mindestlohn|urlaubstage|krankmeldung|lohnsteuer|einkommensteuer|gewerbesteuer|umsatzsteuer|vorsteuer|steuererklaerung|steuererklärung|versteuern|finanzamt|steuerlich|steuerberater|steuerberatung|haftungsrecht|ist das erlaubt|ist das verboten|gesetzlich vorgeschrieben|datenschutzrecht|mitarbeiter entlassen|mitarbeiter einstellen|personalrecht|gehaltserhoehung|gehaltserhöhung)\b/.test(q)){
+  return '<b>Dieser Fachbereich ist noch nicht Teil unserer Beratung.</b><p>TankstellenErtrag unterstützt dich derzeit bei Warenwirtschaft, Sortiment, Margen und Ertrag. Zu rechtlichen, steuerlichen und personalbezogenen Fragen geben wir aktuell keine fachliche Auskunft.</p>';
+ }
+ // "Mitarbeiter" allein löst die Sperre absichtlich nicht aus: Warenwirtschafts- und Schwundfragen bleiben beantwortbar.
  // High-priority focused answers for benchmark intents that were previously captured by broad weather/loss/expiry rules.
  if(/\b(wetter.*(kaffee|backwaren)|regen.*(kaffee|backwaren)|regnerisch.*(kaffee|backwaren)).*(nachfrage|absatz|verkauf)|\b(nachfrage|absatz|verkauf).*(kaffee|backwaren).*(regen|wetter)/.test(q)){
   return '<b>Wettereffekt auf Kaffee und Backwaren prüfen</b><p>Regen oder kühles Wetter kann das Kaufverhalten beeinflussen, aber daraus allein folgt nicht, dass Kaffee oder Backwaren an deiner Station mehr verkauft werden.</p><p>Vergleiche Absatz je Artikel an ähnlichen Wochentagen und Uhrzeiten mit Wetterlage, Aktionen, Öffnungstagen und Verfügbarkeit. Ohne diese Vergleichsdaten ist es eine Hypothese, kein belegter Effekt; eine allgemeine Wetterprognose beweist keinen Mehrabsatz.</p>';
