@@ -294,3 +294,14 @@ test("open-world compound questions retain simultaneous intents instead of forci
     }
   }
 });
+
+
+test("advisor feedback is isolated per station account in UI and RLS migration", async () => {
+  const app = await loadApp();
+  const migration = await readFile(new URL("../../../supabase/migrations/20261025100000_advisor_feedback_learning.sql", import.meta.url), "utf8");
+  assert.match(app, /station_id:authData\.user\.id/);
+  assert.match(migration, /station_id uuid not null default auth\.uid\(\)/);
+  assert.match(migration, /using \(user_id = \(select auth\.uid\(\)\) and station_id = \(select auth\.uid\(\)\)\)/);
+  assert.match(migration, /with check \(user_id = \(select auth\.uid\(\)\) and station_id = \(select auth\.uid\(\)\)\)/);
+  assert.match(migration, /enable row level security/i);
+});
