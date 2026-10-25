@@ -992,7 +992,7 @@ function advisorExpandQuery(raw){
   [/\b(was soll ich .* bestellen|bestell\w*|zu viel bestellt|zu wenig bestellt|liegt zu lange|zu viel auf lager|zu viel bestellt|bestellmenge|uberbestand|nachbestellen)\b/,' bestellmenge lieferzeit sicherheitsbestand disposition nachfrage lagerumschlag'],
   [/\b(preis\w* senken|\w*preise? zu senken|billiger machen|teurer machen|preise andern|kunden finden teuer|zu teuer|preis erhohen|preis erhoehen|preis runter|preis hoch)\b/,' preisstrategie preiselastizitaet absatzreaktion rohertrag preiswahrnehmung'],
   [/\b(rausnehmen|auslisten|was fliegt raus|verkauft sich nicht|steht nur rum|steht nur herum|regalplatz verschwenden|welcher artikel lohnt|sortiment optimieren|ladenhuter)\b/,' sortiment sortimentsoptimierung artikelrentabilitaet rohertrag kannibalisierung regalplatz'],
-  [/\b(warum laeuft|warum laeuft es|schlechter als|weniger als letztes|mehr verkaufen|mehr verdienen|verdienen trotz|marge schlechter|marge gesunken|marge ist schlechter|am monatsende|kaum mehr ubrig|kaum was hangen|bleibt kaum was hangen|bleibt nichts hangen|auf dem konto merkt man nichts|unterm strich bleibt nichts)\b/,' umsatz absatz marge rohertrag vergleich diagnose ursachenanalyse']
+  [/\b(warum laeuft|warum laeuft es|schlechter (aus )?als|weniger als letztes|mehr verkaufen|mehr verdienen|verdienen trotz|marge schlechter|marge gesunken|marge ist schlechter|am monatsende|kaum mehr ubrig|kaum was hangen|bleibt kaum was hangen|bleibt nichts hangen|auf dem konto merkt man nichts|unterm strich bleibt nichts)\b/,' umsatz absatz marge rohertrag vergleich diagnose ursachenanalyse']
  ];
  const extra=[];
  for(const [pattern,terms] of rules)if(pattern.test(q))extra.push(terms);
