@@ -110,6 +110,7 @@ test("legal, tax and personnel questions receive only the fixed scope notice fir
   const notice = "Dieser Fachbereich ist noch nicht Teil unserer Beratung.";
   for (const question of [
     "Darf ich meinem Mitarbeiter kündigen?",
+    "Darf ich meinen Mitarbeiter kündigen?",
     "Wie versteuere ich das?",
     "Was muss ich arbeitsrechtlich beachten?",
     "Muss ich Umsatzsteuer auf den Verkauf zahlen?",
