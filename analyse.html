@@ -1050,7 +1050,7 @@ function advisorDirectAnswer(raw){
 
  // Vorrangregel: Rechts-, Steuer- und Personalberatung ist derzeit nicht Teil des Beratungsumfangs.
  // Diese Prüfung greift vor allen fachlichen Antworten; reine Warenwirtschaft bleibt davon unberührt.
- if(/\b(rechtsberatung|rechtslage|rechtlich|arbeitsrecht|arbeitsvertrag|kuendig|kündig|abmahnung|arbeitszeitgesetz|mindestlohn|urlaubstage|krankmeldung|lohnsteuer|einkommensteuer|gewerbesteuer|umsatzsteuer|vorsteuer|steuererklaerung|steuererklärung|versteuern|finanzamt|steuerlich|steuerberater|steuerberatung|haftungsrecht|ist das erlaubt|ist das verboten|gesetzlich vorgeschrieben|datenschutzrecht|mitarbeiter entlassen|mitarbeiter einstellen|personalrecht|gehaltserhoehung|gehaltserhöhung)\b/.test(q)){
+ if(/\b(rechtsberatung|rechtslage|rechtlich|arbeitsrecht|arbeitsrechtlich|arbeitsvertrag|kuendig|kundig|abmahnung|arbeitszeitgesetz|mindestlohn|urlaubstage|krankmeldung|lohnsteuer|einkommensteuer|gewerbesteuer|umsatzsteuer|vorsteuer|steuererklaerung|steuererklärung|versteuern|versteuere|finanzamt|steuerlich|steuerberater|steuerberatung|haftungsrecht|ist das erlaubt|ist das verboten|gesetzlich vorgeschrieben|datenschutzrecht|mitarbeiter entlassen|mitarbeiter einstellen|personalrecht|gehaltserhoehung|gehaltserhöhung)\b/.test(q)){
   return '<b>Dieser Fachbereich ist noch nicht Teil unserer Beratung.</b><p>TankstellenErtrag unterstützt dich derzeit bei Warenwirtschaft, Sortiment, Margen und Ertrag. Zu rechtlichen, steuerlichen und personalbezogenen Fragen geben wir aktuell keine fachliche Auskunft.</p>';
  }
  // "Mitarbeiter" allein löst die Sperre absichtlich nicht aus: Warenwirtschafts- und Schwundfragen bleiben beantwortbar.
