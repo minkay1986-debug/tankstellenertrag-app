@@ -3,7 +3,7 @@
 create table if not exists public.advisor_feedback (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
-  -- Until a verified station-membership table exists, one authenticated account is one isolated station tenant.
+  -- One user account represents exactly one station.
   station_id uuid not null default auth.uid(),
   question text not null check (char_length(question) between 1 and 1200),
   answer text not null check (char_length(answer) <= 5000),
@@ -35,7 +35,7 @@ create policy advisor_feedback_insert_own
 drop policy if exists advisor_feedback_delete_own on public.advisor_feedback;
 create policy advisor_feedback_delete_own
   on public.advisor_feedback for delete to authenticated
-  using (user_id = (select auth.uid()));
+  using (user_id = (select auth.uid()) and station_id = (select auth.uid()));
 
 -- Isolation: each signed-in station account can access only its own tenant rows.
 -- Shared learning must be a separate, reviewed/admin-only workflow; feedback is not
