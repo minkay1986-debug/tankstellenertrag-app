@@ -35,7 +35,7 @@ Deno.serve(async (req: Request) => {
   const client = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
   const { error: sourceError } = await client.from("tankstellen_knowledge_sources").upsert({
     id: sourceId, publisher: source.publisher, start_url: target, allowed_hosts: source.hosts,
-    scope: "Öffentliche Fachinformationen zu Tankstellenbetrieb und Warenwirtschaft", review_status: "pending_review",
+    scope: "Öffentliche Fachinformationen zu Tankstellenbetrieb und Warenwirtschaft"
   }, { onConflict: "id" });
   if (sourceError) return json({ error: "source_store_failed" }, 500);
 
