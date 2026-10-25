@@ -127,5 +127,5 @@ function isOutOfScopeAdvice(question) {
     .replace(/\s+/g, " ")
     .trim();
 
-  return /\b(rechtsberatung|rechtslage|rechtlich|arbeitsrecht|arbeitsrechtlich|arbeitsvertrag|kundig\w*|kuendig\w*|abmahnung|arbeitszeitgesetz|mindestlohn|urlaubstage|krankmeldung|lohnsteuer|einkommensteuer|gewerbesteuer|umsatzsteuer|vorsteuer|steuererklaerung|versteuern|versteuere|finanzamt|steuerlich|steuerberater|steuerberatung|haftungsrecht|ist das erlaubt|ist das verboten|gesetzlich erlaubt|gesetzlich vorgeschrieben|datenschutzrecht|mitarbeiter entlassen|mitarbeiter einstellen|personalrecht|gehaltserhoehung)\b/.test(q);
+  return /\b(rechtsberatung|rechtslage|rechtlich|arbeitsrecht|arbeitsrechtlich|arbeitsvertrag|kundig\w*|kuendig\w*|abmahnung|arbeitszeitgesetz|mindestlohn|urlaubstage|krankmeldung|lohnsteuer|einkommensteuer|gewerbesteuer|umsatzsteuer|vorsteuer|steuererklaerung|versteuern|versteuere|finanzamt|steuerlich|steuerberater|steuerberatung|haftungsrecht|ist das erlaubt|ist das verboten|gesetzlich erlaubt|gesetzlich vorgeschrieben|datenschutzrecht|mitarbeiter entlassen|mitarbeiter einstellen|welcher mitarbeiter|welche mitarbeiter|mitarbeiter.*(entwend|gestohl|klaut|diebstahl|stehl)|personal.*(entwend|gestohl|klaut|diebstahl|stehl)|personalrecht|gehaltserhoehung)\b/.test(q);
 }
