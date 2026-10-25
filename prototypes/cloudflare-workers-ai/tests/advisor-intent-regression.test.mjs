@@ -101,3 +101,36 @@ test("zero, missing data and causality guardrails are explicitly represented in 
   assert.match(guardrails, /ursache/);
   assert.match(guardrails, /fehlenden ek/);
 });
+
+test("legal, tax and personnel questions receive only the fixed scope notice first", async () => {
+  const source = await loadApp();
+  const normFn = extractFunction(source, "advisorNorm", "advisorReply");
+  const directFn = extractFunction(source, "advisorDirectAnswer", "advisorReply");
+  const direct = vm.runInNewContext(`(()=>{ ${normFn}; ${directFn}; return advisorDirectAnswer; })()`);
+  const notice = "Dieser Fachbereich ist noch nicht Teil unserer Beratung.";
+  for (const question of [
+    "Darf ich meinem Mitarbeiter kündigen?",
+    "Wie versteuere ich das?",
+    "Was muss ich arbeitsrechtlich beachten?",
+    "Muss ich Umsatzsteuer auf den Verkauf zahlen?",
+    "Ist das gesetzlich erlaubt?"
+  ]) {
+    const answer = direct(question);
+    assert.ok(answer.includes(notice), `Expected scope notice for: ${question}`);
+    assert.equal((answer.match(/<p>/g) || []).length, 1, `Expected only one short notice paragraph for: ${question}`);
+  }
+});
+
+test("ordinary inventory and shrinkage questions are not blocked by the scope notice", async () => {
+  const source = await loadApp();
+  const normFn = extractFunction(source, "advisorNorm", "advisorReply");
+  const directFn = extractFunction(source, "advisorDirectAnswer", "advisorReply");
+  const direct = vm.runInNewContext(`(()=>{ ${normFn}; ${directFn}; return advisorDirectAnswer; })()`);
+  for (const question of [
+    "Wie prüfe ich Inventurdifferenzen?",
+    "Wie reduziere ich Schwund?",
+    "Wie erkläre ich meinem Mitarbeiter die Schwundkontrolle?"
+  ]) {
+    assert.ok(!direct(question).includes("Dieser Fachbereich ist noch nicht Teil unserer Beratung."), `Inventory question incorrectly blocked: ${question}`);
+  }
+});
