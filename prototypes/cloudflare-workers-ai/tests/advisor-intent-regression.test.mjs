@@ -21,7 +21,7 @@ function extractFunction(source, name, nextName) {
   return source.slice(start, end);
 }
 function actualIntentFlags(source, raw) {
-  const normFn = extractFunction(source, "advisorNorm", "advisorReply");
+  const normFn = extractFunction(source, "advisorNorm", "advisorDirectAnswer");
   const normalized = vm.runInNewContext(`(()=>{ ${normFn}; return advisorNorm; })()`)(raw);
   const start = source.indexOf("const intentText=String(q||'')");
   const endToken = "isMargin=";
@@ -45,7 +45,7 @@ test("the synthetic question corpus contains 100 unique questions", async () => 
 
 test("actual advisor normalization handles case, accents, ß and punctuation", async () => {
   const source = await loadApp();
-  const normFn = extractFunction(source, "advisorNorm", "advisorReply");
+  const normFn = extractFunction(source, "advisorNorm", "advisorDirectAnswer");
   const norm = vm.runInNewContext(`(()=>{ ${normFn}; return advisorNorm; })()`);
   assert.equal(norm("  MARGE?? ÖL-Änderung!  "), "marge ol-anderung");
   assert.equal(norm("GROẞE Abschriften!!!"), "grosse abschriften");
@@ -54,7 +54,7 @@ test("actual advisor normalization handles case, accents, ß and punctuation", a
 
 test("actual query expansion recognizes normalized German everyday wording", async () => {
   const source = await loadApp();
-  const normFn = extractFunction(source, "advisorNorm", "advisorReply");
+  const normFn = extractFunction(source, "advisorNorm", "advisorDirectAnswer");
   const expandFn = extractFunction(source, "advisorExpandQuery", "advisorKnowledgeHtml");
   const expand = vm.runInNewContext(`(()=>{ ${normFn}; ${expandFn}; return advisorExpandQuery; })()`);
   const cases = [
@@ -104,7 +104,7 @@ test("zero, missing data and causality guardrails are explicitly represented in 
 
 test("legal, tax and personnel questions receive only the fixed scope notice first", async () => {
   const source = await loadApp();
-  const normFn = extractFunction(source, "advisorNorm", "advisorReply");
+  const normFn = extractFunction(source, "advisorNorm", "advisorDirectAnswer");
   const directFn = extractFunction(source, "advisorDirectAnswer", "advisorReply");
   const direct = vm.runInNewContext(`(()=>{ ${normFn}; ${directFn}; return advisorDirectAnswer; })()`);
   const notice = "Dieser Fachbereich ist noch nicht Teil unserer Beratung.";
@@ -125,7 +125,7 @@ test("legal, tax and personnel questions receive only the fixed scope notice fir
 
 test("ordinary inventory and shrinkage questions are not blocked by the scope notice", async () => {
   const source = await loadApp();
-  const normFn = extractFunction(source, "advisorNorm", "advisorReply");
+  const normFn = extractFunction(source, "advisorNorm", "advisorDirectAnswer");
   const directFn = extractFunction(source, "advisorDirectAnswer", "advisorReply");
   const direct = vm.runInNewContext(`(()=>{ ${normFn}; ${directFn}; return advisorDirectAnswer; })()`);
   for (const question of [
