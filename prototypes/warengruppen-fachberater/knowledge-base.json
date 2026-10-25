@@ -1,0 +1,1245 @@
+{
+  "version": "0.5.0",
+  "description": "Fachwissensbestand für den TankstellenErtrag-Beratungs-Chat. Enthält allgemeine Prüfansätze sowie ausgewählte veröffentlichte Branchen- und Handelsquellen. Fremdbenchmarks sind ausdrücklich nicht als Tankstellen-Sollwerte zu verwenden; methodische Einschränkungen sind je Eintrag dokumentiert. Quellen werden nur verlinkt und in eigenen Worten zusammengefasst; keine Volltexte, Tabellen oder Abbildungen werden ohne Nutzungsrecht übernommen. Allgemeine Handels-/Forschungsbefunde werden als nicht tankstellenspezifisch gekennzeichnet. Wissenschaftliche Publikationen werden bibliografisch verlinkt und nur in eigenständiger Kurzfassung beschrieben; publizierte Prozentwerte aus Fallstudien sind keine Garantie für andere Betriebe.",
+  "entries": [
+    {
+      "id": "margin-diagnosis-001",
+      "title": "Sinkende Marge systematisch untersuchen",
+      "keywords": [
+        "marge",
+        "rohertrag",
+        "wareneinsatz",
+        "einkaufspreis",
+        "verkaufspreis",
+        "preis",
+        "margenrückgang"
+      ],
+      "tags": [
+        "margenentwicklung",
+        "datenqualität"
+      ],
+      "questionHints": [
+        "sinkende marge",
+        "marge gesunken",
+        "warum ist meine marge gesunken"
+      ],
+      "answer": "Eine sinkende Marge ist zunächst ein Signal zur Ursachenprüfung, noch keine Erklärung. Vergleiche identische Zeiträume und Warengruppen und prüfe, ob Umsatz und Wareneinsatz nach derselben Abgrenzung erfasst wurden.",
+      "checklist": [
+        "Verkaufspreisänderungen und Einkaufspreise getrennt vergleichen.",
+        "Warengruppenmix und Aktionszeiträume berücksichtigen.",
+        "Rabatte, Abschriften und Schwund getrennt auswerten.",
+        "Fehlende oder verspätete EK-Werte sowie Importzuordnungen prüfen."
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz · keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Die Prüfliste benennt mögliche Ursachen, beweist aber keine davon. Für einen belastbaren Befund sind vollständige und vergleichbare Daten erforderlich."
+    },
+    {
+      "id": "shrinkage-controls-001",
+      "title": "Schwund von Abschriften und Bestandsfehlern trennen",
+      "keywords": [
+        "schwund",
+        "verlust",
+        "fehlbestand",
+        "inventur",
+        "bestandsdifferenz",
+        "diebstahl",
+        "abschrift",
+        "bruchschaeden"
+      ],
+      "tags": [
+        "bestandskontrolle",
+        "verlustanalyse"
+      ],
+      "questionHints": [
+        "schwund systematisch prüfen",
+        "unerklärter verlust"
+      ],
+      "answer": "Schwund, dokumentierte Abschriften, Buchungsfehler und rechnerische Bestandsdifferenzen sollten getrennt erfasst werden. Eine Differenz allein belegt weder Diebstahl noch eine bestimmte Ursache.",
+      "checklist": [
+        "Bestandsaufnahme und Buchungszeitpunkt abgleichen.",
+        "Abschriften, Bruch, Verderb und Retouren separat prüfen.",
+        "Wareneingänge, Lieferscheine und Artikelzuordnung kontrollieren.",
+        "Auffälligkeiten erst nach Datenprüfung als Hypothese untersuchen."
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz · keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Keine Aussage über einzelne Personen. Aus aggregierten Warenwirtschaftsdaten lässt sich keine individuelle Schuld ableiten."
+    },
+    {
+      "id": "ordering-001",
+      "title": "Bestellmengen anhand von Bedarf und Lieferbedingungen prüfen",
+      "keywords": [
+        "bestellung",
+        "bestellmenge",
+        "nachbestellung",
+        "lieferzeit",
+        "reichweite",
+        "bestand",
+        "lagerumschlag",
+        "mindestbestand",
+        "sicherheitsbestand"
+      ],
+      "tags": [
+        "disposition",
+        "bestand"
+      ],
+      "questionHints": [
+        "bestellmengen festlegen",
+        "wie viel soll ich bestellen"
+      ],
+      "answer": "Eine Bestellmenge sollte sich am erwarteten Absatz bis zur nächsten Lieferung, am verfügbaren Bestand und an den Lieferbedingungen orientieren. Eine pauschale Bestellregel ist ohne Artikel- und Lieferdaten nicht zuverlässig.",
+      "checklist": [
+        "Absatz im passenden Zeitraum und saisonale Schwankungen prüfen.",
+        "Verfügbaren Bestand und bereits bestellte Ware abziehen.",
+        "Lieferzeit, Mindestbestellmenge und Liefertage berücksichtigen.",
+        "Verderb, Haltbarkeit, Lagerkapazität und Kapitalbindung beachten."
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz · keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Die optimale Menge hängt von Artikel, Lieferant, Nachfrage und Betriebsablauf ab; dieser Eintrag berechnet keine konkrete Menge."
+    },
+    {
+      "id": "writeoffs-001",
+      "title": "Abschriften transparent und ursachenbezogen erfassen",
+      "keywords": [
+        "abschrift",
+        "abschriften",
+        "mhd",
+        "mindesthaltbarkeit",
+        "verderb",
+        "bruch",
+        "retoure",
+        "ware"
+      ],
+      "tags": [
+        "verlustanalyse",
+        "bestandskontrolle"
+      ],
+      "questionHints": [
+        "was bei abschriften beachten"
+      ],
+      "answer": "Abschriften sollten mit Betrag, Artikel beziehungsweise Warengruppe, Zeitraum und einem geeigneten Grund erfasst werden. So lassen sie sich von anderen Bestandsdifferenzen unterscheiden und im Zeitverlauf prüfen.",
+      "checklist": [
+        "Gründe einheitlich definieren, etwa Verderb, Bruch oder Beschädigung.",
+        "Erfassung zeitnah und nachvollziehbar halten.",
+        "Abschriftenquoten nur bei vergleichbarer Datenbasis vergleichen.",
+        "Bei auffälligen Mustern zuerst Prozess- und Datenfehler prüfen."
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz · keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Keine universelle Zielquote hinterlegt; konkrete Grenzwerte benötigen passende, belastbare Vergleichsdaten."
+    },
+    {
+      "id": "assortment-001",
+      "title": "Sortiment nicht allein nach Umsatz bewerten",
+      "keywords": [
+        "sortiment",
+        "artikel",
+        "warengruppe",
+        "regalplatz",
+        "platzierung",
+        "ladenhueter",
+        "umsatz",
+        "rohertrag",
+        "marge"
+      ],
+      "tags": [
+        "sortimentsanalyse",
+        "warengruppen"
+      ],
+      "questionHints": [
+        "artikel aus dem sortiment nehmen",
+        "sortiment verbessern"
+      ],
+      "answer": "Umsatz allein zeigt nicht, welchen wirtschaftlichen Beitrag ein Artikel leistet. Für eine Sortimentsentscheidung sollten mindestens Rohertrag, Absatztrend, Platzbedarf, Verfügbarkeit, Abschriften und die Funktion des Artikels im Sortiment betrachtet werden.",
+      "checklist": [
+        "Umsatz und Rohertrag gemeinsam betrachten.",
+        "Datenlücken bei EK oder Bestand sichtbar halten.",
+        "Saison und Aktionszeiträume berücksichtigen.",
+        "Vor Auslistung Ersatzartikel, Kundenbedarf und Lieferbedingungen prüfen."
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz · keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Keine pauschale Auslistungsempfehlung ohne Artikel- und Kontextdaten."
+    },
+    {
+      "id": "data-quality-001",
+      "title": "Datenqualität vor wirtschaftlicher Interpretation prüfen",
+      "keywords": [
+        "datenqualität",
+        "importfehler",
+        "fehlende daten",
+        "null",
+        "ek",
+        "einkaufspreis",
+        "wareneinsatz",
+        "daten korrekt",
+        "unvollständig"
+      ],
+      "tags": [
+        "datenprüfung",
+        "import"
+      ],
+      "questionHints": [
+        "welche daten fehlen",
+        "einkauf ist null",
+        "stimmen die daten"
+      ],
+      "answer": "Fehlende oder unplausible Werte müssen von echten Nullwerten unterschieden werden. Wenn der Einkaufspreis fehlt, kann eine daraus berechnete Marge unbrauchbar sein; fehlende Daten sind kein Beleg für null Kosten oder null Verluste.",
+      "checklist": [
+        "Fehlend, echter Nullwert und nicht anwendbar getrennt markieren.",
+        "Zeitraum, Währung, Steuerlogik und Warengruppenzuordnung prüfen.",
+        "Import auf Duplikate, verspätete Buchungen und fehlende Zeilen untersuchen.",
+        "Kennzahlen mit unzureichender Datengrundlage nicht als gesichert ausgeben."
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz · keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Validierung muss an das jeweilige Quellformat und die Definition der Kennzahl angepasst werden."
+    },
+    {
+      "id": "seasonality-001",
+      "title": "Saisonale Nachfrage nicht aus einem einzelnen Zeitraum ableiten",
+      "keywords": [
+        "saison",
+        "saisonal",
+        "wetter",
+        "temperatur",
+        "feiertag",
+        "vergleich",
+        "vorjahr",
+        "nachfrage"
+      ],
+      "tags": [
+        "absatzplanung",
+        "vergleich"
+      ],
+      "questionHints": [
+        "saisonale nachfrage",
+        "wetter und absatz"
+      ],
+      "answer": "Saisonale Effekte sollten möglichst anhand vergleichbarer Zeiträume, tatsächlicher Absatzdaten und relevanter Rahmenbedingungen geprüft werden. Ein einzelner warmer oder kalter Zeitraum beweist nicht, dass das Wetter eine Veränderung verursacht hat.",
+      "checklist": [
+        "Gleiche Kalenderwochen oder vergleichbare Zeiträume gegenüberstellen.",
+        "Aktionen, Öffnungszeiten und Verfügbarkeit als mögliche Einflussfaktoren notieren.",
+        "Wetterdaten nur als Kontext, nicht als alleinigen Kausalnachweis verwenden.",
+        "Vorhersagen als unsicher kennzeichnen."
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz · keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Keine Wetterhistorie und keine externen Daten werden in diesem Prototyp abgefragt."
+    },
+    {
+      "id": "benchmark-001",
+      "title": "Branchenbenchmarks auf Vergleichbarkeit prüfen",
+      "keywords": [
+        "benchmark",
+        "vergleichswert",
+        "branche",
+        "durchschnitt",
+        "studie",
+        "kennzahl",
+        "vergleich"
+      ],
+      "tags": [
+        "studienbewertung",
+        "benchmarking"
+      ],
+      "questionHints": [
+        "mit anderen tankstellen vergleichen",
+        "gibt es einen branchenwert"
+      ],
+      "answer": "Ein Branchenwert ist nur hilfreich, wenn Definition, Zeitraum, Warengruppenmix, Standorttyp, Betriebsmodell und Datenqualität ausreichend vergleichbar sind. Ein Wert aus dem allgemeinen Einzelhandel ist nicht automatisch auf Tankstellen übertragbar.",
+      "checklist": [
+        "Quelle, Veröffentlichungsdatum und untersuchte Stichprobe dokumentieren.",
+        "Kennzahlendefinition und Einheit prüfen.",
+        "Übertragbarkeit auf Tankstellenshops begründen.",
+        "Unterschiede und Unsicherheiten sichtbar ausweisen."
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz · keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Dieser Eintrag enthält selbst keinen Branchenbenchmark und behauptet keinen repräsentativen Tankstellen-Durchschnitt."
+    },
+    {
+      "id": "source-bft-tankstellenmarkt-2025",
+      "title": "Branchenstudie Tankstellenmarkt 2025 (bft)",
+      "keywords": [
+        "bft",
+        "uniti",
+        "tankstellenstudie",
+        "branchenstudie",
+        "shopgeschäft",
+        "shop",
+        "gastronomie",
+        "convenience",
+        "pächter",
+        "pächterfragen",
+        "tankstellenmarkt",
+        "service",
+        "autowäsche",
+        "umsatzmix",
+        "geschäftsfelder"
+      ],
+      "tags": [
+        "tankstellenbranche",
+        "marktstruktur",
+        "shopgeschäft",
+        "strategie"
+      ],
+      "questionHints": [
+        "wie entwickelt sich das tankstellengeschäft",
+        "ist der shop für tankstellen wichtig",
+        "welche geschäftsfelder haben zukunft",
+        "welche branche zahlen gibt es"
+      ],
+      "answer": "Der bft beschreibt Tankstellen als sich wandelnde Versorgungs- und Convenience-Standorte. Die Studie behandelt Kraftstoff, Shop, Gastronomie, Serviceleistungen und neue Mobilitätsangebote. Sie eignet sich als Branchenkontext für strategische Fragen; aus allgemeinen Marktdaten folgt nicht automatisch, welche Maßnahme an einer einzelnen Station rentabel ist.",
+      "checklist": [
+        "Beim Übertragen einer Kennzahl prüfen, ob sie für freie Tankstellen, Markenstationen oder einen gemischten Bestand gilt.",
+        "Geschäftsfeld und Bezugsgröße der Kennzahl im Original prüfen.",
+        "Eigene Stationsdaten für eine betriebliche Entscheidung ergänzen."
+      ],
+      "evidenceLabel": "Veröffentlichte Branchenstudie eines Branchenverbands; keine randomisierte Wirksamkeitsstudie",
+      "sourceTitle": "bft – Branchenstudie Tankstellenmarkt 2025",
+      "sourceUrl": "https://www.bft.de/themen-markt-statistiken/marktanalysen-trends/branchenstudie-tankstellenmarkt-2025",
+      "sourceDate": "29.06.2026",
+      "limitations": "Die Veröffentlichung nennt als Grundlage unter anderem Sekundärdaten. Für betriebswirtschaftliche Kennzahlen werden Eurodata-Daten verwendet, die mehrheitlich markengebundene Stationen abbilden. Die Übertragbarkeit auf freie Stationen und Agenturmodelle muss deshalb geprüft werden."
+    },
+    {
+      "id": "source-uniti-jahreserhebung-2025",
+      "title": "UNITI-Jahreserhebung 2025 – Branchenentwicklung",
+      "keywords": [
+        "uniti",
+        "tankstellen",
+        "shop",
+        "convenience",
+        "carwash",
+        "autowäsche",
+        "zahlung",
+        "payment",
+        "bargeld",
+        "karte",
+        "ladepunkt",
+        "ladepunkte",
+        "pächter",
+        "tankstellenmarkt",
+        "jahreserhebung"
+      ],
+      "tags": [
+        "tankstellenbranche",
+        "markttrend",
+        "payment",
+        "shopgeschäft"
+      ],
+      "questionHints": [
+        "wie entwickelt sich shop und convenience",
+        "wie zahlen tankstellenkunden",
+        "welche trends gibt es bei tankstellen",
+        "was wächst an tankstellen"
+      ],
+      "answer": "Die UNITI-Jahreserhebung 2025 wird als Branchenstandortbestimmung zu Tankstellen und Payment vorgestellt. UNITI nennt Shop & Convenience sowie Carwash als wichtige Entwicklungsfelder. Solche Erhebungen helfen, Branchentrends einzuordnen; sie ersetzen keine stationsindividuelle Absatz- oder Rentabilitätsanalyse.",
+      "checklist": [
+        "Prüfen, ob der berichtete Wert Deutschland, ein bestimmtes Geschäftsfeld oder eine Teilgruppe beschreibt.",
+        "Bei Payment-Fragen Karten- und Barzahlungsanteile nicht mit Gewinn oder Rohertrag gleichsetzen.",
+        "Investitionsentscheidungen zusätzlich mit Kosten, Auslastung und Standortbedingungen bewerten."
+      ],
+      "evidenceLabel": "Veröffentlichte Branchen-Jahreserhebung; methodische Details je Einzelkennzahl prüfen",
+      "sourceTitle": "UNITI – Tankstellen in Deutschland stellen sich wirtschaftlich immer breiter auf",
+      "sourceUrl": "https://www.uniti.de/kommunikation/pressemitteilungen/artikel/tankstellen-in-deutschland-stellen-sich-wirtschaftlich-immer-breiter-auf",
+      "sourceDate": "15.01.2026",
+      "limitations": "Die öffentlich zugängliche Mitteilung fasst ausgewählte Ergebnisse zusammen. Stichprobe, Definitionen und Detailtabellen müssen vor der Nutzung einer einzelnen Kennzahl in einer konkreten Beratung anhand der vollständigen Erhebung geprüft werden."
+    },
+    {
+      "id": "source-ehi-inventurdifferenzen-2026",
+      "title": "EHI-Studie Inventurdifferenzen 2026",
+      "keywords": [
+        "ehi",
+        "inventurdifferenzen",
+        "schwund",
+        "verlust",
+        "fehlbestand",
+        "diebstahl",
+        "inventur",
+        "bestandsdifferenz",
+        "prävention",
+        "praevention",
+        "warenverlust",
+        "kontrolle",
+        "retail"
+      ],
+      "tags": [
+        "schwund",
+        "bestandskontrolle",
+        "fremdbenchmark",
+        "handel"
+      ],
+      "questionHints": [
+        "wie hoch ist schwund im einzelhandel",
+        "gibt es studien zu inventurdifferenzen",
+        "wie ordne ich inventurverluste ein",
+        "wie schwund vermeiden"
+      ],
+      "answer": "Die EHI-Studie untersucht Inventurdifferenzen und Präventionsmaßnahmen im stationären deutschen Einzelhandel. Die Ausgabe 2026 berichtet für das Berichtsjahr 2025 eine geschätzte Gesamtschadenssumme von 5,11 Milliarden Euro. Das ist eine hochgerechnete Handelsgröße, keine Verlustprognose für eine einzelne Tankstelle. Die durchschnittliche Quote von 0,64 Prozent gehört zur Ausgabe 2025 über das Berichtsjahr 2024 und darf nicht der Ausgabe 2026 zugeschrieben werden.",
+      "checklist": [
+        "Erst klären, welche Ausgabe und welches Berichtsjahr gemeint sind.",
+        "Die Bezugsgröße prüfen: Inventurdifferenz zu EK im Verhältnis zum Nettoumsatz ist nicht identisch mit Abschriften oder erfasstem Schwund.",
+        "Keine Ursache wie Diebstahl aus einer einzelnen Bestandsdifferenz ableiten.",
+        "Tankstellen-spezifische Vergleichsdaten nur nutzen, wenn die Quelle diese ausdrücklich ausweist."
+      ],
+      "evidenceLabel": "Veröffentlichte Handelsstudie mit Erhebung bei mehreren Handelsunternehmen; nicht tankstellenspezifisch",
+      "sourceTitle": "EHI – Studie: Inventurdifferenzen 2026",
+      "sourceUrl": "https://www.ehi.org/produkt/studie-inventurdifferenzen-2026-pdf/",
+      "sourceDate": "2026 (Berichtsjahr 2025)",
+      "limitations": "Die Erhebung umfasst 84 Unternehmen beziehungsweise Vertriebsschienen und 17.426 Verkaufsstellen. Es ist kein repräsentativer Tankstellenbenchmark. Die 0,64-%-Kennzahl gehört zur EHI-Ausgabe 2025 über das Berichtsjahr 2024, nicht zur Ausgabe 2026."
+    },
+    {
+      "id": "source-ehi-inventurdifferenzen-2025",
+      "title": "EHI-Studie Inventurdifferenzen 2025 – Vergleichsmaßstab mit Einschränkungen",
+      "keywords": [
+        "ehi",
+        "inventurdifferenzen",
+        "0,64",
+        "0.64",
+        "schwundquote",
+        "inventurverluste",
+        "handel",
+        "benchmark",
+        "ek",
+        "netto",
+        "nutzungsgrenze"
+      ],
+      "tags": [
+        "schwund",
+        "benchmark",
+        "fremdbenchmark",
+        "handel"
+      ],
+      "questionHints": [
+        "welche schwundquote ist normal",
+        "gibt es eine durchschnittliche inventurdifferenz",
+        "wie vergleiche ich schwundwerte"
+      ],
+      "answer": "EHI ermittelt für das Berichtsjahr 2024 durchschnittliche Inventurdifferenzen von 0,64 Prozent des Nettoumsatzes, bewertet zu Einkaufspreisen. Das ist ein Durchschnitt aus dem stationären Einzelhandel und keine Zielquote für Tankstellen. Für eine Tankstelle kann dieser Wert höchstens als vorsichtiger Kontext dienen, nicht als Diagnose oder verbindlicher Grenzwert.",
+      "checklist": [
+        "Definition und Bezugsgröße genau übernehmen.",
+        "Warengruppen- und Betriebstypunterschiede berücksichtigen.",
+        "Den eigenen Verlauf und vollständige Inventurdaten höher gewichten als einen fremden Durchschnitt."
+      ],
+      "evidenceLabel": "Veröffentlichte Handelsstudie; nicht tankstellenspezifisch",
+      "sourceTitle": "EHI – Studie: Inventurdifferenzen 2025",
+      "sourceUrl": "https://www.ehi.org/produkt/studie-inventurdifferenzen-2025-pdf/",
+      "sourceDate": "2025 (Berichtsjahr 2024)",
+      "limitations": "Nicht unmittelbar auf Tankstellen übertragbar. Die Studie umfasst 98 Unternehmen beziehungsweise Vertriebsschienen mit 17.433 Verkaufsstellen; keine Aussage, dass diese eine repräsentative Tankstellenstichprobe bilden."
+    },
+    {
+      "id": "source-bft-shop-customer-context-2024",
+      "title": "B&G Shopper Monitor 2024 – Preiswahrnehmung bei Tankstellenshops (zitiert im bft-Fachmagazin)",
+      "keywords": [
+        "bft",
+        "shoppreise",
+        "preiswahrnehmung",
+        "kundenverhalten",
+        "süßwaren",
+        "suesswaren",
+        "snacks",
+        "getränke",
+        "getraenke",
+        "preise",
+        "preissensibilität",
+        "preissensibilitaet",
+        "shop",
+        "shopumsatz",
+        "kundschaft"
+      ],
+      "tags": [
+        "kundenverhalten",
+        "preisstrategie",
+        "sekundärquelle"
+      ],
+      "questionHints": [
+        "finden kunden tankstellenshops teuer",
+        "wie preissensibel sind tankstellenkunden",
+        "soll ich preise senken",
+        "wie beurteilen kunden shoppreise"
+      ],
+      "answer": "Eine im bft-Fachmagazin wiedergegebene Auswertung des B&G Shopper Monitor 2024 beschreibt, dass Verbraucher die Preise für Süßwaren, Snacks und Getränke in normalen Tankstellenshops häufig als teuer oder sehr teuer einschätzen. Das ist ein Hinweis auf Preiswahrnehmung, aber kein Beleg, dass eine Preissenkung den Gewinn erhöht. Preisentscheidungen müssen Marge, Absatzreaktion, Wettbewerb und Einkaufspreise gemeinsam berücksichtigen.",
+      "checklist": [
+        "Preiswahrnehmung nicht mit tatsächlicher Zahlungsbereitschaft gleichsetzen.",
+        "Bei einer Preisänderung Absatz, Rohertrag in Euro und Marge getrennt beobachten.",
+        "Die zitierte Stichprobe und Originalfrage prüfen, bevor Prozentwerte weiterverwendet werden."
+      ],
+      "evidenceLabel": "Sekundärbericht über eine Markt-/Shopper-Befragung; Originalstudie vor Zahlenverwendung prüfen",
+      "sourceTitle": "bft-Fachmagazin 2025/2 – Trends und Kundenverhalten, Fokus Tankstellen (B&G Shopper Monitor 2024)",
+      "sourceUrl": "https://www.bft.de/download_file/force/623",
+      "sourceDate": "2025 (zitiert wird B&G Shopper Monitor 2024)",
+      "limitations": "Öffentlich sichtbarer Fachmagazin-Auszug ist eine Sekundärquelle. Die dargestellten Preiswahrnehmungen sind keine experimentelle Messung der Preiselastizität und belegen keine kausale Wirkung einer Preissenkung."
+    },
+    {
+      "id": "source-gs1-optimal-shelf-availability",
+      "title": "GS1 Germany – Optimal Shelf Availability (Regalverfügbarkeit)",
+      "keywords": [
+        "gs1",
+        "regallücke",
+        "regallücken",
+        "out of stock",
+        "out-of-stock",
+        "verfügbarkeit",
+        "verfuegbarkeit",
+        "warenverfügbarkeit",
+        "nachschub",
+        "absatzverlust",
+        "fehlbestand",
+        "lieferfähigkeit",
+        "lieferfaehigkeit"
+      ],
+      "tags": [
+        "regalverfügbarkeit",
+        "disposition",
+        "retail-transfer"
+      ],
+      "questionHints": [
+        "was kosten regallücken",
+        "wie vermeide ich out of stock",
+        "warum ist artikel nicht verfügbar",
+        "regalverfügbarkeit verbessern"
+      ],
+      "answer": "GS1 Germany beschreibt Optimal Shelf Availability als Konzept zur Verbesserung der Warenverfügbarkeit am Verkaufsort. Wenn ein Artikel fehlt, kann ein Kunde auf eine Alternative ausweichen, anderswo kaufen oder auf den Kauf verzichten. Für eine Station ist das ein plausibler Prüfansatz; daraus lässt sich ohne eigene Messung kein pauschaler Euro-Verlust je Regallücke ableiten.",
+      "checklist": [
+        "Regallücken und tatsächliche Nichtverfügbarkeit getrennt erfassen.",
+        "Ursache prüfen: nicht bestellt, Lieferproblem, Bestand falsch, Ware im Lager oder Regalpflege.",
+        "Fehlzeiten, Absatz und Warengruppe über einen vergleichbaren Zeitraum auswerten.",
+        "Möglichen entgangenen Umsatz nur als Schätzung mit offengelegten Annahmen ausweisen."
+      ],
+      "evidenceLabel": "Fachkonzept eines Branchenstandards; allgemeiner Handel, keine Tankstellen-Verluststudie",
+      "sourceTitle": "GS1 Germany – Effizientes Supply Chain Management / Optimal Shelf Availability",
+      "sourceUrl": "https://www.gs1-germany.de/branchen-themen/scm-supply-chain-management/",
+      "sourceDate": "Webseite geprüft am 24.10.2026",
+      "limitations": "Die öffentlich zugängliche Seite beschreibt das Konzept, belegt aber keinen festen Verlustbetrag pro Regal-Lücke und keine spezifische Wirkungshöhe für Tankstellen. Keine erfundene Pauschale als Benchmark verwenden."
+    },
+    {
+      "id": "source-fraunhofer-reif-food-waste",
+      "title": "Fraunhofer – Forschungsprojekt REIF: datenbasierte Absatz- und Produktionsplanung gegen Lebensmittelverluste",
+      "keywords": [
+        "fraunhofer",
+        "reif",
+        "lebensmittelverschwendung",
+        "food waste",
+        "backwaren",
+        "bäckerei",
+        "abschriften",
+        "verderb",
+        "mhd",
+        "haltbarkeit",
+        "absatzplanung",
+        "prognose",
+        "bestellplanung",
+        "lebensmittel"
+      ],
+      "tags": [
+        "abschriften",
+        "absatzplanung",
+        "forschung",
+        "retail-transfer"
+      ],
+      "questionHints": [
+        "wie kann ich backwaren abschriften senken",
+        "wie verderb reduzieren",
+        "wie daten für bestellplanung nutzen",
+        "gibt es forschung zu lebensmittelverlusten"
+      ],
+      "answer": "Das Fraunhofer-Projekt REIF untersuchte, wie datenbasierte Planung und die Zusammenführung von Informationen entlang der Lebensmittel-Wertschöpfungskette Lebensmittelverluste reduzieren können. Für Tankstellenshops lässt sich daraus die Prüffrage ableiten, ob Absatz, Bestand, Haltbarkeit und Abschriften gemeinsam betrachtet werden. Die Projektbeschreibung beweist jedoch nicht, dass ein bestimmter Algorithmus an einer einzelnen Tankstelle einen bestimmten Betrag spart.",
+      "checklist": [
+        "Für Backwaren und andere verderbliche Artikel Tagesabsatz und Abschriften nach Uhrzeit/Tag erfassen, soweit vorhanden.",
+        "Bestellmengen, Lieferzeiten, Aktionen und Feiertage als Kontext dokumentieren.",
+        "Testweise Prognose gegen einfache Baseline vergleichen und Fehler messen.",
+        "Einsparungen erst nach einem kontrollierten Vorher-Nachher-Vergleich mit vergleichbaren Zeiträumen beziffern."
+      ],
+      "evidenceLabel": "Öffentlich dokumentiertes Forschungsprojekt; nicht speziell für Tankstellen validiert",
+      "sourceTitle": "Fraunhofer IGCV – REIF: Resource-efficient, Economic and Intelligent Foodchain",
+      "sourceUrl": "https://www.igcv.fraunhofer.de/de/forschung/referenzprojekte/reif_kuenstliche_intelligenz_nachhaltigkeit_lebensmittelindustrie.html",
+      "sourceDate": "Projektlaufzeit 03/2020–02/2023; Webseite geprüft am 24.10.2026",
+      "limitations": "Forschungsprojekt mit Fokus auf Lebensmittel-Wertschöpfungsketten, nicht ein Beleg für konkrete Tankstellen-KPIs. Allgemeine Aussagen und Einsparungspotenziale nicht als garantierte Ergebnisse oder Stationsbenchmarks ausgeben."
+    },
+    {
+      "id": "source-hubner-schaal-assortment-2017",
+      "title": "Forschung: Sortiment, Regalfläche und Warenverfügbarkeit gemeinsam planen",
+      "keywords": [
+        "sortiment",
+        "regalfläche",
+        "regalflaeche",
+        "regalplatz",
+        "platzierung",
+        "artikelmix",
+        "warengruppe",
+        "rentabilität",
+        "rentabilitaet",
+        "profitabilität",
+        "profitabilitaet",
+        "hübner",
+        "hubner",
+        "schaal",
+        "sortimentsoptimierung",
+        "warenverfügbarkeit"
+      ],
+      "tags": [
+        "sortimentsoptimierung",
+        "wissenschaftliche studie",
+        "retail-transfer"
+      ],
+      "questionHints": [
+        "welche artikel lohnen sich",
+        "wie sortiment verbessern",
+        "welche produkte auslisten",
+        "regalplatz rentabel nutzen"
+      ],
+      "answer": "Die begutachtete Operations-Research-Studie von Hübner und Schaal modelliert Sortimentsauswahl und begrenzte Regalfläche gemeinsam und berücksichtigt unsichere Nachfrage sowie mögliche Ersatzkäufe bei Nichtverfügbarkeit. Die Kernaussage für die Beratung: Artikel nicht isoliert nach Umsatz bewerten; Platz, Rohertrag, Nachfrageunsicherheit und mögliche Ersatzkäufe können gemeinsam relevant sein. Die im Paper berichteten Modell- und Fallstudienergebnisse sind keine garantierte Gewinnsteigerung für Tankstellen.",
+      "checklist": [
+        "Artikel nach Rohertrag in Euro, Absatz, Platzbedarf und Verfügbarkeit bewerten.",
+        "Bei ähnlichen Artikeln mögliche Substitution prüfen, statt nur Einzelumsätze zu vergleichen.",
+        "Sortimentsänderungen erst als Szenario rechnen und anschließend mit eigenen Daten validieren.",
+        "Studienergebnisse aus anderen Handelsformaten nicht als Tankstellen-Benchmark ausgeben."
+      ],
+      "evidenceLabel": "Begutachteter wissenschaftlicher Fachartikel; Retail-Fallstudien, keine Tankstellenstudie",
+      "sourceTitle": "Hübner & Schaal (2017) – An integrated assortment and shelf-space optimization model",
+      "sourceUrl": "https://doi.org/10.1016/j.ejor.2017.01.039",
+      "sourceDate": "16.08.2017",
+      "limitations": "Die Ergebnisse beruhen auf Modellen und Datensätzen aus anderen Handelskontexten. Zahlen zu möglichen Gewinnverbesserungen sind nicht direkt auf freie Tankstellen übertragbar und werden nicht als Versprechen verwendet."
+    },
+    {
+      "id": "source-garcia-arca-on-shelf-availability-2020",
+      "title": "Forschung: Regalverfügbarkeit und Logistikprozesse",
+      "keywords": [
+        "regallücke",
+        "regallücken",
+        "out of stock",
+        "out-of-stock",
+        "nicht verfügbar",
+        "nicht verfuegbar",
+        "warenverfügbarkeit",
+        "regalverfügbarkeit",
+        "lieferfähigkeit",
+        "lieferfaehigkeit",
+        "logistik",
+        "nachschub",
+        "fehlbestand",
+        "absatzverlust"
+      ],
+      "tags": [
+        "regalverfügbarkeit",
+        "disposition",
+        "wissenschaftliche studie",
+        "retail-transfer"
+      ],
+      "questionHints": [
+        "warum fehlen artikel im regal",
+        "wie verhindere ich leere regale",
+        "was bringt bessere warenverfügbarkeit"
+      ],
+      "answer": "Eine 2020 veröffentlichte Fachstudie untersucht eine beteiligungsorientierte Methode zur Verbesserung der Regalverfügbarkeit und zur Rationalisierung von Logistikabläufen anhand eines großen spanischen Handelsunternehmens. Für Tankstellen ist der übertragbare Ansatz, Ursachen von Nichtverfügbarkeit systematisch zu erfassen und Prozesse zu prüfen; die Studie liefert keinen festen Euro-Verlust pro Regallücke für Tankstellen.",
+      "checklist": [
+        "Nichtverfügbarkeit nach Artikel, Zeitpunkt und Dauer protokollieren.",
+        "Ursache trennen: Lieferproblem, Disposition, Buchungsfehler oder Ware nicht im Regal.",
+        "Verbesserungen zunächst in einem begrenzten Zeitraum messen.",
+        "Keine pauschalen Verlustwerte ohne eigene Absatz- und Margendaten berechnen."
+      ],
+      "evidenceLabel": "Wissenschaftlicher Fachartikel; Fallanwendung im allgemeinen Einzelhandel",
+      "sourceTitle": "García-Arca et al. (2020) – On-shelf availability and logistics rationalization",
+      "sourceUrl": "https://doi.org/10.1016/j.jretconser.2019.101889",
+      "sourceDate": "Januar 2020",
+      "limitations": "Fallstudie aus einem anderen Handelskontext. Keine repräsentative Tankstellenstichprobe und kein universeller Verlustbetrag je Regallücke."
+    },
+    {
+      "id": "source-rooderkerk-assortment-2013",
+      "title": "Forschung: Sortimentsoptimierung und Kannibalisierung",
+      "keywords": [
+        "sortiment",
+        "sortimentsoptimierung",
+        "artikelmix",
+        "kannibalisierung",
+        "ersatzkauf",
+        "substitution",
+        "preis",
+        "preisstrategie",
+        "preiselastizität",
+        "preiselastizitaet",
+        "artikelrentabilität",
+        "artikelrentabilitaet",
+        "warengruppe",
+        "rohertrag"
+      ],
+      "tags": [
+        "sortimentsoptimierung",
+        "preisstrategie",
+        "wissenschaftliche studie",
+        "retail-transfer"
+      ],
+      "questionHints": [
+        "welche artikel konkurrieren miteinander",
+        "soll ich ähnliche artikel auslisten",
+        "wie wirkt sich sortiment auf gewinn aus",
+        "preise und sortiment gemeinsam betrachten"
+      ],
+      "answer": "Die begutachtete Studie von Rooderkerk, Van Heerde und Bijmolt entwickelt ein Verfahren, um Sortimente auf Kategorieebene unter Berücksichtigung von Kundenpräferenzen und möglicher Kannibalisierung zwischen Artikeln zu optimieren. Für die Tankstellenberatung ist wichtig: Ein Artikel kann Verkäufe anderer Artikel verdrängen, während Auslistungen auch Ersatzkäufe auslösen können. Die Ergebnisse der untersuchten Produktkategorie sind nicht als universeller Effekt für Tankstellenshops zu lesen.",
+      "checklist": [
+        "Ähnliche Artikel nach Preis, Marke, Größe und Funktion gruppieren.",
+        "Vor einer Auslistung prüfen, ob Verkäufe auf verbleibende Artikel übergehen könnten.",
+        "Umsatzverlagerung und gesamten Rohertrag der Warengruppe betrachten.",
+        "Preisänderungen nicht ohne eigene Absatzdaten als wirksam oder unwirksam bewerten."
+      ],
+      "evidenceLabel": "Begutachteter wissenschaftlicher Fachartikel; Produktkategorie im Einzelhandel untersucht",
+      "sourceTitle": "Rooderkerk, Van Heerde & Bijmolt (2013) – Optimizing Retail Assortments",
+      "sourceUrl": "https://doi.org/10.1287/mksc.2013.0800",
+      "sourceDate": "2013",
+      "limitations": "Die berichteten Ergebnisse hängen von Kategorie, Daten und Modellannahmen ab. Nicht als zugesicherte Gewinnsteigerung oder direkte Tankstellenprognose verwenden."
+    },
+    {
+      "id": "sales-comparison-001",
+      "title": "Umsatz- und Vorjahresvergleiche korrekt interpretieren",
+      "keywords": [
+        "umsatzvergleich",
+        "vorjahresvergleich",
+        "vormonat",
+        "abweichung",
+        "entwicklung",
+        "trend",
+        "wachstum",
+        "rückgang",
+        "rueckgang",
+        "prozent",
+        "prozentual",
+        "euro",
+        "vergleichszeitraum",
+        "monatsvergleich"
+      ],
+      "tags": [
+        "umsatzanalyse",
+        "zeitvergleich",
+        "kennzahlen"
+      ],
+      "questionHints": [
+        "läuft es besser als letzten monat",
+        "wie viel prozent veränderung",
+        "umsatz im vergleich zum vorjahr",
+        "warum war der monat schwächer",
+        "abweichung zum vormonat berechnen"
+      ],
+      "answer": "Vergleiche nur gleiche oder nachvollziehbar angeglichene Zeiträume. Zeige absolute Differenz in Euro und relative Veränderung in Prozent getrennt. Prozentänderung = (aktueller Wert − Vergleichswert) / Vergleichswert × 100. Ist der Vergleichswert fehlend oder 0, ist die Prozentänderung nicht sinnvoll berechenbar; nicht durch null teilen und keinen Wert erfinden. Bei einem noch laufenden Monat muss die unterschiedliche Anzahl an Verkaufstagen oder der unvollständige Zeitraum kenntlich gemacht werden.",
+      "checklist": [
+        "Zeitraum und Datenvollständigkeit prüfen",
+        "Umsatzdefinition und Warengruppenabgrenzung gleich halten",
+        "Euro-Differenz und Prozentänderung getrennt zeigen",
+        "Bei fehlendem oder 0-Vergleichswert keine Prozentzahl ausgeben",
+        "Ursachen nur als Hypothesen nennen, solange sie nicht durch Zusatzdaten gestützt sind"
+      ],
+      "evidenceLabel": "Allgemeiner betriebswirtschaftlicher Prüfansatz; keine Tankstellenstudie",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Ein Vergleich zeigt eine Veränderung, erklärt aber nicht automatisch deren Ursache. Saison, Öffnungstage, Preise, Aktionen und Datenimporte können mitwirken."
+    },
+    {
+      "id": "margin-vs-profit-001",
+      "title": "Marge, Rohertrag und Gewinn sauber unterscheiden",
+      "keywords": [
+        "marge",
+        "rohertrag",
+        "gewinn",
+        "umsatz",
+        "wareneinsatz",
+        "kosten",
+        "deckungsbeitrag",
+        "profit",
+        "rentabilität",
+        "rentabilitaet",
+        "mehr verkaufen",
+        "mehr verdienen"
+      ],
+      "tags": [
+        "margenentwicklung",
+        "grundlagen",
+        "kennzahlinterpretation"
+      ],
+      "questionHints": [
+        "mehr umsatz aber nicht mehr geld",
+        "was bleibt nach einkauf übrig",
+        "ist mehr umsatz mehr gewinn",
+        "warum bleibt so wenig übrig",
+        "unterschied marge rohertrag gewinn"
+      ],
+      "answer": "Umsatz ist der Erlös aus Verkäufen. Rohertrag ist im vereinfachten Warenmodell Umsatz minus Wareneinsatz. Die Rohertragsmarge ist Rohertrag geteilt durch Umsatz, multipliziert mit 100. Gewinn ist nicht dasselbe wie Rohertrag: weitere betriebliche Kosten und die konkrete betriebswirtschaftliche Abgrenzung müssen berücksichtigt werden. Mehr Umsatz kann mit geringerem Rohertrag einhergehen, etwa bei niedrigeren Margen oder einem veränderten Warenmix; das ist anhand der Stationsdaten zu prüfen und nicht vorauszusetzen.",
+      "checklist": [
+        "Umsatz und Wareneinsatz für denselben Zeitraum abgleichen",
+        "Rohertrag in Euro und Marge in Prozent separat betrachten",
+        "Warengruppenmix und Preis-/Einkaufsänderungen untersuchen",
+        "Betriebskosten nicht als bereits im Rohertrag enthalten darstellen"
+      ],
+      "evidenceLabel": "Allgemeiner betriebswirtschaftlicher Prüfansatz; keine Studie belegt",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Die genaue Definition von Wareneinsatz, Retouren, Rabatten und Umsatzsteuer muss zum verwendeten Datenmodell passen."
+    },
+    {
+      "id": "ordering-reorder-point-001",
+      "title": "Nachbestellung aus Verbrauch, Lieferzeit und verfügbarem Bestand ableiten",
+      "keywords": [
+        "bestellmenge",
+        "nachbestellung",
+        "bestellpunkt",
+        "mindestbestand",
+        "sicherheitsbestand",
+        "reichweite",
+        "lieferzeit",
+        "verbrauch",
+        "absatz",
+        "bestand",
+        "überbestand",
+        "ueberbestand",
+        "bestellvorschlag"
+      ],
+      "tags": [
+        "disposition",
+        "bestelloptimierung",
+        "bestand"
+      ],
+      "questionHints": [
+        "was soll ich bestellen",
+        "wie viel soll ich nachbestellen",
+        "welche ware geht bald aus",
+        "wie verhindere ich überbestand",
+        "wie berechne ich den mindestbestand"
+      ],
+      "answer": "Eine belastbare Bestellentscheidung benötigt mindestens den aktuellen verfügbaren Bestand, erwarteten Absatz bis zur nächsten Lieferung, Lieferzeit und Lieferrhythmus. Als einfache Orientierung gilt: erwarteter Bedarf während der Lieferzeit plus begründeter Sicherheitsbestand. Die Bestellmenge muss außerdem Packungsgrößen, Mindestbestellmengen, bereits bestellte Ware, Haltbarkeit und Lagerkapazität berücksichtigen. Ohne diese Daten sollte der Chat Prüfschritte vorschlagen, aber keine exakte Menge vortäuschen.",
+      "checklist": [
+        "Verfügbaren Bestand und bereits offene Bestellungen erfassen",
+        "Absatz nach vergleichbaren Wochentagen und Saison prüfen",
+        "Lieferzeit und Lieferfrequenz berücksichtigen",
+        "Sicherheitsbestand anhand der Schwankung und Lieferzuverlässigkeit festlegen",
+        "Bei verderblicher Ware Absatz bis zum Ende der verkaufsfähigen Zeit begrenzen"
+      ],
+      "evidenceLabel": "Allgemeiner fachlicher Prüfansatz; keine universelle Bestellformel für alle Stationen",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Eine vereinfachte Bestellregel ersetzt keine Artikelstammdaten, Bestandsführung oder Lieferantenbedingungen. Ohne Artikelbestand und Absatzdaten keine konkrete Bestellmenge berechnen."
+    },
+    {
+      "id": "shelf-gap-measurement-001",
+      "title": "Regallücken als messbares Verfügbarkeitsproblem behandeln",
+      "keywords": [
+        "regallücke",
+        "regallücken",
+        "regal leer",
+        "out of stock",
+        "out-of-stock",
+        "nicht verfügbar",
+        "nicht verfuegbar",
+        "fehlender artikel",
+        "absatzverlust",
+        "verfügbarkeit",
+        "verfuegbarkeit",
+        "nachschub",
+        "bestandsfehler"
+      ],
+      "tags": [
+        "regalverfügbarkeit",
+        "disposition",
+        "retail-transfer"
+      ],
+      "questionHints": [
+        "was kosten mich regallücken",
+        "artikel fehlen ständig",
+        "wie vermeide ich leere regale",
+        "warum ist ware nicht verfügbar",
+        "wie messe ich regalverfügbarkeit"
+      ],
+      "answer": "Eine beobachtete Regallücke beweist noch keinen bestimmten Umsatzverlust. Dokumentiere für ausgewählte Artikel Zeitpunkt, Dauer, Regalbestand, Lagerbestand, erwartete Nachfrage und ob der Kunde eine Alternative gekauft hat. Trenne Ursachen wie zu geringe Bestellung, nicht ausgelöste Nachbestellung, Lieferausfall, verspätete Verräumung oder Bestandsfehler. Erst aus eigenen Beobachtungen und Absatzdaten lässt sich die wirtschaftliche Relevanz schätzen.",
+      "checklist": [
+        "Lücken mit Artikel, Zeit und Dauer protokollieren",
+        "Regalbestand und Lagerbestand getrennt prüfen",
+        "Liefer- und Verräumungsprozess kontrollieren",
+        "Absatz vergleichbarer Zeitfenster heranziehen",
+        "Keine pauschalen Euro-Verluste je Lücke behaupten"
+      ],
+      "evidenceLabel": "Fachkonzept aus dem Handel; keine Tankstellen-spezifische Verlustmessung",
+      "sourceTitle": "GS1 Germany – Supply Chain Management / Optimal Shelf Availability",
+      "sourceUrl": "https://www.gs1-germany.de/branchen-themen/scm-supply-chain-management/",
+      "sourceDate": null,
+      "limitations": "Die verlinkte Übersichtsseite beschreibt das Fachgebiet, liefert aber keinen festen Eurobetrag je Regallücke und keinen validierten Tankstellenbenchmark.",
+      "sourceDateStatus": "not_stated_in_linked_source"
+    },
+    {
+      "id": "price-test-001",
+      "title": "Preissenkungen nach Rohertrag statt nur nach Absatz bewerten",
+      "keywords": [
+        "preis senken",
+        "preissenkung",
+        "preis erhöhen",
+        "preis erhoehen",
+        "preisstrategie",
+        "preiselastizität",
+        "preiselastizitaet",
+        "absatzreaktion",
+        "aktionspreis",
+        "rabatt",
+        "umsatz",
+        "rohertrag",
+        "deckungsbeitrag",
+        "kunden finden teuer"
+      ],
+      "tags": [
+        "preisstrategie",
+        "margenentwicklung",
+        "testdesign"
+      ],
+      "questionHints": [
+        "soll ich die preise senken",
+        "lohnt sich ein rabatt",
+        "wie reagieren kunden auf preise",
+        "verkaufe ich mehr wenn es billiger ist",
+        "preiselastizität messen"
+      ],
+      "answer": "Eine Preissenkung ist nicht automatisch wirtschaftlich sinnvoll, auch wenn mehr Stück verkauft werden. Vergleiche für einen klar abgegrenzten Artikel oder eine Warengruppe Preis, Absatz, Wareneinsatz und Rohertrag vor und während des Tests. Berücksichtige Saison, Aktionen, Verfügbarkeit und mögliche Verlagerung von Käufen zwischen Artikeln. Wenn möglich, nutze vergleichbare Artikel oder Zeitfenster als Kontrollvergleich. Eine einzelne Vorher-nachher-Beobachtung beweist keine Kausalität.",
+      "checklist": [
+        "Ausgangspreis und Stückrohertrag festhalten",
+        "Testdauer und betroffene Artikel vorab definieren",
+        "Absatz, Umsatz und Rohertrag in Euro messen",
+        "Lagerlücken, Saison und Parallelaktionen dokumentieren",
+        "Ergebnis nicht allein am Umsatz oder an verkauften Stückzahlen bewerten"
+      ],
+      "evidenceLabel": "Allgemeiner Testansatz; Forschung zum Einzelhandel ist nicht automatisch tankstellenspezifisch",
+      "sourceTitle": "van Donselaar et al. (2016) – Analysis and forecasting of demand during promotions for perishable items",
+      "sourceUrl": "https://doi.org/10.1016/j.ijpe.2015.10.022",
+      "sourceDate": "2016",
+      "limitations": "Forschungsarbeit untersucht verderbliche Produkte im Einzelhandel anhand von Daten einer niederländischen Lebensmittelhandelskette. Der Abstract ist zugänglich; Ergebnisse sind kein direkter Tankstellenbeleg und keine Garantie für den Effekt einer konkreten Preissenkung."
+    },
+    {
+      "id": "promotion-demand-forecast-001",
+      "title": "Aktionsabsatz und normale Nachfrage getrennt prognostizieren",
+      "keywords": [
+        "aktion",
+        "promotion",
+        "rabatt",
+        "sonderangebot",
+        "absatzprognose",
+        "nachfrageprognose",
+        "backwaren",
+        "verderb",
+        "saison",
+        "bestellmenge",
+        "verkaufsförderung",
+        "preisnachlass"
+      ],
+      "tags": [
+        "absatzplanung",
+        "preisstrategie",
+        "forschung",
+        "retail-transfer"
+      ],
+      "questionHints": [
+        "wie viel für eine aktion bestellen",
+        "warum war die aktion schwächer",
+        "wie plane ich aktionsware",
+        "aktionsverkauf prognostizieren",
+        "wie vermeide ich reste nach rabattaktionen"
+      ],
+      "answer": "Aktionsverkäufe sollten nicht unkritisch als normale Nachfrage fortgeschrieben werden. Für die Planung sind normale Basisnachfrage, Aktionszeitraum, Preisnachlass, mögliche Vorziehkäufe, Substitution zwischen Artikeln und verbleibende Haltbarkeit getrennt zu betrachten. Nach einer Aktion kann Absatz aus späteren Tagen vorgezogen worden sein. Vergleiche deshalb auch den Zeitraum nach der Aktion und dokumentiere Abschriften sowie nicht verfügbare Ware.",
+      "checklist": [
+        "Basisabsatz ohne Aktion abschätzen",
+        "Aktionszeitraum und Preisänderung dokumentieren",
+        "Ähnliche Aktionen und vergleichbare Wochentage heranziehen",
+        "Nachlaufeffekt und mögliche Kannibalisierung prüfen",
+        "Abschriften und Fehlmengen gemeinsam bewerten"
+      ],
+      "evidenceLabel": "Begutachteter Forschungsartikel; Einzelhandelsdaten, nicht Tankstellen-spezifisch",
+      "sourceTitle": "van Donselaar, Peters, de Jong & Broekmeulen (2016) – Analysis and forecasting of demand during promotions for perishable items",
+      "sourceUrl": "https://doi.org/10.1016/j.ijpe.2015.10.022",
+      "sourceDate": "2016",
+      "limitations": "Der öffentlich sichtbare Abstract beschreibt Daten einer niederländischen Lebensmittelhandelskette und die Prognose verderblicher Produkte. Keine direkte Validierung für Tankstellen oder Garantie eines bestimmten Einsparbetrags."
+    },
+    {
+      "id": "assortment-contribution-001",
+      "title": "Sortimentsentscheidungen mit Rohertrag, Platz und Ersatzkäufen prüfen",
+      "keywords": [
+        "sortimentsoptimierung",
+        "artikel auslisten",
+        "artikelrentabilität",
+        "artikelrentabilitaet",
+        "ladenhüter",
+        "ladenhueter",
+        "regalplatz",
+        "kannibalisierung",
+        "ersatzkauf",
+        "substitution",
+        "warengruppe",
+        "absatz",
+        "rohertrag",
+        "sortiment"
+      ],
+      "tags": [
+        "sortimentsanalyse",
+        "regalfläche",
+        "wissenschaftliche studie",
+        "retail-transfer"
+      ],
+      "questionHints": [
+        "welche artikel soll ich rausnehmen",
+        "welcher artikel lohnt sich nicht",
+        "was steht nur herum",
+        "welche produkte bringen am meisten",
+        "regalplatz besser nutzen"
+      ],
+      "answer": "Ein Artikel sollte nicht allein wegen geringer Stückzahl oder geringem Umsatz ausgelistet werden. Betrachte Rohertrag über den Zeitraum, Regalfläche, Verfügbarkeit, Abschriften, Rolle als Ergänzungsartikel und mögliche Ersatzkäufe. Wenn ein Artikel entfällt, kann der Umsatz zu einem anderen Artikel wechseln, ganz wegfallen oder zu einer anderen Warengruppe wandern. Diese Substitution muss als Möglichkeit geprüft und darf nicht als sicherer Effekt behauptet werden.",
+      "checklist": [
+        "Metrik und Zeitraum vor dem Ranking festlegen",
+        "Artikelumsatz, Rohertrag und Abschriften gemeinsam prüfen",
+        "Regalplatz und Ergänzungsfunktion berücksichtigen",
+        "Mögliche Ersatzkäufe und Wechsel innerhalb der Warengruppe untersuchen",
+        "Vor einer endgültigen Auslistung nach Möglichkeit kontrollierten Test durchführen"
+      ],
+      "evidenceLabel": "Begutachtete Operations-Research-Forschung; allgemeiner Einzelhandel, keine Tankstellenstudie",
+      "sourceTitle": "Hübner & Schaal (2017) – An integrated assortment and shelf-space optimization model with demand substitution and space-elasticity effects",
+      "sourceUrl": "https://doi.org/10.1016/j.ejor.2017.01.039",
+      "sourceDate": "2017",
+      "limitations": "Die Studie modelliert Sortiments- und Regalflächenentscheidungen mit realen Datensätzen aus dem Einzelhandel. Die publizierten Modellresultate sind keine garantierten Gewinne oder direkt übertragbaren Werte für eine einzelne Tankstelle."
+    },
+    {
+      "id": "data-readiness-001",
+      "title": "Vor jeder Antwort Datenverfügbarkeit und Kennzahlengranularität klären",
+      "keywords": [
+        "daten fehlen",
+        "fehlender wert",
+        "null",
+        "0",
+        "einkauf",
+        "wareneinsatz",
+        "artikel",
+        "warengruppe",
+        "import",
+        "huth",
+        "nicht angezeigt",
+        "berechnen",
+        "kennzahl",
+        "datenlücke",
+        "granularität",
+        "granularitaet"
+      ],
+      "tags": [
+        "datenqualität",
+        "import",
+        "kennzahlen",
+        "transparenz"
+      ],
+      "questionHints": [
+        "warum steht keine marge da",
+        "einkauf ist null",
+        "welche daten fehlen",
+        "kannst du artikel einzeln vergleichen",
+        "warum kann die app das nicht berechnen"
+      ],
+      "answer": "Bevor eine Zahl oder Rangliste ausgegeben wird, muss geklärt sein, ob die benötigten Daten tatsächlich vorhanden sind und auf derselben Ebene vorliegen. Ein expliziter Zahlenwert 0 ist nicht dasselbe wie ein fehlender oder nicht importierter Wert. Liegen nur Warengruppenwerte vor, darf der Chat keine Artikelrangliste vortäuschen. Nenne die konkret fehlende Größe und erkläre, welche Daten für eine belastbare Berechnung benötigt werden.",
+      "checklist": [
+        "Vorhanden, fehlend, ungültig und explizit 0 getrennt behandeln",
+        "Zeitraum und Einheit kontrollieren",
+        "Warengruppen- und Artikelebene nicht vermischen",
+        "Keine Kennzahl aus fehlendem Einkauf oder fehlendem Umsatz ableiten",
+        "Importstatus nicht aus dem Ergebnis erraten; tatsächlichen Status prüfen"
+      ],
+      "evidenceLabel": "Datenqualitätsregel für die Beratungslogik; keine externe Studie",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Die konkrete Datenverfügbarkeit muss aus dem Laufzeitstatus der App kommen. Dieser Wissenseintrag selbst kann keinen Importstatus oder fehlenden Wert erkennen."
+    },
+    {
+      "id": "clarification-strategy-001",
+      "title": "Bei unklarer Frage gezielt nachfragen statt allgemeine Antwort auszugeben",
+      "keywords": [
+        "unklare frage",
+        "rückfrage",
+        "rueckfrage",
+        "was meinst du",
+        "gut oder schlecht",
+        "letztes jahr",
+        "vorjahr",
+        "diese zahl",
+        "das",
+        "vergleich",
+        "welche warengruppe",
+        "welcher zeitraum",
+        "kontext",
+        "anschlussfrage"
+      ],
+      "tags": [
+        "gesprächsführung",
+        "intent-erkennung",
+        "transparenz"
+      ],
+      "questionHints": [
+        "ist das gut oder schlecht",
+        "und letztes jahr",
+        "warum ist das so",
+        "was soll ich ändern",
+        "kannst du das genauer erklären"
+      ],
+      "answer": "Wenn die Frage mehrere sinnvolle Bedeutungen hat oder ein Verweis wie „das“, „dort“ oder „letztes Jahr“ ohne ausreichenden Gesprächskontext nicht aufgelöst werden kann, soll der Chat nicht raten. Stelle eine kurze, konkrete Rückfrage. Bei „Ist das gut oder schlecht?“ frage nach der gemeinten Kennzahl oder beziehe dich nur dann auf die vorherige Antwort, wenn der Gesprächsverlauf tatsächlich verfügbar ist. Bei „Und letztes Jahr?“ kläre Zeitraum und Kennzahl, falls sie nicht eindeutig aus dem Kontext hervorgehen.",
+      "checklist": [
+        "Vorherige Nachricht nur nutzen, wenn sie tatsächlich im Gesprächszustand verfügbar ist",
+        "Fehlenden Bezug oder Zeitraum benennen",
+        "Eine kurze Frage stellen, die die nächste Analyse ermöglicht",
+        "Keine erfundene Erinnerung an frühere Antworten oder Stationswerte behaupten"
+      ],
+      "evidenceLabel": "Gestaltungsregel für zuverlässige Beratung; keine externe Studie",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Eine Wissensdatenbank allein stellt keinen Gesprächsspeicher bereit. Mehrstufige Dialoge benötigen eine separate, getestete Kontextverwaltung."
+    },
+    {
+      "id": "station-navigation-001",
+      "title": "Fragen zur App-Bedienung von betriebswirtschaftlicher Analyse trennen",
+      "keywords": [
+        "wo finde ich",
+        "wie benutze ich",
+        "bedienung",
+        "navigation",
+        "dashboard",
+        "auswertung",
+        "import",
+        "einstellungen",
+        "bericht",
+        "pdf",
+        "chat",
+        "app",
+        "seite",
+        "funktion",
+        "klick",
+        "öffnen",
+        "oeffnen"
+      ],
+      "tags": [
+        "produktnavigation",
+        "hilfe",
+        "intent-erkennung"
+      ],
+      "questionHints": [
+        "wo finde ich die auswertung",
+        "wie öffne ich den bericht",
+        "wo lade ich den import hoch",
+        "wie benutze ich das dashboard",
+        "wo kann ich die daten prüfen"
+      ],
+      "answer": "Eine Bedienfrage sollte direkt auf die vorhandene Oberfläche und Funktion antworten, nicht mit einer allgemeinen Warenwirtschaftsberatung. Nenne nur Menüpunkte und Funktionen, die in der aktuellen Version tatsächlich vorhanden sind. Wenn der konkrete Aufbau nicht bekannt oder nicht verifiziert ist, frage nach der geöffneten Seite oder bitte um einen Screenshot, statt einen nicht existierenden Button zu erfinden.",
+      "checklist": [
+        "Bedienfrage als eigenen Intent erkennen",
+        "Nur bestätigte Oberflächenbegriffe nennen",
+        "Keine Funktionen oder Buttons erfinden",
+        "Bei versionsabhängigem Aufbau kurz nach der aktuellen Ansicht fragen"
+      ],
+      "evidenceLabel": "Produkt-Hilfe-Regel; keine externe Studie",
+      "sourceTitle": null,
+      "sourceUrl": null,
+      "sourceDate": null,
+      "limitations": "Die Wissensdatenbank ersetzt keine versionsaktuelle UI-Dokumentation und kann keine Oberfläche sehen, die nicht im Gespräch oder Laufzeitkontext verfügbar ist."
+    },
+    {
+      "id": "forecast-vs-target-001",
+      "title": "Prognose, Zielwert und tatsächlichen Ist-Wert unterscheiden",
+      "keywords": [
+        "prognose",
+        "forecast",
+        "ziel",
+        "sollwert",
+        "istwert",
+        "absatzplanung",
+        "erwartung",
+        "planung",
+        "bestellplanung",
+        "sicherheitsbestand",
+        "nachfrage"
+      ],
+      "tags": [
+        "planung",
+        "prognose",
+        "dateninterpretation"
+      ],
+      "questionHints": [
+        "wie viel werde ich verkaufen",
+        "was soll ich für nächste woche planen",
+        "ist der absatz zu hoch angesetzt",
+        "warum bestelle ich zu viel",
+        "soll und ist vergleichen"
+      ],
+      "answer": "Ein Ist-Wert beschreibt gemessene Verkäufe; eine Prognose schätzt künftige Nachfrage; ein Ziel- oder Servicelevel ist eine Planungsentscheidung. Diese Größen dürfen nicht vermischt werden. Wenn ein gewünschtes Verfügbarkeitsniveau in die Prognose eingebaut wird, kann die Nachfrage systematisch überschätzt werden. Kennzeichne daher Prognoseannahmen und Zielvorgaben getrennt und vergleiche Prognosen später mit den tatsächlich beobachteten Werten.",
+      "checklist": [
+        "Ist-Daten, Prognose und Zielwert getrennt beschriften",
+        "Aktions- und Normalnachfrage unterscheiden",
+        "Prognosefehler regelmäßig gegen Ist-Absatz messen",
+        "Bei verderblicher Ware Haltbarkeit und Abschriften einbeziehen"
+      ],
+      "evidenceLabel": "Begutachteter wissenschaftlicher Forschungsartikel; allgemeine Einzelhandelsprognose",
+      "sourceTitle": "Fahimnia, Tan & Tahirov (2025) – Service-level anchoring in demand forecasting: The moderating impact of retail promotions and product perishability",
+      "sourceUrl": "https://www.sciencedirect.com/science/article/pii/S0169207024000748",
+      "sourceDate": "2025",
+      "limitations": "Der Artikel beschreibt ein Labor-Experiment zur Prognosebeurteilung und den Einfluss von Promotions und Verderblichkeit. Er liefert keinen spezifischen Tankstellen-Benchmark und belegt nicht, dass ein bestimmtes Verfahren an einer einzelnen Station wirkt."
+    },
+    {
+      "id": "price-demand-evidence-001",
+      "title": "Preiselastizität nicht aus allgemeiner Preiswahrnehmung ableiten",
+      "keywords": [
+        "preiselastizität",
+        "preiselastizitaet",
+        "preisempfindlichkeit",
+        "preiswahrnehmung",
+        "preisänderung",
+        "preisänderungen",
+        "absatzreaktion",
+        "preissenkung",
+        "preisnachlass",
+        "rabatt",
+        "umsatz",
+        "rohertrag"
+      ],
+      "tags": [
+        "preisstrategie",
+        "forschung",
+        "datenqualität"
+      ],
+      "questionHints": [
+        "wie preissensibel sind kunden",
+        "wie stark steigt absatz bei rabatt",
+        "lohnt sich preis senken",
+        "kunden finden das zu teuer",
+        "preiselastizität berechnen"
+      ],
+      "answer": "Preiswahrnehmung, tatsächliche Preiselastizität und wirtschaftlicher Effekt einer Preisänderung sind verschiedene Dinge. Eine Umfrage, in der Kunden einen Preis als hoch bewerten, beweist nicht, dass eine Senkung den Absatz oder den Rohertrag erhöht. Für eine stationsindividuelle Einschätzung werden vergleichbare Preis- und Absatzbeobachtungen benötigt; zugleich sind Konkurrenz, Warenverfügbarkeit, Aktionen und Substitution zu berücksichtigen.",
+      "checklist": [
+        "Umfrageaussagen nicht als gemessene Absatzreaktion behandeln",
+        "Preis und Stückabsatz vor/nach Änderung dokumentieren",
+        "Rohertrag in Euro als zentrale wirtschaftliche Größe mitbewerten",
+        "Mögliche Saison- und Aktionseffekte abgrenzen"
+      ],
+      "evidenceLabel": "Fachlicher Forschungsbezug; keine tankstellenspezifische Elastizität",
+      "sourceTitle": "van Donselaar et al. (2016) – Analysis and forecasting of demand during promotions for perishable items",
+      "sourceUrl": "https://doi.org/10.1016/j.ijpe.2015.10.022",
+      "sourceDate": "2016",
+      "limitations": "Die Publikation bezieht sich auf verderbliche Produkte im Lebensmittelhandel. Sie liefert keine Elastizität für Tankstellenartikel und keine pauschale Empfehlung zur Preissenkung."
+    }
+  ],
+  "updatedAt": "2026-10-24"
+}
