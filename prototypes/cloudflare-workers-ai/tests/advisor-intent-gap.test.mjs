@@ -7,7 +7,7 @@ const appPath = new URL("../../../analyse.html", import.meta.url);
 async function flagsFor(question) {
   const source = await readFile(appPath, "utf8");
   const normStart = source.indexOf("function advisorNorm(");
-  const normEnd = source.indexOf("function advisorReply(", normStart);
+  const normEnd = source.indexOf("function advisorDirectAnswer(", normStart);
   assert.ok(normStart >= 0 && normEnd > normStart);
   const normFn = source.slice(normStart, normEnd);
   const start = source.indexOf("const intentText=String(q||'')");
