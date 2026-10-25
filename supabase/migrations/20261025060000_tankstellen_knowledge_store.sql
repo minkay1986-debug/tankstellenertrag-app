@@ -44,8 +44,6 @@ create index if not exists tankstellen_knowledge_chunks_search_idx
   on public.tankstellen_knowledge_chunks using gin (search_vector);
 create index if not exists tankstellen_knowledge_docs_review_idx
   on public.tankstellen_knowledge_documents (review_status, fetched_at desc);
-create index if not exists tankstellen_knowledge_chunks_trgm_idx
-  on public.tankstellen_knowledge_chunks using gin (content extensions.gin_trgm_ops);
 
 alter table public.tankstellen_knowledge_sources enable row level security;
 alter table public.tankstellen_knowledge_documents enable row level security;
