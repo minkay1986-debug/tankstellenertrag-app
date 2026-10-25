@@ -60,6 +60,16 @@ export default {
         : [],
     };
 
+    // Fixed precedence rule: legal, tax and HR advice is outside the current scope.
+    // Return the notice directly and do not send these questions to the model.
+    if (isOutOfScopeAdvice(question)) {
+      return Response.json({
+        answer: "Dieser Fachbereich ist noch nicht Teil unserer Beratung. TankstellenErtrag unterstützt dich derzeit bei Warenwirtschaft, Sortiment, Margen und Ertrag. Zu rechtlichen, steuerlichen und personalbezogenen Fragen geben wir aktuell keine fachliche Auskunft.",
+        prototype: true,
+        scopeNotice: true,
+      });
+    }
+
     if (!env.AI || typeof env.AI.run !== "function") {
       return Response.json({ error: "workers_ai_binding_missing" }, { status: 503 });
     }
@@ -104,4 +114,18 @@ export default {
 
 function finiteOrNull(value) {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+
+function isOutOfScopeAdvice(question) {
+  const q = String(question || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ß/g, "ss")
+    .replace(/[^a-z0-9€%.,:+ -]/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return /\b(rechtsberatung|rechtslage|rechtlich|arbeitsrecht|arbeitsrechtlich|arbeitsvertrag|kundig\w*|kuendig\w*|abmahnung|arbeitszeitgesetz|mindestlohn|urlaubstage|krankmeldung|lohnsteuer|einkommensteuer|gewerbesteuer|umsatzsteuer|vorsteuer|steuererklaerung|versteuern|versteuere|finanzamt|steuerlich|steuerberater|steuerberatung|haftungsrecht|ist das erlaubt|ist das verboten|gesetzlich erlaubt|gesetzlich vorgeschrieben|datenschutzrecht|mitarbeiter entlassen|mitarbeiter einstellen|personalrecht|gehaltserhoehung)\b/.test(q);
 }
