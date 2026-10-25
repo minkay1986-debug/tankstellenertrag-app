@@ -114,7 +114,8 @@ test("legal, tax and personnel questions receive only the fixed scope notice fir
     "Wie versteuere ich das?",
     "Was muss ich arbeitsrechtlich beachten?",
     "Muss ich Umsatzsteuer auf den Verkauf zahlen?",
-    "Ist das gesetzlich erlaubt?"
+    "Ist das gesetzlich erlaubt?",
+    "Kann man anhand dieser Kennzahlen feststellen, welcher Mitarbeiter Ware entwendet?"
   ]) {
     const answer = direct(question);
     assert.ok(answer.includes(notice), `Expected scope notice for: ${question}`);
