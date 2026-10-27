@@ -1053,6 +1053,24 @@ function advisorKnowledgeHtml(raw){
 function advisorNorm(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ß/g,'ss').replace(/[^a-z0-9€%.,:+ -]/gi,' ').replace(/\s+/g,' ').trim()}
 function advisorDirectAnswer(raw){
  const q=advisorNorm(raw);
+ // Ergänzungen für den Beratungs-Chat: Fachbegriffe, Datenqualität und nächste Schritte.
+ if(/\b(was ist|erklaer|erklaere|bedeutet).*(wareneinsatz|schwund|abschriften)|unterschied.*(wareneinsatz|schwund|abschriften)/.test(q)){
+  return '<b>Wareneinsatz, Schwund und Abschriften</b><ul><li><b>Wareneinsatz:</b> Einkaufskosten der verkauften Ware.</li><li><b>Schwund:</b> Bestandsverlust, der nicht durch regulären Verkauf erklärt ist; die Ursache muss geprüft werden.</li><li><b>Abschriften:</b> dokumentierte Wertminderungen oder Ausbuchungen, zum Beispiel bei verdorbener oder abgelaufener Ware.</li></ul><p>Die Begriffe dürfen nicht ungeprüft addiert werden: Je nach Buchungs- und Auswertungslogik können Überschneidungen entstehen. Prüfe Zeitraum, Buchungsgrund und Datenquelle.</p>';
+ }
+ if(/\b(was ist|erklaer|erklaere|bedeutet).*(regalluecke|regalluecken|warenverfuegbarkeit)|warum.*regal.*leer/.test(q)){
+  return '<b>Regallücken und Warenverfügbarkeit</b><p>Eine Regallücke ist zunächst ein beobachteter Zustand, noch kein Beweis für entgangenen Umsatz. Prüfe Artikel, Zeitpunkt, Dauer, Lagerbestand, Nachfüllroutine und Lieferzeit.</p><p>Für eine belastbare Priorisierung erfasse wiederholt betroffene Artikel und vergleiche die Beobachtungen mit Absatz, Bestand und Lieferdaten. Ohne diese Werte nenne ich keinen erfundenen Verlustbetrag.</p>';
+ }
+ if(/\b(bestellmenge|wie viel.*bestell|was soll ich.*bestell|nachbestellmenge)\b/.test(q)){
+  return '<b>Bestellmenge belastbar bestimmen</b><p>Ich sollte ohne aktuelle Eingaben keine scheinbar exakte Bestellmenge nennen. Benötigt werden mindestens Absatz im passenden Zeitraum, aktueller verkaufsfähiger Bestand, offene Lieferungen, Lieferzeit und gegebenenfalls Mindestbestellmenge.</p><p>Danach lässt sich ein Vorschlag mit nachvollziehbaren Annahmen berechnen. Der Beratungs-Chat führt selbst keine Bestellung aus.</p>';
+ }
+ if(/\b(warum.*marge|niedrige marge|marge.*zu niedrig|marge.*gesunken)\b/.test(q)){
+  return '<b>Niedrige Marge systematisch prüfen</b><ol><li>Umsatz und Wareneinsatz für denselben Zeitraum und dieselbe Warengruppe abgleichen.</li><li>EK-Änderungen, Verkaufspreise, Rabatte und Produktmix prüfen.</li><li>Fehlende oder als 0 importierte EK-Werte sowie Schwund und Abschriften separat kontrollieren.</li></ol><p>Das sind Prüfhypothesen, noch keine festgestellten Ursachen. Für eine Rangfolge brauche ich die bestätigten Stationswerte.</p>';
+ }
+ if(/\b(welche daten|was brauchst du|welche angaben|welche werte).*(empfehl|analys|marge|bestell|rohertrag)|daten.*(empfehlungen|beratung)/.test(q)){
+  return '<b>Welche Daten helfen für eine belastbare Beratung?</b><ul><li>Zeitraum und Warengruppe</li><li>Umsatz und dazugehöriger Wareneinsatz/EK mit bestätigter Datenquelle</li><li>Aktueller Bestand, Absatz und Lieferzeit bei Bestell- oder Verfügbarkeitsfragen</li><li>Schwund und Abschriften separat, sofern erfasst</li><li>Vergleichszeitraum, wenn eine Entwicklung bewertet werden soll</li></ul><p>Fehlende Werte kennzeichne ich als unbekannt und setze sie nicht stillschweigend auf 0.</p>';
+ }
+
+ const q=advisorNorm(raw);
  const html=s=>'<p>'+s+'</p>';
 
  // Vorrangregel: Rechts-, Steuer- und Personalberatung ist derzeit nicht Teil des Beratungsumfangs.
