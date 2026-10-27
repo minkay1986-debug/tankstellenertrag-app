@@ -1052,7 +1052,7 @@ function advisorKnowledgeHtml(raw){
 }
 function advisorNorm(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ß/g,'ss').replace(/[^a-z0-9€%.,:+ -]/gi,' ').replace(/\s+/g,' ').trim()}
 function advisorDirectAnswer(raw){
- const q=advisorNorm(raw);
+
  // Ergänzungen für den Beratungs-Chat: Fachbegriffe, Datenqualität und nächste Schritte.
  if(/\b(was ist|erklaer|erklaere|bedeutet).*(wareneinsatz|schwund|abschriften)|unterschied.*(wareneinsatz|schwund|abschriften)/.test(q)){
   return '<b>Wareneinsatz, Schwund und Abschriften</b><ul><li><b>Wareneinsatz:</b> Einkaufskosten der verkauften Ware.</li><li><b>Schwund:</b> Bestandsverlust, der nicht durch regulären Verkauf erklärt ist; die Ursache muss geprüft werden.</li><li><b>Abschriften:</b> dokumentierte Wertminderungen oder Ausbuchungen, zum Beispiel bei verdorbener oder abgelaufener Ware.</li></ul><p>Die Begriffe dürfen nicht ungeprüft addiert werden: Je nach Buchungs- und Auswertungslogik können Überschneidungen entstehen. Prüfe Zeitraum, Buchungsgrund und Datenquelle.</p>';
