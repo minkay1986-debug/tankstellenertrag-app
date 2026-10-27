@@ -1068,7 +1068,7 @@ function advisorDirectAnswer(raw){
   return '<b>Niedrige Marge systematisch prüfen</b><ol><li>Umsatz und Wareneinsatz für denselben Zeitraum und dieselbe Warengruppe abgleichen.</li><li>EK-Änderungen, Verkaufspreise, Rabatte und Produktmix prüfen.</li><li>Fehlende oder als 0 importierte EK-Werte sowie Schwund und Abschriften separat kontrollieren.</li></ol><p>Das sind Prüfhypothesen, noch keine festgestellten Ursachen. Für eine Rangfolge brauche ich die bestätigten Stationswerte.</p>';
  }
  if(/\b(welche daten|was brauchst du|welche angaben|welche werte).*(empfehl|analys|marge|bestell|rohertrag)|daten.*(empfehlungen|beratung)/.test(q)){
-  return '<b>Welche Daten helfen für eine belastbare Beratung?</b><ul><li>Zeitraum und Warengruppe</li><li>Umsatz und dazugehöriger Wareneinsatz/EK mit bestätigter Datenquelle</li><li>Aktueller Bestand, Absatz und Lieferzeit bei Bestell- oder Verfügbarkeitsfragen</li><li>Schwund und Abschriften separat, sofern erfasst</li><li>Vergleichszeitraum, wenn eine Entwicklung bewertet werden soll</li></ul><p>Fehlende Werte kennzeichne ich als unbekannt und setze sie nicht stillschweigend auf 0.</p>';
+  return '<b>Welche Daten helfen für eine belastbare Beratung?</b><ul><li>Zeitraum und Warengruppe</li><li>Umsatz und dazugehöriger Wareneinsatz; bei EK-Fragen den gültigen EK mit bestätigter Datenquelle</li><li>Aktueller Bestand, Absatz und Lieferzeit bei Bestell- oder Verfügbarkeitsfragen</li><li>Schwund und Abschriften separat, sofern erfasst</li><li>Vergleichszeitraum, wenn eine Entwicklung bewertet werden soll</li></ul><p>Fehlende Werte kennzeichne ich als unbekannt und setze sie nicht stillschweigend auf 0.</p>';
  }
 
 
