@@ -23,17 +23,17 @@ permissions:
 jobs:
   browser-smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Checkout PR branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version: 24
       - name: Install Playwright
         run: |
-          npm install --no-save playwright
+          npm install --no-save --no-audit --no-fund playwright
           npx playwright install --with-deps chromium
       - name: Start static server
         run: |
