@@ -133,6 +133,13 @@ jobs:
           }), questions);
           const directAnswerChecks = await page.evaluate(() => {
             const cases = [
+              { id: 'fix-rohertrag-definition', question: 'Was bleibt nach Abzug des Wareneinkaufs?', must: ['Rohertrag', 'Wareneinsatz'] },
+              { id: 'fix-coffee-margin-formula', question: 'Wie berechne ich die Marge für Kaffeeumsätze?', must: ['Rohertragsmarge', 'Umsatz − Wareneinsatz'] },
+              { id: 'fix-effectivity-caveat', question: 'Was bedeutet Rohertrags-Effektivität?', must: ['nicht eindeutig standardisiert', 'Produktdefinition'] },
+              { id: 'fix-margin-ek-gross-profit-terms', question: 'Marge / EK / Rohertrag – was zählt hier?', must: ['Umsatz', 'Wareneinsatz', 'Rohertragsmarge'] },
+              { id: 'fix-shop-gross-profit', question: 'Was bleibt vom Shopverkauf nach Einkauf übrig?', must: ['Rohertrag', 'Nettogewinn'] },
+              { id: 'fix-missing-ek-zero-sales', question: 'EK fehlt und Umsatz ist null: was ist noch möglich?', must: ['Umsatz tatsächlich 0', 'EK fehlt', 'nicht berechenbar'] },
+              { id: 'fix-shrink-writeoff-separation', question: 'Erkläre die Wirkung von Wareneinsatz, Schwund und Abschriften.', must: ['Wareneinsatz', 'Abschriften', 'Schwund'] },
               { id: 'direct-margin-vs-gross-profit', question: 'Kannst du Marge und Rohertrag verständlich auseinanderhalten?', must: ['Eurobetrag', 'Anteil am Umsatz'] },
               { id: 'direct-more-sales-not-automatic-profit', question: 'Wenn ich mehr verkaufe, verdiene ich dann automatisch mehr?', must: ['nicht automatisch', 'Wareneinsatz'] },
               { id: 'direct-lost-profit-priority', question: 'Bei welchen Shop-Artikeln geht mir wahrscheinlich Ertrag verloren?', must: ['EK und Marge', 'Schwund und Abschriften'] },
