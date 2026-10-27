@@ -1309,6 +1309,12 @@ return out.join('')}
 function advisorReply(raw){
  const scope=advisorScopeGuard(raw);
  if(scope)return scope;
+ const direct=advisorDirectAnswer(raw);
+ if(direct)return direct;
+ const advisory=advisorGeneralGuidanceAnswer(raw);
+ if(advisory)return advisory;
+ const noData=advisorNoDataAnswer(raw);
+ if(noData&&!advisorHasCurrentMonthData())return noData;
  const base=advisorReplyBase(raw);
  const knowledge=advisorKnowledgeHtml(raw);
  return knowledge?base+knowledge:base;
