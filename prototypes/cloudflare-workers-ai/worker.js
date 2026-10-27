@@ -3,6 +3,7 @@
  *
  * NOT connected to the app and NOT deployed.
  * Defaults to disabled. Use synthetic test questions only.
+ * Bind env.AI in a private Cloudflare test Worker to try inference.
  */
 const MAX_QUESTION_LENGTH = 1000;
 const MODEL = "@cf/zai-org/glm-4.7-flash";
@@ -84,10 +85,7 @@ export default {
               "Wenn die Frage mehrere plausible Bedeutungen hat und die Antwort davon abhängt, stelle genau eine kurze, hilfreiche Rückfrage. Rate nicht. Wenn nur ein Teil unklar ist, beantworte den sicheren Teil und frage anschließend gezielt nach.",
               "Wenn die Frage klar ist, antworte direkt und vermeide unnötige Rückfragen. Gib bei einer sinnvollen Frage nach Möglichkeit eine kurze Einordnung und konkrete nächste Prüfschritte.",
               "Nutze ausschließlich die übergebenen, ausdrücklich synthetischen Daten. Erfinde keine Zahlen, Daten, Ursachen, Branchenbenchmarks, Studien, Quellen oder Fähigkeiten der App. Berechne keine Kennzahlen neu.",
-              "Ein Umsatz ist kein Verlust. Behaupte keinen Gruppenverlust, wenn er nicht ausdrücklich als validierte Zahl übergeben wurde. Eine Marge von 0 % ist ein erfasster Wert und beweist weder Datenfehler noch Verlust oder Ursache.",
-              "Bei dataStatus=missing ist nur der angegebene Datenstatus bekannt. Rate nicht, ob Verkaufspreis, Einkaufspreis, Import oder ein anderes Feld fehlt. Erfinde keine Ursache für die Datenlücke.",
               "Unterscheide fehlende Werte, gültige Nullwerte und ungeprüfte Importe. Ein fehlender Einkaufspreis ist nicht dasselbe wie null Einkaufskosten. Nenne klar, welche Schlussfolgerung wegen fehlender oder unzuverlässiger Daten nicht möglich ist.",
-              "Für konkrete Bestellmengen reichen Umsatz und Marge allein nicht. Frage bei fehlenden Angaben gezielt nach aktuellem Bestand, Abverkauf/Absatz, Lieferzeit und gewünschtem Zeitraum. Erfinde keine Bestellmenge.",
               "Trenne Fakten aus den Daten von möglichen Erklärungen. Eine Korrelation beweist keine Ursache; Schwund beweist keinen Diebstahl. Formuliere unbestätigte Erklärungen ausdrücklich als Hypothesen.",
               "Gib keine verbindliche Rechts-, Steuer- oder Personalrechtsberatung. Bei solchen Fragen erkläre die allgemeine Grenze und verweise auf eine qualifizierte Stelle, wenn eine konkrete verbindliche Beurteilung nötig ist.",
               "Keine generischen Einleitungen wie 'Als KI'. Keine Behauptung, du hättest Live-Daten, die Datenbank, frühere Gespräche oder externe Quellen geprüft, wenn diese nicht übergeben wurden.",
@@ -100,9 +98,6 @@ export default {
           },
         ],
         max_tokens: 350,
-        // GLM-4.7-Flash otherwise may spend the whole output budget on reasoning
-        // and return message.content=null. The user-facing advisor needs a final answer.
-        chat_template_kwargs: { enable_thinking: false, clear_thinking: true },
       });
 
       const answer = typeof result?.response === "string" ? result.response.trim() : "";
