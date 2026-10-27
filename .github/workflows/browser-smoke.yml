@@ -22,6 +22,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Personal KPI regression guards
+        run: node tests/personal-kpi-regression.mjs
       - name: Install Playwright
         run: |
           npm install --no-save playwright
