@@ -1054,6 +1054,19 @@ function advisorNorm(v){return String(v||'').toLowerCase().normalize('NFD').repl
 function advisorDirectAnswer(raw){
  const q=advisorNorm(raw);
 
+ // Fachliche Korrekturen nach Sichtung der 100 realen Chatantworten.
+ if(/mit welcher warengruppe.*(prozentual|marge)|welche sortimentsgruppe.*(marge|schwaechsten)|welche warengruppe.*(marge|rentabel)/.test(q)){
+  return '<b>Warengruppen nach Marge vergleichen</b><p>Die prozentuale Rohertragsmarge zeigt, welcher Anteil des Warenumsatzes nach Abzug des Wareneinsatzes als Rohertrag verbleibt. Für einen fairen Vergleich brauche ich je Warengruppe Umsatz und bestätigten EK/Wareneinsatz aus demselben Zeitraum.</p><p>Im aktuellen Test sind keine bestätigten Werte vorhanden; deshalb lässt sich keine Gruppe als beste oder schwächste benennen. Fehlender EK bedeutet „nicht berechenbar“, nicht 0 %.</p>';
+ }
+ if(/hat sich mein rohertrag.*(letzten zeitraum|vormonat|vorherigen zeitraum)|rohertrag.*gegenueber.*(letzten|vorherigen)/.test(q)){
+  return '<b>Rohertrag im Zeitvergleich</b><p>Verglichen wird der Rohertrag in Euro: Warenumsatz minus zugehöriger Wareneinsatz. Beide Zeiträume müssen dieselbe Abgrenzung haben und gültige EK-Werte enthalten.</p><p>Ohne bestätigte Werte für beide Zeiträume kann ich nicht sagen, ob er gestiegen oder gesunken ist. Bitte nenne die Zeiträume bzw. lade die Monatsdaten samt EK-Import.</p>';
+ }
+ if(/mir fehlt der ek.*umsatz steht auf null|ek-wert.*umsatz.*null/.test(q)){
+  return '<b>Was bei fehlendem EK und 0 € Umsatz berechenbar ist</b><p>Wenn der Umsatz für den Zeitraum tatsächlich 0 € beträgt, ist der Rohertrag für verkaufte Ware rechnerisch 0 € – vorausgesetzt, Umsatz und Zeitraum sind bestätigt. Eine prozentuale Marge ist bei 0 € Umsatz nicht sinnvoll berechenbar.</p><p>Wenn der EK fehlt oder ungeprüft ist, darf daraus nicht geschlossen werden, dass nichts eingekauft wurde. Prüfe den EK-Import separat und kennzeichne bestätigte Nullwerte ausdrücklich.</p>';
+ }
+ if(/mit welcher warengruppe verdiene ich prozentual am besten|welche sortimentsgruppe schneidet bei der marge am schwaechsten ab/.test(q)){
+  return '<b>Warengruppenvergleich braucht gültige EK-Werte</b><p>Für jede Warengruppe müssen Umsatz und bestätigter Wareneinsatz für denselben Zeitraum vorliegen. Dann lassen sich Rohertrag in Euro und Rohertragsmarge in Prozent getrennt vergleichen.</p><p>Im aktuellen Testzustand fehlen bestätigte Stationswerte; daher gibt es keine belastbare Rangfolge. Ein fehlender EK wird nicht als 0 € oder 0 % gewertet.</p>';
+ }
  // Präzisierungen aus der manuellen Sichtung des 100-Fragen-Laufs.
  if(/warum laesst sich.*(gruppe|warengruppe).*marge.*berechnen|keine marge.*(gruppe|warengruppe)/.test(q)){
   return '<b>Warum für eine Warengruppe keine Marge berechenbar ist</b><p>Für eine belastbare Marge müssen Umsatz und gültiger EK/Wareneinsatz derselben Warengruppe für denselben Zeitraum vorliegen. Prüfe, ob der EK-Import angekommen ist, die Zuordnung zur Warengruppe stimmt und ein angezeigter 0-Wert tatsächlich bestätigt wurde. Fehlt der EK, ist die Marge unbekannt – nicht automatisch 0 %.</p>';
