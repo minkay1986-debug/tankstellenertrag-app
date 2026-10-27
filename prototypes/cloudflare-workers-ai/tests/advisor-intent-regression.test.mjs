@@ -305,3 +305,24 @@ test("advisor feedback is isolated per station account in UI and RLS migration",
   assert.match(migration, /with check \(user_id = \(select auth\.uid\(\)\) and station_id = \(select auth\.uid\(\)\)\)/);
   assert.match(migration, /enable row level security/i);
 });
+
+test("local advisor query expansion covers natural-language variants from the 100-question benchmark", async () => {
+  const source = await loadApp();
+  const normFn = extractFunction(source, "advisorNorm", "advisorDirectAnswer");
+  const expandFn = extractFunction(source, "advisorExpandQuery", "advisorKnowledgeHtml");
+  const expand = vm.runInNewContext(`(()=>{ ${normFn}; ${expandFn}; return advisorExpandQuery; })()`);
+  const cases = [
+    ["An welcher Stelle könnte ich unnötig Geld verschenken?", ["verlust", "schwund"]],
+    ["Welche Warengruppe belastet meinen Ertrag am stärksten?", ["verlust", "rohertrag"]],
+    ["Verglichen mit dem Vormonat: ist mein Geschäft besser gelaufen?", ["vergleich", "umsatz"]],
+    ["Beim EK steht 0: bedeutet das wirklich, dass nichts eingekauft wurde?", ["datenqualitaet", "einkauf null"]],
+    ["Wie prüfe ich, ob ich bei den Backwaren zu hohe Mengen ordern lasse?", ["bestellmenge", "lagerbestand"]],
+    ["Wie prüfe ich, ob sonnige Tage tatsächlich mit höheren Umsätzen zusammenhängen?", ["wetter", "wettereffekt"]],
+    ["Bei Zigaretten fehlen wieder Bestände. Welche Kontrollen sind sinnvoll, ohne jemanden zu beschuldigen?", ["inventur", "bestandsdifferenz"]],
+    ["Kann ich meine Ergebnisse auf Papier oder als PDF ausgeben?", ["bericht", "auswertung"]]
+  ];
+  for (const [question, terms] of cases) {
+    const expanded = expand(question);
+    for (const term of terms) assert.ok(expanded.includes(term), `Missing expansion term "${term}" for: ${question}; got: ${expanded}`);
+  }
+});
