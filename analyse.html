@@ -1054,6 +1054,19 @@ function advisorNorm(v){return String(v||'').toLowerCase().normalize('NFD').repl
 function advisorDirectAnswer(raw){
  const q=advisorNorm(raw);
 
+ // Präzisierungen aus der manuellen Sichtung des 100-Fragen-Laufs.
+ if(/warum laesst sich.*(gruppe|warengruppe).*marge.*berechnen|keine marge.*(gruppe|warengruppe)/.test(q)){
+  return '<b>Warum für eine Warengruppe keine Marge berechenbar ist</b><p>Für eine belastbare Marge müssen Umsatz und gültiger EK/Wareneinsatz derselben Warengruppe für denselben Zeitraum vorliegen. Prüfe, ob der EK-Import angekommen ist, die Zuordnung zur Warengruppe stimmt und ein angezeigter 0-Wert tatsächlich bestätigt wurde. Fehlt der EK, ist die Marge unbekannt – nicht automatisch 0 %.</p>';
+ }
+ if(/huth.*import|import.*huth/.test(q)){
+  return '<b>HUTH-Import systematisch prüfen</b><ol><li>Prüfe in „1_CHECK“, ob die erwarteten Umsatzwerte für den richtigen Zeitraum angekommen sind.</li><li>Prüfe den EK-Import separat; ein erfolgreicher Umsatzimport bestätigt nicht automatisch den Wareneinsatz.</li><li>Vergleiche Warengruppenzuordnung, Summen und Zeitraum mit dem HUTH-Export.</li><li>Fehlende Werte, bestätigte Nullwerte und nicht zugeordnete Positionen getrennt markieren.</li></ol><p>Ich kann den Importstatus nur anhand der tatsächlich geladenen Datei bzw. angezeigten Prüfergebnisse beurteilen.</p>';
+ }
+ if(/warum sehe ich umsatz aber keinen wareneinsatz/.test(q)){
+  return '<b>Umsatz vorhanden, Wareneinsatz fehlt</b><p>Umsatz und EK/Wareneinsatz kommen häufig aus getrennten Datenquellen. Prüfe daher den EK-Import separat, den Zeitraum, die Warengruppenzuordnung und ob EK-Werte fehlen oder als 0 eingelesen wurden. Ein Umsatzwert allein reicht nicht, um Rohertrag oder Marge zu berechnen.</p>';
+ }
+ if(/wie halte ich.*bestandsabweichungen.*sachlich fest|ungewoehnliche bestandsabweichungen.*fest/.test(q)){
+  return '<b>Bestandsabweichung sachlich dokumentieren</b><ol><li>Stichtag, Artikel/Warengruppe und Maßeinheit notieren.</li><li>Sollbestand und gezählten Istbestand dokumentieren.</li><li>Wareneingänge, Retouren, Umlagerungen, Korrekturen und Verkäufe bis zum Stichtag abgleichen.</li><li>Die Differenz neutral festhalten und Nachzählung bzw. Buchungsprüfung dokumentieren.</li></ol><p>Eine Differenz beweist für sich genommen keinen Diebstahl und erlaubt keine Beschuldigung einzelner Personen.</p>';
+ }
  // Ergänzungen für den Beratungs-Chat: Fachbegriffe, Datenqualität und nächste Schritte.
  if(/\b(was ist|erklaer|erklaere|bedeutet).*(wareneinsatz|schwund|abschriften)|unterschied.*(wareneinsatz|schwund|abschriften)/.test(q)){
   return '<b>Wareneinsatz, Schwund und Abschriften</b><ul><li><b>Wareneinsatz:</b> Einkaufskosten der verkauften Ware.</li><li><b>Schwund:</b> Bestandsverlust, der nicht durch regulären Verkauf erklärt ist; die Ursache muss geprüft werden.</li><li><b>Abschriften:</b> dokumentierte Wertminderungen oder Ausbuchungen, zum Beispiel bei verdorbener oder abgelaufener Ware.</li></ul><p>Die Begriffe dürfen nicht ungeprüft addiert werden: Je nach Buchungs- und Auswertungslogik können Überschneidungen entstehen. Prüfe Zeitraum, Buchungsgrund und Datenquelle.</p>';
