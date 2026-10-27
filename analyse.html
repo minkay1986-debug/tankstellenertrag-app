@@ -1063,22 +1063,22 @@ function advisorDirectAnswer(raw){
  // "Mitarbeiter" allein löst die Sperre absichtlich nicht aus: Warenwirtschafts- und Schwundfragen bleiben beantwortbar.
  // Direkte Antworten für reine Begriffs-/Formelfragen: keine Stationsdaten erforderlich.
  // Diese Regeln liegen nach der Rechts-/Steuer-/Personal-Sperre, damit Fachgrenzen Vorrang behalten.
- if (/\b(was bleibt.*(wareneinkauf|einkauf|shopverkauf)|nach abzug.*(wareneinkauf|wareneinsatz)|was bleibt.*(verkauf|umsatz).*(einkauf|wareneinsatz)|rohertrag.*(berechnen|bedeutet|erklaer)|was ist.*rohertrag)\b/.test(q)) {
+ if (/was bleibt.*(wareneinkauf|einkauf|shopverkauf)|nach abzug.*(wareneinkauf|wareneinsatz)|rohertrag.*(berechnen|bedeutet|erklaer)|was ist.*rohertrag/.test(q)) {
   return '<b>Rohertrag einfach erklärt</b><p>Der Rohertrag ergibt sich grundsätzlich aus dem Warenumsatz abzüglich des dazugehörigen Wareneinsatzes (Einkaufskosten der verkauften Ware).</p><p><b>Formel:</b> Warenumsatz − Wareneinsatz = Rohertrag. Dafür müssen Umsatz und Wareneinsatz denselben Zeitraum und denselben Warenumfang betreffen. Ohne bestätigte Werte kann ich deinen konkreten Betrag nicht berechnen.</p>';
  }
  if (/\b(marge.*(kaffee|kaffeeumsatz)|(kaffee|kaffeeumsatz).*(marge|margenberechnung|marge berechnen)|wie berechne ich.*marge)\b/.test(q)) {
   return '<b>Marge berechnen</b><p>Für die Marge von Kaffee brauchst du den Kaffeeumsatz und den dazugehörigen Wareneinsatz für denselben Zeitraum.</p><p><b>Rohertrag:</b> Umsatz − Wareneinsatz. <b>Rohertragsmarge:</b> (Umsatz − Wareneinsatz) ÷ Umsatz × 100.</p><p>Wenn der Umsatz fehlt oder tatsächlich 0 € beträgt, ist die prozentuale Marge nicht sinnvoll berechenbar. Ein fehlender EK-Wert darf nicht als 0 € Einkauf behandelt werden. Nenne oder lade die bestätigten Werte, dann kann ich rechnen.</p>';
  }
- if (/\b(rohertrags effektivitaet|rohertragseffektivitaet|rohertrags effektivit|bedeutung.*rohertrag.*effektiv|was bedeutet.*effektivitaet)\b/.test(q)) {
+ if (/rohertrag.*effektiv|effektiv.*rohertrag/.test(q)) {
   return '<b>Rohertrags-Effektivität</b><p>Der Begriff ist ohne die konkrete Produktdefinition nicht eindeutig standardisiert. Ich möchte deshalb keine eigene Formel als wäre sie die offizielle Kennzahl ausgeben.</p><p>Prüfe bitte die Erläuterung bzw. Formel direkt bei der Kennzahl in TankstellenErtrag. Wenn du mir die dort angezeigte Formel oder einen Screenshot gibst, erkläre ich sie verständlich und prüfe, welche Eingabewerte sie benötigt.</p>';
  }
  if (/\b(marge.*ek.*rohertrag|ek.*rohertrag.*marge|was zaehlt hier|unterschied.*(marge|rohertrag|ek)|marge.*rohertrag.*unterschied)\b/.test(q)) {
   return '<b>Umsatz, EK, Rohertrag und Marge</b><ul><li><b>Umsatz:</b> Erlös aus den Verkäufen.</li><li><b>EK / Wareneinsatz:</b> Einkaufskosten der verkauften Ware; der reine Einkaufswert für Lageraufbau ist nicht automatisch gleich dem Wareneinsatz des Zeitraums.</li><li><b>Rohertrag:</b> Umsatz minus zugehöriger Wareneinsatz.</li><li><b>Rohertragsmarge:</b> Rohertrag geteilt durch Umsatz, mal 100. Bei Umsatz 0 € ist sie nicht berechenbar.</li></ul><p>Für eine konkrete Stationsauswertung müssen Zeitraum, Warengruppe und bestätigte Werte zusammenpassen.</p>';
  }
- if (/\b(was bleibt.*(shopverkauf|shop verkauf|shop).*nach.*(einkauf|wareneinsatz)|was bleibt.*vom shopverkauf|was bleibt vom shop.*uebrig)\b/.test(q)) {
+ if (/was bleibt.*shop.*(einkauf|wareneinsatz)|was bleibt.*shopverkauf|was bleibt vom shop.*uebrig/.test(q)) {
   return '<b>Was bleibt vom Shopverkauf?</b><p>Als Rohertrag bleibt zunächst der Warenumsatz abzüglich des Wareneinsatzes der verkauften Ware. Davon sind noch weitere Kosten wie Personal, Energie, Miete oder Gebühren zu unterscheiden; der Rohertrag ist also nicht automatisch der Nettogewinn.</p><p>Für deinen konkreten Betrag brauche ich bestätigte Werte für denselben Zeitraum.</p>';
  }
- if (/\b(ek fehlt|einkauf fehlt|kein ek|ek ist unbekannt|umsatz ist null|umsatz.*0|nullumsatz).*(marge|rohertrag|moeglich|berechnen|was geht)|\b(marge|rohertrag).*(ek fehlt|einkauf fehlt|umsatz ist null|umsatz.*0|ek unbekannt)\b/.test(q)) {
+ if (/ek.*fehlt.*umsatz.*(null|0)|umsatz.*(null|0).*ek.*fehlt|ek fehlt.*umsatz|umsatz ist null/.test(q)) {
   return '<b>Fehlender EK und Umsatz 0 € getrennt prüfen</b><ul><li><b>Umsatz unbekannt:</b> nicht als 0 € werten; erst Datenquelle und Import prüfen.</li><li><b>Umsatz tatsächlich 0 €:</b> eine prozentuale Marge ist nicht definiert, weil der Umsatz als Nenner 0 ist.</li><li><b>EK fehlt:</b> Rohertrag und Marge sind nicht belastbar berechenbar.</li><li><b>EK tatsächlich 0 €:</b> ungewöhnlich; nur verwenden, wenn der Nullwert ausdrücklich bestätigt ist.</li></ul><p>Andere vorhandene Kennzahlen können separat geprüft werden, sofern ihre benötigten Eingaben vollständig und validiert sind.</p>';
  }
  if (/\b(schwund und abschriften|abschriften und schwund|wirkung.*wareneinsatz.*schwund.*abschriften|wareneinsatz.*schwund.*abschriften)\b/.test(q)) {
