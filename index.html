@@ -1220,7 +1220,7 @@ async function loadStation(session){
     if(!verified){await showAdminMfaSetup();return;}
     // Adminoberfläche erst nach nachgewiesenem AAL2 freigeben; kein Fail-open bei unerwartetem Auth-Status.
     if(aal.data.currentLevel!=='aal2'){await showAdminMfaChallenge();return;}
-    $('adminView').classList.remove('hidden');loadApplicants();loadCancellationRequests();loadVisitorStats();loadCustomerFeedback();loadSnapshotRecoveryStations();loadAdminAppErrorReports();loadIdeaSuggestions();
+    $('adminView').classList.remove('hidden');loadApplicants();loadCancellationRequests();loadVisitorStats();loadCustomerFeedback();loadSnapshotRecoveryStations();loadIdeaSuggestions();
     status('Administrator angemeldet – Besucherstatistik wird geladen.','ok');
     return;
   }
@@ -1827,9 +1827,11 @@ if(client){
   });
 }
 
+let adminAppErrorReportsLoading=false,adminAppErrorReportsLoaded=false;
 async function loadAdminAppErrorReports(){
   const body=$('appErrorReportsRows'),statusEl=$('appErrorReportsStatus');
-  if(!body||!statusEl||!client)return false;
+  if(!body||!statusEl||!client||adminAppErrorReportsLoading)return false;
+  adminAppErrorReportsLoading=true;
   statusEl.className='status';statusEl.textContent='Fehlerberichte werden geladen …';
   try{
     const {data,error}=await client.rpc('get_admin_app_error_reports',{p_limit:150});
@@ -1842,9 +1844,12 @@ async function loadAdminAppErrorReports(){
       return '<tr><td><span class="adminStatusPill '+(r.status==='resolved'?'green':r.status==='monitoring'?'yellow':'red')+'"><span class="adminStatusDot"></span>'+labels[r.status]+'</span></td><td>'+esc(date(r.last_seen))+'<div class="adminMuted">Erstmals: '+esc(date(r.first_seen))+'</div></td><td><strong>'+esc(r.error_type||'Fehler')+'</strong><div class="adminMuted">'+esc(r.source||'unbekannt')+' · '+esc(r.message||'')+'</div><div class="adminMuted">'+esc(r.user_email||'')+'</div></td><td>'+esc(String(r.http_status||'–'))+'</td><td>'+esc(String(r.occurrences||1))+'</td><td><div class="adminActionRow"><select aria-label="Fehlerstatus" data-app-error-status="'+esc(String(r.id))+'">'+statusOptions+'</select><button type="button" class="btn secondary" data-save-app-error="'+esc(String(r.id))+'">Speichern</button></div></td></tr>';
     }).join(''):'<tr><td colspan="6">Keine Fehlerberichte vorhanden.</td></tr>';
     statusEl.className='status ok';statusEl.textContent=rows.length+' Fehlerberichte geladen · '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+    adminAppErrorReportsLoaded=true;
     return true;
   }catch(e){body.innerHTML='<tr><td colspan="6">Fehlerberichte konnten nicht geladen werden.</td></tr>';statusEl.className='status err';statusEl.textContent='Fehlerbericht fehlgeschlagen: '+(e.message||String(e));return false;}
+  finally{adminAppErrorReportsLoading=false;}
 }
+$('appErrorReportsPanel')?.addEventListener('toggle',()=>{const panel=$('appErrorReportsPanel');if(panel?.open&&!adminAppErrorReportsLoaded)loadAdminAppErrorReports();});
 $('refreshAppErrors')?.addEventListener('click',loadAdminAppErrorReports);
 $('appErrorReportsRows')?.addEventListener('click',async ev=>{
   const btn=ev.target.closest('[data-save-app-error]');if(!btn)return;
