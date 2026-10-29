@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>TankstellenErtrag · Netto-Nutzen-Rechner · Test</title>
+<style>
+:root{color-scheme:dark;--bg:#080b0e;--panel:#12181d;--panel2:#182127;--line:#2a343b;--text:#f5f7f8;--muted:#a7b1b7;--orange:#ff812b;--green:#4bd487;--red:#ff7770;--yellow:#f2c35e}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(850px 500px at 90% -10%,#412514 0,transparent 55%),var(--bg);color:var(--text);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+.testbar{padding:10px 16px;text-align:center;background:#171c20;border-bottom:1px solid #53351f;color:#dce2e5;font-size:12px;font-weight:750;letter-spacing:.04em}.testbar b{color:var(--orange)}
+main{max-width:1100px;margin:0 auto;padding:28px 16px 56px}.eyebrow{color:var(--orange);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}h1{font-size:clamp(27px,4vw,42px);line-height:1.1;letter-spacing:-.04em;margin:8px 0 12px}h2{font-size:18px;margin:0 0 14px}p{margin:0;color:var(--muted)}.intro{max-width:760px;margin-bottom:24px}.layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:16px;align-items:start}.panel{background:linear-gradient(150deg,rgba(24,33,39,.97),rgba(15,21,25,.98));border:1px solid var(--line);border-radius:18px;padding:20px;min-width:0;box-shadow:0 18px 60px #0002}.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{min-width:0}.field.full{grid-column:1/-1}label{display:block;font-size:13px;font-weight:650;color:#dce2e5;margin-bottom:6px}.hint{display:block;font-size:11px;color:var(--muted);margin-top:5px}input,select{width:100%;border:1px solid #3b464e;border-radius:10px;padding:11px 12px;background:#0b1014;color:#fff;font:inherit;min-height:44px}input:focus,select:focus{outline:2px solid #ff812b88;border-color:var(--orange)}.results{display:grid;gap:10px}.result{background:#0b1014;border:1px solid var(--line);border-radius:13px;padding:14px}.result .caption{font-size:12px;color:var(--muted)}.result strong{display:block;font-size:clamp(22px,3vw,30px);letter-spacing:-.03em;margin-top:3px;overflow-wrap:anywhere}.result.primary{border-color:#7c4727;background:linear-gradient(135deg,#291b12,#101519)}.positive{color:var(--green)}.negative{color:var(--red)}.neutral{color:var(--yellow)}.mini{font-size:12px;color:var(--muted)}.divider{height:1px;background:var(--line);margin:16px 0}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.callout{padding:13px;border-radius:12px;background:#1a2227;border:1px solid var(--line);font-size:13px;color:#d5dde1}.callout b{color:#fff}.section{margin-top:18px}.checklist{padding-left:20px;color:var(--muted);margin:8px 0 0}.checklist li{margin:7px 0}.foot{font-size:11px;line-height:1.5;color:#94a0a7;margin-top:16px}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#282019;color:#ffb477;font-size:11px;font-weight:800}.footerline{margin-top:18px;font-size:12px;color:#8e9ba2}
+@media(max-width:760px){main{padding:22px 12px 40px}.layout{grid-template-columns:1fr}.panel{padding:16px}.fields{gap:12px}.two{grid-template-columns:1fr 1fr}}
+@media(max-width:420px){.fields{grid-template-columns:1fr}.field.full{grid-column:auto}.two{grid-template-columns:1fr}.testbar{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="testbar"><b>TESTVERSION</b> · TankstellenErtrag · Live-Stand unverändert</div>
+<main>
+<div class="eyebrow">Entscheidungshelfer · Prototyp</div>
+<h1>Netto-Nutzen statt Bauchgefühl.</h1>
+<p class="intro">Rechne Einkaufsersparnis oder Mehrertrag gegen Arbeitszeit, Zusatzkosten, Abschriften und einmalige Einführungskosten. Der Rechner trennt echten Geld-Effekt vom kalkulatorischen Wert der gebundenen Arbeitszeit.</p>
+<div class="layout">
+<section class="panel" aria-labelledby="inputs-title">
+<h2 id="inputs-title">1 · Maßnahme beschreiben</h2>
+<div class="fields">
+<div class="field"><label for="benefit">Ersparnis / zusätzlicher Rohertrag je Ereignis (€)</label><input id="benefit" type="number" min="0" step="0.01" value="10"><span class="hint">Nur den zusätzlichen Vorteil eintragen, nicht den Gesamtumsatz.</span></div>
+<div class="field"><label for="frequency">Ereignisse pro Monat</label><input id="frequency" type="number" min="0" step="1" value="4"></div>
+<div class="field"><label for="hours">Arbeitszeit je Ereignis (Stunden)</label><input id="hours" type="number" min="0" step="0.25" value="2"></div>
+<div class="field"><label for="hourCost">Kalkulatorischer Stundenwert (€)</label><input id="hourCost" type="number" min="0" step="0.5" value="30"><span class="hint">Vollständige Arbeitgeberkosten oder bewusst gewählter Opportunitätswert.</span></div>
+<div class="field"><label for="extraCosts">Weitere laufende Zusatzkosten pro Monat (€)</label><input id="extraCosts" type="number" min="0" step="0.01" value="0"><span class="hint">Zum Beispiel zusätzliche Liefergebühren oder Softwarekosten.</span></div>
+<div class="field"><label for="writeoffs">Zusätzliche Abschriften / Verluste pro Monat (€)</label><input id="writeoffs" type="number" min="0" step="0.01" value="20"><span class="hint">Nur die Veränderung gegenüber dem normalen Zustand.</span></div>
+<div class="field"><label for="setup">Einmalige Einführungskosten (€)</label><input id="setup" type="number" min="0" step="0.01" value="0"><span class="hint">Einrichtung, Schulung, Umstellung oder einmaliger Zusatzaufwand.</span></div>
+<div class="field"><label for="months">Betrachtungszeitraum</label><select id="months"><option value="1">1 Monat</option><option value="3">3 Monate</option><option value="6">6 Monate</option><option value="12" selected>12 Monate</option><option value="24">24 Monate</option></select></div>
+<div class="field full"><label for="capacity">Wie wirkt sich die eingesparte / eingesetzte Arbeitszeit aus?</label><select id="capacity"><option value="opportunity" selected>Gebundene Zeit hat einen kalkulatorischen Wert</option><option value="cash">Arbeitsstunden reduzieren tatsächlich bezahlte Stunden</option><option value="reinvest">Zeit wird für andere wertschöpfende Aufgaben genutzt</option></select><span class="hint">Diese Auswahl ändert die Interpretation, nicht die zugrunde liegende Rechnung.</span></div>
+</div>
+</section>
+<aside class="panel" aria-labelledby="results-title" aria-live="polite">
+<h2 id="results-title">2 · Ergebnis</h2>
+<div class="results">
+<div class="result"><span class="caption">Brutto-Vorteil im Zeitraum (vor Kosten)</span><strong id="gross">480,00 €</strong></div>
+<div class="result"><span class="caption">Geld-Effekt nach laufenden Kosten und Einführung</span><strong id="cash">220,00 €</strong><span class="mini">Ohne kalkulatorische Arbeitszeit</span></div>
+<div class="result primary"><span class="caption">Wirtschaftlicher Netto-Nutzen inkl. Arbeitszeitwert</span><strong id="net">−500,00 €</strong><span class="mini" id="verdict">Die Maßnahme bindet mehr kalkulatorischen Wert, als sie erzeugt.</span></div>
+<div class="two">
+<div class="result"><span class="caption">Gebundene Arbeitszeit</span><strong id="time">96 Std.</strong></div>
+<div class="result"><span class="caption">Netto-Nutzen pro Stunde</span><strong id="perHour">−5,21 €</strong></div>
+</div>
+</div>
+<div class="divider"></div>
+<div class="callout" id="capacityNote"><b>Interpretation:</b> Die Zeit hat einen Opportunitätswert. Das ist nicht automatisch eine echte Gehaltsersparnis.</div>
+<p class="foot">Rechenmodell in Netto-/vergleichbaren Werten. Umsatzsteuer ist nicht automatisch herausgerechnet: Eingaben müssen auf derselben Basis erfolgen. Nur zusätzliche, durch die Maßnahme verursachte Kosten erfassen. Bei Arbeitszeit darf nicht zugleich der volle kalkulatorische Wert als Kosten und dieselbe Zeit als echte Lohnersparnis doppelt gezählt werden.</p>
+</aside>
+</div>
+<section class="panel section">
+<h2>3 · Faktoren, die das Ergebnis verändern können</h2>
+<div class="two">
+<div class="callout"><b>Wiederholung:</b> Sind die 10 € einmalig oder fallen sie wirklich bei jeder Bestellung an? Nur belegte Wiederholungen hochrechnen.</div>
+<div class="callout"><b>Abschriften:</b> Vergleiche die Veränderung zum Normalbetrieb, nicht die gesamten Abschriften, wenn sie ohnehin angefallen wären.</div>
+<div class="callout"><b>Qualität & Verfügbarkeit:</b> Liefergebühren, Mindestbestellwerte, Ausfälle, längere Wege und schlechtere Verfügbarkeit können den Vorteil aufzehren.</div>
+<div class="callout"><b>Kannibalisierung:</b> Bei Aktionen prüfen, ob zusätzliche Käufe entstehen oder bestehende Käufe nur günstiger werden.</div>
+<div class="callout"><b>Saison & Nachfrage:</b> Vorher-nachher-Vergleiche möglichst mit ähnlichen Wochentagen, Saison und Absatzbedingungen durchführen.</div>
+<div class="callout"><b>Freie Zeit:</b> Sie ist nicht automatisch Lohnersparnis. Sie kann für bessere Warenwirtschaft eingesetzt werden oder tatsächlich bezahlte Stunden ersetzen – beides getrennt ausweisen.</div>
+</div>
+<div class="section">
+<h2>4 · Entscheidung nicht nur am Rechner treffen</h2>
+<ul class="checklist">
+<li>Vor dem Test Ziel, Ausgangswert, Zeitraum und erwartete Kosten festhalten.</li>
+<li>Nach dem Test den realisierten Zusatznutzen messen und Abschriften, Verfügbarkeit sowie Servicequalität prüfen.</li>
+<li>Nur dann skalieren, wenn der Netto-Nutzen wiederholbar ist und keine wichtige Betriebsanforderung verschlechtert wird.</li>
+</ul>
+</div>
+<p class="footerline">Isolierter Prototyp · keine Daten werden gespeichert oder an einen Server gesendet.</p>
+</section>
+</main>
+<script>
+(function(){
+  const ids=['benefit','frequency','hours','hourCost','extraCosts','writeoffs','setup','months','capacity'];
+  const el=Object.fromEntries(ids.map(id=>[id,document.getElementById(id)]));
+  const money=n=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(n);
+  const number=n=>new Intl.NumberFormat('de-DE',{maximumFractionDigits:2}).format(n);
+  function val(id){const n=Number(el[id].value);return Number.isFinite(n)?Math.max(0,n):0}
+  function render(){
+    const benefit=val('benefit'),freq=val('frequency'),hours=val('hours'),hourCost=val('hourCost');
+    const extra=val('extraCosts'),writeoffs=val('writeoffs'),setup=val('setup'),months=val('months');
+    const gross=benefit*freq*months;
+    const cash=gross-(extra+writeoffs)*months-setup;
+    const time=hours*freq*months;
+    const labor=time*hourCost;
+    const net=cash-labor;
+    const perHour=time>0?net/time:null;
+    document.getElementById('gross').textContent=money(gross);
+    const cashEl=document.getElementById('cash');cashEl.textContent=money(cash);cashEl.className=cash>=0?'positive':'negative';
+    const netEl=document.getElementById('net');netEl.textContent=money(net);netEl.className=net>=0?'positive':'negative';
+    document.getElementById('time').textContent=number(time)+' Std.';
+    const ph=document.getElementById('perHour');ph.textContent=perHour===null?'—':money(perHour);ph.className=perHour===null?'':perHour>=0?'positive':'negative';
+    document.getElementById('verdict').textContent=net>0?'Positiver kalkulatorischer Netto-Nutzen in diesem Szenario.':net<0?'Die Maßnahme bindet mehr kalkulatorischen Wert, als sie erzeugt.':'In diesem Szenario ist der kalkulatorische Netto-Nutzen ausgeglichen.';
+    const notes={
+      opportunity:'Die Arbeitszeit wird als Opportunitätswert berücksichtigt. Das zeigt, ob die gebundene Zeit sinnvoll eingesetzt ist; es ist nicht automatisch eine echte Gehaltsersparnis.',
+      cash:'Wenn tatsächlich bezahlte Stunden wegfallen, kann ein Teil des Arbeitszeitwerts zu einer realen Kostenersparnis werden. Nicht zusätzlich als Opportunitätskosten doppelt abziehen.',
+      reinvest:'Die Zeit wird anderweitig eingesetzt. Der Zeitwert ist dann nur dann zusätzlicher Nutzen, wenn die andere Tätigkeit messbar Mehrertrag oder vermiedene Kosten erzeugt.'
+    };
+    document.getElementById('capacityNote').innerHTML='<b>Interpretation:</b> '+notes[el.capacity.value];
+  }
+  ids.forEach(id=>el[id].addEventListener('input',render));
+  render();
+})();
+</script>
+</body>
+</html>
