@@ -30,7 +30,7 @@ function appFixture() {
     const groupRevenue = m.revenue / 8;
     const groups: Record<string,any> = {};
     for (const [id,,target] of groupDefs) groups[id] = {revenue:id==="waschen"?0:groupRevenue,ek:id==="waschen"?0:groupRevenue*(1-m.marginPct/100),margin:target,shrink:id==="backshop"&&m.key==="2026-10"?groupRevenue*.032:groupRevenue*.008,writeoff:groupRevenue*.002,stock:groupRevenue*.4,_stockEntered:true,openingStock:groupRevenue*.42,_openingStockEntered:true};
-    data.months[m.key] = {revenue:m.revenue,ek:m.ek,shrink:m.revenue*m.shrinkPct/100,writeoff:m.revenue*.002,stock:m.revenue*.4,sourceShrink:true,groups};
+    data.months[m.key] = {revenue:m.revenue,ek:m.ek,shrink:m.revenue*m.shrinkPct/100,writeoff:m.revenue*.002,stock:m.revenue*.4,sourceMonthly:true,sourceEK:true,sourceShrink:true,sourceInventory:true,groups};
   }
   return data;
 }
@@ -47,7 +47,8 @@ function runtime(data:any) {
   const pct = (v:number) => (Number(v)||0).toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1})+" %";
   const target = {value:"",innerHTML:""};
   const yearly = appFunction("yearly","economic",["keys","data","calc","eur","pct","$"],{keys,data,calc,eur,pct,$:(id:string)=>target});
-  const practiceGuidance = appFunction("practiceGuidance","wowCard",[],{});
+  const esc = (v:unknown) => String(v??"");
+  const practiceGuidance = appFunction("practiceGuidance","measurePotential",["esc"],{esc});
   const riskLevel = appFunction("riskLevel","riskForRow",[],{});
   const riskForRow = appFunction("riskForRow","riskSummary",["settings","riskLevel"],{settings,riskLevel});
   const grossSafe = (v:number|null) => v===null?0:(Number(v)||0);
