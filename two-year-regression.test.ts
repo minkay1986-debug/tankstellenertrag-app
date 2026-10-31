@@ -340,12 +340,16 @@ Deno.test("report renders every signal, separates actual and target margin, and 
   setScenarioGroup(rt,key,"backshop",{revenue:900,margin:48,shrink:20,writeoff:8,stock:0});
   rt.data.settings.targetMargins={...rt.data.settings.targetMargins,backshop:50};
   rt.data.months[key].sourceInventory=false;
+  rt.data.months[key].sourceShrink=true;
+  rt.data.months[key].sourceEK=false;
   rt.report();
   const out=rt.target.innerHTML;
   for(const signal of ["Umsatz rückläufig","Ist-Marge unter Ihrem Zielwert","Schwund auffällig","Abschriften auffällig"])
     assert(out.includes(signal),"Report omitted independent signal: "+signal);
   assert(out.includes("Ist-Marge 48,0 % · Zielmarge 50,0 %"),"Report must show actual and operator target margin separately");
   assert(out.includes("Bestandsquote")&&out.includes("Nicht erfasst"),"Missing inventory must be labeled as unavailable, not 0%");
+  assert(out.includes("Rohertrag</div><div class="+"\\"+"value"+ "\\"+">Nicht erfasst"),"Missing shop EK source must not produce a fabricated gross profit");
+  assert(out.includes("Shop-Ist-Marge</div><div class="+"\\"+"value"+ "\\"+">Nicht berechenbar"),"Missing shop EK source must not show a fabricated 100% margin");
   assert(!out.includes("kein festgestellter Verlust"),"Report must not negate its own loss-related review signals");
   assert(out.includes("Prüfsignal, kein bestätigter Verlustnachweis"),"Report must distinguish a review signal from proven loss");
 });
