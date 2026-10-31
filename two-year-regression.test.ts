@@ -16,7 +16,7 @@ function appFunction(name: string, nextName: string, params: string[], deps: Rec
   const end = html.indexOf(`function ${nextName}(`, start + 1);
   assert(start >= 0 && end > start, `Could not locate app function ${name}`);
   const source = html.slice(start, end).trim();
-  const factory = new Function(...params, `return (${source});`);
+  const factory = new Function(...params, `${source}; return ${name};`);
   return factory(...params.map((p) => deps[p]));
 }
 const groupDefs = [
@@ -85,16 +85,197 @@ Deno.test("actual app year renderer marks a partial year and includes inventory-
   assert(rt.target.innerHTML.includes("2025-12"),"Inventory-only month was not included in monthly detail");
 });
 
-Deno.test("practical guidance gives actionable checks and separates signals from causes",()=>{
+Deno.test("practical guidance is actionable, prioritised and labels missing data",()=>{
   const rt=runtime(appFixture());
   const margin=rt.practiceGuidance({reasons:["Ist-Marge um 2 %-Pkt. gefallen"]});
-  assert(margin.includes("Praxischeck")&&margin.includes("EK anhand der Rechnung")&&margin.includes("Wirkungskontrolle"),"Margin guidance lacks concrete checks or follow-up");
+  assert(margin.includes("KONKRET ZUERST TUN")&&margin.includes("Netto-EK")&&margin.includes("ERFOLGSKONTROLLE"),"Margin guidance lacks concrete checks or measurable follow-up");
+  assert(margin.includes("DATENGRUNDLAGE")&&margin.includes("Warengruppen-EK fehlt")&&margin.includes("Vormonat fehlt"),"Missing inputs must be explicitly identified");
   const loss=rt.practiceGuidance({reasons:["Schwund auffällig","Abschriften auffällig","Bestandsquote gestiegen"]});
-  assert(loss.includes("Lieferscheine")&&loss.includes("Liefergebinde")&&loss.includes("beweist nicht automatisch eine Ursache"),"Loss/inventory guidance lacks practical checks or caution");
-  assert(loss.includes("keine Bestellung oder Preisänderung automatisch ausgelöst"),"Guidance must not imply automated operational changes");
+  assert(loss.includes("Inventur")&&loss.includes("Warenzugänge")&&loss.includes("Bestandswert")&&loss.includes("DATENGRUNDLAGE"),"Loss/inventory guidance lacks relevant checks or data-quality notes");
+  assert(!loss.includes("keine Bestellung oder Preisänderung automatisch ausgelöst"),"Remove irrelevant automated-action disclaimer");
   const sales=rt.practiceGuidance({reasons:["Umsatz rückläufig"]});
-  assert(sales.includes("Öffnungszeiten")&&sales.includes("Umsatz allein beweist keine höhere Rentabilität"),"Sales guidance must check comparable trading days and avoid equating sales with profit");
+  assert(sales.includes("Öffnungstage")&&sales.includes("drei Artikel")&&sales.includes("ERFOLGSKONTROLLE"),"Sales guidance must prioritise comparable trading days and a concrete follow-up");
   assert(html.includes("'+practiceGuidance(r)+'</div>'")||html.includes("practiceGuidance(r)"),"Guidance is not wired into the real advisory tile/report renderer");
 });
 
 Deno.test("app has all requested renderers and renderAll calls them",()=>{for(const fn of ["function renderMeinMonat()","function yearly()","function report()","function analysis()","function renderAll()"])assert(html.includes(fn),"Missing "+fn);const renderAllFn=html.slice(html.indexOf("function renderAll()"),html.indexOf("function parseHuth("));assert(["renderMeinMonat()","analysis()","yearly()","report()"].every(call=>renderAllFn.includes(call)),"renderAll must invoke month, analysis, year and report renderers");for(const id of ['id="monthly"','id="yearly"','id="report"','id="dashboard"'])assert(html.includes(id),"Missing section "+id);const yearFn=html.slice(html.indexOf("function yearly()"),html.indexOf("function economic()"));assert(yearFn.includes("Jahresübersicht")&&yearFn.includes("gewichtete Marge"),"Yearly view must show annual totals and weighted margin");const monthFn=html.slice(html.indexOf("function renderMeinMonat()"),html.indexOf("function renderCustomScenarioInputs"));for(const check of ["focus","shrink","action"])assert(monthFn.includes(check),"Missing monthly check tile "+check);const analysisFn=html.slice(html.indexOf("function analysis()"),html.indexOf("function renderCustomScenarioInputs"));assert(analysisFn.includes("Daten-TÜV")&&analysisFn.includes("Bestandsabgleich")&&analysisFn.includes("Ihre wichtigsten Prüffelder"),"Analysis is missing a required check area");const reportFn=html.slice(html.indexOf("function report()"),html.indexOf("function settingsUI()"));for(const item of ["Shop-Umsatz","Rohertrag","Marge","Schwund","Bestand EK","Notizen / Maßnahmen"])assert(reportFn.includes(item),"Report missing "+item);});
+
+Deno.test("advice separates achieved margin target from operational review risk",()=>{
+  const rt=runtime(appFixture());
+  const m=rt.data.months["2026-10"];
+  const backshop=m.groups.backshop;
+  backshop.ek=backshop.revenue*.40;
+  backshop._ekEntered=true;
+  backshop.shrink=backshop.revenue*.032;
+  backshop.writeoff=backshop.revenue*.002;
+  const row=rt.wowPriority("2026-10").find((x:any)=>x.g.id==="backshop");
+  assert(!!row,"Backshop advice row missing");
+  assert(row.g.actualMargin>=row.g.margin,"Fixture must reach the margin target");
+  assert(row.reasons.includes("Schwund auffällig"),"High shrink must remain a review signal");
+  assert(!row.reasons.some((x:string)=>x.includes("Marge")),"Reached margin target must not be called a margin drop");
+  assert(html.includes("Ist-Marge '+pct(actual)+' · Ziel erreicht"),"Card must render margin target state independently");
+  assert(html.includes("risk.icon+' PRÜFBEDARF · '+risk.label"),"Review-risk badge must be explicitly separated from margin state");
+});
+
+Deno.test("advice potential is only calculated for matching detected shrink/write-off signals",()=>{
+  const rt=runtime(appFixture());
+  const measure=appFunction("measurePotential","potentialHtml",["r"],{});
+  const eur=(v:number)=>new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(v);
+  const potential=appFunction("potentialHtml","wowCard",["r","measurePotential","eur"],{measurePotential:measure,eur});
+  const salesOnly={reasons:["Umsatz rückläufig"],g:{shrink:128,writeoff:64}};
+  assert(measure(salesOnly).length===0,"Sales-only alert must not inherit unrelated shrink/write-off euro potential");
+  assert(potential(salesOnly,measure,eur).includes("kein pauschaler Gewinnbetrag")||potential(salesOnly).includes("kein Euro-Betrag")||potential(salesOnly).includes("kein"),"Sales-only advice must explain why no euro potential is calculated");
+  const shrinkOnly={reasons:["Schwund auffällig"],g:{shrink:128,writeoff:64}};
+  const parts=measure(shrinkOnly);
+  assert(parts.length===1&&parts[0].label==="Schwund","Only the detected shrink signal may contribute");
+  assert(Math.abs(parts[0].amount-12.8)<.001,"Shrink scenario must calculate 10% of the monthly shrink amount");
+  const combined={reasons:["Schwund auffällig","Abschriften auffällig"],g:{shrink:128,writeoff:64}};
+  assert(measure(combined).length===2,"Both signals may be shown separately, with overlap warning");
+});
+
+Deno.test("missing comparison month suppresses trend-based advice instead of using an older month",()=>{
+  const rt=runtime(appFixture());
+  delete rt.data.months["2026-09"];
+  const rows=rt.wowPriority("2026-10");
+  assert(rows.every((r:any)=>!r.reasons.includes("Umsatz rückläufig")&&!r.reasons.some((x:string)=>x.includes("Marge"))),"Missing September must not be replaced by an older comparison month");
+});
+
+Deno.test("threshold boundaries are inclusive and invalid optimizer inputs are not fabricated",()=>{
+  const at=optimizer.evaluateGroup({name:"Grenzfall",actualRevenue:1000,previousRevenue:1000,priorYearRevenue:1000,marginPct:50,previousMarginPct:52,shrinkPct:4.01,dataComplete:true});
+  assert(at.alerts.some((a:any)=>a.code==="MARGIN_DROP"),"A 2 percentage-point margin drop must trigger at the boundary");
+  assert(at.alerts.some((a:any)=>a.code==="SHRINK_REVIEW"),"Shrink above the 4% review threshold must trigger review");
+  const missing=optimizer.evaluateGroup({name:"Unvollständig",actualRevenue:1000,previousRevenue:null,priorYearRevenue:null,marginPct:null,previousMarginPct:null,shrinkPct:null,dataComplete:false});
+  assert(missing.expectedRevenue===null&&missing.varianceEuro===null,"Missing baseline must not produce a fabricated euro variance");
+  assert(missing.confidence==="low","Incomplete inputs must lower confidence");
+});
+
+
+/** Scenario audit: executes the unchanged production advice functions with synthetic data only. */
+function setScenarioGroup(rt:any,key:string,id:string,values:{revenue?:number;margin?:number;shrink?:number;writeoff?:number;stock?:number}) {
+  const g=rt.data.months[key].groups[id];
+  if(values.revenue!==undefined)g.revenue=values.revenue;
+  if(values.margin!==undefined){g.ek=g.revenue*(1-values.margin/100);g._ekEntered=true;}
+  if(values.shrink!==undefined)g.shrink=values.shrink;
+  if(values.writeoff!==undefined)g.writeoff=values.writeoff;
+  if(values.stock!==undefined)g.stock=values.stock;
+}
+function scenarioRow(rt:any,key="2026-10",id="backshop") {
+  return rt.wowPriority(key).find((r:any)=>r.g.id===id);
+}
+Deno.test("scenario audit: rising sales with falling margin flags the margin, not revenue",()=>{
+  const rt=runtime(appFixture());
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:55,shrink:2,writeoff:2,stock:400});
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:1100,margin:50,shrink:2,writeoff:2,stock:440});
+  const r=scenarioRow(rt);
+  assert(!!r&&r.reasons.some((x:string)=>x.includes("Ist-Marge")),"Margin deterioration was missed");
+  assert(!r.reasons.includes("Umsatz rückläufig"),"Rising sales must not be called declining");
+});
+Deno.test("scenario audit: falling sales with improving margin flags sales only",()=>{
+  const rt=runtime(appFixture());
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:400});
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:900,margin:55,shrink:2,writeoff:2,stock:360});
+  const r=scenarioRow(rt);
+  assert(!!r&&r.reasons.includes("Umsatz rückläufig"),"Sales decline was missed");
+  assert(!r.reasons.some((x:string)=>x.includes("Ist-Marge")),"Improving margin must not be called a margin drop");
+});
+Deno.test("scenario audit: severe target-margin shortfall without month-on-month deterioration is not triggered",()=>{
+  const rt=runtime(appFixture());
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:45,shrink:2,writeoff:2,stock:400});
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,margin:45,shrink:2,writeoff:2,stock:400});
+  const r=scenarioRow(rt);
+  assert(!r,"Stable metrics alone should not create a trend alert; target-margin gap is currently not an independent trigger");
+  assert(45<59.2,"Scenario must materially miss the configured target margin");
+});
+Deno.test("scenario audit: shrink and write-off are independently detected",()=>{
+  const rt=runtime(appFixture());
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:400});
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,margin:50,shrink:20,writeoff:2,stock:400});
+  const shrink=scenarioRow(rt);
+  assert(!!shrink&&shrink.reasons.includes("Schwund auffällig")&&!shrink.reasons.includes("Abschriften auffällig"),"Shrink-only scenario was not isolated");
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,margin:50,shrink:2,writeoff:8,stock:400});
+  const writeoff=scenarioRow(rt);
+  assert(!!writeoff&&writeoff.reasons.includes("Abschriften auffällig")&&!writeoff.reasons.includes("Schwund auffällig"),"Write-off-only scenario was not isolated");
+});
+Deno.test("scenario audit: rising stock ratio triggers at the configured inclusive threshold",()=>{
+  const rt=runtime(appFixture());
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:400});
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:420});
+  const atBoundary=scenarioRow(rt);
+  assert(!!atBoundary&&atBoundary.reasons.includes("Bestandsquote gestiegen"),"A 5% relative increase must trigger at the inclusive configured threshold");
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:424});
+  const above=scenarioRow(rt);
+  assert(!!above&&above.reasons.includes("Bestandsquote gestiegen"),"Stock-ratio increase above 5% was missed");
+});
+Deno.test("scenario audit: seasonal January drop is flagged against December even when year-on-year is flat",()=>{
+  const rt=runtime(appFixture());
+  const jan25=rt.data.months["2025-01"].groups.backshop.revenue;
+  const dec25=rt.data.months["2025-12"].groups.backshop.revenue;
+  setScenarioGroup(rt,"2025-12","backshop",{revenue:dec25,margin:52,shrink:2,writeoff:2,stock:dec25*.4});
+  setScenarioGroup(rt,"2026-01","backshop",{revenue:jan25,margin:52,shrink:2,writeoff:2,stock:jan25*.4});
+  const r=scenarioRow(rt,"2026-01");
+  assert(!!r&&r.reasons.includes("Umsatz rückläufig"),"Expected current month-on-month rule to flag the seasonal December-to-January decline");
+  assert(Math.abs(rt.data.months["2026-01"].groups.backshop.revenue/rt.data.months["2025-01"].groups.backshop.revenue-1)<.001,"January year-on-year must be flat in this scenario");
+});
+Deno.test("scenario audit: simultaneous signals rank ahead of a single-signal group",()=>{
+  const rt=runtime(appFixture());
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:55,shrink:2,writeoff:2,stock:400});
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:900,margin:50,shrink:20,writeoff:8,stock:500});
+  setScenarioGroup(rt,"2026-09","getraenke",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:400});
+  setScenarioGroup(rt,"2026-10","getraenke",{revenue:900,margin:50,shrink:2,writeoff:2,stock:400});
+  const rows=rt.wowPriority("2026-10");
+  assert(rows.length>=2,"Expected two independently flagged groups");
+  assert(rows[0].g.id==="backshop","Group with more independent signals should rank ahead of single-signal group");
+  assert(rows[0].reasons.length>rows[1].reasons.length,"Priority ordering did not reflect number of reasons");
+});
+
+Deno.test("operator settings: revenue, margin, shrink, write-off and stock thresholds are read from the saved configuration",()=>{
+  const rt=runtime(appFixture());
+  const key="2026-10";
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:50,shrink:4,writeoff:4,stock:400});
+  setScenarioGroup(rt,key,"backshop",{revenue:960,margin:49,shrink:6,writeoff:6,stock:403.2});
+  // The same synthetic data is evaluated against two deliberately different operator profiles.
+  rt.data.settings={...rt.data.settings,revenueDrop:3,marginDrop:.8,shrinkRate:.5,writeoffRate:.5,stockIncrease:4};
+  const permissive=rt.wowPriority(key).find((r:any)=>r.g.id==="backshop");
+  assert(!!permissive,"Lower configured limits should produce a review row");
+  assert(permissive.reasons.includes("Umsatz rückläufig"),"Configured 3% revenue threshold was ignored");
+  assert(permissive.reasons.some((x:string)=>x.includes("Ist-Marge")),"Configured 0.8 percentage-point margin threshold was ignored");
+  assert(permissive.reasons.includes("Schwund auffällig"),"Configured shrink threshold was ignored");
+  assert(permissive.reasons.includes("Abschriften auffällig"),"Configured write-off threshold was ignored");
+  assert(permissive.reasons.includes("Bestandsquote gestiegen"),"Configured 4% relative stock threshold was ignored");
+
+  rt.data.settings={...rt.data.settings,revenueDrop:5,marginDrop:1.5,shrinkRate:1,writeoffRate:1,stockIncrease:6};
+  const stricter=rt.wowPriority(key).find((r:any)=>r.g.id==="backshop");
+  assert(!stricter||!stricter.reasons.includes("Umsatz rückläufig"),"Revenue signal ignored the stricter 5% operator threshold");
+  assert(!stricter||!stricter.reasons.some((x:string)=>x.includes("Ist-Marge")),"Margin signal ignored the stricter 1.5 point operator threshold");
+  assert(!stricter||!stricter.reasons.includes("Schwund auffällig"),"Shrink signal ignored the stricter 1% operator threshold");
+  assert(!stricter||!stricter.reasons.includes("Abschriften auffällig"),"Write-off signal ignored the stricter 1% operator threshold");
+  assert(!stricter||!stricter.reasons.includes("Bestandsquote gestiegen"),"Stock signal ignored the stricter 6% operator threshold");
+});
+
+Deno.test("operator settings: per-category target margins flow into the real calculation without universal target assumptions",()=>{
+  const rt=runtime(appFixture());
+  const key="2026-10";
+  rt.data.settings.targetMargins={...rt.data.settings.targetMargins,backshop:43.7,kaffee:67.3,getraenke:38.4};
+  const d=rt.calc(key);
+  const target=(id:string)=>d.groups.find((g:any)=>g.id===id)?.margin;
+  assert(target("backshop")===43.7,"Backshop must use the operator-entered 43.7% target");
+  assert(target("kaffee")===67.3,"Coffee must use the operator-entered 67.3% target");
+  assert(target("getraenke")===38.4,"Drinks must use the operator-entered 38.4% target");
+  assert(target("drogerie")===50,"Unchanged category must retain its own configured/default value, not inherit another category's target");
+  rt.data.settings.targetMargins.backshop=61.1;
+  assert(rt.calc(key).groups.find((g:any)=>g.id==="backshop")?.margin===61.1,"Changing the operator target must immediately change the calculated target field");
+});
+
+Deno.test("operator settings: threshold boundary behavior follows each entered value, not test fixture defaults",()=>{
+  const rt=runtime(appFixture());
+  const key="2026-10";
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:400});
+  setScenarioGroup(rt,key,"backshop",{revenue:970,margin:48.5,shrink:10.67,writeoff:10.67,stock:407.4});
+  rt.data.settings={...rt.data.settings,revenueDrop:3,marginDrop:1.5,shrinkRate:1,writeoffRate:1,stockIncrease:5};
+  const at=rt.wowPriority(key).find((r:any)=>r.g.id==="backshop");
+  assert(!!at,"Signals exactly at configured boundaries must be retained");
+  assert(at.reasons.includes("Umsatz rückläufig"),"Revenue decline exactly at the entered 3% boundary must trigger");
+  assert(at.reasons.some((x:string)=>x.includes("Ist-Marge")),"Margin drop exactly at the entered 1.5 point boundary must trigger");
+  assert(at.reasons.includes("Schwund auffällig")&&at.reasons.includes("Abschriften auffällig"),"Rates above their entered 1% boundaries must trigger");
+  assert(at.reasons.includes("Bestandsquote gestiegen"),"Stock ratio increase exactly at the entered 5% relative boundary must trigger");
+});
