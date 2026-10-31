@@ -114,16 +114,17 @@ Deno.test("advice separates achieved margin target from operational review risk"
   assert(row.reasons.includes("Schwund auffällig"),"High shrink must remain a review signal");
   assert(!row.reasons.some((x:string)=>x.includes("Marge")),"Reached margin target must not be called a margin drop");
   assert(html.includes("Ist-Marge '+pct(actual)+' · Ziel erreicht"),"Card must render margin target state independently");
-  assert(html.includes("PRÜFBEDARF · ' +risk.label")||html.includes("PRÜFBEDARF · "+ " ' +risk.label"),"Review-risk badge must be explicitly separated from margin state");
+  assert(html.includes("risk.icon+' PRÜFBEDARF · '+risk.label"),"Review-risk badge must be explicitly separated from margin state");
 });
 
 Deno.test("advice potential is only calculated for matching detected shrink/write-off signals",()=>{
   const rt=runtime(appFixture());
   const measure=appFunction("measurePotential","potentialHtml",["r"],{});
-  const potential=appFunction("potentialHtml","wowCard",["r"],{measurePotential:measure,eur:(v:number)=>new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(v)});
+  const eur=(v:number)=>new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(v);
+  const potential=appFunction("potentialHtml","wowCard",["r","measurePotential","eur"],{});
   const salesOnly={reasons:["Umsatz rückläufig"],g:{shrink:128,writeoff:64}};
   assert(measure(salesOnly).length===0,"Sales-only alert must not inherit unrelated shrink/write-off euro potential");
-  assert(potential(salesOnly).includes("kein pauschaler Gewinnbetrag")||potential(salesOnly).includes("kein Euro-Betrag")||potential(salesOnly).includes("kein"),"Sales-only advice must explain why no euro potential is calculated");
+  assert(potential(salesOnly,measure,eur).includes("kein pauschaler Gewinnbetrag")||potential(salesOnly).includes("kein Euro-Betrag")||potential(salesOnly).includes("kein"),"Sales-only advice must explain why no euro potential is calculated");
   const shrinkOnly={reasons:["Schwund auffällig"],g:{shrink:128,writeoff:64}};
   const parts=measure(shrinkOnly);
   assert(parts.length===1&&parts[0].label==="Schwund","Only the detected shrink signal may contribute");
