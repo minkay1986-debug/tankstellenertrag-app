@@ -554,6 +554,28 @@ function radarGuidance(r){
  if(!checks.length)checks.push('Zuerst Monatsdaten und Vergleichszeitraum auf Vollständigkeit prüfen.');
  return {explain,checks};
 }
+function wrapRadarAccordion(node,title,subtitle,open=false){
+ if(!node||node.dataset.radarAccordion==='1')return;
+ const parent=node.parentNode;if(!parent)return;
+ const details=document.createElement('details');details.className='tse-accordion radar-section-accordion';if(open)details.open=true;
+ const summary=document.createElement('summary');summary.innerHTML='<span class="tse-accordion-title">'+esc(title)+'<span class="tse-accordion-sub">'+esc(subtitle||'Bei Bedarf öffnen')+'</span></span><span class="tse-accordion-icon" aria-hidden="true"></span>';
+ const content=document.createElement('div');content.className='tse-accordion-content';parent.insertBefore(details,node);content.append(node);details.append(summary,content);node.dataset.radarAccordion='1';
+}
+function enhanceRadarAccordions(){
+ const view=$('radar');if(!view)return;
+ const panels=[...view.querySelectorAll(':scope > .panel')];
+ panels.forEach((panel,i)=>{const h=panel.querySelector(':scope > h2');const eyebrow=panel.querySelector(':scope > .eyebrow');const title=h?.textContent?.trim()||eyebrow?.textContent?.trim()||'Ertragsradar-Bereich';wrapRadarAccordion(panel,title,'Inhalt und Eingaben öffnen',i===0)});
+ const allDetails=[...view.querySelectorAll('.radar-section-accordion')];
+ const own=allDetails.find(d=>/Mögliche Ursachen|eigene Prüffälle/i.test(d.querySelector('summary')?.textContent||''));
+ if(own){
+  const learner=own.querySelector(':scope .panel:not(#articleDiagnostic)');if(learner)wrapRadarAccordion(learner,'Lernender Artikel-Check','Lernlogik und Orientierungsstufen');
+  const diagnostic=own.querySelector('#articleDiagnostic');if(diagnostic)wrapRadarAccordion(diagnostic,'Artikel gezielt prüfen','Monatswerte erfassen und auswerten');
+  const history=own.querySelector('#articleHistoryPanel')?.parentElement;if(history?.classList.contains('panel'))wrapRadarAccordion(history,'Artikelhistorie','Gespeicherte Beobachtungen ansehen');
+  own.querySelectorAll('#investigationTool .investigation-card').forEach((card,i)=>wrapRadarAccordion(card,card.querySelector('.investigation-number')?.textContent||('Prüffall '+(i+1)),'Beobachtung und Prüfergebnis bearbeiten'));
+ }
+ view.querySelectorAll('#customScenarioInputs .custom-scenario-row').forEach((card,i)=>wrapRadarAccordion(card,card.querySelector('.eyebrow')?.textContent||('Eigene Warengruppe '+(i+1)),'Eingaben und Szenario öffnen'));
+ const loopEl=$('loop');if(loopEl)loopEl.querySelectorAll(':scope > .alert').forEach((card,i)=>wrapRadarAccordion(card,card.querySelector('strong')?.textContent||('Beratungsfall '+(i+1)),'Beratungsschritte ansehen'));
+}
 function radar(){
  const k=month(),d=calc(k),rows=wowPriority(k).filter(r=>r.reasons.length);
  let html='<div class="panel"><div class="eyebrow">Erkennen · erklären · priorisieren</div><h2><svg class="headingIcon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg> Ertragsradar</h2><p class="small">Der Radar zeigt nur konkrete Prüfsignale aus Ihren Daten. Das Euro-Potenzial legen Sie anschließend selbst in der Simulation fest.</p>';
@@ -568,6 +590,7 @@ function radar(){
  $('radarBody').querySelectorAll('.alert').forEach((card,i)=>{if(!card.querySelector('button[onclick^="startRadarAction"]'))return;const heading=card.querySelector('strong')?.textContent?.trim()||'Prüfsignal '+(i+1);const label=card.querySelector('.eyebrow')?.textContent?.trim()||'PRÜFSIGNAL';const details=document.createElement('details');details.className='tse-accordion radar-signal-accordion';const summary=document.createElement('summary');summary.innerHTML='<span><span class="tse-accordion-sub">'+esc(label)+'</span><span class="tse-accordion-title">'+esc(heading)+'</span></span><span class="tse-accordion-icon" aria-hidden="true"></span>';const content=document.createElement('div');content.className='tse-accordion-content';while(card.firstChild)content.append(card.firstChild);details.append(summary,content);card.replaceWith(details)});
  simulation();
  loop(rows[0]);
+ enhanceRadarAccordions();
 }
 function startRadarAction(groupId){const rows=wowPriority(month()).filter(r=>r.reasons.length);const selected=rows.find(r=>r.g.id===groupId);if(!selected)return;loop(selected);const target=$('loop');if(target){target.scrollIntoView({behavior:'smooth',block:'start'});target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}const msg=$('investigationMsg');if(msg)msg.textContent='Maßnahmenplanung für '+selected.g.name+' geöffnet. Prüfen Sie die Vorschläge und wählen Sie nur passende Maßnahmen aus.';}
 function scenarioResult(g,rp,sp,wp){
