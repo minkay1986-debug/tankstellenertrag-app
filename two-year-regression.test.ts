@@ -232,7 +232,7 @@ Deno.test("operator settings: revenue, margin, shrink, write-off and stock thres
   const rt=runtime(appFixture());
   const key="2026-10";
   setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:50,shrink:4,writeoff:4,stock:400});
-  setScenarioGroup(rt,key,"backshop",{revenue:960,margin:49,shrink:6,writeoff:6,stock:420});
+  setScenarioGroup(rt,key,"backshop",{revenue:960,margin:49,shrink:6,writeoff:6,stock:403.2});
   // The same synthetic data is evaluated against two deliberately different operator profiles.
   rt.data.settings={...rt.data.settings,revenueDrop:3,marginDrop:.8,shrinkRate:.5,writeoffRate:.5,stockIncrease:4};
   const permissive=rt.wowPriority(key).find((r:any)=>r.g.id==="backshop");
@@ -270,12 +270,12 @@ Deno.test("operator settings: threshold boundary behavior follows each entered v
   const rt=runtime(appFixture());
   const key="2026-10";
   setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:400});
-  setScenarioGroup(rt,key,"backshop",{revenue:970,margin:48.75,shrink:9.7,writeoff:9.7,stock:420});
-  rt.data.settings={...rt.data.settings,revenueDrop:3,marginDrop:1.25,shrinkRate:1,writeoffRate:1,stockIncrease:5};
+  setScenarioGroup(rt,key,"backshop",{revenue:970,margin:48.5,shrink:9.7,writeoff:9.7,stock:407.4});
+  rt.data.settings={...rt.data.settings,revenueDrop:3,marginDrop:1.5,shrinkRate:1,writeoffRate:1,stockIncrease:5};
   const at=rt.wowPriority(key).find((r:any)=>r.g.id==="backshop");
   assert(!!at,"Signals exactly at configured boundaries must be retained");
   assert(at.reasons.includes("Umsatz rückläufig"),"Revenue decline exactly at the entered 3% boundary must trigger");
-  assert(at.reasons.some((x:string)=>x.includes("Ist-Marge")),"Margin drop exactly at the entered 1.25 point boundary must trigger");
+  assert(at.reasons.some((x:string)=>x.includes("Ist-Marge")),"Margin drop exactly at the entered 1.5 point boundary must trigger");
   assert(at.reasons.includes("Schwund auffällig")&&at.reasons.includes("Abschriften auffällig"),"Rates above their entered 1% boundaries must trigger");
   assert(at.reasons.includes("Bestandsquote gestiegen"),"Stock ratio increase exactly at the entered 5% relative boundary must trigger");
 });
