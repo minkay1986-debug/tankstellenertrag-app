@@ -352,12 +352,35 @@ Deno.test("report renders every signal, separates actual and target margin, and 
   assert(out.includes("Shop-Ist-Marge")&&out.includes("Nicht berechenbar"),"Missing shop EK source must not show a fabricated 100% margin");
   assert(!out.includes("kein festgestellter Verlust"),"Report must not negate its own loss-related review signals");
   assert(out.includes("Prüfsignal, kein bestätigter Verlustnachweis"),"Report must distinguish a review signal from proven loss");
+  assert((out.match(/class="report-guidance-step"/g)||[]).length===4,"The report must keep all four advisory stages available as expandable sections");
+  assert(out.includes("Pfand und Gebindegrößen")&&out.includes("Produktionsmengen"),"Expanded guidance must retain category-specific drinks and bakery checks");
+  assert(out.includes("Wirkung mit derselben Datengrundlage kontrollieren"),"Expanded guidance must retain a substantive follow-up control step");
 });
-Deno.test("missing shrink source suppresses shrink signals, risk and euro potential even if stale amounts remain",()=>{\n  const rt=runtime(appFixture()),key="2026-10";\n  rt.data.months[key].sourceShrink=false;\n  setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,shrink:80,writeoff:60});\n  const row=scenarioRow(rt,key,"backshop");\n  assert(!row||(!row.reasons.includes("Schwund auffällig")&&!row.reasons.includes("Abschriften auffällig")),"Unconfirmed shrink data must not create operational alerts");\n  if(row){const measure=appFunction("measurePotential","potentialHtml",["r"],{});assert(measure({...row,reasons:["Schwund auffällig","Abschriften auffällig"]}).length===0,"Unconfirmed shrink data must not create euro potential");}\n});\n\nDeno.test("report shows inventory ratios only when inventory source is confirmed",()=>{
+Deno.test("missing shrink source suppresses shrink signals, risk and euro potential even if stale amounts remain",()=>{
+  const rt=runtime(appFixture()),key="2026-10";
+  rt.data.months[key].sourceShrink=false;
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,shrink:80,writeoff:60});
+  const row=scenarioRow(rt,key,"backshop");
+  assert(!row||(!row.reasons.includes("Schwund auffällig")&&!row.reasons.includes("Abschriften auffällig")),"Unconfirmed shrink data must not create operational alerts");
+  if(row){const measure=appFunction("measurePotential","potentialHtml",["r"],{});assert(measure({...row,reasons:["Schwund auffällig","Abschriften auffällig"]}).length===0,"Unconfirmed shrink data must not create euro potential");}
+});
+
+Deno.test("report shows inventory ratios only when inventory source is confirmed",()=>{
   const rt=runtime(appFixture()),key="2026-10";
   rt.data.months[key].sourceInventory=true;
   rt.report();
   assert(!rt.target.innerHTML.includes("Bestandsquote</div><div class=\"value\">Nicht erfasst"),"Confirmed inventory source should allow a measured overall ratio");
+});
+
+Deno.test("missing inventory source never leaks stored group stock into report priority guidance",()=>{
+  const rt=runtime(appFixture()),key="2026-10";
+  setScenarioGroup(rt,key,"backshop",{revenue:1000,margin:48,shrink:20,writeoff:8,stock:6800});
+  rt.data.months[key].sourceInventory=false;
+  rt.data.months[key].sourceShrink=true;
+  rt.report();
+  const out=rt.target.innerHTML;
+  assert(out.includes("Lagerbestand nicht erfasst"),"Priority guidance must explicitly mark missing inventory");
+  assert(!out.includes("Lagerbestand 6.800"),"Stored but unconfirmed stock must not be presented as a measured value");
 });
 Deno.test("risk score incorporates an operator target-margin miss",()=>{
   const rt=runtime(appFixture()),key="2026-10";
