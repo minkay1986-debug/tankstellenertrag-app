@@ -99,3 +99,51 @@ Deno.test("practical guidance is actionable, prioritised and labels missing data
 });
 
 Deno.test("app has all requested renderers and renderAll calls them",()=>{for(const fn of ["function renderMeinMonat()","function yearly()","function report()","function analysis()","function renderAll()"])assert(html.includes(fn),"Missing "+fn);const renderAllFn=html.slice(html.indexOf("function renderAll()"),html.indexOf("function parseHuth("));assert(["renderMeinMonat()","analysis()","yearly()","report()"].every(call=>renderAllFn.includes(call)),"renderAll must invoke month, analysis, year and report renderers");for(const id of ['id="monthly"','id="yearly"','id="report"','id="dashboard"'])assert(html.includes(id),"Missing section "+id);const yearFn=html.slice(html.indexOf("function yearly()"),html.indexOf("function economic()"));assert(yearFn.includes("Jahresübersicht")&&yearFn.includes("gewichtete Marge"),"Yearly view must show annual totals and weighted margin");const monthFn=html.slice(html.indexOf("function renderMeinMonat()"),html.indexOf("function renderCustomScenarioInputs"));for(const check of ["focus","shrink","action"])assert(monthFn.includes(check),"Missing monthly check tile "+check);const analysisFn=html.slice(html.indexOf("function analysis()"),html.indexOf("function renderCustomScenarioInputs"));assert(analysisFn.includes("Daten-TÜV")&&analysisFn.includes("Bestandsabgleich")&&analysisFn.includes("Ihre wichtigsten Prüffelder"),"Analysis is missing a required check area");const reportFn=html.slice(html.indexOf("function report()"),html.indexOf("function settingsUI()"));for(const item of ["Shop-Umsatz","Rohertrag","Marge","Schwund","Bestand EK","Notizen / Maßnahmen"])assert(reportFn.includes(item),"Report missing "+item);});
+
+Deno.test("advice separates achieved margin target from operational review risk",()=>{
+  const rt=runtime(appFixture());
+  const m=rt.data.months["2026-10"];
+  const backshop=m.groups.backshop;
+  backshop.ek=backshop.revenue*.40;
+  backshop._ekEntered=true;
+  backshop.shrink=backshop.revenue*.032;
+  backshop.writeoff=backshop.revenue*.002;
+  const row=rt.wowPriority("2026-10").find((x:any)=>x.g.id==="backshop");
+  assert(!!row,"Backshop advice row missing");
+  assert(row.g.actualMargin>=row.g.margin,"Fixture must reach the margin target");
+  assert(row.reasons.includes("Schwund auffällig"),"High shrink must remain a review signal");
+  assert(!row.reasons.some((x:string)=>x.includes("Marge")),"Reached margin target must not be called a margin drop");
+  assert(html.includes("Ist-Marge '+pct(actual)+' · Ziel erreicht"),"Card must render margin target state independently");
+  assert(html.includes("PRÜFBEDARF · ' +risk.label")||html.includes("PRÜFBEDARF · "+ " ' +risk.label"),"Review-risk badge must be explicitly separated from margin state");
+});
+
+Deno.test("advice potential is only calculated for matching detected shrink/write-off signals",()=>{
+  const rt=runtime(appFixture());
+  const measure=appFunction("measurePotential","potentialHtml",["r"],{});
+  const potential=appFunction("potentialHtml","wowCard",["r"],{measurePotential:measure,eur:(v:number)=>new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(v)});
+  const salesOnly={reasons:["Umsatz rückläufig"],g:{shrink:128,writeoff:64}};
+  assert(measure(salesOnly).length===0,"Sales-only alert must not inherit unrelated shrink/write-off euro potential");
+  assert(potential(salesOnly).includes("kein pauschaler Gewinnbetrag")||potential(salesOnly).includes("kein Euro-Betrag")||potential(salesOnly).includes("kein"),"Sales-only advice must explain why no euro potential is calculated");
+  const shrinkOnly={reasons:["Schwund auffällig"],g:{shrink:128,writeoff:64}};
+  const parts=measure(shrinkOnly);
+  assert(parts.length===1&&parts[0].label==="Schwund","Only the detected shrink signal may contribute");
+  assert(Math.abs(parts[0].amount-12.8)<.001,"Shrink scenario must calculate 10% of the monthly shrink amount");
+  const combined={reasons:["Schwund auffällig","Abschriften auffällig"],g:{shrink:128,writeoff:64}};
+  assert(measure(combined).length===2,"Both signals may be shown separately, with overlap warning");
+});
+
+Deno.test("missing comparison month suppresses trend-based advice instead of using an older month",()=>{
+  const rt=runtime(appFixture());
+  delete rt.data.months["2026-09"];
+  const rows=rt.wowPriority("2026-10");
+  assert(rows.every((r:any)=>!r.reasons.includes("Umsatz rückläufig")&&!r.reasons.some((x:string)=>x.includes("Marge"))),"Missing September must not be replaced by an older comparison month");
+});
+
+Deno.test("threshold boundaries are inclusive and invalid optimizer inputs are not fabricated",()=>{
+  const at=optimizer.evaluateGroup({name:"Grenzfall",actualRevenue:1000,previousRevenue:1000,priorYearRevenue:1000,marginPct:50,previousMarginPct:52,shrinkPct:2,dataComplete:true});
+  assert(at.alerts.some((a:any)=>a.code==="MARGIN_DROP"),"A 2 percentage-point margin drop must trigger at the boundary");
+  assert(at.alerts.some((a:any)=>a.code==="SHRINK_REVIEW"),"Shrink above 2% must trigger review");
+  const missing=optimizer.evaluateGroup({name:"Unvollständig",actualRevenue:1000,previousRevenue:null,priorYearRevenue:null,marginPct:null,previousMarginPct:null,shrinkPct:null,dataComplete:false});
+  assert(missing.expectedRevenue===null&&missing.varianceEuro===null,"Missing baseline must not produce a fabricated euro variance");
+  assert(missing.confidence==="low","Incomplete inputs must lower confidence");
+});
