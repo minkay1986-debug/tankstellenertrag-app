@@ -313,7 +313,7 @@ Deno.test("seasonal context retains real year-on-year decline and independent op
   const rt=runtime(appFixture());
   const jan25=rt.data.months["2025-01"].groups.backshop.revenue;
   setScenarioGroup(rt,"2025-12","backshop",{revenue:25000,margin:52,shrink:0,writeoff:0,stock:10000});
-  setScenarioGroup(rt,"2026-01","backshop",{revenue:jan25*.8,margin:48,shrink:25,writeoff:0,stock:jan25*.32});
+  setScenarioGroup(rt,"2026-01","backshop",{revenue:jan25*.8,margin:48,shrink:200,writeoff:0,stock:jan25*.32});
   const r=scenarioRow(rt,"2026-01");
   assert(!!r&&r.reasons.includes("Umsatz rückläufig"),"Material year-on-year decline must remain visible");
   assert(r.reasons.some((x:string)=>x.includes("Ist-Marge")),"Seasonality must not suppress independent margin deterioration");
@@ -323,6 +323,7 @@ Deno.test("missing prior-year same-month data does not suppress month-on-month s
   const rt=runtime(appFixture());
   delete rt.data.months["2025-01"];
   setScenarioGroup(rt,"2025-12","backshop",{revenue:25000,margin:52,shrink:0,writeoff:0,stock:10000});
+  setScenarioGroup(rt,"2026-01","backshop",{revenue:1000,margin:52,shrink:0,writeoff:0,stock:400});
   const r=scenarioRow(rt,"2026-01");
   assert(!!r&&r.reasons.includes("Umsatz rückläufig"),"Without prior-year same-month data, configured month-on-month logic remains active");
 });
