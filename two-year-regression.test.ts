@@ -407,3 +407,36 @@ Deno.test("revenue scenario uses actual margin and refuses to invent profit when
   assert(missing.revenueGain===null,"Missing actual margin must not produce a revenue-profit estimate");
   assert(missing.total===0,"Unmeasured revenue profit must not be included in calculated potential");
 });
+
+
+Deno.test("economic potential calculates traceable euro scenarios from confirmed sales, margin and shrink sources",()=>{
+  const rt=runtime(appFixture()),key="2026-10";
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:40,shrink:0,writeoff:0,stock:400});
+  setScenarioGroup(rt,key,"backshop",{revenue:800,margin:40,shrink:100,writeoff:50,stock:400});
+  rt.data.months[key].sourceMonthly=true;
+  rt.data.months[key].sourceShrink=true;
+  rt.data.settings.targetMargins={...rt.data.settings.targetMargins,backshop:50};
+  const row=scenarioRow(rt,key,"backshop");
+  assert(!!row,"Expected an economic review row");
+  const measure=appFunction("measurePotential","potentialHtml",["r"],{});
+  const parts=measure(row);
+  const total=parts.reduce((sum:any,p:any)=>sum+p.amount,0);
+  assert(Math.abs(total-55)<.001,"Expected €20 margin scenario + €20 sales recovery + €10 shrink + €5 write-off scenario");
+  assert(parts.some((p:any)=>p.label.includes("Margenlücke")),"Target-margin gap must create a euro scenario");
+  assert(parts.some((p:any)=>p.label.includes("Umsatzrückgang")),"Confirmed month-on-month sales drop must create a euro scenario");
+});
+
+Deno.test("economic potential never monetizes unconfirmed EK, monthly sales or inventory-only signals",()=>{
+  const rt=runtime(appFixture()),key="2026-10";
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:40,shrink:0,writeoff:0,stock:400});
+  setScenarioGroup(rt,key,"backshop",{revenue:800,margin:40,shrink:0,writeoff:0,stock:700});
+  rt.data.months[key].sourceMonthly=false;
+  rt.data.months[key].sourceInventory=true;
+  rt.data.settings.targetMargins={...rt.data.settings.targetMargins,backshop:50};
+  const row=scenarioRow(rt,key,"backshop");
+  assert(!!row,"Expected a review row for the target-margin gap");
+  rt.data.months[key].groups.backshop._ekEntered=false;
+  const refreshed=scenarioRow(rt,key,"backshop");
+  const measure=appFunction("measurePotential","potentialHtml",["r"],{});
+  assert(measure(refreshed).length===0,"Missing EK and unconfirmed monthly source must not produce a euro amount");
+});
