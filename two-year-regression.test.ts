@@ -47,12 +47,16 @@ function runtime(data:any) {
   const target = {value:"",innerHTML:""};
   const yearly = appFunction("yearly","economic",["keys","data","calc","eur","pct","$"],{keys,data,calc,eur,pct,$:(id:string)=>target});
   const practiceGuidance = appFunction("practiceGuidance","wowCard",[],{});
+  const riskLevel = appFunction("riskLevel","riskForRow",[],{});
+  const riskForRow = appFunction("riskForRow","riskSummary",["settings","riskLevel"],{settings,riskLevel});
+  const grossSafe = (v:number|null) => v===null?0:(Number(v)||0);
+  const scenarioResult = appFunction("scenarioResult","simulation",["grossSafe"],{grossSafe});
   const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext","practiceGuidance"],{
     calc,month:()=> "2026-10",settings,wowPriority,prev,eur,pct,esc:(v:unknown)=>String(v??""),$:(id:string)=>target,
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
     TEStudyContext:{htmlForReport:async()=>""},practiceGuidance
   });
-  return {data,calc,wowPriority,yearly,report,practiceGuidance,target,prev};
+  return {data,calc,wowPriority,yearly,report,practiceGuidance,riskForRow,scenarioResult,target,prev};
 }
 Deno.test("real app calc, year table and report reconcile across all 24 months",()=>{
   const rt=runtime(appFixture());
@@ -326,4 +330,48 @@ Deno.test("missing prior-year same-month data does not suppress month-on-month s
   setScenarioGroup(rt,"2026-01","backshop",{revenue:1000,margin:52,shrink:0,writeoff:0,stock:400});
   const r=scenarioRow(rt,"2026-01");
   assert(!!r&&r.reasons.includes("Umsatz rückläufig"),"Without prior-year same-month data, configured month-on-month logic remains active");
+});
+
+
+Deno.test("report renders every signal, separates actual and target margin, and never fabricates missing inventory",()=>{
+  const rt=runtime(appFixture());
+  const key="2026-10";
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:52,shrink:2,writeoff:2,stock:400});
+  setScenarioGroup(rt,key,"backshop",{revenue:900,margin:48,shrink:20,writeoff:8,stock:0});
+  rt.data.settings.targetMargins={...rt.data.settings.targetMargins,backshop:50};
+  rt.data.months[key].sourceInventory=false;
+  rt.report();
+  const out=rt.target.innerHTML;
+  for(const signal of ["Umsatz rückläufig","Ist-Marge unter Ihrem Zielwert","Schwund auffällig","Abschriften auffällig"])
+    assert(out.includes(signal),"Report omitted independent signal: "+signal);
+  assert(out.includes("Ist-Marge 48,0 % · Zielmarge 50,0 %"),"Report must show actual and operator target margin separately");
+  assert(out.includes("Bestandsquote")&&out.includes("Nicht erfasst"),"Missing inventory must be labeled as unavailable, not 0%");
+  assert(!out.includes("kein festgestellter Verlust"),"Report must not negate its own loss-related review signals");
+  assert(out.includes("Prüfsignal, kein bestätigter Verlustnachweis"),"Report must distinguish a review signal from proven loss");
+});
+Deno.test("report shows inventory ratios only when inventory source is confirmed",()=>{
+  const rt=runtime(appFixture()),key="2026-10";
+  rt.data.months[key].sourceInventory=true;
+  rt.report();
+  assert(!rt.target.innerHTML.includes("Bestandsquote</div><div class=\"value\">Nicht erfasst"),"Confirmed inventory source should allow a measured overall ratio");
+});
+Deno.test("risk score incorporates an operator target-margin miss",()=>{
+  const rt=runtime(appFixture()),key="2026-10";
+  setScenarioGroup(rt,key,"backshop",{revenue:1000,margin:40,shrink:0,writeoff:0,stock:400});
+  rt.data.settings.targetMargins={...rt.data.settings.targetMargins,backshop:60};
+  const row=scenarioRow(rt,key);
+  assert(!!row&&row.targetMarginGap===20,"Configured target gap must be present in the real priority row");
+  const risk=rt.riskForRow(row);
+  assert(risk.key!=="normal","Target-margin miss must affect review risk");
+});
+Deno.test("revenue scenario uses actual margin and refuses to invent profit when EK is missing",()=>{
+  const rt=runtime(appFixture());
+  const g=rt.calc("2026-10").groups.find((x:any)=>x.id==="backshop");
+  g.revenue=1000;g.actualMargin=42;g.margin=60;
+  const measured=rt.scenarioResult(g,10,0,0);
+  assert(Math.abs((measured.revenueGain||0)-42)<.001,"Revenue uplift must use 42% actual margin, not 60% target margin");
+  g.actualMargin=null;
+  const missing=rt.scenarioResult(g,10,0,0);
+  assert(missing.revenueGain===null,"Missing actual margin must not produce a revenue-profit estimate");
+  assert(missing.total===0,"Unmeasured revenue profit must not be included in calculated potential");
 });
