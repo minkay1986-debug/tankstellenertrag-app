@@ -196,12 +196,12 @@ Deno.test("scenario audit: shrink and write-off are independently detected",()=>
   const writeoff=scenarioRow(rt);
   assert(!!writeoff&&writeoff.reasons.includes("Abschriften auffällig")&&!writeoff.reasons.includes("Schwund auffällig"),"Write-off-only scenario was not isolated");
 });
-Deno.test("scenario audit: rising stock ratio is detected only after relative threshold is crossed",()=>{
+Deno.test("scenario audit: rising stock ratio triggers at the configured inclusive threshold",()=>{
   const rt=runtime(appFixture());
   setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:400});
   setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:420});
-  const below=scenarioRow(rt);
-  assert(!below?.reasons.includes("Bestandsquote gestiegen"),"A 5% relative increase is the threshold; exactly 5% should not exceed it due floating-point rounding");
+  const atBoundary=scenarioRow(rt);
+  assert(!!atBoundary&&atBoundary.reasons.includes("Bestandsquote gestiegen"),"A 5% relative increase must trigger at the inclusive configured threshold");
   setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:424});
   const above=scenarioRow(rt);
   assert(!!above&&above.reasons.includes("Bestandsquote gestiegen"),"Stock-ratio increase above 5% was missed");
