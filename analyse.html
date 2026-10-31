@@ -595,7 +595,8 @@ function radar(){
 function startRadarAction(groupId){const rows=wowPriority(month()).filter(r=>r.reasons.length);const selected=rows.find(r=>r.g.id===groupId);if(!selected)return;loop(selected);const target=$('loop');if(target){target.scrollIntoView({behavior:'smooth',block:'start'});target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}const msg=$('investigationMsg');if(msg)msg.textContent='Maßnahmenplanung für '+selected.g.name+' geöffnet. Prüfen Sie die Vorschläge und wählen Sie nur passende Maßnahmen aus.';}
 function scenarioResult(g,rp,sp,wp){
  const newRev=g.revenue*(1+rp/100);
- const actualMargin=g.actualMargin!==null&&g.actualMargin!==undefined&&Number.isFinite(Number(g.actualMargin))?Number(g.actualMargin):null;\n const revenueGain=actualMargin===null?null:(newRev*actualMargin/100-g.revenue*actualMargin/100);
+ const actualMargin=g.actualMargin!==null&&g.actualMargin!==undefined&&Number.isFinite(Number(g.actualMargin))?Number(g.actualMargin):null;
+ const revenueGain=actualMargin===null?null:(newRev*actualMargin/100-g.revenue*actualMargin/100);
  const shrinkGain=g.shrink*sp/100;
  const writeoffGain=g.writeoff*wp/100;
  const total=grossSafe(revenueGain)+shrinkGain+writeoffGain;
