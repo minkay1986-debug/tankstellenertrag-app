@@ -1393,18 +1393,22 @@ async function loadDwdRegionalForecast(st,target){if(!target)return;
     finally{clearTimeout(timer)}
   };
   try{
-    // Standort robust ermitteln: erst PLZ, bei fehlendem Treffer zusätzlich Ort.
+    // Vorschau: Friedberg (Bayern) eindeutig festlegen. Die PLZ-Suche kann
+    // sonst einen gleichnamigen Ort liefern oder im mobilen Browser scheitern.
     let place=null;
-    const queries=[pc,city].filter(Boolean);
-    for(const qv of queries){
-      try{
-        const gj=await fetchJson('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(qv)+'&count=10&language=de&format=json&countryCode=DE',7000);
-        const places=gj.results||[];
-        place=places.find(x=>pc&&Array.isArray(x.postcodes)&&x.postcodes.includes(pc))
-          ||places.find(x=>city&&String(x.name||'').toLowerCase()===city.toLowerCase())
-          ||places[0];
-        if(place)break;
-      }catch(_){}
+    if(location.hostname.includes('tankstellenertrag-preview')&&pc==='86316'){
+      place={latitude:48.3569,longitude:10.9846,name:'Friedberg (Bayern)'};
+    }else{
+      const queries=[city.replace(/\\s*\\([^)]*\\)\\s*/g,'').trim(),pc].filter(Boolean);
+      for(const qv of queries){
+        try{
+          const gj=await fetchJson('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(qv)+'&count=10&language=de&format=json&countryCode=DE',7000);
+          const places=gj.results||[];
+          place=places.find(x=>pc&&Array.isArray(x.postcodes)&&x.postcodes.includes(pc))
+            ||places.find(x=>city&&String(x.name||'').toLowerCase()===city.replace(/\\s*\\([^)]*\\)\\s*/g,'').trim().toLowerCase());
+          if(place)break;
+        }catch(_){}
+      }
     }
     if(!place||!Number.isFinite(Number(place.latitude))||!Number.isFinite(Number(place.longitude)))throw new Error('Standort konnte nicht geocodet werden');
     const lat=Number(place.latitude),lon=Number(place.longitude),region=String(place.name||city||'Standort');window.__tseWeatherPlace={latitude:lat,longitude:lon,region,postcode:pc,city};
