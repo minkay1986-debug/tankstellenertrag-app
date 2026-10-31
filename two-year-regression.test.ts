@@ -183,8 +183,8 @@ Deno.test("scenario audit: severe target-margin shortfall without month-on-month
   setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:45,shrink:2,writeoff:2,stock:400});
   setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,margin:45,shrink:2,writeoff:2,stock:400});
   const r=scenarioRow(rt);
-  assert(!r,"Stable metrics alone should not create a trend alert; target-margin gap is currently not an independent trigger");
-  assert(45<59.2,"Scenario must materially miss the configured target margin");
+  assert(!!r&&r.reasons.includes("Ist-Marge unter Ihrem Zielwert"),"Stable but below-target margin must independently trigger using the configured category target");
+  assert(r.reasons.every((x:string)=>!x.includes("gefallen")),"A stable margin must not be mislabeled as a month-on-month decline");
 });
 Deno.test("scenario audit: shrink and write-off are independently detected",()=>{
   const rt=runtime(appFixture());
