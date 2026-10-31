@@ -29,7 +29,7 @@ function appFixture() {
   for (const m of months) {
     const groupRevenue = m.revenue / 8;
     const groups: Record<string,any> = {};
-    for (const [id,,target] of groupDefs) groups[id] = {revenue:id==="waschen"?0:groupRevenue,ek:id==="waschen"?0:groupRevenue*(1-m.marginPct/100),margin:target,shrink:id==="backshop"&&m.key==="2026-10"?groupRevenue*.032:groupRevenue*.008,writeoff:groupRevenue*.002,stock:groupRevenue*.4};
+    for (const [id,,target] of groupDefs) groups[id] = {revenue:id==="waschen"?0:groupRevenue,ek:id==="waschen"?0:groupRevenue*(1-m.marginPct/100),margin:target,shrink:id==="backshop"&&m.key==="2026-10"?groupRevenue*.032:groupRevenue*.008,writeoff:groupRevenue*.002,stock:groupRevenue*.4,_stockEntered:true,openingStock:groupRevenue*.42,_openingStockEntered:true};
     data.months[m.key] = {revenue:m.revenue,ek:m.ek,shrink:m.revenue*m.shrinkPct/100,writeoff:m.revenue*.002,stock:m.revenue*.4,sourceShrink:true,groups};
   }
   return data;
@@ -40,7 +40,8 @@ function runtime(data:any) {
   const mrow = (k:string) => data.months[k];
   const prev = (k:string) => {const [y,mo]=k.split("-").map(Number);const d=new Date(y,mo-2,1);const p=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;return Object.hasOwn(data.months,p)?p:null;};
   const calc = appFunction("calc","reconciliation",["GROUPS","data","settings","mrow"],{GROUPS,data,settings,mrow});
-  const wowPriority = appFunction("wowPriority","riskLevel",["calc","prev","settings","data"],{calc,prev,settings,data});
+  const inventoryMetrics = appFunction("inventoryMetrics","reconciliation",["g","days"],{});
+  const wowPriority = appFunction("wowPriority","riskLevel",["calc","prev","settings","data","inventoryMetrics"],{calc,prev,settings,data,inventoryMetrics});
   const keys = () => Object.keys(data.months).sort();
   const eur = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Number(v)||0);
   const pct = (v:number) => (Number(v)||0).toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1})+" %";
@@ -56,7 +57,7 @@ function runtime(data:any) {
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
     TEStudyContext:{htmlForReport:async()=>""},practiceGuidance
   });
-  return {data,calc,wowPriority,yearly,report,practiceGuidance,riskForRow,scenarioResult,target,prev};
+  return {data,calc,wowPriority,yearly,report,practiceGuidance,riskForRow,scenarioResult,inventoryMetrics,target,prev};
 }
 Deno.test("real app calc, year table and report reconcile across all 24 months",()=>{
   const rt=runtime(appFixture());
@@ -131,7 +132,7 @@ Deno.test("advice potential is only calculated for matching detected shrink/writ
   assert(potential(salesOnly,measure,eur).includes("Vergleichbarer Vormonatsumsatz fehlt"),"Sales-only advice must name the missing comparison/source data instead of a blanket no-potential statement");
   const shrinkOnly={reasons:["Schwund auffällig"],g:{shrink:128,writeoff:64},dataStatus:{shrinkSourceAvailable:true}};
   const parts=measure(shrinkOnly);
-  assert(parts.length===1&&parts[0].label==="Schwund","Only the detected shrink signal may contribute");
+  assert(parts.length===1&&parts[0].label==="Schwund reduzieren","Only the detected shrink signal may contribute");
   assert(Math.abs(parts[0].amount-12.8)<.001,"Shrink scenario must calculate 10% of the monthly shrink amount");
   const combined={reasons:["Schwund auffällig","Abschriften auffällig"],g:{shrink:128,writeoff:64},dataStatus:{shrinkSourceAvailable:true}};
   assert(measure(combined).length===2,"Both signals may be shown separately, with overlap warning");
@@ -161,7 +162,7 @@ function setScenarioGroup(rt:any,key:string,id:string,values:{revenue?:number;ma
   if(values.margin!==undefined){g.ek=g.revenue*(1-values.margin/100);g._ekEntered=true;}
   if(values.shrink!==undefined)g.shrink=values.shrink;
   if(values.writeoff!==undefined)g.writeoff=values.writeoff;
-  if(values.stock!==undefined)g.stock=values.stock;
+  if(values.stock!==undefined){g.stock=values.stock;g._stockEntered=true;}
 }
 function scenarioRow(rt:any,key="2026-10",id="backshop") {
   return rt.wowPriority(key).find((r:any)=>r.g.id===id);
@@ -421,9 +422,9 @@ Deno.test("economic potential calculates traceable euro scenarios from confirmed
   const measure=appFunction("measurePotential","potentialHtml",["r"],{});
   const parts=measure(row);
   const total=parts.reduce((sum:any,p:any)=>sum+p.amount,0);
-  assert(Math.abs(total-55)<.001,"Expected €20 margin scenario + €20 sales recovery + €10 shrink + €5 write-off scenario");
-  assert(parts.some((p:any)=>p.label.includes("Margenlücke")),"Target-margin gap must create a euro scenario");
-  assert(parts.some((p:any)=>p.label.includes("Umsatzrückgang")),"Confirmed month-on-month sales drop must create a euro scenario");
+  assert(Math.abs(total-35)<.001,"Expected €20 shared gross-profit scenario (not €40 double-counted) + €10 shrink + €5 write-off scenario");
+  assert(parts.length===3&&parts[0].kind==="zusätzlicher Rohertrag","Margin and sales effects must be combined into one non-overlapping gross-profit scenario");
+  assert(Math.abs(parts[0].marginScenario-20)<.001&&Math.abs(parts[0].salesScenario-20)<.001,"Both individual scenario values must remain visible for transparency");
 });
 
 Deno.test("economic potential never monetizes unconfirmed EK, monthly sales or inventory-only signals",()=>{
@@ -439,4 +440,41 @@ Deno.test("economic potential never monetizes unconfirmed EK, monthly sales or i
   const refreshed=scenarioRow(rt,key,"backshop");
   const measure=appFunction("measurePotential","potentialHtml",["r"],{});
   assert(measure(refreshed).length===0,"Missing EK and unconfirmed monthly source must not produce a euro amount");
+});
+
+
+Deno.test("inventory metrics calculate coverage, turnover and target-based capital separately",()=>{
+  const metric=appFunction("inventoryMetrics","reconciliation",["g","days"],{});
+  const m=metric({stock:1200,stockEntered:true,ek:3000,ekEntered:true,openingStock:1000,openingStockEntered:true,targetStockDays:10},30);
+  assert(m.available,"Confirmed inventory should be available");
+  assert(Math.abs(m.coverageDays-12)<.001,"Expected 12 days stock coverage");
+  assert(Math.abs(m.monthlyTurnover-(3000/1100))<.001,"Turnover must use average opening/closing stock");
+  assert(Math.abs(m.targetStock-1000)<.001&&Math.abs(m.excessCapital-200)<.001,"Capital above target must be calculated from the operator's target days");
+  const noTarget=metric({stock:1200,stockEntered:true,ek:3000,ekEntered:true,openingStock:1000,openingStockEntered:true,targetStockDays:null},30);
+  assert(noTarget.excessCapital===null,"No arbitrary overstock or capital-release value without a user target");
+  const missing=metric({stock:1200,stockEntered:false,ek:3000,ekEntered:true},30);
+  assert(!missing.available&&missing.coverageDays===null,"Unconfirmed inventory must not create a coverage estimate");
+});
+
+Deno.test("category advice uses distinct operational checks for drinks, coffee and bakery",()=>{
+  const rt=runtime(appFixture());
+  const guidance=(id:string)=>rt.practiceGuidance({g:{id,name:id},reasons:["Ist-Marge unter Ihrem Zielwert"],dataStatus:{groupEkAvailable:true,previousMonthAvailable:true}});
+  const drinks=guidance("getraenke"),coffee=guidance("kaffee"),bakery=guidance("backshop");
+  assert(drinks.includes("Pfand")&&drinks.includes("Gebindegrößen"),"Drinks advice must cover deposit and pack sizes");
+  assert(coffee.includes("Rezepturen")&&coffee.includes("Bohnenmenge")&&!coffee.includes("Pfand"),"Coffee advice must focus on recipe-level cup contribution, not generic deposit checks");
+  assert(bakery.includes("Backintervalle")&&bakery.includes("Tageszeit-Abverkauf"),"Bakery advice must focus on production timing and daypart sales");
+});
+
+Deno.test("priority tie-break uses economic exposure after signal strength",()=>{
+  const rt=runtime(appFixture()),key="2026-10";
+  for(const id of ["backshop","getraenke"]) {
+    setScenarioGroup(rt,"2026-09",id,{revenue:1000,margin:50,shrink:0,writeoff:0,stock:400});
+    setScenarioGroup(rt,key,id,{revenue:1000,margin:45,shrink:0,writeoff:0,stock:400});
+  }
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,margin:45,shrink:0,writeoff:0,stock:400});
+  setScenarioGroup(rt,"2026-10","getraenke",{revenue:10000,margin:45,shrink:0,writeoff:0,stock:4000});
+  const rows=rt.wowPriority(key);
+  const b=rows.find((r:any)=>r.g.id==="backshop"),d=rows.find((r:any)=>r.g.id==="getraenke");
+  assert(!!b&&!!d&&b.signalScore===d.signalScore,"Fixture must create equal signal strength");
+  assert(d.economicExposure>b.economicExposure&&rows.indexOf(d)<rows.indexOf(b),"Higher euro exposure must rank first when signal strength is equal");
 });
