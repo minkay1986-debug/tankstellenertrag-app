@@ -270,7 +270,7 @@ Deno.test("operator settings: threshold boundary behavior follows each entered v
   const rt=runtime(appFixture());
   const key="2026-10";
   setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:400});
-  setScenarioGroup(rt,key,"backshop",{revenue:970,margin:48.5,shrink:9.7,writeoff:9.7,stock:407.4});
+  setScenarioGroup(rt,key,"backshop",{revenue:970,margin:48.5,shrink:10.67,writeoff:10.67,stock:407.4});
   rt.data.settings={...rt.data.settings,revenueDrop:3,marginDrop:1.5,shrinkRate:1,writeoffRate:1,stockIncrease:5};
   const at=rt.wowPriority(key).find((r:any)=>r.g.id==="backshop");
   assert(!!at,"Signals exactly at configured boundaries must be retained");
