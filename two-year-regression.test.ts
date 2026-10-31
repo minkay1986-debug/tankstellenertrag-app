@@ -377,7 +377,7 @@ Deno.test("report shows inventory ratios only when inventory source is confirmed
 Deno.test("missing inventory source suppresses stock signals and never leaks stored group stock into report guidance",()=>{
   const rt=runtime(appFixture()),key="2026-10";
   setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:48,shrink:0,writeoff:0,stock:400});
-  setScenarioGroup(rt,key,"backshop",{revenue:1000,margin:48,shrink:0,writeoff:0,stock:6800});
+  setScenarioGroup(rt,key,"backshop",{revenue:1000,margin:47,shrink:0,writeoff:0,stock:6800});
   rt.data.months["2026-09"].sourceInventory=true;
   rt.data.months[key].sourceInventory=false;
   rt.data.months[key].sourceShrink=true;
