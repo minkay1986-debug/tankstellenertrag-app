@@ -279,3 +279,49 @@ Deno.test("operator settings: threshold boundary behavior follows each entered v
   assert(at.reasons.includes("Schwund auffällig")&&at.reasons.includes("Abschriften auffällig"),"Rates above their entered 1% boundaries must trigger");
   assert(at.reasons.includes("Bestandsquote gestiegen"),"Stock ratio increase exactly at the entered 5% relative boundary must trigger");
 });
+
+
+Deno.test("operator target margins are evaluated independently for each category",()=>{
+  const rt=runtime(appFixture()),key="2026-10";
+  rt.data.settings.targetMargins={...rt.data.settings.targetMargins,backshop:52.4,kaffee:47.3,getraenke:39.6};
+  for(const k of ["2026-09",key]) for(const id of ["backshop","kaffee","getraenke"]) setScenarioGroup(rt,k,id,{revenue:1000,margin:46,shrink:0,writeoff:0,stock:400});
+  const rows=rt.wowPriority(key);
+  assert(rows.some((r:any)=>r.g.id==="backshop"&&r.reasons.includes("Ist-Marge unter Ihrem Zielwert")),"52.4% operator target must flag actual 46%");
+  assert(rows.some((r:any)=>r.g.id==="kaffee"&&r.reasons.includes("Ist-Marge unter Ihrem Zielwert")),"47.3% operator target must flag actual 46%");
+  assert(!rows.some((r:any)=>r.g.id==="getraenke"&&r.reasons.includes("Ist-Marge unter Ihrem Zielwert")),"39.6% operator target must not flag actual 46%");
+});
+Deno.test("target-margin trigger follows a changed target and requires entered EK",()=>{
+  const rt=runtime(appFixture()),key="2026-10";
+  rt.data.settings.targetMargins={...rt.data.settings.targetMargins,backshop:45.7};
+  for(const k of ["2026-09",key]) setScenarioGroup(rt,k,"backshop",{revenue:1000,margin:46,shrink:0,writeoff:0,stock:400});
+  assert(!scenarioRow(rt,key,"backshop")?.reasons.includes("Ist-Marge unter Ihrem Zielwert"),"Actual 46% meets target 45.7%");
+  rt.data.settings.targetMargins.backshop=46.8;
+  assert(scenarioRow(rt,key,"backshop")?.reasons.includes("Ist-Marge unter Ihrem Zielwert"),"Target change to 46.8% must trigger against actual 46%");
+  rt.data.months[key].groups.backshop._ekEntered=false;
+  assert(!scenarioRow(rt,key,"backshop")?.reasons.includes("Ist-Marge unter Ihrem Zielwert"),"Missing EK must not fabricate a target shortfall");
+});
+Deno.test("same-month prior-year comparison contextualizes a seasonal sales drop",()=>{
+  const rt=runtime(appFixture());
+  const jan25=rt.data.months["2025-01"].groups.backshop.revenue;
+  setScenarioGroup(rt,"2025-12","backshop",{revenue:1200,margin:52,shrink:0,writeoff:0,stock:480});
+  setScenarioGroup(rt,"2026-01","backshop",{revenue:jan25,margin:52,shrink:0,writeoff:0,stock:jan25*.4});
+  const r=scenarioRow(rt,"2026-01");
+  assert(!r||!r.reasons.includes("Umsatz rückläufig"),"Flat year-on-year January must not be treated as unexplained seasonal decline");
+});
+Deno.test("seasonal context retains real year-on-year decline and independent operational alerts",()=>{
+  const rt=runtime(appFixture());
+  const jan25=rt.data.months["2025-01"].groups.backshop.revenue;
+  setScenarioGroup(rt,"2025-12","backshop",{revenue:1200,margin:52,shrink:0,writeoff:0,stock:480});
+  setScenarioGroup(rt,"2026-01","backshop",{revenue:jan25*.8,margin:48,shrink:25,writeoff:0,stock:jan25*.32});
+  const r=scenarioRow(rt,"2026-01");
+  assert(!!r&&r.reasons.includes("Umsatz rückläufig"),"Material year-on-year decline must remain visible");
+  assert(r.reasons.some((x:string)=>x.includes("Ist-Marge")),"Seasonality must not suppress independent margin deterioration");
+  assert(r.reasons.includes("Schwund auffällig"),"Seasonality must not suppress independent shrink alerts");
+});
+Deno.test("missing prior-year same-month data does not suppress month-on-month sales review",()=>{
+  const rt=runtime(appFixture());
+  delete rt.data.months["2025-01"];
+  setScenarioGroup(rt,"2025-12","backshop",{revenue:1200,margin:52,shrink:0,writeoff:0,stock:480});
+  const r=scenarioRow(rt,"2026-01");
+  assert(!!r&&r.reasons.includes("Umsatz rückläufig"),"Without prior-year same-month data, configured month-on-month logic remains active");
+});
