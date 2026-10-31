@@ -8,7 +8,7 @@ Deno.test("24-month fixture covers two complete years without duplicate keys",()
 Deno.test("all 24 monthly report calculations preserve revenue and margin",()=>{for(const m of months){const prior=months.find(x=>x.key===`${m.year-1}-${String(m.month).padStart(2,"0")}`);const prev=months.find(x=>x.key===`${m.year}-${String(m.month-1).padStart(2,"0")}`)||months.find(x=>x.key===`${m.year-1}-12`);const r=optimizer.evaluateGroup({name:"Shop",actualRevenue:m.revenue,previousRevenue:prev?.revenue??null,priorYearRevenue:prior?.revenue??null,marginPct:m.marginPct,previousMarginPct:prev?.marginPct??null,shrinkPct:m.shrinkPct,dataComplete:true});assert(r.actualRevenue===m.revenue,`${m.key}: revenue mismatch`);assert(r.marginPct===m.marginPct,`${m.key}: margin mismatch`);if(prior)assert(Number.isFinite(r.expectedRevenue),`${m.key}: expected revenue missing`);}});
 Deno.test("annual aggregation and year-on-year growth reconcile",()=>{const y25=months.filter(x=>x.year===2025).reduce((s,x)=>s+x.revenue,0),y26=months.filter(x=>x.year===2026).reduce((s,x)=>s+x.revenue,0);assert(y26>y25,"2026 should exceed 2025");assert(Math.abs((y26/y25-1)*100-4)<.02,"Expected approximately +4% YoY");assert(months.filter(x=>x.year===2025).length===12&&months.filter(x=>x.year===2026).length===12,"Each year must contain 12 months");});
 Deno.test("known shrink incident is retained without claiming a cause",()=>{const m=months.find(x=>x.key==="2026-10")!;const r=optimizer.evaluateGroup({name:"Shop",actualRevenue:m.revenue,previousRevenue:months.find(x=>x.key==="2026-09")!.revenue,priorYearRevenue:months.find(x=>x.key==="2025-10")!.revenue,marginPct:m.marginPct,previousMarginPct:48,shrinkPct:m.shrinkPct,dataComplete:true});assert(r.shrinkPct===3.2,"October shrink spike lost");assert(!r.alerts.some((a:any)=>/Diebstahl|Ursache bewiesen/i.test(a.title+" "+a.detail)),"Unproven cause was asserted");});
-Deno.test("margin drop and partial-year safeguards remain wired",()=>{assert(html.includes("Ist-Marge um "),"Margin-drop signal missing");assert(html.includes("r.marginDrop>=s.marginDrop"),"Margin drop does not affect severity");assert(html.includes("unvollständig – nur erfasste Monate"),"Partial years not marked");assert(html.includes("g?.revenue,g?.ek,g?.shrink,g?.writeoff,g?.stock"),"Inventory-only months excluded");});
+Deno.test("margin drop and partial-year safeguards remain wired",()=>{assert(html.includes("Ist-Marge liegt "),"Margin-drop wording missing");assert(html.includes("r.marginDrop>=s.marginDrop"),"Margin drop does not affect severity");assert(html.includes("unvollständig – nur erfasste Monate"),"Partial years not marked");assert(html.includes("g?.revenue,g?.ek,g?.shrink,g?.writeoff,g?.stock"),"Inventory-only months excluded");});
 
 /** Extracts the real named app function from the single-file app so tests execute production logic, not a copied formula. */
 function appFunction(name: string, nextName: string, params: string[], deps: Record<string, unknown>): (...args: any[]) => any {
@@ -30,7 +30,7 @@ function appFixture() {
     const groupRevenue = m.revenue / 8;
     const groups: Record<string,any> = {};
     for (const [id,,target] of groupDefs) groups[id] = {revenue:id==="waschen"?0:groupRevenue,ek:id==="waschen"?0:groupRevenue*(1-m.marginPct/100),margin:target,shrink:id==="backshop"&&m.key==="2026-10"?groupRevenue*.032:groupRevenue*.008,writeoff:groupRevenue*.002,stock:groupRevenue*.4};
-    data.months[m.key] = {revenue:m.revenue,ek:m.ek,shrink:m.revenue*m.shrinkPct/100,writeoff:m.revenue*.002,stock:m.revenue*.4,groups};
+    data.months[m.key] = {revenue:m.revenue,ek:m.ek,shrink:m.revenue*m.shrinkPct/100,writeoff:m.revenue*.002,stock:m.revenue*.4,sourceShrink:true,groups};
   }
   return data;
 }
@@ -129,11 +129,11 @@ Deno.test("advice potential is only calculated for matching detected shrink/writ
   const salesOnly={reasons:["Umsatz rückläufig"],g:{shrink:128,writeoff:64}};
   assert(measure(salesOnly).length===0,"Sales-only alert must not inherit unrelated shrink/write-off euro potential");
   assert(potential(salesOnly,measure,eur).includes("kein pauschaler Gewinnbetrag")||potential(salesOnly).includes("kein Euro-Betrag")||potential(salesOnly).includes("kein"),"Sales-only advice must explain why no euro potential is calculated");
-  const shrinkOnly={reasons:["Schwund auffällig"],g:{shrink:128,writeoff:64}};
+  const shrinkOnly={reasons:["Schwund auffällig"],g:{shrink:128,writeoff:64},dataStatus:{shrinkSourceAvailable:true}};
   const parts=measure(shrinkOnly);
   assert(parts.length===1&&parts[0].label==="Schwund","Only the detected shrink signal may contribute");
   assert(Math.abs(parts[0].amount-12.8)<.001,"Shrink scenario must calculate 10% of the monthly shrink amount");
-  const combined={reasons:["Schwund auffällig","Abschriften auffällig"],g:{shrink:128,writeoff:64}};
+  const combined={reasons:["Schwund auffällig","Abschriften auffällig"],g:{shrink:128,writeoff:64},dataStatus:{shrinkSourceAvailable:true}};
   assert(measure(combined).length===2,"Both signals may be shown separately, with overlap warning");
 });
 
@@ -353,7 +353,7 @@ Deno.test("report renders every signal, separates actual and target margin, and 
   assert(!out.includes("kein festgestellter Verlust"),"Report must not negate its own loss-related review signals");
   assert(out.includes("Prüfsignal, kein bestätigter Verlustnachweis"),"Report must distinguish a review signal from proven loss");
 });
-Deno.test("report shows inventory ratios only when inventory source is confirmed",()=>{
+Deno.test("missing shrink source suppresses shrink signals, risk and euro potential even if stale amounts remain",()=>{\n  const rt=runtime(appFixture()),key="2026-10";\n  rt.data.months[key].sourceShrink=false;\n  setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,shrink:80,writeoff:60});\n  const row=scenarioRow(rt,key,"backshop");\n  assert(!row||(!row.reasons.includes("Schwund auffällig")&&!row.reasons.includes("Abschriften auffällig")),"Unconfirmed shrink data must not create operational alerts");\n  if(row){const measure=appFunction("measurePotential","potentialHtml",["r"],{});assert(measure({...row,reasons:["Schwund auffällig","Abschriften auffällig"]}).length===0,"Unconfirmed shrink data must not create euro potential");}\n});\n\nDeno.test("report shows inventory ratios only when inventory source is confirmed",()=>{
   const rt=runtime(appFixture()),key="2026-10";
   rt.data.months[key].sourceInventory=true;
   rt.report();
