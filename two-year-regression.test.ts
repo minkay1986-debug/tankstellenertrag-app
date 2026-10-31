@@ -372,11 +372,16 @@ Deno.test("report shows inventory ratios only when inventory source is confirmed
   assert(!rt.target.innerHTML.includes("Bestandsquote</div><div class=\"value\">Nicht erfasst"),"Confirmed inventory source should allow a measured overall ratio");
 });
 
-Deno.test("missing inventory source never leaks stored group stock into report priority guidance",()=>{
+Deno.test("missing inventory source suppresses stock signals and never leaks stored group stock into report guidance",()=>{
   const rt=runtime(appFixture()),key="2026-10";
-  setScenarioGroup(rt,key,"backshop",{revenue:1000,margin:48,shrink:20,writeoff:8,stock:6800});
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:48,shrink:0,writeoff:0,stock:400});
+  setScenarioGroup(rt,key,"backshop",{revenue:1000,margin:48,shrink:0,writeoff:0,stock:6800});
+  rt.data.months["2026-09"].sourceInventory=true;
   rt.data.months[key].sourceInventory=false;
   rt.data.months[key].sourceShrink=true;
+  const row=scenarioRow(rt,key,"backshop");
+  assert(!!row&&row.stockRatio===null,"Unconfirmed inventory must not produce a stock ratio");
+  assert(!row.reasons.includes("Bestandsquote gestiegen"),"Unconfirmed inventory must not create a stock-trend alert");
   rt.report();
   const out=rt.target.innerHTML;
   assert(out.includes("Lagerbestand nicht erfasst"),"Priority guidance must explicitly mark missing inventory");
