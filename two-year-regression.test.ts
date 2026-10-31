@@ -382,7 +382,7 @@ Deno.test("missing inventory source suppresses stock signals and never leaks sto
   rt.data.months[key].sourceInventory=false;
   rt.data.months[key].sourceShrink=true;
   const row=scenarioRow(rt,key,"backshop");
-  assert(!!row&&row.stockRatio===null,"Unconfirmed inventory must not produce a stock ratio");
+  assert(!!row&&row.stockRatio===null,`Unconfirmed inventory must not produce a stock ratio; row=${JSON.stringify(row&&{stockRatio:row.stockRatio,inventorySourceAvailable:row.dataStatus?.inventorySourceAvailable,groupStockEntered:row.g?.stockEntered})}`);
   assert(!row.reasons.includes("Bestandsquote gestiegen"),"Unconfirmed inventory must not create a stock-trend alert");
   rt.report();
   const out=rt.target.innerHTML;
