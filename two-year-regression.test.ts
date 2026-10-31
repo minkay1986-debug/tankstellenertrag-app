@@ -227,3 +227,55 @@ Deno.test("scenario audit: simultaneous signals rank ahead of a single-signal gr
   assert(rows[0].g.id==="backshop","Group with more independent signals should rank ahead of single-signal group");
   assert(rows[0].reasons.length>rows[1].reasons.length,"Priority ordering did not reflect number of reasons");
 });
+
+Deno.test("operator settings: revenue, margin, shrink, write-off and stock thresholds are read from the saved configuration",()=>{
+  const rt=runtime(appFixture());
+  const key="2026-10";
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:50,shrink:4,writeoff:4,stock:400});
+  setScenarioGroup(rt,key,"backshop",{revenue:960,margin:49,shrink:6,writeoff:6,stock:420});
+  // The same synthetic data is evaluated against two deliberately different operator profiles.
+  rt.data.settings={...rt.data.settings,revenueDrop:3,marginDrop:.8,shrinkRate:.5,writeoffRate:.5,stockIncrease:4};
+  const permissive=rt.wowPriority(key).find((r:any)=>r.g.id==="backshop");
+  assert(!!permissive,"Lower configured limits should produce a review row");
+  assert(permissive.reasons.includes("Umsatz rückläufig"),"Configured 3% revenue threshold was ignored");
+  assert(permissive.reasons.some((x:string)=>x.includes("Ist-Marge")),"Configured 0.8 percentage-point margin threshold was ignored");
+  assert(permissive.reasons.includes("Schwund auffällig"),"Configured shrink threshold was ignored");
+  assert(permissive.reasons.includes("Abschriften auffällig"),"Configured write-off threshold was ignored");
+  assert(permissive.reasons.includes("Bestandsquote gestiegen"),"Configured 4% relative stock threshold was ignored");
+
+  rt.data.settings={...rt.data.settings,revenueDrop:5,marginDrop:1.5,shrinkRate:1,writeoffRate:1,stockIncrease:6};
+  const stricter=rt.wowPriority(key).find((r:any)=>r.g.id==="backshop");
+  assert(!stricter||!stricter.reasons.includes("Umsatz rückläufig"),"Revenue signal ignored the stricter 5% operator threshold");
+  assert(!stricter||!stricter.reasons.some((x:string)=>x.includes("Ist-Marge")),"Margin signal ignored the stricter 1.5 point operator threshold");
+  assert(!stricter||!stricter.reasons.includes("Schwund auffällig"),"Shrink signal ignored the stricter 1% operator threshold");
+  assert(!stricter||!stricter.reasons.includes("Abschriften auffällig"),"Write-off signal ignored the stricter 1% operator threshold");
+  assert(!stricter||!stricter.reasons.includes("Bestandsquote gestiegen"),"Stock signal ignored the stricter 6% operator threshold");
+});
+
+Deno.test("operator settings: per-category target margins flow into the real calculation without universal target assumptions",()=>{
+  const rt=runtime(appFixture());
+  const key="2026-10";
+  rt.data.settings.targetMargins={...rt.data.settings.targetMargins,backshop:43.7,kaffee:67.3,getraenke:38.4};
+  const d=rt.calc(key);
+  const target=(id:string)=>d.groups.find((g:any)=>g.id===id)?.margin;
+  assert(target("backshop")===43.7,"Backshop must use the operator-entered 43.7% target");
+  assert(target("kaffee")===67.3,"Coffee must use the operator-entered 67.3% target");
+  assert(target("getraenke")===38.4,"Drinks must use the operator-entered 38.4% target");
+  assert(target("drogerie")===50,"Unchanged category must retain its own configured/default value, not inherit another category's target");
+  rt.data.settings.targetMargins.backshop=61.1;
+  assert(rt.calc(key).groups.find((g:any)=>g.id==="backshop")?.margin===61.1,"Changing the operator target must immediately change the calculated target field");
+});
+
+Deno.test("operator settings: threshold boundary behavior follows each entered value, not test fixture defaults",()=>{
+  const rt=runtime(appFixture());
+  const key="2026-10";
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:400});
+  setScenarioGroup(rt,key,"backshop",{revenue:970,margin:48.75,shrink:9.7,writeoff:9.7,stock:420});
+  rt.data.settings={...rt.data.settings,revenueDrop:3,marginDrop:1.25,shrinkRate:1,writeoffRate:1,stockIncrease:5};
+  const at=rt.wowPriority(key).find((r:any)=>r.g.id==="backshop");
+  assert(!!at,"Signals exactly at configured boundaries must be retained");
+  assert(at.reasons.includes("Umsatz rückläufig"),"Revenue decline exactly at the entered 3% boundary must trigger");
+  assert(at.reasons.some((x:string)=>x.includes("Ist-Marge")),"Margin drop exactly at the entered 1.25 point boundary must trigger");
+  assert(at.reasons.includes("Schwund auffällig")&&at.reasons.includes("Abschriften auffällig"),"Rates above their entered 1% boundaries must trigger");
+  assert(at.reasons.includes("Bestandsquote gestiegen"),"Stock ratio increase exactly at the entered 5% relative boundary must trigger");
+});
