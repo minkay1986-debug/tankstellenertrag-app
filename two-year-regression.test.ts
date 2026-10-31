@@ -206,14 +206,14 @@ Deno.test("scenario audit: rising stock ratio triggers at the configured inclusi
   const above=scenarioRow(rt);
   assert(!!above&&above.reasons.includes("Bestandsquote gestiegen"),"Stock-ratio increase above 5% was missed");
 });
-Deno.test("scenario audit: seasonal January drop is flagged against December even when year-on-year is flat",()=>{
+Deno.test("scenario audit: seasonal January drop is contextualized against the same month last year",()=>{
   const rt=runtime(appFixture());
   const jan25=rt.data.months["2025-01"].groups.backshop.revenue;
   const dec25=rt.data.months["2025-12"].groups.backshop.revenue;
   setScenarioGroup(rt,"2025-12","backshop",{revenue:dec25,margin:52,shrink:2,writeoff:2,stock:dec25*.4});
   setScenarioGroup(rt,"2026-01","backshop",{revenue:jan25,margin:52,shrink:2,writeoff:2,stock:jan25*.4});
   const r=scenarioRow(rt,"2026-01");
-  assert(!!r&&r.reasons.includes("Umsatz rückläufig"),"Expected current month-on-month rule to flag the seasonal December-to-January decline");
+  assert(!r||!r.reasons.includes("Umsatz rückläufig"),"Flat year-on-year January should not be flagged solely because December was higher");
   assert(Math.abs(rt.data.months["2026-01"].groups.backshop.revenue/rt.data.months["2025-01"].groups.backshop.revenue-1)<.001,"January year-on-year must be flat in this scenario");
 });
 Deno.test("scenario audit: simultaneous signals rank ahead of a single-signal group",()=>{
