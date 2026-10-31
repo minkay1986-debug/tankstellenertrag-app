@@ -322,7 +322,7 @@ Deno.test("seasonal context retains real year-on-year decline and independent op
 Deno.test("missing prior-year same-month data does not suppress month-on-month sales review",()=>{
   const rt=runtime(appFixture());
   delete rt.data.months["2025-01"];
-  setScenarioGroup(rt,"2025-12","backshop",{revenue:1200,margin:52,shrink:0,writeoff:0,stock:480});
+  setScenarioGroup(rt,"2025-12","backshop",{revenue:25000,margin:52,shrink:0,writeoff:0,stock:10000});
   const r=scenarioRow(rt,"2026-01");
   assert(!!r&&r.reasons.includes("Umsatz rückläufig"),"Without prior-year same-month data, configured month-on-month logic remains active");
 });
