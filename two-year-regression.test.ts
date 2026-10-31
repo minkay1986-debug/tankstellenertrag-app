@@ -128,7 +128,7 @@ Deno.test("advice potential is only calculated for matching detected shrink/writ
   const potential=appFunction("potentialHtml","wowCard",["r","measurePotential","eur"],{measurePotential:measure,eur});
   const salesOnly={reasons:["Umsatz rückläufig"],g:{shrink:128,writeoff:64}};
   assert(measure(salesOnly).length===0,"Sales-only alert must not inherit unrelated shrink/write-off euro potential");
-  assert(potential(salesOnly,measure,eur).includes("kein pauschaler Gewinnbetrag")||potential(salesOnly).includes("kein Euro-Betrag")||potential(salesOnly).includes("kein"),"Sales-only advice must explain why no euro potential is calculated");
+  assert(potential(salesOnly,measure,eur).includes("Vergleichbarer Vormonatsumsatz fehlt"),"Sales-only advice must name the missing comparison/source data instead of a blanket no-potential statement");
   const shrinkOnly={reasons:["Schwund auffällig"],g:{shrink:128,writeoff:64},dataStatus:{shrinkSourceAvailable:true}};
   const parts=measure(shrinkOnly);
   assert(parts.length===1&&parts[0].label==="Schwund","Only the detected shrink signal may contribute");
