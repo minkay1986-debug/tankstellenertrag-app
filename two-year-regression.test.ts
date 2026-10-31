@@ -182,6 +182,7 @@ Deno.test("scenario audit: severe target-margin shortfall without month-on-month
   const rt=runtime(appFixture());
   setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:45,shrink:2,writeoff:2,stock:400});
   setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,margin:45,shrink:2,writeoff:2,stock:400});
+  rt.data.settings.targetMargins={...rt.data.settings.targetMargins,backshop:59.2};
   const r=scenarioRow(rt);
   assert(!!r&&r.reasons.includes("Ist-Marge unter Ihrem Zielwert"),"Stable but below-target margin must independently trigger using the configured category target");
   assert(r.reasons.every((x:string)=>!x.includes("gefallen")),"A stable margin must not be mislabeled as a month-on-month decline");
@@ -303,7 +304,7 @@ Deno.test("target-margin trigger follows a changed target and requires entered E
 Deno.test("same-month prior-year comparison contextualizes a seasonal sales drop",()=>{
   const rt=runtime(appFixture());
   const jan25=rt.data.months["2025-01"].groups.backshop.revenue;
-  setScenarioGroup(rt,"2025-12","backshop",{revenue:1200,margin:52,shrink:0,writeoff:0,stock:480});
+  setScenarioGroup(rt,"2025-12","backshop",{revenue:jan25*1.4,margin:52,shrink:0,writeoff:0,stock:jan25*.56});
   setScenarioGroup(rt,"2026-01","backshop",{revenue:jan25,margin:52,shrink:0,writeoff:0,stock:jan25*.4});
   const r=scenarioRow(rt,"2026-01");
   assert(!r||!r.reasons.includes("Umsatz rückläufig"),"Flat year-on-year January must not be treated as unexplained seasonal decline");
@@ -311,7 +312,7 @@ Deno.test("same-month prior-year comparison contextualizes a seasonal sales drop
 Deno.test("seasonal context retains real year-on-year decline and independent operational alerts",()=>{
   const rt=runtime(appFixture());
   const jan25=rt.data.months["2025-01"].groups.backshop.revenue;
-  setScenarioGroup(rt,"2025-12","backshop",{revenue:1200,margin:52,shrink:0,writeoff:0,stock:480});
+  setScenarioGroup(rt,"2025-12","backshop",{revenue:25000,margin:52,shrink:0,writeoff:0,stock:10000});
   setScenarioGroup(rt,"2026-01","backshop",{revenue:jan25*.8,margin:48,shrink:25,writeoff:0,stock:jan25*.32});
   const r=scenarioRow(rt,"2026-01");
   assert(!!r&&r.reasons.includes("Umsatz rückläufig"),"Material year-on-year decline must remain visible");
