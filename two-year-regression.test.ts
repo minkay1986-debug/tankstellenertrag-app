@@ -148,3 +148,82 @@ Deno.test("threshold boundaries are inclusive and invalid optimizer inputs are n
   assert(missing.expectedRevenue===null&&missing.varianceEuro===null,"Missing baseline must not produce a fabricated euro variance");
   assert(missing.confidence==="low","Incomplete inputs must lower confidence");
 });
+
+
+/** Scenario audit: executes the unchanged production advice functions with synthetic data only. */
+function setScenarioGroup(rt:any,key:string,id:string,values:{revenue?:number;margin?:number;shrink?:number;writeoff?:number;stock?:number}) {
+  const g=rt.data.months[key].groups[id];
+  if(values.revenue!==undefined)g.revenue=values.revenue;
+  if(values.margin!==undefined){g.ek=g.revenue*(1-values.margin/100);g._ekEntered=true;}
+  if(values.shrink!==undefined)g.shrink=values.shrink;
+  if(values.writeoff!==undefined)g.writeoff=values.writeoff;
+  if(values.stock!==undefined)g.stock=values.stock;
+}
+function scenarioRow(rt:any,key="2026-10",id="backshop") {
+  return rt.wowPriority(key).find((r:any)=>r.g.id===id);
+}
+Deno.test("scenario audit: rising sales with falling margin flags the margin, not revenue",()=>{
+  const rt=runtime(appFixture());
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:55,shrink:2,writeoff:2,stock:400});
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:1100,margin:50,shrink:2,writeoff:2,stock:440});
+  const r=scenarioRow(rt);
+  assert(!!r&&r.reasons.some((x:string)=>x.includes("Ist-Marge")),"Margin deterioration was missed");
+  assert(!r.reasons.includes("Umsatz rückläufig"),"Rising sales must not be called declining");
+});
+Deno.test("scenario audit: falling sales with improving margin flags sales only",()=>{
+  const rt=runtime(appFixture());
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:400});
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:900,margin:55,shrink:2,writeoff:2,stock:360});
+  const r=scenarioRow(rt);
+  assert(!!r&&r.reasons.includes("Umsatz rückläufig"),"Sales decline was missed");
+  assert(!r.reasons.some((x:string)=>x.includes("Ist-Marge")),"Improving margin must not be called a margin drop");
+});
+Deno.test("scenario audit: severe target-margin shortfall without month-on-month deterioration is not triggered",()=>{
+  const rt=runtime(appFixture());
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:45,shrink:2,writeoff:2,stock:400});
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,margin:45,shrink:2,writeoff:2,stock:400});
+  const r=scenarioRow(rt);
+  assert(!r,"Stable metrics alone should not create a trend alert; target-margin gap is currently not an independent trigger");
+  assert(45<59.2,"Scenario must materially miss the configured target margin");
+});
+Deno.test("scenario audit: shrink and write-off are independently detected",()=>{
+  const rt=runtime(appFixture());
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:400});
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,margin:50,shrink:20,writeoff:2,stock:400});
+  const shrink=scenarioRow(rt);
+  assert(!!shrink&&shrink.reasons.includes("Schwund auffällig")&&!shrink.reasons.includes("Abschriften auffällig"),"Shrink-only scenario was not isolated");
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,margin:50,shrink:2,writeoff:8,stock:400});
+  const writeoff=scenarioRow(rt);
+  assert(!!writeoff&&writeoff.reasons.includes("Abschriften auffällig")&&!writeoff.reasons.includes("Schwund auffällig"),"Write-off-only scenario was not isolated");
+});
+Deno.test("scenario audit: rising stock ratio is detected only after relative threshold is crossed",()=>{
+  const rt=runtime(appFixture());
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:400});
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:420});
+  const below=scenarioRow(rt);
+  assert(!below?.reasons.includes("Bestandsquote gestiegen"),"A 5% relative increase is the threshold; exactly 5% should not exceed it due floating-point rounding");
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:424});
+  const above=scenarioRow(rt);
+  assert(!!above&&above.reasons.includes("Bestandsquote gestiegen"),"Stock-ratio increase above 5% was missed");
+});
+Deno.test("scenario audit: seasonal January drop is flagged against December even when year-on-year is flat",()=>{
+  const rt=runtime(appFixture());
+  const jan25=rt.data.months["2025-01"].groups.backshop.revenue;
+  const dec25=rt.data.months["2025-12"].groups.backshop.revenue;
+  setScenarioGroup(rt,"2025-12","backshop",{revenue:dec25,margin:52,shrink:2,writeoff:2,stock:dec25*.4});
+  setScenarioGroup(rt,"2026-01","backshop",{revenue:jan25,margin:52,shrink:2,writeoff:2,stock:jan25*.4});
+  const r=scenarioRow(rt,"2026-01");
+  assert(!!r&&r.reasons.includes("Umsatz rückläufig"),"Expected current month-on-month rule to flag the seasonal December-to-January decline");
+  assert(Math.abs(rt.data.months["2026-01"].groups.backshop.revenue/rt.data.months["2025-01"].groups.backshop.revenue-1)<.001,"January year-on-year must be flat in this scenario");
+});
+Deno.test("scenario audit: simultaneous signals rank ahead of a single-signal group",()=>{
+  const rt=runtime(appFixture());
+  setScenarioGroup(rt,"2026-09","backshop",{revenue:1000,margin:55,shrink:2,writeoff:2,stock:400});
+  setScenarioGroup(rt,"2026-10","backshop",{revenue:900,margin:50,shrink:20,writeoff:8,stock:500});
+  setScenarioGroup(rt,"2026-09","getraenke",{revenue:1000,margin:50,shrink:2,writeoff:2,stock:400});
+  setScenarioGroup(rt,"2026-10","getraenke",{revenue:900,margin:50,shrink:2,writeoff:2,stock:400});
+  const rows=rt.wowPriority("2026-10");
+  assert(rows.length>=2,"Expected two independently flagged groups");
+  assert(rows[0].g.id==="backshop","Group with more independent signals should rank ahead of single-signal group");
+  assert(rows[0].reasons.length>rows[1].reasons.length,"Priority ordering did not reflect number of reasons");
+});
