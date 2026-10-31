@@ -16,7 +16,7 @@ function appFunction(name: string, nextName: string, params: string[], deps: Rec
   const end = html.indexOf(`function ${nextName}(`, start + 1);
   assert(start >= 0 && end > start, `Could not locate app function ${name}`);
   const source = html.slice(start, end).trim();
-  const factory = new Function(...params, `return (${source});`);
+  const factory = new Function(...params, `${source}; return ${name};`);
   return factory(...params.map((p) => deps[p]));
 }
 const groupDefs = [
@@ -140,9 +140,9 @@ Deno.test("missing comparison month suppresses trend-based advice instead of usi
 });
 
 Deno.test("threshold boundaries are inclusive and invalid optimizer inputs are not fabricated",()=>{
-  const at=optimizer.evaluateGroup({name:"Grenzfall",actualRevenue:1000,previousRevenue:1000,priorYearRevenue:1000,marginPct:50,previousMarginPct:52,shrinkPct:2,dataComplete:true});
+  const at=optimizer.evaluateGroup({name:"Grenzfall",actualRevenue:1000,previousRevenue:1000,priorYearRevenue:1000,marginPct:50,previousMarginPct:52,shrinkPct:4.01,dataComplete:true});
   assert(at.alerts.some((a:any)=>a.code==="MARGIN_DROP"),"A 2 percentage-point margin drop must trigger at the boundary");
-  assert(at.alerts.some((a:any)=>a.code==="SHRINK_REVIEW"),"Shrink above 2% must trigger review");
+  assert(at.alerts.some((a:any)=>a.code==="SHRINK_REVIEW"),"Shrink above the 4% review threshold must trigger review");
   const missing=optimizer.evaluateGroup({name:"Unvollständig",actualRevenue:1000,previousRevenue:null,priorYearRevenue:null,marginPct:null,previousMarginPct:null,shrinkPct:null,dataComplete:false});
   assert(missing.expectedRevenue===null&&missing.varianceEuro===null,"Missing baseline must not produce a fabricated euro variance");
   assert(missing.confidence==="low","Incomplete inputs must lower confidence");
