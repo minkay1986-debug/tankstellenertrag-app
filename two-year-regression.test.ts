@@ -64,7 +64,7 @@ function runtime(data:any) {
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
     TEStudyContext:{htmlForReport:async()=>""},reportPriorityGuidance
   });
-  return {data,calc,wowPriority,yearly,report,practiceGuidance,riskForRow,scenarioResult,inventoryMetrics,dataQuality,learnCalendarEffects,target,prev};
+  return {data,calc,wowPriority,yearly,report,practiceGuidance,potentialHtml,reportPriorityGuidance,riskForRow,scenarioResult,inventoryMetrics,dataQuality,learnCalendarEffects,target,prev};
 }
 Deno.test("real app calc, year table and report reconcile across all 24 months",()=>{
   const rt=runtime(appFixture());
@@ -92,7 +92,7 @@ Deno.test("priority cards and monthly report share order, guidance and economic 
     const index=report.indexOf(heading);
     assert(index>previousIndex,"Report priority order must match the priority-card order: "+heading);
     previousIndex=index;
-    const scenario=potentialHtml(row);
+    const scenario=rt.potentialHtml(row);
     assert(report.includes(scenario),"Report must include the same potential/evidence block as the matching priority card: "+row.g.name);
     assert(report.includes(row.reasons.join(" · ")),"Report must retain the same evidence signals as the priority card: "+row.g.name);
   }
