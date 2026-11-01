@@ -1019,3 +1019,12 @@ Deno.test("measure economics never treats a missing modeled benefit as zero",()=
   assert(Math.abs(valid.firstMonthBalance-40)<.001,"First-month balance must additionally subtract one-time implementation cost");
   assert(Math.abs(valid.annualBalance-1580)<.001,"12-month balance must subtract one-time cost once");
 });
+
+Deno.test("operational advisor recommendations do not depend on article-level sales or stock data",()=>{
+  for(const obsolete of ["Absatz je Artikel","Artikelabsatz im vergleichbaren Zeitraum","Stückabsatz","EK je Einheit","Vergleiche je Getränk Artikelabsatz","konkrete Streichliste je Artikel"]){
+    assert(!html.includes(obsolete),"Article-level recommendation remains in the application: "+obsolete);
+  }
+  for(const required of ["Warengruppenumsatz","bestätigten Bestandswert","Wareneinsatzquote","Warengruppensummen"]){
+    assert(html.includes(required),"Category-level advisory basis missing: "+required);
+  }
+});
