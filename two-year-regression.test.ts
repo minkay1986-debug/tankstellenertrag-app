@@ -54,15 +54,15 @@ function runtime(data:any) {
   const practiceGuidance = appFunction("practiceGuidance","measurePotential",["esc"],{esc});
   const measurePotential = appFunction("measurePotential","potentialHtml",["r"],{});
   const potentialHtml = appFunction("potentialHtml","wowCard",["measurePotential","eur"],{measurePotential,eur});
-  (globalThis as any).potentialHtml = potentialHtml;
+  const reportPriorityGuidance = appFunction("reportPriorityGuidance","wowCard",["practiceGuidance","potentialHtml"],{practiceGuidance,potentialHtml});
   const riskLevel = appFunction("riskLevel","riskForRow",[],{});
   const riskForRow = appFunction("riskForRow","riskSummary",["settings","riskLevel"],{settings,riskLevel});
   const grossSafe = (v:number|null) => v===null?0:(Number(v)||0);
   const scenarioResult = appFunction("scenarioResult","simulation",["grossSafe"],{grossSafe});
-  const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext","practiceGuidance","potentialHtml"],{
+  const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext","reportPriorityGuidance"],{
     calc,month:()=> "2026-10",settings,wowPriority,prev,eur,pct,esc:(v:unknown)=>String(v??""),$:(id:string)=>target,
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
-    TEStudyContext:{htmlForReport:async()=>""},practiceGuidance,potentialHtml
+    TEStudyContext:{htmlForReport:async()=>""},reportPriorityGuidance
   });
   return {data,calc,wowPriority,yearly,report,practiceGuidance,riskForRow,scenarioResult,inventoryMetrics,dataQuality,learnCalendarEffects,target,prev};
 }
