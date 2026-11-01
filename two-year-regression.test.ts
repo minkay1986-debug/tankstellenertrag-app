@@ -29,7 +29,7 @@ function appFixture() {
   for (const m of months) {
     const groupRevenue = m.revenue / 8;
     const groups: Record<string,any> = {};
-    for (const [id,,target] of groupDefs) groups[id] = {revenue:id==="waschen"?0:groupRevenue,ek:id==="waschen"?0:groupRevenue*(1-m.marginPct/100),margin:target,shrink:id==="waschen"?0:id==="backshop"&&m.key==="2026-10"?groupRevenue*.032:groupRevenue*.008,writeoff:id==="waschen"?0:groupRevenue*.002,_shrinkEntered:id!=="waschen",_writeoffEntered:id!=="waschen",stock:groupRevenue*.4,_stockEntered:true,openingStock:groupRevenue*.42,_openingStockEntered:true};
+    for (const [id,,target] of groupDefs) groups[id] = {revenue:id==="waschen"?0:groupRevenue,_revenueEntered:id!=="waschen",ek:id==="waschen"?0:groupRevenue*(1-m.marginPct/100),margin:target,shrink:id==="waschen"?0:id==="backshop"&&m.key==="2026-10"?groupRevenue*.032:groupRevenue*.008,writeoff:id==="waschen"?0:groupRevenue*.002,_shrinkEntered:id!=="waschen",_writeoffEntered:id!=="waschen",stock:groupRevenue*.4,_stockEntered:true,openingStock:groupRevenue*.42,_openingStockEntered:true};
     data.months[m.key] = {revenue:m.revenue,ek:m.ek,shrink:m.revenue*m.shrinkPct/100,writeoff:m.revenue*.002,stock:m.revenue*.4,sourceMonthly:true,sourceEK:true,sourceShrink:true,sourceInventory:true,groups};
   }
   return data;
