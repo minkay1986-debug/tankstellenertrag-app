@@ -41,6 +41,8 @@ function runtime(data:any) {
   const prev = (k:string) => {const [y,mo]=k.split("-").map(Number);const d=new Date(y,mo-2,1);const p=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;return Object.hasOwn(data.months,p)?p:null;};
   const calc = appFunction("calc","reconciliation",["GROUPS","data","settings","mrow"],{GROUPS,data,settings,mrow});
   const inventoryMetrics = appFunction("inventoryMetrics","reconciliation",["g","days"],{});
+  const dataQuality = appFunction("dataQuality","hasData",["mrow","calc","prev","eur"],{mrow,calc,prev,eur});
+  const learnCalendarEffects = appFunction("learnCalendarEffects","forecastSeason",["months","calFn","calcFn","station"],{station:{city:"Testort"}});
   const wowPriority = appFunction("wowPriority","riskLevel",["calc","prev","settings","data","inventoryMetrics"],{calc,prev,settings,data,inventoryMetrics});
   const keys = () => Object.keys(data.months).sort();
   const eur = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Number(v)||0);
@@ -58,7 +60,7 @@ function runtime(data:any) {
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
     TEStudyContext:{htmlForReport:async()=>""},practiceGuidance
   });
-  return {data,calc,wowPriority,yearly,report,practiceGuidance,riskForRow,scenarioResult,inventoryMetrics,target,prev};
+  return {data,calc,wowPriority,yearly,report,practiceGuidance,riskForRow,scenarioResult,inventoryMetrics,dataQuality,learnCalendarEffects,target,prev};
 }
 Deno.test("real app calc, year table and report reconcile across all 24 months",()=>{
   const rt=runtime(appFixture());
@@ -510,4 +512,31 @@ Deno.test("avoidable excess stock is only estimated above both target and operat
   assert(Math.abs(withFloor.avoidableExcessCapital-850)<.01,"Avoidable capital must be measured above the higher of target stock and operational minimum");
   const floorHigher=metric({...base,operationalMinStockEntered:true,operationalMinStockEK:4300},31);
   assert(floorHigher.avoidableExcessCapital===0,"No avoidable capital when operational minimum exceeds actual stock");
+});
+
+Deno.test("data quality treats possible negative gross margin and high shrink as review hints, not hard errors",()=>{
+  const rt=runtime(appFixture()),key="2026-10",m=rt.data.months[key];
+  m.revenue=1000;m.ek=1200;m.shrink=1400;
+  m.groups.backshop.revenue=100;m.groups.backshop.shrink=150;
+  const q=rt.dataQuality(key);
+  assert(q.errors.length===0,"Economically possible negative gross margin / high shrink must not be classified as hard data errors");
+  assert(q.status==="check","Plausibility anomalies should create a single review state");
+  assert(q.notes.some((x:string)=>x.includes("negativen Rohertrag")),"Negative gross margin needs a contextual review hint");
+  assert(q.notes.some((x:string)=>x.includes("Schwund liegt über dem Shop-Umsatz")),"High total shrink needs a contextual review hint");
+  assert(q.notes.some((x:string)=>x.includes("Backwaren")||x.includes("Backshop")),"High group shrink needs a contextual review hint");
+});
+Deno.test("seasonal event learning normalizes revenue by actual calendar days",()=>{
+  const learn=appFunction("learnCalendarEffects","forecastSeason",["months","calFn","calcFn","station"],{station:{city:"Testort"}});
+  const result=learn(["2025-02","2024-02"],()=>({holidays:[{name:"Nikolaus"}],upcoming:[]}),k=>({revenue:k==="2025-02"?2800:2900}));
+  assert(result.length===1&&result[0].observations===2,"Two observed event months should be retained");
+  assert(Math.abs(result[0].avgDailyRevenue-100)<.001,"Leap-year February and standard February must be compared on daily revenue, not raw monthly totals");
+  assert(result[0].method==="Umsatz je Kalendertag","Seasonal method must be explicitly identified");
+});
+Deno.test("potential display labels 25% and 10% rates as assumptions, not evidence",()=>{
+  assert(html.includes("Modellannahme 25 %")&&html.includes("Modellannahme 10 %"),"Scenario rates must be visibly labeled as model assumptions");
+  assert(html.includes("keine empirisch belegten Erfolgsquoten"),"Potential disclaimer must say the rates are not empirically established success rates");
+});
+Deno.test("knowledge article SEO keywords never contain undefined",()=>{
+  const articlePaths=["wissen/backshop-tankstelle.html","wissen/marge-tankstellenshop.html","wissen/rohertrag-tankstellenshop.html","wissen/sortiment-tankstellenshop.html","wissen/warenwirtschaft-tankstelle.html"];
+  for(const path of articlePaths) assert(!html.includes('<meta name="keywords" content="undefined">'),"Main app should not carry undefined keyword metadata");
 });
