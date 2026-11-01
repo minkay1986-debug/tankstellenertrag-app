@@ -60,7 +60,7 @@ function runtime(data:any) {
   const riskLevel = appFunction("riskLevel","riskForRow",[],{});
   const riskForRow = appFunction("riskForRow","riskSummary",["settings","riskLevel"],{settings,riskLevel});
   const wowCard = appFunction("wowCard","knowledgeWhy",["riskForRow","eur","pct","esc","reportPriorityGuidance"],{riskForRow,eur,pct,esc,reportPriorityGuidance});
-  const grossSafe = (v:number|null) => v===null?0:(Number(v)||0);
+  const grossSafe = appFunction("grossSafe","scenarioResult",[],{});
   const scenarioResult = appFunction("scenarioResult","simulation",["grossSafe"],{grossSafe});
   const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext","reportPriorityGuidance"],{
     calc,month:()=> "2026-10",settings,wowPriority,prev,eur,pct,esc:(v:unknown)=>String(v??""),$:(id:string)=>target,
@@ -1027,4 +1027,10 @@ Deno.test("operational advisor recommendations do not depend on article-level sa
   for(const required of ["Warengruppenumsatz","bestätigten Bestandswert","Wareneinsatzquote","Warengruppensummen"]){
     assert(html.includes(required),"Category-level advisory basis missing: "+required);
   }
+});
+
+Deno.test("simulation safe-number helper is present in production and handles missing values",()=>{
+  const safe=appFunction("grossSafe","scenarioResult",[],{});
+  assert(safe(null)===0&&safe(undefined)===0,"Missing numeric scenario components must safely contribute zero");
+  assert(safe("12.5")===12.5&&safe("invalid")===0,"Scenario helper must safely normalize numeric inputs");
 });
