@@ -54,6 +54,7 @@ function runtime(data:any) {
   const practiceGuidance = appFunction("practiceGuidance","measurePotential",["esc"],{esc});
   const measurePotential = appFunction("measurePotential","potentialHtml",["r"],{});
   const potentialHtml = appFunction("potentialHtml","wowCard",["measurePotential","eur"],{measurePotential,eur});
+  (globalThis as any).potentialHtml = potentialHtml;
   const riskLevel = appFunction("riskLevel","riskForRow",[],{});
   const riskForRow = appFunction("riskForRow","riskSummary",["settings","riskLevel"],{settings,riskLevel});
   const grossSafe = (v:number|null) => v===null?0:(Number(v)||0);
