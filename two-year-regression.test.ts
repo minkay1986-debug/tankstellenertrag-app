@@ -136,7 +136,7 @@ Deno.test("advice potential is only calculated for matching detected shrink/writ
   assert(potential(salesOnly,measure,eur).includes("Vergleichbarer Vormonatsumsatz fehlt"),"Sales-only advice must name the missing comparison/source data instead of a blanket no-potential statement");
   const shrinkOnly={reasons:["Schwund auffällig"],g:{shrink:128,writeoff:64},dataStatus:{shrinkSourceAvailable:true}};
   const parts=measure(shrinkOnly);
-  assert(parts.length===1&&parts[0].label==="Schwund reduzieren","Only the detected shrink signal may contribute");
+  assert(parts.length===1&&parts[0].label.includes("Schwund reduzieren")&&parts[0].label.includes("Modellannahme 10 %"),"Only the detected shrink signal may contribute");
   assert(Math.abs(parts[0].amount-12.8)<.001,"Shrink scenario must calculate 10% of the monthly shrink amount");
   const combined={reasons:["Schwund auffällig","Abschriften auffällig"],g:{shrink:128,writeoff:64},dataStatus:{shrinkSourceAvailable:true}};
   assert(measure(combined).length===2,"Both signals may be shown separately, with overlap warning");
@@ -522,7 +522,7 @@ Deno.test("data quality treats possible negative gross margin and high shrink as
   const q=rt.dataQuality(key);
   assert(q.errors.length===0,"Economically possible negative gross margin / high shrink must not be classified as hard data errors");
   assert(q.status==="check","Plausibility anomalies should create a single review state");
-  assert(q.notes.some((x:string)=>x.includes("negativen Rohertrag")),"Negative gross margin needs a contextual review hint");
+  assert(q.notes.some((x:string)=>x.includes("negativer Rohertrag")),"Negative gross margin needs a contextual review hint");
   assert(q.notes.some((x:string)=>x.includes("Schwund liegt über dem Shop-Umsatz")),"High total shrink needs a contextual review hint");
   assert(q.notes.some((x:string)=>x.includes("Backwaren")||x.includes("Backshop")),"High group shrink needs a contextual review hint");
 });
