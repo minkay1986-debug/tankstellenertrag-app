@@ -951,6 +951,10 @@ Deno.test("cause diagnosis decomposes category gross-profit change and preserves
   assert(Math.abs(revenueEffect+costRatioEffect-expectedGrossChange)<.001,"Category effects must reconcile exactly to the gross-profit change");
   assert(diagnosis.some((x:any)=>x.title==="Umsatzeffekt auf den Rohertrag"&&x.detail.includes("Absatzmenge lassen sich ohne Mengendaten nicht voneinander trennen")),"Revenue effect must state the quantity-data limitation");
   assert(diagnosis.some((x:any)=>x.title==="Wareneinsatzquote verändert"&&x.detail.includes("Belastung")),"Cost-ratio effect must identify the adverse impact");
+  assert(diagnosis.some((x:any)=>x.title==="Wareneinsatzquote verändert"&&x.state==="proven"),"The cost-ratio effect is a confirmed arithmetic bridge even when it is adverse");
+  current.ek=6600;
+  const improved=rt.causeDiagnosis({id:"backshop",name:"Backwaren"},"2026-10");
+  assert(improved.some((x:any)=>x.title==="Wareneinsatzquote verändert"&&x.detail.includes("Entlastung")),"A lower cost ratio must be described as a gross-profit relief, not a burden");
   assert(!diagnosis.some((x:any)=>/Artikelnummer|Einzelartikel|Artikelmenge|SKU/i.test(x.title+" "+x.detail)),"Diagnosis must not request article-level data");
 });
 
