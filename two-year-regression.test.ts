@@ -618,3 +618,9 @@ Deno.test("advisor chat does not rank groups or calculate shop totals when EK is
   assert(advisor.includes("lossAvailable=d.sourceShrink===true"),"Loss advice must gate totals on confirmed loss data");
   assert(advisor.includes("comparisonAvailable=lossAvailable&&p?.sourceShrink===true"),"Loss comparisons must require both source periods");
 });
+
+Deno.test("customer-facing advisor answers contain no test-only wording",()=>{
+  const start=html.indexOf("function advisorDirectAnswer"),end=html.indexOf("function advisorReplyBase",start);
+  const direct=html.slice(start,end);
+  assert(!/aktuellen Test|Testzustand|Testdaten/i.test(direct),"Test-only wording must not appear in customer-facing direct answers");
+});
