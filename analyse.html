@@ -396,6 +396,8 @@ p,.muted,.subtle,.description{color:rgba(218,231,247,.82)}
 
 <style id="expandable-priority-cards-2026-10-30">
 .wow-details{margin-top:12px;border-top:1px solid rgba(174,182,188,.18);padding-top:9px}
+/* Accordion-Inhalte auf allen Browsern zuverlässig geschlossen halten. */
+.wow-details:not([open])> :not(summary),.tse-accordion:not([open])> :not(summary),.analysis-accordion:not([open])> :not(summary),.report-guidance-step:not([open])> :not(summary){display:none!important}
 .wow-details summary{display:flex;align-items:center;gap:8px;min-height:40px;cursor:pointer;list-style:none;color:var(--o);font-size:12px;font-weight:800;user-select:none}
 .wow-details summary::-webkit-details-marker{display:none}
 .wow-details summary:after{content:"＋";margin-left:auto;font-size:17px;line-height:1;color:var(--o)}
@@ -559,17 +561,17 @@ function radarGuidance(r){
  if(!checks.length)checks.push('Zuerst Monatsdaten und Vergleichszeitraum auf Vollständigkeit prüfen.');
  return {explain,checks};
 }
-function wrapRadarAccordion(node,title,subtitle,open=false){
+function wrapRadarAccordion(node,title,subtitle){
  if(!node||node.dataset.radarAccordion==='1')return;
  const parent=node.parentNode;if(!parent)return;
- const details=document.createElement('details');details.className='tse-accordion radar-section-accordion';if(open)details.open=true;
+ const details=document.createElement('details');details.className='tse-accordion radar-section-accordion';
  const summary=document.createElement('summary');summary.innerHTML='<span class="tse-accordion-title">'+esc(title)+'<span class="tse-accordion-sub">'+esc(subtitle||'Bei Bedarf öffnen')+'</span></span><span class="tse-accordion-icon" aria-hidden="true"></span>';
  const content=document.createElement('div');content.className='tse-accordion-content';parent.insertBefore(details,node);content.append(node);details.append(summary,content);node.dataset.radarAccordion='1';
 }
 function enhanceRadarAccordions(){
  const view=$('radar');if(!view)return;
  const panels=[...view.querySelectorAll(':scope > .panel')];
- panels.forEach((panel,i)=>{const h=panel.querySelector(':scope > h2');const eyebrow=panel.querySelector(':scope > .eyebrow');const title=h?.textContent?.trim()||eyebrow?.textContent?.trim()||'Ertragsradar-Bereich';wrapRadarAccordion(panel,title,'Inhalt und Eingaben öffnen',i===0)});
+ panels.forEach((panel,i)=>{const h=panel.querySelector(':scope > h2');const eyebrow=panel.querySelector(':scope > .eyebrow');const title=h?.textContent?.trim()||eyebrow?.textContent?.trim()||'Ertragsradar-Bereich';wrapRadarAccordion(panel,title,'Inhalt und Eingaben öffnen')});
  const allDetails=[...view.querySelectorAll('.radar-section-accordion')];
  const own=allDetails.find(d=>/Mögliche Ursachen|eigene Prüffälle/i.test(d.querySelector('summary')?.textContent||''));
  if(own){
