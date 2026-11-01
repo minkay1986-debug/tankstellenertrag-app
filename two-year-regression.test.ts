@@ -596,7 +596,7 @@ Deno.test("simulation shows not calculable when neither margin nor loss sources 
   assert(result.total===null,"No available calculation component must not be shown as zero potential");
 });
 Deno.test("monthly overview displays the consolidated quality hint and guards margin comparisons",()=>{
-  assert(html.includes("dq.notes.slice(0,1).map(esc)"),"Monthly overview must show the one consolidated data-quality hint");
+  assert(html.includes("const qualityTone=dq.status")&&html.includes("dq.findings.map(f=>"),"Monthly overview must show the consolidated, expandable data-quality check");
   assert(html.includes("d.sourceEK===true&&p.sourceEK===true&&d.revenue>0&&p.revenue>0"),"Monthly margin comparison must require confirmed EK in both periods");
   assert(html.includes("d.sourceShrink===true&&d.revenue>0"),"Monthly shrink comparison must require a confirmed shrink source");
 });
