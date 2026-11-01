@@ -679,7 +679,7 @@ function advisorTestReply(data:any, key="2026-12") {
   const advisorReplyBase = appFunction("advisorReplyBase","advisorReply",
     ["advisorNorm","month","calc","prev","data","reconciliation","dataQuality","settings","GROUPS","inventoryMetrics","inventoryPeriodDays","wowPriority","potentialHtml"],
     {advisorNorm,month,calc:rt.calc,prev:rt.prev,data,reconciliation,dataQuality,settings,GROUPS:groupDefs,inventoryMetrics:rt.inventoryMetrics,inventoryPeriodDays,wowPriority:rt.wowPriority,potentialHtml});
-  const advisorGeneralGuidanceAnswer = appFunction("advisorGeneralGuidanceAnswer","advisorReplyBase",[],{});
+  const advisorGeneralGuidanceAnswer = appFunction("advisorGeneralGuidanceAnswer","advisorReplyBase",["advisorNorm"],{advisorNorm});
   return appFunction("advisorReply","initAdvisorChat",
     ["advisorScopeGuard","advisorNorm","advisorDirectAnswer","advisorGeneralGuidanceAnswer","advisorNoDataAnswer","advisorHasCurrentMonthData","advisorReplyBase","advisorKnowledgeHtml"],
     {advisorScopeGuard:()=>"",advisorNorm,advisorDirectAnswer,advisorGeneralGuidanceAnswer,
