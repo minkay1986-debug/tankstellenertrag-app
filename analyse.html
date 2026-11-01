@@ -604,14 +604,15 @@ function scenarioResult(g,rp,sp,wp,lossDataAvailable=true){
  const revenueGain=actualMargin===null?null:(newRev*actualMargin/100-g.revenue*actualMargin/100);
  const shrinkGain=lossDataAvailable?g.shrink*sp/100:null;
  const writeoffGain=lossDataAvailable?g.writeoff*wp/100:null;
- const total=grossSafe(revenueGain)+grossSafe(shrinkGain)+grossSafe(writeoffGain);
+ const hasCalculableComponent=revenueGain!==null||lossDataAvailable;
+ const total=hasCalculableComponent?grossSafe(revenueGain)+grossSafe(shrinkGain)+grossSafe(writeoffGain):null;
  return {newRev,actualMargin,revenueGain,shrinkGain,writeoffGain,total,lossDataAvailable};
 }
 function simulation(){
  const d=calc(month()),g=d.groups.find(x=>x.id===$('simGroup').value)||d.groups.find(x=>x.revenue>0);
  if(!g){$('simResult').innerHTML='<div class="card"><div class="label">Standard-Warengruppe</div><div class="small">Noch keine Warengruppe mit Umsatz erfasst.</div></div>';return}
  const rp=+$('simRevenue').value||0,sp=+$('simShrink').value||0,wp=+$('simWriteoff').value||0,res=scenarioResult(g,rp,sp,wp,d.sourceShrink===true);
- $('simResult').innerHTML=[['Berechenbare Komponenten / Monat','+'+eur(res.total)],['davon zusätzlicher Rohertrag aus Umsatz',res.revenueGain===null?'Nicht berechenbar · Ist-Marge fehlt':'+'+eur(res.revenueGain)],['davon Schwund',res.shrinkGain===null?'Nicht erfasst':'+'+eur(res.shrinkGain)],['davon Abschriften',res.writeoffGain===null?'Nicht erfasst':'+'+eur(res.writeoffGain)],['Berechenbare Komponenten / Jahr','+'+eur(res.total*12)]].map(x=>'<div class="card"><div class="label">'+x[0]+'</div><div class="value">'+x[1]+'</div></div>').join('');
+ $('simResult').innerHTML=[['Berechenbare Komponenten / Monat',res.total===null?'Nicht berechenbar':'+'+eur(res.total)],['davon zusätzlicher Rohertrag aus Umsatz',res.revenueGain===null?'Nicht berechenbar · Ist-Marge fehlt':'+'+eur(res.revenueGain)],['davon Schwund',res.shrinkGain===null?'Nicht erfasst':'+'+eur(res.shrinkGain)],['davon Abschriften',res.writeoffGain===null?'Nicht erfasst':'+'+eur(res.writeoffGain)],['Berechenbare Komponenten / Jahr',res.total===null?'Nicht berechenbar':'+'+eur(res.total*12)]].map(x=>'<div class="card"><div class="label">'+x[0]+'</div><div class="value">'+x[1]+'</div></div>').join('');
 }
 function renderCustomScenarioInputs(){
  const wrap=$('customScenarioInputs'); if(!wrap)return;
