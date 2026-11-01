@@ -829,3 +829,55 @@ Deno.test("two-year advisor routes plural critical-stock wording and prioritizat
   assert(priorities.includes("Priorisierte Prüffelder")&&priorities.includes("Backwaren:")&&priorities.includes("Spielzeug:")&&priorities.includes("Getränke:"),"Three next checks must be ranked from current signals. Actual: "+priorities);
   assert(!priorities.includes("Ich brauche noch eine konkrete Zielgröße")&&!priorities.includes("Ich ordne deine Frage noch nicht sicher zu"),"Priority question must not return generic clarification. Actual: "+priorities);
 });
+
+
+Deno.test("unconfirmed group revenue cannot create margins or comparison signals",()=>{
+  const data=appFixture();
+  const current=data.months["2026-10"],prior=data.months["2026-09"],priorYear=data.months["2025-10"];
+  current.groups.backshop.revenue=1000;current.groups.backshop._revenueEntered=true;current.groups.backshop.ek=700;current.groups.backshop._ekEntered=true;
+  prior.groups.backshop.revenue=2000;prior.groups.backshop._revenueEntered=false;prior.groups.backshop.ek=600;prior.groups.backshop._ekEntered=true;
+  priorYear.groups.backshop.revenue=5000;priorYear.groups.backshop._revenueEntered=false;priorYear.groups.backshop.ek=1000;priorYear.groups.backshop._ekEntered=true;
+  const rt=runtime(data);
+  assert(rt.calc("2026-09").groups.find((g:any)=>g.id==="backshop").actualMargin===null,"Unconfirmed prior revenue must not produce an actual margin");
+  const row=rt.wowPriority("2026-10").find((r:any)=>r.g.id==="backshop");
+  assert(row,"Current confirmed group should remain eligible for review");
+  assert(!row.reasons.some((x:string)=>x.includes("Ist-Marge liegt")),"Unconfirmed prior EK/revenue pair must not create a margin-drop signal");
+  assert(!row.reasons.includes("Umsatz rückläufig"),"Unconfirmed prior revenue must not create a sales-drop signal");
+  assert(row.seasonalContextAvailable===false&&row.priorYearRevenue===0,"Unconfirmed prior-year revenue must not suppress a real current trend");
+});
+
+Deno.test("advisor labels unconfirmed monthly and group revenue instead of quoting stale amounts",()=>{
+  const data=appFixture();
+  data.months["2026-10"].revenue=987654;
+  data.months["2026-10"].sourceMonthly=false;
+  data.months["2026-10"].groups.backshop.revenue=9876;
+  data.months["2026-10"].groups.backshop._revenueEntered=false;
+  data.months["2026-10"].groups.backshop.ek=1234;
+  data.months["2026-10"].groups.backshop._ekEntered=true;
+  const reply=advisorTestReply(data,"2026-10");
+  const sales=reply("Warum ist mein Umsatz gesunken?");
+  assert(sales.includes("Shop-Umsatz aktuell: nicht bestätigt")&&!sales.includes("987.654"),"Sales advice must not quote unconfirmed shop revenue");
+  const margin=reply("Wie ist die Marge bei Backwaren?");
+  assert(margin.includes("Umsatz nicht bestätigt")&&!margin.includes("9.876,00"),"Group margin advice must not quote stale group revenue");
+  const order=reply("Welche Warengruppen haben den niedrigsten Umsatz und wo sollte ich nachbestellen?");
+  assert(!order.includes("Backwaren (9.876,00"),"Ordering advice must not rank unconfirmed stale group revenue");
+});
+
+Deno.test("all merchandise group guidance remains category-specific",()=>{
+  const rt=runtime(appFixture());
+  const guidance=(id:string)=>rt.practiceGuidance({g:{id,name:id},reasons:["Ist-Marge unter Ihrem Zielwert"],dataStatus:{groupEkAvailable:true,previousMonthAvailable:true}});
+  const expected:Record<string,string[]> = {
+    getraenke:["Pfand","Gebindegrößen"],
+    kaffee:["Rezepturen","Bohnenmenge"],
+    backshop:["Backintervalle","Tageszeit-Abverkauf"],
+    "süsswaren":["Langsamdreher","Mindesthaltbarkeit"],
+    drogerie:["Sortimentstiefe","Doppelartikel"],
+    lebensmittel:["Frische","MHD"],
+    spielzeug:["Saison","Regalfläche"],
+    eis:["Kühltruhen","Temperatur"]
+  };
+  for(const [id,terms] of Object.entries(expected)){
+    const text=guidance(id);
+    for(const term of terms)assert(text.toLowerCase().includes(term.toLowerCase()),id+" guidance missing "+term);
+  }
+});
