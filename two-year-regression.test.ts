@@ -600,3 +600,12 @@ Deno.test("monthly overview displays the consolidated quality hint and guards ma
   assert(html.includes("d.sourceEK===true&&p.sourceEK===true&&d.revenue>0&&p.revenue>0"),"Monthly margin comparison must require confirmed EK in both periods");
   assert(html.includes("d.sourceShrink===true&&d.revenue>0"),"Monthly shrink comparison must require a confirmed shrink source");
 });
+
+Deno.test("analysis view never reports missing EK or shrink as zero and gates month comparisons",()=>{
+  const analysis=html.slice(html.indexOf("function analysis()"),html.indexOf("function renderCustomScenarioInputs"));
+  assert(analysis.includes("d.sourceEK?eur(d.ek):'Nicht erfasst'"),"Analysis must mark missing EK");
+  assert(analysis.includes("d.sourceEK?eur(d.gross):'Nicht berechenbar · EK fehlt'"),"Analysis must not present false gross profit");
+  assert(analysis.includes("d.sourceShrink?eur(g.shrink):'Nicht erfasst'"),"Analysis must not show missing group shrink as zero");
+  assert(analysis.includes("d.sourceMonthly&&p.sourceMonthly"),"Revenue comparison must require both source months");
+  assert(analysis.includes("d.sourceEK&&p.sourceEK&&d.revenue>0&&p.revenue>0"),"Margin comparison must require confirmed EK and positive sales in both months");
+});
