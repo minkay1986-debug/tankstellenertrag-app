@@ -125,13 +125,13 @@ Deno.test("actual app year renderer marks a partial year and includes inventory-
 Deno.test("practical guidance is actionable, prioritised and labels missing data",()=>{
   const rt=runtime(appFixture());
   const margin=rt.practiceGuidance({reasons:["Ist-Marge um 2 %-Pkt. gefallen"]});
-  assert(margin.includes("KONKRET ZUERST TUN")&&margin.includes("Netto-EK")&&margin.includes("ERFOLGSKONTROLLE"),"Margin guidance lacks concrete checks or measurable follow-up");
+  assert(margin.includes("KONKRET ZUERST TUN")&&margin.includes("Wareneinsatzquote")&&margin.includes("Kategorie-Verkaufspreise")&&margin.includes("ERFOLGSKONTROLLE"),"Margin guidance must use group-level checks and measurable follow-up");
   assert(margin.includes("DATENGRUNDLAGE")&&margin.includes("Warengruppen-EK fehlt")&&margin.includes("Vormonat fehlt"),"Missing inputs must be explicitly identified");
   const loss=rt.practiceGuidance({reasons:["Schwund auffällig","Abschriften auffällig","Bestandsquote gestiegen"]});
-  assert(loss.includes("Inventur")&&loss.includes("Warenzugänge")&&loss.includes("Bestandswert")&&loss.includes("DATENGRUNDLAGE"),"Loss/inventory guidance lacks relevant checks or data-quality notes");
+  assert(loss.includes("Inventur")&&loss.includes("Warenzugänge")&&loss.includes("Bestandswert")&&loss.includes("DATENGRUNDLAGE"),"Loss/inventory guidance must compare confirmed group movements and stock values");
   assert(!loss.includes("keine Bestellung oder Preisänderung automatisch ausgelöst"),"Remove irrelevant automated-action disclaimer");
   const sales=rt.practiceGuidance({reasons:["Umsatz rückläufig"]});
-  assert(sales.includes("Öffnungstage")&&sales.includes("drei Artikel")&&sales.includes("ERFOLGSKONTROLLE"),"Sales guidance must prioritise comparable trading days and a concrete follow-up");
+  assert(sales.includes("Umsatzveränderung")&&sales.includes("Mengendaten")&&sales.includes("ERFOLGSKONTROLLE"),"Sales guidance must explain the group-level comparison and its quantity-data limitation");
   assert(html.includes("'+practiceGuidance(r)+'</div>'")||html.includes("practiceGuidance(r)"),"Guidance is not wired into the real advisory tile/report renderer");
 });
 
