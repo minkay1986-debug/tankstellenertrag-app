@@ -737,3 +737,18 @@ Deno.test("unconfirmed group shrink and write-off values never become radar sign
   const scenario=rt.scenarioResult({...rt.calc("2026-10").groups.find((g:any)=>g.id==="backshop"),shrink:9999,writeoff:8888,shrinkEntered:false,writeoffEntered:false},0,50,50,true);
   assert(scenario.shrinkGain===null&&scenario.writeoffGain===null,"Unconfirmed group loss amounts must not be monetized in simulation");
 });
+
+
+Deno.test("annual report excludes zero-sales months from EK-backed gross profit and margin",()=>{
+  const data=appFixture();
+  data.months["2025-01"].revenue=0;
+  data.months["2025-01"].ek=10000;
+  data.months["2025-01"].sourceEK=true;
+  const expected=months.filter(m=>m.year===2025&&m.month!==1).reduce((sum,m)=>sum+m.revenue-m.ek,0);
+  const rt=runtime(data);
+  rt.yearly();
+  const row=String(rt.target.innerHTML).match(/<tr><td>2025<\/td>.*?<\/tr>/)?.[0]||"";
+  const formatted=new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(expected);
+  assert(row.includes(formatted),"Annual gross profit must use only months with both positive shop revenue and confirmed EK. Row: "+row);
+  assert(row.includes("11/12 Monate")||row.includes("11/12"),"Annual completeness must continue to show only 11 revenue months");
+});
