@@ -1545,21 +1545,32 @@ if(!out.length&&topicTerms){const featureList=[['Monatsvergleich','aktueller Mon
 if(!out.length){const hints=[['Marge / Rohertrag','Wie hat sich meine Marge verändert? Wo verliere ich Rohertrag?'],['Verlust / Bestand','Woher kommt die Bestandsdifferenz? Wie entwickeln sich Schwund und Abschriften?'],['Umsatz / Absatz','Warum ist mein Umsatz niedriger als im Vorjahr?'],['Wetter','Könnte das Wetter den Abverkauf beeinflusst haben?'],['Daten / Plattform','Welche Daten fehlen? Wo finde ich den Beratungsbericht?']];out.push('<b>Ich ordne deine Frage noch nicht sicher zu.</b><p>Ich möchte keine Ursache erfinden. Mit deinen vorhandenen Monatsdaten kann ich aber direkt diese Prüfungen starten:</p><ul>'+hints.map(x=>'<li><b>'+x[0]+':</b> '+x[1]+'</li>').join('')+'</ul><p><b>Aktueller Monat '+k+':</b> Umsatz '+money(d.revenue)+', Wareneinsatz '+(d.sourceEK?money(d.ek):'nicht erfasst')+', rechnerischer Rohertrag '+(d.sourceEK?money(d.gross):'nicht berechenbar')+', Rohertragsquote '+(d.sourceEK&&d.revenue>0?d.margin.toLocaleString('de-DE',{maximumFractionDigits:1})+' %':'nicht berechenbar')+'. Sag mir zum Beispiel, ob du die Abweichung zum Vormonat oder Vorjahr meinst und welche Warengruppe auffällig ist.</p>')}
 return out.join('')}
 
+function advisorEvidenceResponse(answer,kind){
+ if(!answer)return answer;
+ const labels={
+  data:{title:'DATENBEFUND',text:'Zahlen und Vergleiche in dieser Antwort beziehen sich auf die geladenen Stationsdaten. Als Befund gelten nur Werte, die für den jeweiligen Zeitraum und die Warengruppe tatsächlich erfasst und bestätigt sind. Fehlende Werte sind kein Nullwert.'},
+  guidance:{title:'FACHLICHE EINORDNUNG',text:'Diese Antwort enthält allgemeine Warenwirtschaftsregeln oder Prüfhypothesen. Sie belegt nicht, dass die beschriebene Ursache an dieser Station tatsächlich vorliegt.'},
+  missing:{title:'DATENLAGE',text:'Für eine individuelle wirtschaftliche Aussage fehlen bestätigte Stationsdaten. Die folgenden Hinweise sind allgemeine Prüfschritte und keine Feststellung über den Betrieb.'}
+ };
+ const label=labels[kind]||labels.guidance;
+ const footer='<section class="advisor-evidence-frame"><p><b>'+label.title+'</b><br>'+label.text+'</p><p><b>VERMUTUNG / URSACHE</b><br>Eine zeitliche Veränderung oder Auffälligkeit beweist für sich allein keine Ursache. Preis-, Mengen-, Mix-, Aktions- und Buchungseffekte nur dann als Ursache benennen, wenn sie durch passende Daten belegt sind; sonst ausdrücklich als Hypothese behandeln.</p><p><b>HANDLUNGSVORSCHLAG</b><br>Prüfschritte und Maßnahmen sind Empfehlungen. Eine Wirkung gilt erst nach Vergleich derselben bestätigten Kennzahl mit dokumentiertem Ausgangswert und geeignetem Folgezeitraum als beobachtet – nicht automatisch als durch die Maßnahme verursacht.</p></section>';
+ return answer+footer;
+}
 function advisorReply(raw){
  const scope=advisorScopeGuard(raw);
  if(scope)return scope;
  // Datenbasierte Priorisierung muss vor allgemeinen Direkt-/Rückfrageantworten laufen.
  const priorityQuery=advisorNorm(raw);
- if(/potenzial|wirtschaftlich|priorit|welche drei|drei dinge|erste drei|wichtigsten.{0,24}pruef|naechsten.{0,24}pruef|(?:drei|3).{0,32}(?:pruef|kontroll|massnahmen)|(?:pruef|kontroll|massnahmen).{0,32}(?:drei|3)/.test(priorityQuery))return advisorReplyBase(raw);
+ if(/potenzial|wirtschaftlich|priorit|welche drei|drei dinge|erste drei|wichtigsten.{0,24}pruef|naechsten.{0,24}pruef|(?:drei|3).{0,32}(?:pruef|kontroll|massnahmen)|(?:pruef|kontroll|massnahmen).{0,32}(?:drei|3)/.test(priorityQuery))return advisorEvidenceResponse(advisorReplyBase(raw),'data');
  const direct=advisorDirectAnswer(raw);
- if(direct)return direct;
+ if(direct)return advisorEvidenceResponse(direct,'guidance');
  const advisory=advisorGeneralGuidanceAnswer(raw);
- if(advisory)return advisory;
+ if(advisory)return advisorEvidenceResponse(advisory,'guidance');
  const noData=advisorNoDataAnswer(raw);
- if(noData&&!advisorHasCurrentMonthData())return noData;
+ if(noData&&!advisorHasCurrentMonthData())return advisorEvidenceResponse(noData,'missing');
  const base=advisorReplyBase(raw);
  const knowledge=advisorKnowledgeHtml(raw);
- return knowledge?base+knowledge:base;
+ return advisorEvidenceResponse(knowledge?base+knowledge:base,'data');
 }
 
 function initAdvisorChat(){const form=$('advisorChatForm'),input=$('advisorChatInput'),messages=$('advisorChatMessages');if(!form||form.dataset.ready)return;form.dataset.ready='1';const add=(role,text,html)=>{const el=document.createElement('div');el.className='chat-message '+role;const head=document.createElement('b');head.textContent=role==='user'?'Du':'TankstellenErtrag';el.appendChild(head);if(role==='user'){const p=document.createElement('p');p.textContent=text;el.appendChild(p)}else{const b=document.createElement('div');b.innerHTML=html;el.appendChild(b)}messages.appendChild(el)};form.addEventListener('submit',async e=>{e.preventDefault();e.stopPropagation();const q=input.value.trim();if(!q)return;add('user',q,'');const reply=document.createElement('div');reply.className='chat-message assistant';const head=document.createElement('b');head.textContent='TankstellenErtrag';reply.appendChild(head);const body=document.createElement('div');body.innerHTML='<p>Ich prüfe deine Frage …</p>';reply.appendChild(body);messages.appendChild(reply);input.value='';try{await advisorKnowledgePromise;const answer=advisorReply(q);body.innerHTML=answer||'<p>Die Auswertung lieferte keine Antwort. Bitte prüfe, ob Monatsdaten geladen sind.</p>'}catch(err){console.error('Beratungs-Chat Fehler:',err);body.innerHTML='<b>Die Auswertung ist fehlgeschlagen</b><p>Die Frage wurde verarbeitet, aber die Detailanalyse konnte nicht erstellt werden. Technischer Hinweis: '+String(err&&err.message||err).replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</p><p>Es wurden keine fehlenden Zahlen erfunden.</p>'}reply.scrollIntoView({block:'nearest',behavior:'smooth'})});$('advisorChatClear')?.addEventListener('click',()=>{messages.innerHTML='<div class="chat-message assistant"><b>TankstellenErtrag</b><p>Chat geleert. Stelle eine neue Frage.</p></div>'})}
