@@ -597,7 +597,7 @@ function practiceGuidance(r){
  if(has('marge'))checks.push('Wareneinsatzquote und Rohertrag der Warengruppe mit dem Vormonat vergleichen; aktuelle EK-Konditionen und Kategorie-Verkaufspreise anhand der vorhandenen Belege prüfen.');
  if(has('umsatz'))checks.push('Umsatz der Warengruppe mit Vormonat und Vorjahresmonat vergleichen; ohne Mengendaten lässt sich Umsatzveränderung nicht in Preis- und Mengeneffekt aufteilen.');
  if(has('bestandsquote')||has('bestand über'))checks.push('Bestandswert, Reichweite und Zielbestand der Warengruppe vergleichen; Warenbewegungen nur einbeziehen, wenn sie vollständig und bestätigt erfasst sind.');
- if(has('schwund')||has('abschriften'))checks.push('Erfasste Schwund- und Abschriftenwerte getrennt prüfen und mit bestätigten Bestandsbewegungen abgleichen; die Ursache ist damit noch nicht bewiesen.');
+ if(has('schwund')||has('abschriften'))checks.push('Inventur, dokumentierte Warenzugänge sowie erfasste Schwund- und Abschriftenwerte getrennt prüfen und mit bestätigten Bestandsbewegungen abgleichen; die Ursache ist damit noch nicht bewiesen.');
  if(!checks.length)checks.push('Umsatz, Wareneinsatzquote, Rohertrag und – sofern bestätigt – Bestand dieser Warengruppe gemeinsam prüfen.');
  if(has('marge'))measures.push('Wareneinsatzquote und Rohertrag derselben Warengruppe im Folgemonat erneut berechnen und mit dem Ausgangswert vergleichen.');
  if(has('umsatz'))measures.push('Umsatz und Rohertrag der Warengruppe im Folgemonat sowie im nächsten verfügbaren Vorjahresvergleich kontrollieren.');
