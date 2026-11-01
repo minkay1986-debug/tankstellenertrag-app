@@ -37,10 +37,19 @@ jobs:
       - name: Start static server
         run: |
           echo '127.0.0.1 feature.tankstellenertrag-preview.pages.dev' | sudo tee -a /etc/hosts
-          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/tankstellenertrag-http.log 2>&1 &
+          openssl req -x509 -newkey rsa:2048 -keyout /tmp/tse-preview-key.pem -out /tmp/tse-preview-cert.pem -days 1 -nodes -subj "/CN=feature.tankstellenertrag-preview.pages.dev" -addext "subjectAltName=DNS:feature.tankstellenertrag-preview.pages.dev"
+          python3 - <<'PY' > /tmp/tankstellenertrag-http.log 2>&1 &
+          import ssl
+          from http.server import HTTPServer, SimpleHTTPRequestHandler
+          server = HTTPServer(("127.0.0.1", 4173), SimpleHTTPRequestHandler)
+          context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+          context.load_cert_chain("/tmp/tse-preview-cert.pem", "/tmp/tse-preview-key.pem")
+          server.socket = context.wrap_socket(server.socket, server_side=True)
+          server.serve_forever()
+          PY
           echo $! > /tmp/tankstellenertrag-http.pid
           for i in $(seq 1 30); do
-            if curl --fail --silent http://feature.tankstellenertrag-preview.pages.dev:4173/analyse.html > /dev/null; then exit 0; fi
+            if curl --insecure --fail --silent https://feature.tankstellenertrag-preview.pages.dev:4173/analyse.html > /dev/null; then exit 0; fi
             sleep 1
           done
           cat /tmp/tankstellenertrag-http.log
@@ -50,10 +59,10 @@ jobs:
           node --input-type=module <<'NODE'
           import { chromium } from 'playwright';
           const browser = await chromium.launch({ headless: true });
-          const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
+          const page = await browser.newPage({ viewport: { width: 1365, height: 900 }, ignoreHTTPSErrors: true });
           const pageErrors = [];
           page.on('pageerror', error => pageErrors.push(error.stack || error.message));
-          const response = await page.goto('http://feature.tankstellenertrag-preview.pages.dev:4173/analyse.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
+          const response = await page.goto('https://feature.tankstellenertrag-preview.pages.dev:4173/analyse.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
           if (!response || !response.ok()) throw new Error('analyse.html returned HTTP ' + (response?.status() ?? 'no response'));
           await page.waitForTimeout(3000);
           const previewState = await page.evaluate(() => ({
@@ -123,10 +132,10 @@ jobs:
           node --input-type=module <<'NODE'
           import { chromium } from 'playwright';
           const browser = await chromium.launch({ headless: true });
-          const page = await browser.newPage();
+          const page = await browser.newPage({ ignoreHTTPSErrors: true });
           const errors = [];
           page.on('pageerror', e => errors.push(e.message));
-          await page.goto('http://feature.tankstellenertrag-preview.pages.dev:4173/analyse.html', { waitUntil: 'domcontentloaded' });
+          await page.goto('https://feature.tankstellenertrag-preview.pages.dev:4173/analyse.html', { waitUntil: 'domcontentloaded' });
           await page.locator('#advisorChatForm').waitFor({ state: 'attached', timeout: 15000 });
           await page.evaluate(() => {
             document.querySelector('#app').style.display = 'block';
