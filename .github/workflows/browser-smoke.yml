@@ -172,7 +172,7 @@ jobs:
           const operational = await ask('Wie optimiere ich meinen Wareneinsatz?');
           if (operational.includes('nicht Teil von TankstellenErtrag')) throw new Error('Operational question incorrectly blocked');
           const marginRanking = await ask('Welche Warengruppe hat die niedrigste Marge?');
-          if (!marginRanking.includes('Spielzeug') || !marginRanking.includes('Marge 45')) {
+          if (!marginRanking.includes('Getränke') || !marginRanking.includes('Marge 38')) {
             throw new Error('Margin ranking did not use the synthetic station data: ' + marginRanking);
           }
           const grossProfitComparison = await ask('Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?');
