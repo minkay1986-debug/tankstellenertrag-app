@@ -717,7 +717,7 @@ Deno.test("two-year advisory account calculates gross-profit comparison only wit
   assert(!answer.includes("Für die aktuell geladenen Stationsdaten sind keine bestätigten Werte für beide Zeiträume vorhanden"),"Confirmed current and prior-year EK must not trigger a stale missing-data answer");
   data.months["2026-09"].sourceEK=false;
   const missing=advisorTestReply(data,"2026-10")("Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?");
-  assert(missing.includes("nicht berechenbar · EK fehlt in mindestens einem Zeitraum"),"Missing EK in one period must suppress the gross-profit delta");
+  assert(missing.includes("nicht berechenbar · EK fehlt in mindestens einem Zeitraum"),"Missing EK in one period must suppress the gross-profit delta. Actual answer: "+missing);
 });
 
 
