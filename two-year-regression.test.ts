@@ -831,6 +831,32 @@ Deno.test("two-year advisor routes plural critical-stock wording and prioritizat
 });
 
 
+Deno.test("intelligent data quality detects unallocated group totals without inventing causes",()=>{
+  const data=appFixture();
+  const month=data.months["2026-10"];
+  const groupRevenue=Object.values(month.groups).reduce((sum:any,g:any)=>sum+Number(g.revenue||0),0);
+  month.revenue=groupRevenue+1234;
+  month.sourceMonthly=true;
+  const rt=runtime(data);
+  const quality=rt.dataQuality("2026-10");
+  const turnover=quality.findings.find((f:any)=>f.label==="Umsatzabgleich");
+  assert(turnover,"Confirmed monthly and group revenue should be reconciled");
+  assert(Math.abs(turnover.amount-1234)<0.01,"Unallocated turnover amount must be exact");
+  assert(turnover.complete===true,"Fixture has confirmed values for every merchandise group");
+  assert(quality.status==="check","A reconciliation difference should create a plausibility check, not a hard input error");
+  assert(quality.findings.every((f:any)=>!/Diebstahl|Fehlerursache bewiesen/i.test(f.detail)),"Data quality must not claim a cause");
+});
+Deno.test("intelligent data quality labels partial group coverage instead of treating missing groups as zero",()=>{
+  const data=appFixture();
+  const month=data.months["2026-10"];
+  month.groups.backshop._revenueEntered=false;
+  const rt=runtime(data);
+  const quality=rt.dataQuality("2026-10");
+  const turnover=quality.findings.find((f:any)=>f.label==="Umsatzabgleich");
+  assert(turnover,"Remaining confirmed groups should still be compared with the monthly total");
+  assert(turnover.complete===false&&turnover.coverage!=="8/8","Missing group data must be shown as incomplete coverage");
+  assert(quality.status==="check","Incomplete allocation must remain a check, not a critical error");
+});
 Deno.test("unconfirmed group revenue cannot create margins or comparison signals",()=>{
   const data=appFixture();
   const current=data.months["2026-10"],prior=data.months["2026-09"],priorYear=data.months["2025-10"];
