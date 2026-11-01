@@ -29,7 +29,7 @@ function appFixture() {
   for (const m of months) {
     const groupRevenue = m.revenue / 8;
     const groups: Record<string,any> = {};
-    for (const [id,,target] of groupDefs) groups[id] = {revenue:id==="waschen"?0:groupRevenue,ek:id==="waschen"?0:groupRevenue*(1-m.marginPct/100),margin:target,shrink:id==="backshop"&&m.key==="2026-10"?groupRevenue*.032:groupRevenue*.008,writeoff:groupRevenue*.002,stock:groupRevenue*.4,_stockEntered:true,openingStock:groupRevenue*.42,_openingStockEntered:true};
+    for (const [id,,target] of groupDefs) groups[id] = {revenue:id==="waschen"?0:groupRevenue,ek:id==="waschen"?0:groupRevenue*(1-m.marginPct/100),margin:target,shrink:id==="backshop"&&m.key==="2026-10"?groupRevenue*.032:groupRevenue*.008,writeoff:groupRevenue*.002,_shrinkEntered:true,_writeoffEntered:true,stock:groupRevenue*.4,_stockEntered:true,openingStock:groupRevenue*.42,_openingStockEntered:true};
     data.months[m.key] = {revenue:m.revenue,ek:m.ek,shrink:m.revenue*m.shrinkPct/100,writeoff:m.revenue*.002,stock:m.revenue*.4,sourceMonthly:true,sourceEK:true,sourceShrink:true,sourceInventory:true,groups};
   }
   return data;
@@ -711,4 +711,23 @@ Deno.test("two-year advisory account calculates gross-profit comparison only wit
   data.months["2026-11"].sourceEK=false;
   const missing=advisorTestReply(data)("Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?");
   assert(missing.includes("nicht berechenbar · EK fehlt in mindestens einem Zeitraum"),"Missing EK in one period must suppress the gross-profit delta");
+});
+
+
+Deno.test("unconfirmed group shrink and write-off values never become radar signals or simulation savings",()=>{
+  const data=appFixture();
+  const row=data.months["2026-10"];
+  row.sourceShrink=true;
+  row.groups.backshop.shrink=9999;
+  row.groups.backshop.writeoff=8888;
+  row.groups.backshop._shrinkEntered=false;
+  row.groups.backshop._writeoffEntered=false;
+  const rt=runtime(data);
+  const radar=rt.wowPriority("2026-10").find((r:any)=>r.g.id==="backshop");
+  assert(radar,"Backshop row should remain available for other signals");
+  assert(!radar.reasons.includes("Schwund auffällig"),"Unconfirmed group shrink must not create a radar signal");
+  assert(!radar.reasons.includes("Abschriften auffällig"),"Unconfirmed group write-off must not create a radar signal");
+  assert(radar.dataStatus.shrinkSourceAvailable===false&&radar.dataStatus.writeoffSourceAvailable===false,"Group loss source status must remain unconfirmed");
+  const scenario=rt.scenarioResult({...rt.calc("2026-10").groups.find((g:any)=>g.id==="backshop"),shrink:9999,writeoff:8888,shrinkEntered:false,writeoffEntered:false},0,50,50,true);
+  assert(scenario.shrinkGain===null&&scenario.writeoffGain===null,"Unconfirmed group loss amounts must not be monetized in simulation");
 });
