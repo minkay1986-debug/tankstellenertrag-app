@@ -1006,7 +1006,7 @@ function learnCalendarEffects(months,calFn,calcFn){
       if(hit){
         const d=calcFn(k);
         const revenue=Number(d?.revenue||0);
-        const match=/^(\\d{4})-(\\d{2})$/.exec(String(k||''));
+        const match=/^(\d{4})-(\d{2})$/.exec(String(k||''));
         if(revenue>0&&match){
           const days=new Date(Date.UTC(Number(match[1]),Number(match[2]),0)).getUTCDate();
           if(days>0)vals.push({revenue,days,dailyRevenue:revenue/days,month:k});
