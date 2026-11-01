@@ -785,3 +785,18 @@ Deno.test("monthly report marks inventory incomplete when a shop group's revenue
   assert(html.includes("Teilbestand · nicht vollständig"),"Inventory completeness must require confirmed revenue and stock for every shop group");
   assert(html.includes("Umsatz dieser Warengruppe nicht bestätigt"),"Report must name the missing group revenue source");
 });
+
+
+Deno.test("temporary inspect two-year synthetic advisor responses",()=>{
+  const data=twoYearAdvisorTestAccount();
+  const reply=advisorTestReply(data);
+  for(const q of [
+    "Welche Warengruppe hat die niedrigste Marge?",
+    "Welche Warengruppe hat die höchste Marge?",
+    "Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?",
+    "Wie entwickeln sich meine erfassten Verlustbeträge im Vergleich zum Vorjahr?",
+    "Wo ist mein Warenbestand kritisch?",
+    "Wo liegt das größte wirtschaftliche Potenzial?",
+    "Welche drei Dinge sollte ich zuerst prüfen?"
+  ]) console.log("ADVISOR_RESPONSE",q,reply(q));
+});
