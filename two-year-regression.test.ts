@@ -55,9 +55,9 @@ function runtime(data:any) {
   const measurePotential = appFunction("measurePotential","potentialHtml",["r"],{});
   const potentialHtml = appFunction("potentialHtml","wowCard",["measurePotential","eur"],{measurePotential,eur});
   const reportPriorityGuidance = appFunction("reportPriorityGuidance","wowCard",["practiceGuidance","potentialHtml"],{practiceGuidance,potentialHtml});
-  const wowCard = appFunction("wowCard","knowledgeWhy",["riskForRow","eur","pct","esc","reportPriorityGuidance"],{riskForRow,eur,pct,esc,reportPriorityGuidance});
   const riskLevel = appFunction("riskLevel","riskForRow",[],{});
   const riskForRow = appFunction("riskForRow","riskSummary",["settings","riskLevel"],{settings,riskLevel});
+  const wowCard = appFunction("wowCard","knowledgeWhy",["riskForRow","eur","pct","esc","reportPriorityGuidance"],{riskForRow,eur,pct,esc,reportPriorityGuidance});
   const grossSafe = (v:number|null) => v===null?0:(Number(v)||0);
   const scenarioResult = appFunction("scenarioResult","simulation",["grossSafe"],{grossSafe});
   const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext","reportPriorityGuidance"],{
