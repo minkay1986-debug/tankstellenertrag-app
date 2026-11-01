@@ -41,11 +41,12 @@ function runtime(data:any) {
   const prev = (k:string) => {const [y,mo]=k.split("-").map(Number);const d=new Date(y,mo-2,1);const p=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;return Object.hasOwn(data.months,p)?p:null;};
   const calc = appFunction("calc","reconciliation",["GROUPS","data","settings","mrow"],{GROUPS,data,settings,mrow});
   const inventoryMetrics = appFunction("inventoryMetrics","reconciliation",["g","days"],{});
-  const dataQuality = appFunction("dataQuality","hasData",["mrow","calc","prev","eur","GROUPS"],{mrow,calc,prev,eur,GROUPS});
+
   const learnCalendarEffects = appFunction("learnCalendarEffects","forecastSeason",["months","calFn","calcFn","station"],{station:{city:"Testort"}});
   const wowPriority = appFunction("wowPriority","riskLevel",["calc","prev","settings","data","inventoryMetrics"],{calc,prev,settings,data,inventoryMetrics});
   const keys = () => Object.keys(data.months).sort();
   const eur = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Number(v)||0);
+  const dataQuality = appFunction("dataQuality","hasData",["mrow","calc","prev","eur","GROUPS"],{mrow,calc,prev,eur,GROUPS});
   const pct = (v:number) => (Number(v)||0).toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1})+" %";
   const target = {value:"",innerHTML:""};
   const yearly = appFunction("yearly","economic",["keys","data","calc","eur","pct","$"],{keys,data,calc,eur,pct,$:(id:string)=>target});
@@ -527,7 +528,7 @@ Deno.test("data quality treats possible negative gross margin and high shrink as
 });
 Deno.test("seasonal event learning normalizes revenue by actual calendar days",()=>{
   const learn=appFunction("learnCalendarEffects","forecastSeason",["months","calFn","calcFn","station"],{station:{city:"Testort"}});
-  const result=learn(["2025-02","2024-02"],()=>({holidays:[{name:"Nikolaus"}],upcoming:[]}),k=>({revenue:k==="2025-02"?2800:2900}));
+  const result=learn(["2025-02","2024-02"],()=>({holidays:[{name:"Nikolaus"}],upcoming:[]}),(k:string)=>({revenue:k==="2025-02"?2800:2900}));
   assert(result.length===1&&result[0].observations===2,"Two observed event months should be retained");
   assert(Math.abs(result[0].avgDailyRevenue-100)<.001,"Leap-year February and standard February must be compared on daily revenue, not raw monthly totals");
   assert(result[0].method==="Umsatz je Kalendertag","Seasonal method must be explicitly identified");
