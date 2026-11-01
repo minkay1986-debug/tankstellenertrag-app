@@ -670,11 +670,15 @@ function advisorTestReply(data:any, key="2026-12") {
   const reconciliation = () => ({ready:false});
   const dataQuality = () => ({notes:[]});
   const settings = () => data.settings || {};
+  const inventoryPeriodDays = appFunction("inventoryPeriodDays","inventoryMetrics",["key"],{});
+  const eur = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:2}).format(Number(v)||0);
+  const measurePotential = appFunction("measurePotential","potentialHtml",[],{});
+  const potentialHtml = appFunction("potentialHtml","scenarioOptions",["measurePotential","eur"],{measurePotential,eur});
   const advisorDirectAnswer = appFunction("advisorDirectAnswer","advisorHasCurrentMonthData",
     ["advisorNorm","month","calc","data"],{advisorNorm,month,calc:rt.calc,data});
   const advisorReplyBase = appFunction("advisorReplyBase","advisorReply",
-    ["advisorNorm","month","calc","prev","data","reconciliation","dataQuality","settings","GROUPS"],
-    {advisorNorm,month,calc:rt.calc,prev:rt.prev,data,reconciliation,dataQuality,settings,GROUPS:groupDefs});
+    ["advisorNorm","month","calc","prev","data","reconciliation","dataQuality","settings","GROUPS","inventoryMetrics","inventoryPeriodDays","wowPriority","potentialHtml"],
+    {advisorNorm,month,calc:rt.calc,prev:rt.prev,data,reconciliation,dataQuality,settings,GROUPS:groupDefs,inventoryMetrics:rt.inventoryMetrics,inventoryPeriodDays,wowPriority:rt.wowPriority,potentialHtml});
   return appFunction("advisorReply","initAdvisorChat",
     ["advisorScopeGuard","advisorDirectAnswer","advisorGeneralGuidanceAnswer","advisorNoDataAnswer","advisorHasCurrentMonthData","advisorReplyBase","advisorKnowledgeHtml"],
     {advisorScopeGuard:()=>"",advisorDirectAnswer,advisorGeneralGuidanceAnswer:()=>"",
