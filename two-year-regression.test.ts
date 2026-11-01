@@ -843,6 +843,7 @@ Deno.test("intelligent data quality detects unallocated group totals without inv
   assert(turnover,"Confirmed monthly and group revenue should be reconciled");
   assert(Math.abs(turnover.amount-1234)<0.01,"Unallocated turnover amount must be exact");
   assert(turnover.complete===true,"Fixture has confirmed values for every merchandise group");
+  assert(turnover.coverage==="7/7","Coverage denominator must exclude the non-merchandise wash group");
   assert(quality.status==="check","A reconciliation difference should create a plausibility check, not a hard input error");
   assert(quality.findings.every((f:any)=>!/Diebstahl|Fehlerursache bewiesen/i.test(f.detail)),"Data quality must not claim a cause");
 });
@@ -854,7 +855,7 @@ Deno.test("intelligent data quality labels partial group coverage instead of tre
   const quality=rt.dataQuality("2026-10");
   const turnover=quality.findings.find((f:any)=>f.label==="Umsatzabgleich");
   assert(turnover,"Remaining confirmed groups should still be compared with the monthly total");
-  assert(turnover.complete===false&&turnover.coverage!=="8/8","Missing group data must be shown as incomplete coverage");
+  assert(turnover.complete===false&&turnover.coverage==="6/7","Missing group data must show the six of seven merchandise groups actually covered");
   assert(quality.status==="check","Incomplete allocation must remain a check, not a critical error");
 });
 Deno.test("unconfirmed group revenue cannot create margins or comparison signals",()=>{
