@@ -55,6 +55,7 @@ function runtime(data:any) {
   const measurePotential = appFunction("measurePotential","potentialHtml",["r"],{});
   const potentialHtml = appFunction("potentialHtml","wowCard",["measurePotential","eur"],{measurePotential,eur});
   const reportPriorityGuidance = appFunction("reportPriorityGuidance","wowCard",["practiceGuidance","potentialHtml"],{practiceGuidance,potentialHtml});
+  const wowCard = appFunction("wowCard","knowledgeWhy",["riskForRow","eur","pct","esc","reportPriorityGuidance"],{riskForRow,eur,pct,esc,reportPriorityGuidance});
   const riskLevel = appFunction("riskLevel","riskForRow",[],{});
   const riskForRow = appFunction("riskForRow","riskSummary",["settings","riskLevel"],{settings,riskLevel});
   const grossSafe = (v:number|null) => v===null?0:(Number(v)||0);
@@ -64,7 +65,7 @@ function runtime(data:any) {
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
     TEStudyContext:{htmlForReport:async()=>""},reportPriorityGuidance
   });
-  return {data,calc,wowPriority,yearly,report,practiceGuidance,potentialHtml,reportPriorityGuidance,riskForRow,scenarioResult,inventoryMetrics,dataQuality,learnCalendarEffects,target,prev};
+  return {data,calc,wowPriority,yearly,report,practiceGuidance,potentialHtml,reportPriorityGuidance,wowCard,riskForRow,scenarioResult,inventoryMetrics,dataQuality,learnCalendarEffects,target,prev};
 }
 Deno.test("real app calc, year table and report reconcile across all 24 months",()=>{
   const rt=runtime(appFixture());
@@ -92,8 +93,10 @@ Deno.test("priority cards and monthly report share order, guidance and economic 
     const index=report.indexOf(heading);
     assert(index>previousIndex,"Report priority order must match the priority-card order: "+heading);
     previousIndex=index;
-    const scenario=rt.potentialHtml(row);
-    assert(report.includes(scenario),"Report must include the same potential/evidence block as the matching priority card: "+row.g.name);
+    const sharedGuidance=rt.reportPriorityGuidance(row);
+    const card=rt.wowCard(row,i);
+    assert(card.includes(sharedGuidance),"Priority card must use the shared guidance and scenario renderer: "+row.g.name);
+    assert(report.includes(sharedGuidance),"Report must include the exact same guidance and scenario block as the priority card: "+row.g.name);
     assert(report.includes(row.reasons.join(" · ")),"Report must retain the same evidence signals as the priority card: "+row.g.name);
   }
   assert(report.includes("ausdrücklich ausgewiesenen Modellannahmen"),"Report must describe potential as a modelled scenario, not as confirmed loss or net profit");
