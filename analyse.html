@@ -758,9 +758,9 @@ function causeDiagnosis(g,currentKey=month()){
   const revenueEffect=(now.revenue-before.revenue)*(1-oldCost);
   const costRatioEffect=-now.revenue*(newCost-oldCost);
   const marginDelta=(now.actualMargin??(1-newCost)*100)-(before.actualMargin??(1-oldCost)*100);
-  out.push({state:'proven',title:'Umsatz-/Mengenwirkung auf Gesamtrohertrag',detail:(revenueEffect>=0?'Positiver':'Negativer')+' rechnerischer Effekt von '+eur(Math.abs(revenueEffect))+'. Das ist ein Umsatz-/Mengen-Effekt auf Warengruppenebene, keine Artikelmengenanalyse.'});
+  out.push({state:'proven',title:'Umsatz-/Mengenwirkung auf Gesamtrohertrag',detail:(revenueEffect>=0?'Positiver':'Negativer')+' rechnerischer Effekt von '+eur(Math.abs(revenueEffect))+'. Das ist der rechnerische Umsatz-Effekt auf Warengruppenebene; Umsatzveränderung und Absatzmenge lassen sich ohne Mengendaten nicht voneinander trennen.'});
   out.push({state:costRatioEffect<=0?'proven':'warning',title:'Wareneinsatzquote verändert',detail:(costRatioEffect>=0?'Belastung':'Entlastung')+' von '+eur(Math.abs(costRatioEffect))+'; Marge '+(marginDelta>=0?'+':'')+pct(marginDelta)+'. Der Wert bündelt EK-Preis-, Sortimentsmix- und Aktions-/Rabatteffekte.'});
-  out.push({state:'unknown',title:'EK-Preis oder Produktmix?',detail:'Mit Monats-Gesamtsummen nicht trennbar. Dafür werden Artikelnummer, Absatzmenge, EK und tatsächlicher VK je Artikel benötigt.'});
+  out.push({state:'unknown',title:'EK-Preis oder Produktmix?',detail:'Mit den vorhandenen Monats-Gesamtsummen lassen sich Einkaufspreis- und Sortimentsmixeffekte nicht getrennt nachweisen. Die Beratung bleibt deshalb bewusst auf Warengruppenebene und bewertet nur Umsatz, Wareneinsatzquote, Schwund, Abschriften und Bestand.'});
   if(Math.abs((newGross-oldGross)-(revenueEffect+costRatioEffect))>0.02)out.push({state:'warning',title:'Abweichung in der Überleitung',detail:'Die rechnerische Überleitung ist nicht vollständig. Eingaben und Rundungen prüfen.'});
  }
  if(now.shrinkEntered){
