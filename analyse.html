@@ -482,12 +482,12 @@ function dataQuality(k){
  });
  const sumCheck=(label,total,totalConfirmed,field,flag,sourceName)=>{
   if(totalConfirmed!==true)return;
-  const rows=groupRows.filter(([,q])=>q[flag]===true||(q[flag]!==false&&q[field]!==undefined&&q[field]!==null&&q[field]!==''&&n(q[field])!==0));
+  const rows=groupRows.filter(([id,q])=>id!=='waschen'&&(q[flag]===true||(q[flag]!==false&&q[field]!==undefined&&q[field]!==null&&q[field]!==''&&n(q[field])!==0)));
   if(!rows.length)return;
-  const sum=rows.reduce((s,[,q])=>s+n(q[field]),0),diff=n(total)-sum,complete=rows.length===GROUPS.length;
+  const sum=rows.reduce((s,[,q])=>s+n(q[field]),0),diff=n(total)-sum,groupCount=GROUPS.filter(g=>g[0]!=='waschen').length,complete=rows.length===groupCount;
   if(Math.abs(diff)>1){
    const amount=eur(Math.abs(diff)),direction=diff>0?'nicht auf Warengruppen verteilt':'Warengruppen-Summe liegt über dem Monatsgesamtwert';
-   const detail=label+': Monatswert '+eur(total)+' · erfasste Warengruppen '+eur(sum)+' · Differenz '+(diff>0?'+':'−')+amount+'. '+(complete?'Alle Warengruppen sind markiert.':'Nur '+rows.length+' von '+GROUPS.length+' Warengruppen haben bestätigte Werte.')+' Die Differenz ist '+(diff>0?'noch nicht zugeordnet':'größer als der Monatsgesamtwert')+'; sie beweist keinen Buchungsfehler.';
+   const detail=label+': Monatswert '+eur(total)+' · erfasste Warengruppen '+eur(sum)+' · Differenz '+(diff>0?'+':'−')+amount+'. '+(complete?'Alle Warengruppen sind markiert.':'Nur '+rows.length+' von '+groupCount+' Warengruppen haben bestätigte Werte.')+' Die Differenz ist '+(diff>0?'noch nicht zugeordnet':'größer als der Monatsgesamtwert')+'; sie beweist keinen Buchungsfehler.';
    findings.push({label,detail,amount:Math.abs(diff),complete,coverage:rows.length+'/'+GROUPS.length});
    anomalies.push(label+' und Warengruppen weichen um '+amount+' ab ('+direction+').');
   }
