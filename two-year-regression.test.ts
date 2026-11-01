@@ -980,3 +980,42 @@ Deno.test("priority cards rank confirmed euro exposure before signal count",()=>
   assert(rows.every((r:any)=>Number.isFinite(r.economicExposure)&&r.economicExposure>=0),
     "Economic ranking must use finite, non-negative confirmed exposure only");
 });
+
+Deno.test("advisory rejects article-level analysis and keeps monthly category guidance available",()=>{
+  const norm=(v:string)=>String(v||"").toLowerCase().normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/ß/g,"ss").replace(/[^a-z0-9€%.,:+ -]/gi," ").replace(/\\s+/g," ").trim();
+  const guard=appFunction("advisorScopeGuard","advisorKnowledgeHtml",["advisorNorm"],{advisorNorm:norm});
+  for(const q of ["Welche Artikel soll ich auslisten?","Artikelabsatz je SKU vergleichen","Artikelnummer und Stückmarge prüfen","Welche Artikel bei der nächsten Bestellung reduzieren?"]){
+    const answer=guard(q);
+    assert(answer.includes("wertet bewusst keine Einzelartikel"),"Article-level request must be redirected to group-level analysis: "+q);
+  }
+  assert(guard("Wie hat sich die Wareneinsatzquote der Getränke entwickelt?")==="","Valid group-level question must remain available");
+  assert(!html.includes("articleTiles")&&!html.includes("articleObservations")&&!html.includes("renderArticleDiagnostics")&&!html.includes("saveArticleDiagnostic"),"Legacy article-analysis UI/functions must not return");
+});
+
+Deno.test("advisory follow-up skips months without the metric relevant to the saved measure",()=>{
+  const outcome=appFunction("calculateAdvisoryOutcome","initAdvisorCaseActions",[],{});
+  const data:any={
+    "2026-10":{groups:[{id:"backshop",revenue:1000,ek:400,revenueEntered:true,ekEntered:true,actualMargin:60,shrink:20,shrinkEntered:true,writeoff:0,writeoffEntered:false,stock:0,stockEntered:false}],sourceShrink:true,sourceInventory:false},
+    "2026-11":{groups:[{id:"backshop",revenue:1100,ek:440,revenueEntered:true,ekEntered:true,actualMargin:60,shrink:0,shrinkEntered:false,writeoff:0,writeoffEntered:false,stock:0,stockEntered:false}],sourceShrink:false,sourceInventory:false},
+    "2026-12":{groups:[{id:"backshop",revenue:1200,ek:480,revenueEntered:true,ekEntered:true,actualMargin:60,shrink:12,shrinkEntered:true,writeoff:0,writeoffEntered:false,stock:0,stockEntered:false}],sourceShrink:true,sourceInventory:false}
+  };
+  const follow=appFunction("advisoryCaseFollowUp","reportPriorityGuidance",["keys","hasData","calc","calculateAdvisoryOutcome"],{
+    keys:()=>Object.keys(data).sort(),hasData:(k:string)=>!!data[k],calc:(k:string)=>data[k],calculateAdvisoryOutcome:outcome
+  });
+  const c={month:"2026-10",groupId:"backshop",measures:["Schwund der Warengruppe reduzieren"],baseline:{shrinkRate:2,shrinkConfirmed:true,revenue:1000,revenueConfirmed:true}};
+  const result=follow(c);
+  assert(result?.month==="2026-12","Follow-up must skip November because the saved shrink measure has no confirmed November metric");
+  assert(result.metrics.some((m:any)=>m.key==="shrinkRate"),"Follow-up must return the confirmed metric relevant to the saved measure");
+});
+
+Deno.test("measure economics never treats a missing modeled benefit as zero",()=>{
+  const calc=appFunction("calculateMeasureEconomics","measureEconomicsSummary",["monthlyBenefit","values"],{});
+  const costs={hoursPerMonth:2,hourlyCost:25,oneTimeCost:100,monthlyCost:10};
+  const missing=calc(null,costs);
+  assert(missing.complete===false&&missing.benefit===null,"Missing potential must keep the economic result open, not turn it into a €0 benefit");
+  const valid=calc(200,costs);
+  assert(valid.complete===true,"Complete cost inputs and a modeled benefit should permit a scenario balance");
+  assert(Math.abs(valid.monthlyBalance-140)<.001,"Monthly balance must subtract labor and recurring cost from modeled monthly benefit");
+  assert(Math.abs(valid.firstMonthBalance-40)<.001,"First-month balance must additionally subtract one-time implementation cost");
+  assert(Math.abs(valid.annualBalance-1580)<.001,"12-month balance must subtract one-time cost once");
+});
