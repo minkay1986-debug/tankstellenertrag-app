@@ -799,4 +799,11 @@ Deno.test("temporary inspect two-year synthetic advisor responses",()=>{
     "Wo liegt das größte wirtschaftliche Potenzial?",
     "Welche drei Dinge sollte ich zuerst prüfen?"
   ]) console.log("ADVISOR_RESPONSE",q,reply(q));
+  const stock=reply("Wo ist mein Warenbestand kritisch?");
+  assert(stock.includes("Bestandsanalyse")&&stock.includes("rechnerische Reichweite"),"Inventory question must route to confirmed inventory metrics, not loss analysis. Actual answer: "+stock);
+  assert(!stock.includes("Verlustanalyse"),"Inventory question must not be misclassified as shrink/write-off analysis");
+  const potential=reply("Wo liegt das größte wirtschaftliche Potenzial?");
+  assert(potential.includes("Priorisierte Prüffelder")&&potential.includes("Modellannahme"),"Economic-potential question must use real priority signals and label scenario assumptions. Actual answer: "+potential);
+  const priorities=reply("Welche drei Dinge sollte ich zuerst prüfen?");
+  assert(priorities.includes("Priorisierte Prüffelder")&&!priorities.includes("Ich ordne deine Frage noch nicht sicher zu"),"Prioritization question must use the current radar ranking. Actual answer: "+priorities);
 });
