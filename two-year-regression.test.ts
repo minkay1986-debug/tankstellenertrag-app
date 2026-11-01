@@ -475,7 +475,7 @@ Deno.test("inventory analysis uses actual calendar days and reconciles documente
 Deno.test("inventory movement inputs are saved separately for each merchandise group",()=>{
   assert(html.includes("data-stock-purchases")&&html.includes("data-supplier-returns")&&html.includes("data-stock-losses")&&html.includes("data-stock-adjustments"),"The entry form must expose each movement category");
   assert(html.includes("inventoryMovementBalance")&&html.includes("Bewegungsdifferenz"),"The report must show a per-group movement reconciliation");
-  assert(html.includes("inventoryPeriodDays(d.key)"),"Analysis must use actual calendar days for the selected month");
+  assert(html.includes("const periodMatch=String(k||'' ).match")||html.includes("const periodMatch=String(k||'').match"),"Analysis must calculate actual calendar days");assert(html.includes("days=Number(g?.periodDays)||days"),"Inventory metrics must use the calculated period length");
 });
 
 Deno.test("category advice uses distinct operational checks for drinks, coffee and bakery",()=>{
