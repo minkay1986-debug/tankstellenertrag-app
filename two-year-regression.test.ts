@@ -649,7 +649,7 @@ Deno.test("customer-facing advisor answers contain no test-only wording",()=>{
 function twoYearAdvisorTestAccount() {
   const data = appFixture();
   data.testAccount = {name:"TSE Zwei-Jahres-Beratungstest", kind:"synthetic", years:["2025","2026"], months:24};
-  const key = "2026-12";
+  const key = "2026-10";
   const marginByGroup: Record<string,number> = {
     backshop:30,spielzeug:35,getraenke:40,lebensmittel:45,drogerie:50,
     "süsswaren":55,eis:60,kaffee:65,waschen:0
@@ -685,7 +685,7 @@ Deno.test("two-year synthetic advisory account ranks real confirmed margins inst
   const data=twoYearAdvisorTestAccount();
   assert(Object.keys(data.months).length===24,"Test account must contain 24 monthly records");
   assert(data.testAccount.years.join(",")==="2025,2026","Test account must cover 2025 and 2026");
-  const reply=advisorTestReply(data);
+  const reply=advisorTestReply(data,"2026-10");
   const weakest=reply("Welche Warengruppe hat die niedrigste Marge?");
   assert(!weakest.includes("Für die aktuell geladenen Stationsdaten liegen keine bestätigten Werte"),"Advisor must not claim missing data when confirmed group EK values exist");
   assert(weakest.indexOf("<li><b>Backwaren")>=0&&weakest.indexOf("<li><b>Backwaren")<weakest.indexOf("<li><b>Spielzeug"),"Weakest margin must rank Backwaren (30%) before Spielzeug (35%). Actual answer: "+weakest);
@@ -695,21 +695,21 @@ Deno.test("two-year synthetic advisory account ranks real confirmed margins inst
 
 Deno.test("two-year advisory account reports real year-over-year loss values and labels causes as unproven",()=>{
   const data=twoYearAdvisorTestAccount();
-  const reply=advisorTestReply(data);
+  const reply=advisorTestReply(data,"2026-10");
   const answer=reply("Wie entwickeln sich meine erfassten Verlustbeträge im Vergleich zum Vorjahr?");
-  assert(answer.includes("Vorjahresmonat (2025-12)"),"Loss advice must compare the same calendar month in the previous year. Actual answer: "+answer);
+  assert(answer.includes("Vorjahresmonat (2025-10)"),"Loss advice must compare the same calendar month in the previous year. Actual answer: "+answer);
   assert(answer.includes("Erfasster Schwund")&&answer.includes("Abschriften"),"Loss advice must separate recorded shrink and write-offs");
-  assert(answer.includes("1.164,80")&&answer.includes("1.120,00")&&answer.includes("44,80"),"Loss advice must calculate current, prior-year and delta values from the same month");
+  assert(answer.includes("3.500,64")&&answer.includes("990,00")&&answer.includes("2.510,64"),"Loss advice must calculate current, prior-year and delta values from the same month");
   assert(!answer.includes("<li>Waschen:"),"Non-shop wash service must not appear in shop group loss breakdown");
   assert(answer.includes("Die Zahlen allein erklären nicht"),"Loss advice must not claim an unproven cause. Actual answer: "+answer);
 });
 
 Deno.test("two-year advisory account calculates gross-profit comparison only with confirmed EK in both months",()=>{
   const data=twoYearAdvisorTestAccount();
-  const reply=advisorTestReply(data);
+  const reply=advisorTestReply(data,"2026-10");
   const answer=reply("Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?");
-  assert(answer.includes("Shop-Veränderung zu Vormonat 2026-11"),"Advisor must use the actual previous month in the comparison");
-  assert(answer.includes("8.985,60")&&answer.includes("18.720,00"),"Advisor must calculate the real gross-profit and revenue deltas");
+  assert(answer.includes("Shop-Veränderung zu Vormonat 2026-09"),"Advisor must use the actual previous month in the comparison");
+  assert(answer.includes("-2.496,00")&&answer.includes("-5.200,00"),"Advisor must calculate the real gross-profit and revenue deltas");
   assert(!answer.includes("Für die aktuell geladenen Stationsdaten sind keine bestätigten Werte für beide Zeiträume vorhanden"),"Confirmed current and prior-year EK must not trigger a stale missing-data answer");
   data.months["2026-11"].sourceEK=false;
   const missing=advisorTestReply(data)("Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?");
@@ -789,7 +789,7 @@ Deno.test("monthly report marks inventory incomplete when a shop group's revenue
 
 Deno.test("temporary inspect two-year synthetic advisor responses",()=>{
   const data=twoYearAdvisorTestAccount();
-  const reply=advisorTestReply(data);
+  const reply=advisorTestReply(data,"2026-10");
   for(const q of [
     "Welche Warengruppe hat die niedrigste Marge?",
     "Welche Warengruppe hat die höchste Marge?",
