@@ -679,9 +679,10 @@ function advisorTestReply(data:any, key="2026-12") {
   const advisorReplyBase = appFunction("advisorReplyBase","advisorReply",
     ["advisorNorm","month","calc","prev","data","reconciliation","dataQuality","settings","GROUPS","inventoryMetrics","inventoryPeriodDays","wowPriority","potentialHtml"],
     {advisorNorm,month,calc:rt.calc,prev:rt.prev,data,reconciliation,dataQuality,settings,GROUPS:groupDefs,inventoryMetrics:rt.inventoryMetrics,inventoryPeriodDays,wowPriority:rt.wowPriority,potentialHtml});
+  const advisorGeneralGuidanceAnswer = appFunction("advisorGeneralGuidanceAnswer","advisorReplyBase",[],{});
   return appFunction("advisorReply","initAdvisorChat",
     ["advisorScopeGuard","advisorDirectAnswer","advisorGeneralGuidanceAnswer","advisorNoDataAnswer","advisorHasCurrentMonthData","advisorReplyBase","advisorKnowledgeHtml"],
-    {advisorScopeGuard:()=>"",advisorDirectAnswer,advisorGeneralGuidanceAnswer:()=>"",
+    {advisorScopeGuard:()=>"",advisorDirectAnswer,advisorGeneralGuidanceAnswer,
       advisorNoDataAnswer:()=>"",advisorHasCurrentMonthData:()=>true,advisorReplyBase,advisorKnowledgeHtml:() => ""});
 }
 
@@ -807,4 +808,24 @@ Deno.test("two-year advisory account routes inventory and priority questions to 
   const priorities=reply("Welche drei Dinge sollte ich zuerst prüfen?");
   assert(priorities.includes("Priorisierte Prüffelder")&&priorities.includes("Backwaren:")&&priorities.includes("Spielzeug:")&&priorities.includes("Getränke:"),"Prioritization question must use the top three current radar signals. Actual answer: "+priorities);
   assert(!priorities.includes("Ich ordne deine Frage noch nicht sicher zu"),"Prioritization question must not fall back to generic clarification");
+});
+
+Deno.test("two-year advisor routes plural critical-stock wording and prioritization to live data before generic answers",()=>{
+  const data=twoYearAdvisorTestAccount();
+  const reply=advisorTestReply(data,"2026-10");
+  for(const question of [
+    "Wo ist mein Warenbestand kritisch?",
+    "Welche Lagerbestände sind kritisch?",
+    "Welche Bestände sind kritisch?"
+  ]){
+    const answer=reply(question);
+    assert(answer.includes("Bestandsanalyse"),"Inventory wording must reach stock analysis: "+question+" -> "+answer);
+    assert(!answer.includes("Verlustanalyse"),"Inventory-only wording must not be treated as loss analysis: "+question);
+    assert(answer.includes("rechnerische Reichweite"),"Confirmed stock must include its calculated coverage: "+question);
+  }
+  const potential=reply("Wo liegt das größte wirtschaftliche Potenzial?");
+  assert(potential.includes("Größtes wirtschaftliches Potenzial")&&potential.includes("+620,33")&&potential.includes("Modellannahme 25 %"),"Biggest-potential question must use confirmed data before generic guidance. Actual: "+potential);
+  const priorities=reply("Welche drei wichtigsten nächsten Prüfungen sollte ich zuerst angehen?");
+  assert(priorities.includes("Priorisierte Prüffelder")&&priorities.includes("Backwaren:")&&priorities.includes("Spielzeug:")&&priorities.includes("Getränke:"),"Three next checks must be ranked from current signals. Actual: "+priorities);
+  assert(!priorities.includes("Ich brauche noch eine konkrete Zielgröße")&&!priorities.includes("Ich ordne deine Frage noch nicht sicher zu"),"Priority question must not return generic clarification. Actual: "+priorities);
 });
