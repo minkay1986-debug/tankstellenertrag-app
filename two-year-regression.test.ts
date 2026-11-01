@@ -609,3 +609,12 @@ Deno.test("analysis view never reports missing EK or shrink as zero and gates mo
   assert(analysis.includes("d.sourceMonthly&&p.sourceMonthly"),"Revenue comparison must require both source months");
   assert(analysis.includes("d.sourceEK&&p.sourceEK&&d.revenue>0&&p.revenue>0"),"Margin comparison must require confirmed EK and positive sales in both months");
 });
+
+Deno.test("advisor chat does not rank groups or calculate shop totals when EK is missing",()=>{
+  const start=html.indexOf("function advisorReplyBase"),end=html.indexOf("function advisorReply(",start),advisor=html.slice(start,end);
+  assert(advisor.includes("d.sourceEK?money(d.ek):'nicht erfasst'"),"Advisor must not show missing EK as zero");
+  assert(advisor.includes("d.sourceEK?money(d.gross):'nicht berechenbar · bestätigter EK fehlt'"),"Advisor must not calculate gross profit without EK");
+  assert(advisor.includes("d.sourceEK===true?d.groups.filter"),"Advisor must not rank groups by gross profit if EK is missing");
+  assert(advisor.includes("lossAvailable=d.sourceShrink===true"),"Loss advice must gate totals on confirmed loss data");
+  assert(advisor.includes("comparisonAvailable=lossAvailable&&p?.sourceShrink===true"),"Loss comparisons must require both source periods");
+});
