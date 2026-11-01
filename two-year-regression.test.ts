@@ -765,3 +765,23 @@ Deno.test("monthly report does not present stale revenue and gross profit as con
   assert(html.includes("Shop-Umsatz</div><div class=\"value\">Nicht erfasst"),"Report must label unconfirmed monthly revenue as not recorded");
   assert(html.includes("Rohertrag</div><div class=\"value\">Nicht berechenbar"),"Report must not calculate gross profit from stale revenue");
 });
+
+
+Deno.test("radar ignores stale group revenue when its source is not confirmed",()=>{
+  const data=appFixture();
+  data.months["2026-10"].groups.backshop._revenueEntered=false;
+  const rt=runtime(data);
+  assert(!rt.wowPriority("2026-10").some((r:any)=>r.g.id==="backshop"),"Unconfirmed group revenue must not create a radar priority");
+});
+
+Deno.test("monthly report marks inventory incomplete when a shop group's revenue is unconfirmed",()=>{
+  const data=appFixture();
+  data.months["2026-10"].sourceInventory=true;
+  data.months["2026-10"].groups.backshop._revenueEntered=false;
+  data.months["2026-10"].groups.backshop._stockEntered=true;
+  const rt=runtime(data);
+  rt.report();
+  const html=String(rt.target.innerHTML);
+  assert(html.includes("Teilbestand · nicht vollständig"),"Inventory completeness must require confirmed revenue and stock for every shop group");
+  assert(html.includes("Umsatz dieser Warengruppe nicht bestätigt"),"Report must name the missing group revenue source");
+});
