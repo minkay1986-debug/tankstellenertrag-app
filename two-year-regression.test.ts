@@ -648,7 +648,7 @@ Deno.test("customer-facing advisor answers contain no test-only wording",()=>{
 
 function twoYearAdvisorTestAccount() {
   const data = appFixture();
-  data.testAccount = {name:"TSE Zwei-Jahres-Beratungstest", kind:"synthetic", years:["2025","2026"], months:24};
+  data.testAccount = {name:"TSE Zwei-Jahres-Beratungstest", kind:"synthetic", years:["2025","2026"], months:24, asOfMonth:"2026-10"};
   const key = "2026-10";
   const marginByGroup: Record<string,number> = {
     backshop:30,spielzeug:35,getraenke:40,lebensmittel:45,drogerie:50,
@@ -798,6 +798,9 @@ Deno.test("two-year advisory account routes inventory and priority questions to 
   assert(stock.includes("Bestandsanalyse")&&stock.includes("rechnerische Reichweite")&&stock.includes("17,7 Tage"),"Inventory question must report confirmed stock and calendar-day coverage. Actual answer: "+stock);
   assert(!stock.includes("Verlustanalyse"),"Inventory-only question must not be misclassified as shrink/write-off analysis");
   assert(stock.includes("kein eigener Zielwert hinterlegt"),"Without operator thresholds the advisor must not declare stock critical");
+  data.months["2026-10"].sourceInventory=false;
+  const unconfirmedStock=reply("Wo ist mein Warenbestand kritisch?");
+  assert(unconfirmedStock.includes("keine bestätigte Inventurquelle")&&!unconfirmedStock.includes("Bestand 5.148"),"Stored group stock must not leak into advice when the inventory source is unconfirmed");
   const potential=reply("Wo liegt das größte wirtschaftliche Potenzial?");
   assert(potential.includes("Größtes wirtschaftliches Potenzial")&&potential.includes("+620,33")&&potential.includes("Modellannahme 25 %"),"Economic-potential question must show the top data-backed lever and its explicit assumption. Actual answer: "+potential);
   assert(!potential.includes("Spielzeug:"),"A singular biggest-potential question should not dump every ranked group");
