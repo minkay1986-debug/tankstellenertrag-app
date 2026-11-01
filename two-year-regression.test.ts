@@ -914,7 +914,7 @@ Deno.test("priority cards rank confirmed euro exposure before signal count",()=>
   const data=appFixture();
   const current=data.months["2026-10"],previous=data.months["2026-09"];
   const big=current.groups.backshop,small=current.groups.kaffee,smallPrev=previous.groups.kaffee;
-  big.revenue=20000;big._revenueEntered=true;big.ek=10000;big._ekEntered=true;
+  big.revenue=20000;big._revenueEntered=true;big.ek=20000*(1-59.2/100);big._ekEntered=true;
   big.shrink=500;big._shrinkEntered=true;big.writeoff=0;big._writeoffEntered=true;
   small.revenue=1000;small._revenueEntered=true;small.ek=600;small._ekEntered=true;
   smallPrev.revenue=2000;smallPrev._revenueEntered=true;smallPrev.ek=800;smallPrev._ekEntered=true;
