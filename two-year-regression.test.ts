@@ -536,7 +536,7 @@ Deno.test("potential display labels 25% and 10% rates as assumptions, not eviden
   assert(html.includes("Modellannahme 25 %")&&html.includes("Modellannahme 10 %"),"Scenario rates must be visibly labeled as model assumptions");
   assert(html.includes("keine empirisch belegten Erfolgsquoten"),"Potential disclaimer must say the rates are not empirically established success rates");
 });
-Deno.test("knowledge article SEO keywords never contain undefined",()=>{
+Deno.test("knowledge article SEO keywords never contain undefined",async()=>{
   const articlePaths=["wissen/backshop-tankstelle.html","wissen/marge-tankstellenshop.html","wissen/rohertrag-tankstellenshop.html","wissen/sortiment-tankstellenshop.html","wissen/warenwirtschaft-tankstelle.html"];
-  for(const path of articlePaths) assert(!html.includes('<meta name="keywords" content="undefined">'),"Main app should not carry undefined keyword metadata");
+  for(const path of articlePaths){const content=await Deno.readTextFile(new URL("./"+path,import.meta.url));assert(!/name="keywords" content="undefined"/i.test(content),path+" still has undefined SEO keywords");}
 });
