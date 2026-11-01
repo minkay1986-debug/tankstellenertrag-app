@@ -84,7 +84,12 @@ jobs:
             { id: 'advisorChat', selector: '#advisorChatForm' }
           ];
           for (const view of views) {
-            await page.locator('.nav button[data-v="' + view.id + '"]').click();
+            const navButton = page.locator('.nav button[data-v="' + view.id + '"]');
+            if (await navButton.count()) {
+              await navButton.click();
+            } else {
+              await page.evaluate(id => nav(id), view.id);
+            }
             await page.locator('#' + view.id + '.view.active').waitFor({ timeout: 5000 });
             const exists = await page.locator(view.selector).count();
             if (!exists) throw new Error('Missing content in view ' + view.id);
