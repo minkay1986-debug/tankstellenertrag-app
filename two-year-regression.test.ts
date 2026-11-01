@@ -1034,3 +1034,32 @@ Deno.test("simulation safe-number helper is present in production and handles mi
   assert(safe(null)===0&&safe(undefined)===0,"Missing numeric scenario components must safely contribute zero");
   assert(safe("12.5")===12.5&&safe("invalid")===0,"Scenario helper must safely normalize numeric inputs");
 });
+
+Deno.test("advisor consistently separates data findings, hypotheses and action proposals",()=>{
+  const frame=appFunction("advisorEvidenceResponse","advisorReply",[],{});
+  const sample="<b>Rohertrag</b><p>Der Rohertrag ist um 120 € gestiegen.</p>";
+  const data=frame(sample,"data");
+  const guidance=frame(sample,"guidance");
+  const missing=frame(sample,"missing");
+  for(const response of [data,guidance,missing]){
+    assert(response.includes("DATENBEFUND")||response.includes("FACHLICHE EINORDNUNG")||response.includes("DATENLAGE"),"Response lacks an explicit evidence status");
+    assert(response.includes("VERMUTUNG / URSACHE"),"Response does not separate causes from findings");
+    assert(response.includes("HANDLUNGSVORSCHLAG"),"Response does not label recommendations");
+    assert(response.includes("beweist für sich allein keine Ursache"),"Response overstates causal certainty");
+    assert(response.includes("dokumentiertem Ausgangswert"),"Response lacks a measurable follow-up principle");
+  }
+  assert(data.includes("DATENBEFUND"),"Data-backed response must be labelled as a data finding");
+  assert(guidance.includes("FACHLICHE EINORDNUNG"),"General guidance must not look like a station-specific finding");
+  assert(missing.includes("DATENLAGE"),"Missing-data response must be explicitly labelled");
+});
+
+Deno.test("advisor response routing applies evidence framing to every economic answer path",()=>{
+  const start=html.indexOf("function advisorReply(raw){");
+  const end=html.indexOf("\nfunction initAdvisorChat",start);
+  assert(start>=0&&end>start,"Could not locate advisor reply router");
+  const router=html.slice(start,end);
+  assert(router.includes("advisorEvidenceResponse(direct,'guidance')"),"Direct economic answers are not framed");
+  assert(router.includes("advisorEvidenceResponse(advisory,'guidance')"),"General guidance is not framed");
+  assert(router.includes("advisorEvidenceResponse(noData,'missing')"),"Missing-data answers are not framed");
+  assert(router.includes("advisorEvidenceResponse(base,'data')")||router.includes("advisorEvidenceResponse(knowledge?base+knowledge:base,'data')"),"Data analysis answers are not framed");
+});
