@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'analyse.html'
+      - 'two-year-regression.test.ts'
+      - 'ertragsoptimierer.test.ts'
       - '.github/workflows/browser-smoke.yml'
   workflow_dispatch:
 
@@ -18,6 +20,12 @@ jobs:
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Run calculation and advisory regression tests
+        run: deno test --allow-read two-year-regression.test.ts ertragsoptimierer.test.ts
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -28,10 +36,20 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Start static server
         run: |
-          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/tankstellenertrag-http.log 2>&1 &
+          echo '127.0.0.1 feature.tankstellenertrag-preview.pages.dev' | sudo tee -a /etc/hosts
+          openssl req -x509 -newkey rsa:2048 -keyout /tmp/tse-preview-key.pem -out /tmp/tse-preview-cert.pem -days 1 -nodes -subj "/CN=feature.tankstellenertrag-preview.pages.dev" -addext "subjectAltName=DNS:feature.tankstellenertrag-preview.pages.dev"
+          python3 - <<'PY' > /tmp/tankstellenertrag-http.log 2>&1 &
+          import ssl
+          from http.server import HTTPServer, SimpleHTTPRequestHandler
+          server = HTTPServer(("127.0.0.1", 4173), SimpleHTTPRequestHandler)
+          context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+          context.load_cert_chain("/tmp/tse-preview-cert.pem", "/tmp/tse-preview-key.pem")
+          server.socket = context.wrap_socket(server.socket, server_side=True)
+          server.serve_forever()
+          PY
           echo $! > /tmp/tankstellenertrag-http.pid
           for i in $(seq 1 30); do
-            if curl --fail --silent http://127.0.0.1:4173/analyse.html > /dev/null; then exit 0; fi
+            if curl --insecure --fail --silent https://feature.tankstellenertrag-preview.pages.dev:4173/analyse.html > /dev/null; then exit 0; fi
             sleep 1
           done
           cat /tmp/tankstellenertrag-http.log
@@ -41,12 +59,50 @@ jobs:
           node --input-type=module <<'NODE'
           import { chromium } from 'playwright';
           const browser = await chromium.launch({ headless: true });
-          const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
+          const page = await browser.newPage({ viewport: { width: 1365, height: 900 }, ignoreHTTPSErrors: true });
           const pageErrors = [];
           page.on('pageerror', error => pageErrors.push(error.stack || error.message));
-          const response = await page.goto('http://127.0.0.1:4173/analyse.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
+          const response = await page.goto('https://feature.tankstellenertrag-preview.pages.dev:4173/analyse.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
           if (!response || !response.ok()) throw new Error('analyse.html returned HTTP ' + (response?.status() ?? 'no response'));
           await page.waitForTimeout(3000);
+          const previewState = await page.evaluate(() => ({
+            appVisible: getComputedStyle(document.querySelector('#app')).display !== 'none',
+            station: document.querySelector('#stationInfo')?.innerText ?? '',
+            month: document.querySelector('#month')?.value ?? ''
+          }));
+          if (!previewState.appVisible || !previewState.station.includes('Musterstation') || !previewState.month) {
+            throw new Error('Synthetic preview data did not initialize: ' + JSON.stringify(previewState));
+          }
+          const views = [
+            { id: 'monthly', selector: '#rev' },
+            { id: 'meinmonat', selector: '#meinMonatContent' },
+            { id: 'analysis', selector: '#analysisBody' },
+            { id: 'radar', selector: '#radarBody' },
+            { id: 'economic', selector: '#economicBody' },
+            { id: 'yearly', selector: '#yearTable' },
+            { id: 'report', selector: '#reportBody' },
+            { id: 'advisorChat', selector: '#advisorChatForm' }
+          ];
+          for (const view of views) {
+            const navButton = page.locator('.nav button[data-v="' + view.id + '"]');
+            if (await navButton.count()) {
+              await navButton.click();
+            } else {
+              await page.evaluate(id => nav(id), view.id);
+            }
+            await page.locator('#' + view.id + '.view.active').waitFor({ timeout: 5000 });
+            const exists = await page.locator(view.selector).count();
+            if (!exists) throw new Error('Missing content in view ' + view.id);
+            if (view.id === 'monthly') {
+              if (!(await page.locator('#rev').isVisible()) || !(await page.locator('#saveMonth').isVisible())) {
+                throw new Error('Input controls are not visible in monthly view');
+              }
+            } else if (view.id !== 'advisorChat') {
+              const content = await page.locator(view.selector).first().innerText().catch(() => '');
+              if (content.trim().length < 10) throw new Error('View appears empty: ' + view.id);
+            }
+          }
+          if (pageErrors.length) throw new Error('Runtime errors during view navigation:\\n' + pageErrors.join('\\n---\\n'));
           await page.screenshot({ path: 'ocean-glass-desktop.png', fullPage: true });
           const glassAudit = await page.evaluate(() => {
             const body = getComputedStyle(document.body);
@@ -85,10 +141,10 @@ jobs:
           node --input-type=module <<'NODE'
           import { chromium } from 'playwright';
           const browser = await chromium.launch({ headless: true });
-          const page = await browser.newPage();
+          const page = await browser.newPage({ ignoreHTTPSErrors: true });
           const errors = [];
           page.on('pageerror', e => errors.push(e.message));
-          await page.goto('http://127.0.0.1:4173/analyse.html', { waitUntil: 'domcontentloaded' });
+          await page.goto('https://feature.tankstellenertrag-preview.pages.dev:4173/analyse.html', { waitUntil: 'domcontentloaded' });
           await page.locator('#advisorChatForm').waitFor({ state: 'attached', timeout: 15000 });
           await page.evaluate(() => {
             document.querySelector('#app').style.display = 'block';
@@ -101,7 +157,6 @@ jobs:
             await page.locator('#advisorChatInput').fill(question);
             await page.locator('#advisorChatForm button[type="submit"]').click();
             const replies = page.locator('#advisorChatMessages .chat-message.assistant');
-            await replies.last().locator('div').last().waitFor();
             await page.waitForFunction(() => {
               const els = document.querySelectorAll('#advisorChatMessages .chat-message.assistant');
               const last = els[els.length - 1];
@@ -109,14 +164,45 @@ jobs:
             }, { timeout: 10000 });
             return await replies.last().innerText();
           }
+          function assertEvidenceFrame(answer, expected, question) {
+            for (const label of [expected, 'VERMUTUNG / URSACHE', 'HANDLUNGSVORSCHLAG']) {
+              if (!answer.includes(label)) throw new Error('Advisor evidence framing missing "' + label + '" for "' + question + '": ' + answer);
+            }
+          }
           for (const q of ['Frage zum Recht', 'Frage zu Steuern', 'Frage zu Personal']) {
             const answer = await ask(q);
             if (!answer.includes('nicht Teil von TankstellenErtrag')) throw new Error('Scope guard failed for "' + q + '": ' + answer);
           }
           const operational = await ask('Wie optimiere ich meinen Wareneinsatz?');
           if (operational.includes('nicht Teil von TankstellenErtrag')) throw new Error('Operational question incorrectly blocked');
+          assertEvidenceFrame(operational, 'DATENBEFUND', 'Wareneinsatz');
+          const marginRanking = await ask('Welche Warengruppe hat die niedrigste Marge?');
+          if (!marginRanking.includes('Getränke') || !marginRanking.includes('Marge 38')) {
+            throw new Error('Margin ranking did not use the synthetic station data: ' + marginRanking);
+          }
+          assertEvidenceFrame(marginRanking, 'DATENBEFUND', 'Margenranking');
+          const grossProfitComparison = await ask('Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?');
+          if (!grossProfitComparison.includes('Shop-Veränderung zu Vormonat') || !grossProfitComparison.includes('Rohertrag')) {
+            throw new Error('Gross-profit comparison did not use the selected month and prior month: ' + grossProfitComparison);
+          }
+          assertEvidenceFrame(grossProfitComparison, 'DATENBEFUND', 'Rohertragsvergleich');
+          const lossComparison = await ask('Wie entwickeln sich meine erfassten Verlustbeträge im Vergleich zum Vorjahr?');
+          if (!lossComparison.includes('Verlustanalyse im Tankstellenshop') || !lossComparison.includes('Vorjahresmonat')) {
+            throw new Error('Loss advice did not use the same month in the prior year: ' + lossComparison);
+          }
+          const inventoryAnswer = await ask('Welche Lagerbestände sind kritisch?');
+          if (!inventoryAnswer.includes('Bestandsanalyse') || inventoryAnswer.includes('Verlustanalyse')) {
+            throw new Error('Inventory question was not routed to stock analysis: ' + inventoryAnswer);
+          }
+          const priorityAnswer = await ask('Welche drei wichtigsten nächsten Prüfungen sollte ich zuerst angehen?');
+          if (!priorityAnswer.includes('Priorisierte Prüffelder') ||
+              priorityAnswer.includes('Ich brauche noch eine konkrete Zielgröße') ||
+              priorityAnswer.includes('Ich ordne deine Frage noch nicht sicher zu')) {
+            throw new Error('Priority question did not return a data-backed prioritization: ' + priorityAnswer);
+          }
+          assertEvidenceFrame(priorityAnswer, 'DATENBEFUND', 'Priorisierung');
           if (errors.length) throw new Error('Runtime errors during chat test: ' + errors.join(' | '));
-          console.log(JSON.stringify({ legalTaxHrQuestionsBlocked: 3, operationalQuestionAnswered: true, runtimeErrors: errors.length }));
+          console.log(JSON.stringify({ legalTaxHrQuestionsBlocked: 3, operationalQuestionAnswered: true, marginRankingUsesStationData: true, grossProfitComparisonUsesTwoPeriods: true, lossAdviceUsesPriorYearData: true, inventoryQuestionUsesStockAnalysis: true, priorityQuestionUsesDataBackedRanking: true, runtimeErrors: errors.length }));
           await browser.close();
           NODE
 
