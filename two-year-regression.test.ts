@@ -908,3 +908,16 @@ Deno.test("all merchandise group guidance remains category-specific",()=>{
     for(const term of terms)assert(text.toLowerCase().includes(term.toLowerCase()),id+" guidance missing "+term);
   }
 });
+
+
+Deno.test("priority cards rank confirmed euro exposure before signal count",()=>{
+  const rt=runtime(appFixture());
+  const rows=rt.wowPriority("2026-10");
+  assert(rows.length>1,"Fixture should produce multiple priority cards");
+  for(let i=1;i<rows.length;i++){
+    assert(rows[i-1].economicExposure+0.000001>=rows[i].economicExposure,
+      "A card with lower confirmed euro exposure must not rank above a larger economic issue");
+  }
+  assert(rows.every((r:any)=>Number.isFinite(r.economicExposure)&&r.economicExposure>=0),
+    "Economic ranking must use finite, non-negative confirmed exposure only");
+});
