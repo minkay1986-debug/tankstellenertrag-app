@@ -1884,5 +1884,42 @@ window.initTeAsk=initTeAsk;window.loadTeCommunity=loadTeCommunity;
   document.addEventListener('visibilitychange',function(){if(!document.hidden)checkOfficialStatus();});
   window.addEventListener('online',function(){checkOfficialStatus();});
 })();
-</script></body></html>
+</script><style id="uniform-dark-blue-overrides">
+/* Letzter, verbindlicher Farb-Override: alle App-Flächen dunkelblau */
+.app .panel,
+.app .card,
+.app .step,
+.app .alert,
+.app .wow-card,
+.app .investigation-card,
+.app .month-hero,
+.app .weather-day-card,
+.app .weather-dashboard,
+.app .custom-scenario-row,
+.app .study-context-card,
+.app .weather-tile,
+.app .report-guidance-step,
+.app .practice-box,
+.app .cause-tool-intro,
+.app #loop .panel,
+.app #advisoryCasesPanel {
+  background:#102b4b !important;
+  background-image:none !important;
+  border-color:#28517a !important;
+  color:#f3f7fb !important;
+}
+.app .panel .panel,
+.app .panel .card,
+.app #loop .panel,
+.app #loop .card,
+.app #advisoryCasesPanel {
+  background-color:#102b4b !important;
+  background-image:none !important;
+}
+.app .panel .small,
+.app .card .small,
+.app #loop .small,
+.app #advisoryCasesPanel .small {color:#c3d2e0 !important}
+</style>
+</body></html>
 <!-- Cloudflare Pages preview trigger: branch-only deployment -->
