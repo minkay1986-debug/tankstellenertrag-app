@@ -619,6 +619,26 @@ Deno.test("advisor chat does not rank groups or calculate shop totals when EK is
   assert(advisor.includes("comparisonAvailable=lossAvailable&&p?.sourceShrink===true"),"Loss comparisons must require both source periods");
 });
 
+Deno.test("report does not aggregate a partially confirmed inventory as a complete station stock",()=>{
+  const rt=runtime(appFixture()),key="2026-10";
+  rt.data.months[key].sourceInventory=true;
+  rt.data.months[key].groups.getraenke._stockEntered=false;
+  rt.report();
+  const out=rt.target.innerHTML;
+  assert(out.includes("Teilbestand · nicht vollständig"),"A partial inventory source must not be presented as a complete station total");
+  assert(out.includes("Bestand dieser Warengruppe nicht bestätigt"),"A group without a confirmed stock count must remain explicitly unconfirmed");
+  assert(out.includes("Lagerbestand EK</th>"),"The inventory detail table must remain available");
+});
+
+Deno.test("radar and advisor never surface stale shrink values when the source is unconfirmed",()=>{
+  const radarStart=html.indexOf("function radar()"),radarEnd=html.indexOf("function startRadarAction",radarStart);
+  const radar=html.slice(radarStart,radarEnd);
+  assert(radar.includes("r.dataStatus?.shrinkSourceAvailable?eur(r.g.shrink):'Nicht erfasst'"),"Radar must gate shrink amounts on a confirmed source");
+  assert(radar.includes("r.dataStatus?.shrinkSourceAvailable?eur(r.g.writeoff):'Nicht erfasst'"),"Radar must gate write-off amounts on a confirmed source");
+  const start=html.indexOf("function advisorReplyBase"),end=html.indexOf("function advisorReply(",start),advisor=html.slice(start,end);
+  assert(advisor.includes("lossAvailable&&d.groups&&d.groups.some"),"Advisor group-level loss statements must be gated on the confirmed loss source");
+});
+
 Deno.test("customer-facing advisor answers contain no test-only wording",()=>{
   const start=html.indexOf("function advisorDirectAnswer"),end=html.indexOf("function advisorReplyBase",start);
   const direct=html.slice(start,end);
