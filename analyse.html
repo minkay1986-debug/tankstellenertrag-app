@@ -488,7 +488,7 @@ function dataQuality(k){
   if(Math.abs(diff)>1){
    const amount=eur(Math.abs(diff)),direction=diff>0?'nicht auf Warengruppen verteilt':'Warengruppen-Summe liegt über dem Monatsgesamtwert';
    const detail=label+': Monatswert '+eur(total)+' · erfasste Warengruppen '+eur(sum)+' · Differenz '+(diff>0?'+':'−')+amount+'. '+(complete?'Alle Warengruppen sind markiert.':'Nur '+rows.length+' von '+groupCount+' Warengruppen haben bestätigte Werte.')+' Die Differenz ist '+(diff>0?'noch nicht zugeordnet':'größer als der Monatsgesamtwert')+'; sie beweist keinen Buchungsfehler.';
-   findings.push({label,detail,amount:Math.abs(diff),complete,coverage:rows.length+'/'+GROUPS.length});
+   findings.push({label,detail,amount:Math.abs(diff),complete,coverage:rows.length+'/'+groupCount});
    anomalies.push(label+' und Warengruppen weichen um '+amount+' ab ('+direction+').');
   }
  };
