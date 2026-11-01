@@ -688,7 +688,7 @@ Deno.test("two-year synthetic advisory account ranks real confirmed margins inst
   const reply=advisorTestReply(data);
   const weakest=reply("Welche Warengruppe hat die niedrigste Marge?");
   assert(!weakest.includes("Für die aktuell geladenen Stationsdaten liegen keine bestätigten Werte"),"Advisor must not claim missing data when confirmed group EK values exist");
-  assert(weakest.indexOf("<li><b>Backshop")>=0&&weakest.indexOf("<li><b>Backshop")<weakest.indexOf("<li><b>Spielzeug"),"Weakest margin must rank Backshop (30%) before Spielzeug (35%). Actual answer: "+weakest);
+  assert(weakest.indexOf("<li><b>Backwaren")>=0&&weakest.indexOf("<li><b>Backwaren")<weakest.indexOf("<li><b>Spielzeug"),"Weakest margin must rank Backwaren (30%) before Spielzeug (35%). Actual answer: "+weakest);
   const strongest=reply("Welche Warengruppe hat die höchste Marge?");
   assert(strongest.indexOf("<li><b>Kaffee")>=0&&strongest.indexOf("<li><b>Kaffee")<strongest.indexOf("<li><b>Eis"),"Highest margin must rank Kaffee (65%) before Eis (60%). Actual answer: "+strongest);
 });
