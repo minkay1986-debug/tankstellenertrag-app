@@ -175,17 +175,17 @@ jobs:
           }
           const operational = await ask('Wie optimiere ich meinen Wareneinsatz?');
           if (operational.includes('nicht Teil von TankstellenErtrag')) throw new Error('Operational question incorrectly blocked');
-          assertEvidenceFrame(operational, 'FACHLICHE EINORDNUNG', 'Wareneinsatz');
+          assertEvidenceFrame(operational, 'DATENBEFUND', 'Wareneinsatz');
           const marginRanking = await ask('Welche Warengruppe hat die niedrigste Marge?');
           if (!marginRanking.includes('Getränke') || !marginRanking.includes('Marge 38')) {
             throw new Error('Margin ranking did not use the synthetic station data: ' + marginRanking);
           }
-          assertEvidenceFrame(marginRanking, 'FACHLICHE EINORDNUNG', 'Margenranking');
+          assertEvidenceFrame(marginRanking, 'DATENBEFUND', 'Margenranking');
           const grossProfitComparison = await ask('Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?');
           if (!grossProfitComparison.includes('Shop-Veränderung zu Vormonat') || !grossProfitComparison.includes('Rohertrag')) {
             throw new Error('Gross-profit comparison did not use the selected month and prior month: ' + grossProfitComparison);
           }
-          assertEvidenceFrame(grossProfitComparison, 'FACHLICHE EINORDNUNG', 'Rohertragsvergleich');
+          assertEvidenceFrame(grossProfitComparison, 'DATENBEFUND', 'Rohertragsvergleich');
           const lossComparison = await ask('Wie entwickeln sich meine erfassten Verlustbeträge im Vergleich zum Vorjahr?');
           if (!lossComparison.includes('Verlustanalyse im Tankstellenshop') || !lossComparison.includes('Vorjahresmonat')) {
             throw new Error('Loss advice did not use the same month in the prior year: ' + lossComparison);
