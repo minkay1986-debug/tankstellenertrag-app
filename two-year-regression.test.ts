@@ -752,3 +752,16 @@ Deno.test("annual report excludes zero-sales months from EK-backed gross profit 
   assert(row.includes(formatted),"Annual gross profit must use only months with both positive shop revenue and confirmed EK. Row: "+row);
   assert(row.includes("11/12 Monate")||row.includes("11/12"),"Annual completeness must continue to show only 11 revenue months");
 });
+
+
+Deno.test("monthly report does not present stale revenue and gross profit as confirmed values",()=>{
+  const data=appFixture();
+  data.months["2026-10"].sourceMonthly=false;
+  data.months["2026-10"].revenue=125000;
+  data.months["2026-10"].sourceEK=true;
+  const rt=runtime(data);
+  rt.report();
+  const html=String(rt.target.innerHTML);
+  assert(html.includes("Shop-Umsatz</div><div class=\"value\">Nicht erfasst"),"Report must label unconfirmed monthly revenue as not recorded");
+  assert(html.includes("Rohertrag</div><div class=\"value\">Nicht berechenbar"),"Report must not calculate gross profit from stale revenue");
+});
