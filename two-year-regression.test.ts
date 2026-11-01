@@ -502,7 +502,7 @@ Deno.test("priority tie-break uses economic exposure after signal strength",()=>
 });
 
 Deno.test("avoidable excess stock is only estimated above both target and operational minimum",()=>{
-  const metric=appFunction("inventoryMetrics","inventoryPeriodDays",["g","days"],{});
+  const metric=appFunction("inventoryMetrics","inventoryMovementBalance",["g","days"],{});
   const base={stock:4050,stockEntered:true,ek:2800,ekEntered:true,openingStock:4000,openingStockEntered:true,targetStockDays:30,periodDays:31};
   const withoutFloor=metric(base,31);
   assert(withoutFloor.excessCapital!==null&&withoutFloor.avoidableExcessCapital===null,"No avoidable capital without an operator-confirmed operational floor");
