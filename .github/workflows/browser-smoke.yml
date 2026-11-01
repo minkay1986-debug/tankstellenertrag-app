@@ -36,10 +36,11 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Start static server
         run: |
+          echo '127.0.0.1 feature.tankstellenertrag-preview.pages.dev' | sudo tee -a /etc/hosts
           python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/tankstellenertrag-http.log 2>&1 &
           echo $! > /tmp/tankstellenertrag-http.pid
           for i in $(seq 1 30); do
-            if curl --fail --silent http://127.0.0.1:4173/analyse.html > /dev/null; then exit 0; fi
+            if curl --fail --silent http://feature.tankstellenertrag-preview.pages.dev:4173/analyse.html > /dev/null; then exit 0; fi
             sleep 1
           done
           cat /tmp/tankstellenertrag-http.log
@@ -52,9 +53,38 @@ jobs:
           const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
           const pageErrors = [];
           page.on('pageerror', error => pageErrors.push(error.stack || error.message));
-          const response = await page.goto('http://127.0.0.1:4173/analyse.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
+          const response = await page.goto('http://feature.tankstellenertrag-preview.pages.dev:4173/analyse.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
           if (!response || !response.ok()) throw new Error('analyse.html returned HTTP ' + (response?.status() ?? 'no response'));
           await page.waitForTimeout(3000);
+          const previewState = await page.evaluate(() => ({
+            appVisible: getComputedStyle(document.querySelector('#app')).display !== 'none',
+            station: document.querySelector('#stationInfo')?.innerText ?? '',
+            month: document.querySelector('#month')?.value ?? ''
+          }));
+          if (!previewState.appVisible || !previewState.station.includes('Musterstation') || !previewState.month) {
+            throw new Error('Synthetic preview data did not initialize: ' + JSON.stringify(previewState));
+          }
+          const views = [
+            { id: 'monthly', selector: '#rev' },
+            { id: 'meinmonat', selector: '#meinMonatContent' },
+            { id: 'analysis', selector: '#analysisBody' },
+            { id: 'radar', selector: '#radarBody' },
+            { id: 'economic', selector: '#economicBody' },
+            { id: 'yearly', selector: '#yearTable' },
+            { id: 'report', selector: '#reportBody' },
+            { id: 'advisorChat', selector: '#advisorChatForm' }
+          ];
+          for (const view of views) {
+            await page.locator('.nav button[data-v="' + view.id + '"]').click();
+            await page.locator('#' + view.id + '.view.active').waitFor({ timeout: 5000 });
+            const exists = await page.locator(view.selector).count();
+            if (!exists) throw new Error('Missing content in view ' + view.id);
+            if (view.id !== 'advisorChat') {
+              const content = await page.locator(view.selector).first().innerText().catch(() => '');
+              if (content.trim().length < 10) throw new Error('View appears empty: ' + view.id);
+            }
+          }
+          if (pageErrors.length) throw new Error('Runtime errors during view navigation:\\n' + pageErrors.join('\\n---\\n'));
           await page.screenshot({ path: 'ocean-glass-desktop.png', fullPage: true });
           const glassAudit = await page.evaluate(() => {
             const body = getComputedStyle(document.body);
@@ -96,7 +126,7 @@ jobs:
           const page = await browser.newPage();
           const errors = [];
           page.on('pageerror', e => errors.push(e.message));
-          await page.goto('http://127.0.0.1:4173/analyse.html', { waitUntil: 'domcontentloaded' });
+          await page.goto('http://feature.tankstellenertrag-preview.pages.dev:4173/analyse.html', { waitUntil: 'domcontentloaded' });
           await page.locator('#advisorChatForm').waitFor({ state: 'attached', timeout: 15000 });
           await page.evaluate(() => {
             document.querySelector('#app').style.display = 'block';
