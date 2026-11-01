@@ -635,7 +635,7 @@ function customSimulation(i){
  const res=scenarioResult(g,0,sp,wp);
  const values={name:g.name,revenue:g.revenue,shrink:g.shrink,writeoff:g.writeoff,shrinkPct:sp,writeoffPct:wp};
  try{const all=JSON.parse(localStorage.getItem('tankstellenertrag-custom-scenarios')||'[]');all[i-1]=values;localStorage.setItem('tankstellenertrag-custom-scenarios',JSON.stringify(all));}catch(_){}
- $('customResult'+i).innerHTML=g.revenue||g.shrink||g.writeoff?'<b>Ihr Szenario:</b> +'+eur(res.total)+'/Monat · Schwund +'+eur(res.shrinkGain)+' · Abschriften +'+eur(res.writeoffGain)+' · <b>jährlich +'+eur(res.total*12)+'</b>':'<span>Umsatz, Schwund und Abschriften eingeben – dann sehen Sie sofort das Szenario.</span>';
+ $('customResult'+i).innerHTML=g.revenue||g.shrink||g.writeoff?'<b>Ihr Szenario:</b> '+(res.total===null?'nicht berechenbar':'+'+eur(res.total))+'/Monat · Schwund '+(res.shrinkGain===null?'nicht erfasst':'+'+eur(res.shrinkGain))+' · Abschriften '+(res.writeoffGain===null?'nicht erfasst':'+'+eur(res.writeoffGain))+' · <b>jährlich '+(res.total===null?'nicht berechenbar':'+'+eur(res.total*12))+'</b>':'<span>Umsatz, Schwund und Abschriften eingeben – dann sehen Sie sofort das Szenario.</span>';
 }
 function investigationAnalysis(article,text){
  const raw=String((article||'')+' '+(text||'')).trim(),t=raw.toLowerCase();
