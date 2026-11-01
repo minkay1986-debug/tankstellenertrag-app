@@ -911,13 +911,22 @@ Deno.test("all merchandise group guidance remains category-specific",()=>{
 
 
 Deno.test("priority cards rank confirmed euro exposure before signal count",()=>{
-  const rt=runtime(appFixture());
-  const rows=rt.wowPriority("2026-10");
-  assert(rows.length>=1,"Fixture should produce at least one priority card");
-  for(let i=1;i<rows.length;i++){
-    assert(rows[i-1].economicExposure+0.000001>=rows[i].economicExposure,
-      "A card with lower confirmed euro exposure must not rank above a larger economic issue");
-  }
+  const data=appFixture();
+  const current=data.months["2026-10"],previous=data.months["2026-09"];
+  const big=current.groups.backshop,small=current.groups.kaffee,smallPrev=previous.groups.kaffee;
+  big.revenue=20000;big._revenueEntered=true;big.ek=10000;big._ekEntered=true;
+  big.shrink=500;big._shrinkEntered=true;big.writeoff=0;big._writeoffEntered=true;
+  small.revenue=1000;small._revenueEntered=true;small.ek=600;small._ekEntered=true;
+  smallPrev.revenue=2000;smallPrev._revenueEntered=true;smallPrev.ek=800;smallPrev._ekEntered=true;
+  data.settings.targetMargins={kaffee:60};
+  const rt=runtime(data),rows=rt.wowPriority("2026-10");
+  const bigRow=rows.find((r:any)=>r.g.id==="backshop"),smallRow=rows.find((r:any)=>r.g.id==="kaffee");
+  assert(!!bigRow&&!!smallRow,"Synthetic comparison must produce both economic priority cards");
+  assert(bigRow.economicExposure>smallRow.economicExposure,"Large confirmed shrink exposure must exceed the smaller overlapping margin/sales exposure");
+  assert(bigRow.signalScore<smallRow.signalScore,"Synthetic case must challenge signal-count-first ranking");
+  assert(rows[0].g.id==="backshop","Higher confirmed euro exposure must rank first even with fewer signals");
+  for(let i=1;i<rows.length;i++)assert(rows[i-1].economicExposure+0.000001>=rows[i].economicExposure,
+    "Priority rows must be sorted by confirmed euro exposure");
   assert(rows.every((r:any)=>Number.isFinite(r.economicExposure)&&r.economicExposure>=0),
     "Economic ranking must use finite, non-negative confirmed exposure only");
 });
