@@ -728,6 +728,8 @@ Deno.test("unconfirmed group shrink and write-off values never become radar sign
   assert(!radar.reasons.includes("Schwund auffällig"),"Unconfirmed group shrink must not create a radar signal");
   assert(!radar.reasons.includes("Abschriften auffällig"),"Unconfirmed group write-off must not create a radar signal");
   assert(radar.dataStatus.shrinkSourceAvailable===false&&radar.dataStatus.writeoffSourceAvailable===false,"Group loss source status must remain unconfirmed");
+  const lossAdvice=advisorTestReply(data,"2026-10")("Wie entwickeln sich meine erfassten Verlustbeträge im Vergleich zum Vorjahr?");
+  assert(!lossAdvice.includes("Es gibt bestätigte positive Werte auf Warengruppenebene"),"Advisor must not attribute unconfirmed group losses");
   const scenario=rt.scenarioResult({...rt.calc("2026-10").groups.find((g:any)=>g.id==="backshop"),shrink:9999,writeoff:8888,shrinkEntered:false,writeoffEntered:false},0,50,50,true);
   assert(scenario.shrinkGain===null&&scenario.writeoffGain===null,"Unconfirmed group loss amounts must not be monetized in simulation");
 });
