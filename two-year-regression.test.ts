@@ -41,7 +41,7 @@ function runtime(data:any) {
   const prev = (k:string) => {const [y,mo]=k.split("-").map(Number);const d=new Date(y,mo-2,1);const p=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;return Object.hasOwn(data.months,p)?p:null;};
   const calc = appFunction("calc","reconciliation",["GROUPS","data","settings","mrow"],{GROUPS,data,settings,mrow});
   const inventoryMetrics = appFunction("inventoryMetrics","reconciliation",["g","days"],{});
-  const dataQuality = appFunction("dataQuality","hasData",["mrow","calc","prev","eur"],{mrow,calc,prev,eur});
+  const dataQuality = appFunction("dataQuality","hasData",["mrow","calc","prev","eur","GROUPS"],{mrow,calc,prev,eur,GROUPS});
   const learnCalendarEffects = appFunction("learnCalendarEffects","forecastSeason",["months","calFn","calcFn","station"],{station:{city:"Testort"}});
   const wowPriority = appFunction("wowPriority","riskLevel",["calc","prev","settings","data","inventoryMetrics"],{calc,prev,settings,data,inventoryMetrics});
   const keys = () => Object.keys(data.months).sort();
@@ -576,4 +576,15 @@ Deno.test("dashboard and quick advisory never display gross profit or margin wit
 Deno.test("monthly stock reconciliation input requires loss data to be entered explicitly",()=>{
   assert(html.includes("r.shrinkEntered=$('shrink').value!=='';r.writeoffEntered=$('writeoff').value!==''"),"Monthly input must preserve explicit empty-vs-zero loss fields");
   assert(html.includes("x.shrinkEntered!==true||x.writeoffEntered!==true"),"Reconciliation must gate on explicit loss inputs");
+});
+
+Deno.test("manual month entry marks data sources and data quality emits one consolidated hint",()=>{
+  const data=appFixture(),key="2026-10",row=data.months[key];
+  row.sourceMonthly=true;row.sourceEK=true;row.sourceShrink=true;
+  row.revenue=1000;row.ek=1200;row.shrink=1400;
+  row.groups.backshop._revenueEntered=true;row.groups.backshop.revenue=100;row.groups.backshop.shrink=150;
+  const q=runtime(data).dataQuality(key);
+  assert(q.errors.length===0,"Possible negative gross margin and high shrink must not be hard errors");
+  assert(q.notes.length===1,"Multiple plausibility anomalies should be consolidated into one review hint");
+  assert(q.notes[0].includes("negativer Rohertrag")&&q.notes[0].includes("Schwund bei Backwaren"),"Consolidated hint must retain the relevant checks");
 });
