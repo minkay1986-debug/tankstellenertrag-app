@@ -699,6 +699,8 @@ Deno.test("two-year advisory account reports real year-over-year loss values and
   const answer=reply("Wie entwickeln sich meine erfassten Verlustbeträge im Vergleich zum Vorjahr?");
   assert(answer.includes("Vorjahresmonat (2025-12)"),"Loss advice must compare the same calendar month in the previous year. Actual answer: "+answer);
   assert(answer.includes("Erfasster Schwund")&&answer.includes("Abschriften"),"Loss advice must separate recorded shrink and write-offs");
+  assert(answer.includes("1.164,80")&&answer.includes("1.120,00")&&answer.includes("44,80"),"Loss advice must calculate current, prior-year and delta values from the same month");
+  assert(!answer.includes("<li>Waschen:"),"Non-shop wash service must not appear in shop group loss breakdown");
   assert(answer.includes("Die Zahlen allein erklären nicht"),"Loss advice must not claim an unproven cause. Actual answer: "+answer);
 });
 
@@ -707,6 +709,7 @@ Deno.test("two-year advisory account calculates gross-profit comparison only wit
   const reply=advisorTestReply(data);
   const answer=reply("Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?");
   assert(answer.includes("Shop-Veränderung zu Vormonat 2026-11"),"Advisor must use the actual previous month in the comparison");
+  assert(answer.includes("8.985,60")&&answer.includes("18.720,00"),"Advisor must calculate the real gross-profit and revenue deltas");
   assert(!answer.includes("Für die aktuell geladenen Stationsdaten sind keine bestätigten Werte für beide Zeiträume vorhanden"),"Confirmed current and prior-year EK must not trigger a stale missing-data answer");
   data.months["2026-11"].sourceEK=false;
   const missing=advisorTestReply(data)("Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?");
