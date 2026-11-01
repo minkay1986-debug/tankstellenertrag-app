@@ -791,23 +791,17 @@ Deno.test("monthly report marks inventory incomplete when a shop group's revenue
 });
 
 
-Deno.test("temporary inspect two-year synthetic advisor responses",()=>{
+Deno.test("two-year advisory account routes inventory and priority questions to data-backed analysis",()=>{
   const data=twoYearAdvisorTestAccount();
   const reply=advisorTestReply(data,"2026-10");
-  for(const q of [
-    "Welche Warengruppe hat die niedrigste Marge?",
-    "Welche Warengruppe hat die höchste Marge?",
-    "Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?",
-    "Wie entwickeln sich meine erfassten Verlustbeträge im Vergleich zum Vorjahr?",
-    "Wo ist mein Warenbestand kritisch?",
-    "Wo liegt das größte wirtschaftliche Potenzial?",
-    "Welche drei Dinge sollte ich zuerst prüfen?"
-  ]) console.log("ADVISOR_RESPONSE",q,reply(q));
   const stock=reply("Wo ist mein Warenbestand kritisch?");
-  assert(stock.includes("Bestandsanalyse")&&stock.includes("rechnerische Reichweite"),"Inventory question must route to confirmed inventory metrics, not loss analysis. Actual answer: "+stock);
-  assert(!stock.includes("Verlustanalyse"),"Inventory question must not be misclassified as shrink/write-off analysis");
+  assert(stock.includes("Bestandsanalyse")&&stock.includes("rechnerische Reichweite")&&stock.includes("17,7 Tage"),"Inventory question must report confirmed stock and calendar-day coverage. Actual answer: "+stock);
+  assert(!stock.includes("Verlustanalyse"),"Inventory-only question must not be misclassified as shrink/write-off analysis");
+  assert(stock.includes("kein eigener Zielwert hinterlegt"),"Without operator thresholds the advisor must not declare stock critical");
   const potential=reply("Wo liegt das größte wirtschaftliche Potenzial?");
-  assert(potential.includes("Priorisierte Prüffelder")&&potential.includes("Modellannahme"),"Economic-potential question must use real priority signals and label scenario assumptions. Actual answer: "+potential);
+  assert(potential.includes("Größtes wirtschaftliches Potenzial")&&potential.includes("+620,33")&&potential.includes("Modellannahme 25 %"),"Economic-potential question must show the top data-backed lever and its explicit assumption. Actual answer: "+potential);
+  assert(!potential.includes("Spielzeug:"),"A singular biggest-potential question should not dump every ranked group");
   const priorities=reply("Welche drei Dinge sollte ich zuerst prüfen?");
-  assert(priorities.includes("Priorisierte Prüffelder")&&!priorities.includes("Ich ordne deine Frage noch nicht sicher zu"),"Prioritization question must use the current radar ranking. Actual answer: "+priorities);
+  assert(priorities.includes("Priorisierte Prüffelder")&&priorities.includes("Backwaren:")&&priorities.includes("Spielzeug:")&&priorities.includes("Getränke:"),"Prioritization question must use the top three current radar signals. Actual answer: "+priorities);
+  assert(!priorities.includes("Ich ordne deine Frage noch nicht sicher zu"),"Prioritization question must not fall back to generic clarification");
 });
