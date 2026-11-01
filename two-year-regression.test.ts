@@ -30,7 +30,7 @@ function appFixture() {
     const groupRevenue = m.revenue / 8;
     const groups: Record<string,any> = {};
     for (const [id,,target] of groupDefs) groups[id] = {revenue:id==="waschen"?0:groupRevenue,_revenueEntered:id!=="waschen",ek:id==="waschen"?0:groupRevenue*(1-m.marginPct/100),margin:target,shrink:id==="waschen"?0:id==="backshop"&&m.key==="2026-10"?groupRevenue*.032:groupRevenue*.008,writeoff:id==="waschen"?0:groupRevenue*.002,_shrinkEntered:id!=="waschen",_writeoffEntered:id!=="waschen",stock:groupRevenue*.4,_stockEntered:true,openingStock:groupRevenue*.42,_openingStockEntered:true};
-    data.months[m.key] = {revenue:m.revenue,ek:m.ek,shrink:m.revenue*m.shrinkPct/100,writeoff:m.revenue*.002,stock:m.revenue*.4,sourceMonthly:true,sourceEK:true,sourceShrink:true,sourceInventory:true,groups};
+    data.months[m.key] = {revenue:m.revenue,ek:m.ek,shrink:Object.values(groups).reduce((sum,g)=>sum+Number(g.shrink||0),0),writeoff:m.revenue*.002,stock:m.revenue*.4,sourceMonthly:true,sourceEK:true,sourceShrink:true,sourceInventory:true,groups};
   }
   return data;
 }
@@ -703,7 +703,7 @@ Deno.test("two-year advisory account reports real year-over-year loss values and
   const answer=reply("Wie entwickeln sich meine erfassten Verlustbeträge im Vergleich zum Vorjahr?");
   assert(answer.includes("Vorjahresmonat (2025-10)"),"Loss advice must compare the same calendar month in the previous year. Actual answer: "+answer);
   assert(answer.includes("Erfasster Schwund")&&answer.includes("Abschriften"),"Loss advice must separate recorded shrink and write-offs");
-  assert(answer.includes("3.500,64")&&answer.includes("990,00")&&answer.includes("2.510,64"),"Loss advice must calculate current, prior-year and delta values from the same month");
+  assert(answer.includes("1.338,48")&&answer.includes("990,00")&&answer.includes("348,48"),"Loss advice must calculate current, prior-year and delta values from the same month");
   assert(!answer.includes("<li>Waschen:"),"Non-shop wash service must not appear in shop group loss breakdown");
   assert(answer.includes("Die Zahlen allein erklären nicht"),"Loss advice must not claim an unproven cause. Actual answer: "+answer);
 });
@@ -716,7 +716,7 @@ Deno.test("two-year advisory account calculates gross-profit comparison only wit
   assert(answer.includes("-2.496,00")&&answer.includes("-5.200,00"),"Advisor must calculate the real gross-profit and revenue deltas");
   assert(!answer.includes("Für die aktuell geladenen Stationsdaten sind keine bestätigten Werte für beide Zeiträume vorhanden"),"Confirmed current and prior-year EK must not trigger a stale missing-data answer");
   data.months["2026-09"].sourceEK=false;
-  const missing=advisorTestReply(data)("Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?");
+  const missing=advisorTestReply(data,"2026-10")("Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?");
   assert(missing.includes("nicht berechenbar · EK fehlt in mindestens einem Zeitraum"),"Missing EK in one period must suppress the gross-profit delta");
 });
 
