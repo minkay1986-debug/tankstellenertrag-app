@@ -644,3 +644,71 @@ Deno.test("customer-facing advisor answers contain no test-only wording",()=>{
   const direct=html.slice(start,end);
   assert(!/aktuellen Test|Testzustand|Testdaten/i.test(direct),"Test-only wording must not appear in customer-facing direct answers");
 });
+
+
+function twoYearAdvisorTestAccount() {
+  const data = appFixture();
+  data.testAccount = {name:"TSE Zwei-Jahres-Beratungstest", kind:"synthetic", years:["2025","2026"], months:24};
+  const key = "2026-12";
+  const marginByGroup: Record<string,number> = {
+    backshop:30,spielzeug:35,getraenke:40,lebensmittel:45,drogerie:50,
+    "süsswaren":55,eis:60,kaffee:65,waschen:0
+  };
+  for (const [id,margin] of Object.entries(marginByGroup)) {
+    const g = data.months[key].groups[id];
+    if (!g || id === "waschen") continue;
+    g.ek = g.revenue * (1 - margin / 100);
+    g._ekEntered = true;
+  }
+  return data;
+}
+
+function advisorTestReply(data:any, key="2026-12") {
+  const rt = runtime(data);
+  const month = () => key;
+  const advisorNorm = appFunction("advisorNorm","advisorScopeGuard",[],{});
+  const reconciliation = () => ({ready:false});
+  const dataQuality = () => ({notes:[]});
+  const settings = () => data.settings || {};
+  const advisorDirectAnswer = appFunction("advisorDirectAnswer","advisorHasCurrentMonthData",
+    ["advisorNorm","month","calc","data"],{advisorNorm,month,calc:rt.calc,data});
+  const advisorReplyBase = appFunction("advisorReplyBase","advisorReply",
+    ["advisorNorm","month","calc","prev","data","reconciliation","dataQuality","settings","GROUPS"],
+    {advisorNorm,month,calc:rt.calc,prev:rt.prev,data,reconciliation,dataQuality,settings,GROUPS:groupDefs});
+  return appFunction("advisorReply","initAdvisorChat",
+    ["advisorScopeGuard","advisorDirectAnswer","advisorGeneralGuidanceAnswer","advisorNoDataAnswer","advisorHasCurrentMonthData","advisorReplyBase","advisorKnowledgeHtml"],
+    {advisorScopeGuard:()=>"",advisorDirectAnswer,advisorGeneralGuidanceAnswer:()=>"",
+      advisorNoDataAnswer:()=>"",advisorHasCurrentMonthData:()=>true,advisorReplyBase,advisorKnowledgeHtml:() => ""});
+}
+
+Deno.test("two-year synthetic advisory account ranks real confirmed margins instead of returning a stale no-data answer",()=>{
+  const data=twoYearAdvisorTestAccount();
+  assert(Object.keys(data.months).length===24,"Test account must contain 24 monthly records");
+  assert(data.testAccount.years.join(",")==="2025,2026","Test account must cover 2025 and 2026");
+  const reply=advisorTestReply(data);
+  const weakest=reply("Welche Warengruppe hat die niedrigste Marge?");
+  assert(!weakest.includes("Für die aktuell geladenen Stationsdaten liegen keine bestätigten Werte"),"Advisor must not claim missing data when confirmed group EK values exist");
+  assert(weakest.indexOf("<li><b>Backshop")>=0&&weakest.indexOf("<li><b>Backshop")<weakest.indexOf("<li><b>Spielzeug"),"Weakest margin must rank Backshop (30%) before Spielzeug (35%)");
+  const strongest=reply("Welche Warengruppe hat die höchste Marge?");
+  assert(strongest.indexOf("<li><b>Kaffee")>=0&&strongest.indexOf("<li><b>Kaffee")<strongest.indexOf("<li><b>Eis"),"Highest margin must rank Kaffee (65%) before Eis (60%)");
+});
+
+Deno.test("two-year advisory account reports real year-over-year loss values and labels causes as unproven",()=>{
+  const data=twoYearAdvisorTestAccount();
+  const reply=advisorTestReply(data);
+  const answer=reply("Wie entwickeln sich Schwund und Abschriften im Vergleich zum Vorjahr?");
+  assert(answer.includes("Vorjahresmonat (2025-12)"),"Loss advice must compare the same calendar month in the previous year");
+  assert(answer.includes("Erfasster Schwund")&&answer.includes("Abschriften"),"Loss advice must separate recorded shrink and write-offs");
+  assert(answer.includes("Die Zahlen allein erklären nicht"),"Loss advice must not claim an unproven cause");
+});
+
+Deno.test("two-year advisory account calculates gross-profit comparison only with confirmed EK in both months",()=>{
+  const data=twoYearAdvisorTestAccount();
+  const reply=advisorTestReply(data);
+  const answer=reply("Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?");
+  assert(answer.includes("Shop-Veränderung zu Vormonat (2026-11)"),"Advisor must use the actual previous month in the comparison");
+  assert(!answer.includes("Für die aktuell geladenen Stationsdaten sind keine bestätigten Werte für beide Zeiträume vorhanden"),"Confirmed current and prior-year EK must not trigger a stale missing-data answer");
+  data.months["2026-11"].sourceEK=false;
+  const missing=advisorTestReply(data)("Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?");
+  assert(missing.includes("nicht berechenbar · EK fehlt in mindestens einem Zeitraum"),"Missing EK in one period must suppress the gross-profit delta");
+});
