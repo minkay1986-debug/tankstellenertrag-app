@@ -706,7 +706,7 @@ Deno.test("two-year advisory account calculates gross-profit comparison only wit
   const data=twoYearAdvisorTestAccount();
   const reply=advisorTestReply(data);
   const answer=reply("Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?");
-  assert(answer.includes("Shop-Veränderung zu Vormonat (2026-11)"),"Advisor must use the actual previous month in the comparison");
+  assert(answer.includes("Shop-Veränderung zu Vormonat 2026-11"),"Advisor must use the actual previous month in the comparison");
   assert(!answer.includes("Für die aktuell geladenen Stationsdaten sind keine bestätigten Werte für beide Zeiträume vorhanden"),"Confirmed current and prior-year EK must not trigger a stale missing-data answer");
   data.months["2026-11"].sourceEK=false;
   const missing=advisorTestReply(data)("Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?");
