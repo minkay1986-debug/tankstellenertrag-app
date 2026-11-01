@@ -457,6 +457,27 @@ Deno.test("inventory metrics calculate coverage, turnover and target-based capit
   assert(!missing.available&&missing.coverageDays===null,"Unconfirmed inventory must not create a coverage estimate");
 });
 
+Deno.test("inventory analysis uses actual calendar days and reconciles documented stock movements",()=>{
+  const days=appFunction("inventoryPeriodDays","inventoryMetrics",["key"],{});
+  assert(days("2026-02")===28&&days("2024-02")===29&&days("2026-09")===30&&days("2026-10")===31,"Inventory rate calculations must use the selected calendar month's actual day count");
+  const balance=appFunction("inventoryMovementBalance","reconciliation",["g"],{});
+  const complete={openingStock:1000,openingStockEntered:true,stockPurchasesEK:500,stockPurchasesEntered:true,supplierReturnsEK:50,supplierReturnsEntered:true,stockLossesEK:20,stockLossesEntered:true,stockAdjustmentsEK:10,stockAdjustmentsEntered:true,ek:400,ekEntered:true,stock:1040,stockEntered:true};
+  const m=balance(complete);
+  assert(m.ready&&Math.abs(m.expectedClosing-1040)<.001&&Math.abs(m.difference)<.001,"Expected a reconciled closing stock of 1,040 EUR");
+  const discrepancy=balance({...complete,stock:1000});
+  assert(discrepancy.ready&&Math.abs(discrepancy.difference-40)<.001,"A 40 EUR difference must remain visible for review");
+  const missing=balance({...complete,stockLossesEntered:false});
+  assert(!missing.ready&&missing.difference===null,"Missing movement values must not be treated as zero");
+  const negative=balance({...complete,supplierReturnsEK:-1});
+  assert(!negative.ready,"Negative supplier returns must be rejected");
+});
+
+Deno.test("inventory movement inputs are saved separately for each merchandise group",()=>{
+  assert(html.includes("data-stock-purchases")&&html.includes("data-supplier-returns")&&html.includes("data-stock-losses")&&html.includes("data-stock-adjustments"),"The entry form must expose each movement category");
+  assert(html.includes("inventoryMovementBalance")&&html.includes("Bewegungsdifferenz"),"The report must show a per-group movement reconciliation");
+  assert(html.includes("inventoryPeriodDays(d.key)"),"Analysis must use actual calendar days for the selected month");
+});
+
 Deno.test("category advice uses distinct operational checks for drinks, coffee and bakery",()=>{
   const rt=runtime(appFixture());
   const guidance=(id:string)=>rt.practiceGuidance({g:{id,name:id},reasons:["Ist-Marge unter Ihrem Zielwert"],dataStatus:{groupEkAvailable:true,previousMonthAvailable:true}});
