@@ -475,10 +475,10 @@ function dashboard(){
  const fmtDelta=v=>v===null?'Nicht verfügbar':(v>0?'+':'')+v.toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
  const yearsKeys=allKeys.filter(key=>{const yr=Number(key.slice(0,4));return yr<=selectedYear&&yr>=selectedYear-3;});
  if(!yearsKeys.length){$('trend').innerHTML='<p class="small">Noch keine Monatsdaten für eine belastbare Verlaufskurve.</p>';return}
- const currentYearRows=Array.from({length:12},(_,i)=>{const key=selectedYear+'-'+String(i+1).padStart(2,'0');return allKeys.includes(key)?{month:i+1,key,d:calc(key)}:null});
- const priorYearRows=Array.from({length:12},(_,i)=>{const key=(selectedYear-1)+'-'+String(i+1).padStart(2,'0');return allKeys.includes(key)?{month:i+1,key,d:calc(key)}:null});
- const twoYearsAgoRows=Array.from({length:12},(_,i)=>{const key=(selectedYear-2)+'-'+String(i+1).padStart(2,'0');return allKeys.includes(key)?{month:i+1,key,d:calc(key)}:null});
- const threeYearsAgoRows=Array.from({length:12},(_,i)=>{const key=(selectedYear-3)+'-'+String(i+1).padStart(2,'0');return allKeys.includes(key)?{month:i+1,key,d:calc(key)}:null});
+ const currentYearRows=Array.from({length:12},(_,i)=>{const key=selectedYear+'-'+String(i+1).padStart(2,'0');if(!allKeys.includes(key))return null;const d=calc(key);return d.sourceEK===true?{month:i+1,key,d}:null});
+ const priorYearRows=Array.from({length:12},(_,i)=>{const key=(selectedYear-1)+'-'+String(i+1).padStart(2,'0');if(!allKeys.includes(key))return null;const d=calc(key);return d.sourceEK===true?{month:i+1,key,d}:null});
+ const twoYearsAgoRows=Array.from({length:12},(_,i)=>{const key=(selectedYear-2)+'-'+String(i+1).padStart(2,'0');if(!allKeys.includes(key))return null;const d=calc(key);return d.sourceEK===true?{month:i+1,key,d}:null});
+ const threeYearsAgoRows=Array.from({length:12},(_,i)=>{const key=(selectedYear-3)+'-'+String(i+1).padStart(2,'0');if(!allKeys.includes(key))return null;const d=calc(key);return d.sourceEK===true?{month:i+1,key,d}:null});
  const grossValues=yearsKeys.map(key=>calc(key)).filter(d=>d.sourceEK===true).map(d=>Number(d.gross)||0);
  const minGross=Math.min(0,...grossValues),maxGross=Math.max(1,...grossValues);
  const yMin=minGross<0?minGross:0,yMax=maxGross*1.08,ySpan=Math.max(1,yMax-yMin);
@@ -598,20 +598,20 @@ function radar(){
  enhanceRadarAccordions();
 }
 function startRadarAction(groupId){const rows=wowPriority(month()).filter(r=>r.reasons.length);const selected=rows.find(r=>r.g.id===groupId);if(!selected)return;loop(selected);const target=$('loop');if(target){target.scrollIntoView({behavior:'smooth',block:'start'});target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}const msg=$('investigationMsg');if(msg)msg.textContent='Maßnahmenplanung für '+selected.g.name+' geöffnet. Prüfen Sie die Vorschläge und wählen Sie nur passende Maßnahmen aus.';}
-function scenarioResult(g,rp,sp,wp){
+function scenarioResult(g,rp,sp,wp,lossDataAvailable=true){
  const newRev=g.revenue*(1+rp/100);
  const actualMargin=g.actualMargin!==null&&g.actualMargin!==undefined&&Number.isFinite(Number(g.actualMargin))?Number(g.actualMargin):null;
  const revenueGain=actualMargin===null?null:(newRev*actualMargin/100-g.revenue*actualMargin/100);
- const shrinkGain=g.shrink*sp/100;
- const writeoffGain=g.writeoff*wp/100;
- const total=grossSafe(revenueGain)+shrinkGain+writeoffGain;
- return {newRev,actualMargin,revenueGain,shrinkGain,writeoffGain,total};
+ const shrinkGain=lossDataAvailable?g.shrink*sp/100:null;
+ const writeoffGain=lossDataAvailable?g.writeoff*wp/100:null;
+ const total=grossSafe(revenueGain)+grossSafe(shrinkGain)+grossSafe(writeoffGain);
+ return {newRev,actualMargin,revenueGain,shrinkGain,writeoffGain,total,lossDataAvailable};
 }
 function simulation(){
  const d=calc(month()),g=d.groups.find(x=>x.id===$('simGroup').value)||d.groups.find(x=>x.revenue>0);
  if(!g){$('simResult').innerHTML='<div class="card"><div class="label">Standard-Warengruppe</div><div class="small">Noch keine Warengruppe mit Umsatz erfasst.</div></div>';return}
- const rp=+$('simRevenue').value||0,sp=+$('simShrink').value||0,wp=+$('simWriteoff').value||0,res=scenarioResult(g,rp,sp,wp);
- $('simResult').innerHTML=[['Berechenbare Komponenten / Monat','+'+eur(res.total)],['davon zusätzlicher Rohertrag aus Umsatz',res.revenueGain===null?'Nicht berechenbar · Ist-Marge fehlt':'+'+eur(res.revenueGain)],['davon Schwund','+'+eur(res.shrinkGain)],['davon Abschriften','+'+eur(res.writeoffGain)],['Berechenbare Komponenten / Jahr','+'+eur(res.total*12)]].map(x=>'<div class="card"><div class="label">'+x[0]+'</div><div class="value">'+x[1]+'</div></div>').join('');
+ const rp=+$('simRevenue').value||0,sp=+$('simShrink').value||0,wp=+$('simWriteoff').value||0,res=scenarioResult(g,rp,sp,wp,d.sourceShrink===true);
+ $('simResult').innerHTML=[['Berechenbare Komponenten / Monat','+'+eur(res.total)],['davon zusätzlicher Rohertrag aus Umsatz',res.revenueGain===null?'Nicht berechenbar · Ist-Marge fehlt':'+'+eur(res.revenueGain)],['davon Schwund',res.shrinkGain===null?'Nicht erfasst':'+'+eur(res.shrinkGain)],['davon Abschriften',res.writeoffGain===null?'Nicht erfasst':'+'+eur(res.writeoffGain)],['Berechenbare Komponenten / Jahr','+'+eur(res.total*12)]].map(x=>'<div class="card"><div class="label">'+x[0]+'</div><div class="value">'+x[1]+'</div></div>').join('');
 }
 function renderCustomScenarioInputs(){
  const wrap=$('customScenarioInputs'); if(!wrap)return;
