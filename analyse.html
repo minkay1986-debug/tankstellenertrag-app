@@ -479,7 +479,7 @@ function dashboard(){
  const priorYearRows=Array.from({length:12},(_,i)=>{const key=(selectedYear-1)+'-'+String(i+1).padStart(2,'0');if(!allKeys.includes(key))return null;const d=calc(key);return d.sourceMonthly===true&&d.sourceEK===true?{month:i+1,key,d}:null});
  const twoYearsAgoRows=Array.from({length:12},(_,i)=>{const key=(selectedYear-2)+'-'+String(i+1).padStart(2,'0');if(!allKeys.includes(key))return null;const d=calc(key);return d.sourceMonthly===true&&d.sourceEK===true?{month:i+1,key,d}:null});
  const threeYearsAgoRows=Array.from({length:12},(_,i)=>{const key=(selectedYear-3)+'-'+String(i+1).padStart(2,'0');if(!allKeys.includes(key))return null;const d=calc(key);return d.sourceMonthly===true&&d.sourceEK===true?{month:i+1,key,d}:null});
- const grossValues=yearsKeys.map(key=>calc(key)).filter(d=>d.sourceMonthly===true&&d.sourceEK===true).map(d=>Number(d.gross)||0);
+ const grossValues=yearsKeys.map(key=>calc(key)).filter(d=>d.sourceMonthly===true&&d.sourceEK===true).map(d=>Number(d.gross)||0);if(!grossValues.length){$('trend').innerHTML='<p class="small">Noch keine bestätigten Shop-Umsatz- und EK-Monatswerte für eine belastbare Rohertragskurve.</p>';return}
  const minGross=Math.min(0,...grossValues),maxGross=Math.max(1,...grossValues);
  const yMin=minGross<0?minGross:0,yMax=maxGross*1.08,ySpan=Math.max(1,yMax-yMin);
  const W=820,H=270,L=76,R=20,T=22,B=42,iw=W-L-R,ih=H-T-B;
