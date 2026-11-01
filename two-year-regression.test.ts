@@ -589,3 +589,14 @@ Deno.test("manual month entry marks data sources and data quality emits one cons
   assert(q.notes.length===1,"Multiple plausibility anomalies should be consolidated into one review hint");
   assert(q.notes[0].includes("negativer Rohertrag")&&q.notes[0].includes("Schwund bei Backwaren"),"Consolidated hint must retain the relevant checks");
 });
+
+Deno.test("simulation shows not calculable when neither margin nor loss sources are available",()=>{
+  const rt=runtime(appFixture());
+  const result=rt.scenarioResult({revenue:1000,actualMargin:null,shrink:0,writeoff:0},5,10,10,false);
+  assert(result.total===null,"No available calculation component must not be shown as zero potential");
+});
+Deno.test("monthly overview displays the consolidated quality hint and guards margin comparisons",()=>{
+  assert(html.includes("dq.notes.slice(0,1).map(esc)"),"Monthly overview must show the one consolidated data-quality hint");
+  assert(html.includes("d.sourceEK===true&&p.sourceEK===true&&d.revenue>0&&p.revenue>0"),"Monthly margin comparison must require confirmed EK in both periods");
+  assert(html.includes("d.sourceShrink===true&&d.revenue>0"),"Monthly shrink comparison must require a confirmed shrink source");
+});
