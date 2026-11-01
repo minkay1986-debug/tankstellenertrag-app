@@ -789,7 +789,7 @@ function causeDiagnosis(g,currentKey=month()){
   const costRatioEffect=-now.revenue*(newCost-oldCost);
   const marginDelta=(now.actualMargin??(1-newCost)*100)-(before.actualMargin??(1-oldCost)*100);
   out.push({state:'proven',title:'Umsatzeffekt auf den Rohertrag',detail:(revenueEffect>=0?'Positiver':'Negativer')+' rechnerischer Effekt von '+eur(Math.abs(revenueEffect))+'. Berechnet aus der Umsatzveränderung bei gleichbleibender vorheriger Rohertragsquote der Warengruppe. Umsatzveränderung und Absatzmenge lassen sich ohne Mengendaten nicht voneinander trennen.'});
-  out.push({state:costRatioEffect<=0?'proven':'warning',title:'Wareneinsatzquote verändert',detail:(costRatioEffect>=0?'Belastung':'Entlastung')+' von '+eur(Math.abs(costRatioEffect))+'; Marge '+(marginDelta>=0?'+':'')+pct(marginDelta)+'. Der Wert bündelt EK-Preis-, Sortimentsmix- und Aktions-/Rabatteffekte.'});
+  out.push({state:'proven',title:'Wareneinsatzquote verändert',detail:(costRatioEffect<0?'Belastung':costRatioEffect>0?'Entlastung':'Keine Veränderung')+' von '+eur(Math.abs(costRatioEffect))+'; Marge '+(marginDelta>=0?'+':'')+pct(marginDelta)+'. Der Wert bündelt EK-Preis-, Sortimentsmix- und Aktions-/Rabatteffekte.'});
   out.push({state:'unknown',title:'EK-Preis oder Produktmix?',detail:'Mit den vorhandenen Monats-Gesamtsummen lassen sich Einkaufspreis- und Sortimentsmixeffekte nicht getrennt nachweisen. Die Beratung bleibt deshalb bewusst auf Warengruppenebene und bewertet nur Umsatz, Wareneinsatzquote, Schwund, Abschriften und Bestand.'});
   if(Math.abs((newGross-oldGross)-(revenueEffect+costRatioEffect))>0.02)out.push({state:'warning',title:'Abweichung in der Überleitung',detail:'Die rechnerische Überleitung ist nicht vollständig. Eingaben und Rundungen prüfen.'});
  }
