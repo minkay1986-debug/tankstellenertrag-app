@@ -164,20 +164,28 @@ jobs:
             }, { timeout: 10000 });
             return await replies.last().innerText();
           }
+          function assertEvidenceFrame(answer, expected, question) {
+            for (const label of [expected, 'VERMUTUNG / URSACHE', 'HANDLUNGSVORSCHLAG']) {
+              if (!answer.includes(label)) throw new Error('Advisor evidence framing missing "' + label + '" for "' + question + '": ' + answer);
+            }
+          }
           for (const q of ['Frage zum Recht', 'Frage zu Steuern', 'Frage zu Personal']) {
             const answer = await ask(q);
             if (!answer.includes('nicht Teil von TankstellenErtrag')) throw new Error('Scope guard failed for "' + q + '": ' + answer);
           }
           const operational = await ask('Wie optimiere ich meinen Wareneinsatz?');
           if (operational.includes('nicht Teil von TankstellenErtrag')) throw new Error('Operational question incorrectly blocked');
+          assertEvidenceFrame(operational, 'FACHLICHE EINORDNUNG', 'Wareneinsatz');
           const marginRanking = await ask('Welche Warengruppe hat die niedrigste Marge?');
           if (!marginRanking.includes('Getränke') || !marginRanking.includes('Marge 38')) {
             throw new Error('Margin ranking did not use the synthetic station data: ' + marginRanking);
           }
+          assertEvidenceFrame(marginRanking, 'FACHLICHE EINORDNUNG', 'Margenranking');
           const grossProfitComparison = await ask('Wie hat sich mein Rohertrag gegenüber dem Vormonat verändert?');
           if (!grossProfitComparison.includes('Shop-Veränderung zu Vormonat') || !grossProfitComparison.includes('Rohertrag')) {
             throw new Error('Gross-profit comparison did not use the selected month and prior month: ' + grossProfitComparison);
           }
+          assertEvidenceFrame(grossProfitComparison, 'FACHLICHE EINORDNUNG', 'Rohertragsvergleich');
           const lossComparison = await ask('Wie entwickeln sich meine erfassten Verlustbeträge im Vergleich zum Vorjahr?');
           if (!lossComparison.includes('Verlustanalyse im Tankstellenshop') || !lossComparison.includes('Vorjahresmonat')) {
             throw new Error('Loss advice did not use the same month in the prior year: ' + lossComparison);
@@ -192,6 +200,7 @@ jobs:
               priorityAnswer.includes('Ich ordne deine Frage noch nicht sicher zu')) {
             throw new Error('Priority question did not return a data-backed prioritization: ' + priorityAnswer);
           }
+          assertEvidenceFrame(priorityAnswer, 'DATENBEFUND', 'Priorisierung');
           if (errors.length) throw new Error('Runtime errors during chat test: ' + errors.join(' | '));
           console.log(JSON.stringify({ legalTaxHrQuestionsBlocked: 3, operationalQuestionAnswered: true, marginRankingUsesStationData: true, grossProfitComparisonUsesTwoPeriods: true, lossAdviceUsesPriorYearData: true, inventoryQuestionUsesStockAnalysis: true, priorityQuestionUsesDataBackedRanking: true, runtimeErrors: errors.length }));
           await browser.close();
