@@ -681,8 +681,8 @@ function advisorTestReply(data:any, key="2026-12") {
     {advisorNorm,month,calc:rt.calc,prev:rt.prev,data,reconciliation,dataQuality,settings,GROUPS:groupDefs,inventoryMetrics:rt.inventoryMetrics,inventoryPeriodDays,wowPriority:rt.wowPriority,potentialHtml});
   const advisorGeneralGuidanceAnswer = appFunction("advisorGeneralGuidanceAnswer","advisorReplyBase",[],{});
   return appFunction("advisorReply","initAdvisorChat",
-    ["advisorScopeGuard","advisorDirectAnswer","advisorGeneralGuidanceAnswer","advisorNoDataAnswer","advisorHasCurrentMonthData","advisorReplyBase","advisorKnowledgeHtml"],
-    {advisorScopeGuard:()=>"",advisorDirectAnswer,advisorGeneralGuidanceAnswer,
+    ["advisorScopeGuard","advisorNorm","advisorDirectAnswer","advisorGeneralGuidanceAnswer","advisorNoDataAnswer","advisorHasCurrentMonthData","advisorReplyBase","advisorKnowledgeHtml"],
+    {advisorScopeGuard:()=>"",advisorNorm,advisorDirectAnswer,advisorGeneralGuidanceAnswer,
       advisorNoDataAnswer:()=>"",advisorHasCurrentMonthData:()=>true,advisorReplyBase,advisorKnowledgeHtml:() => ""});
 }
 
