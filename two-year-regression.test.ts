@@ -688,16 +688,16 @@ Deno.test("two-year synthetic advisory account ranks real confirmed margins inst
   const reply=advisorTestReply(data);
   const weakest=reply("Welche Warengruppe hat die niedrigste Marge?");
   assert(!weakest.includes("Für die aktuell geladenen Stationsdaten liegen keine bestätigten Werte"),"Advisor must not claim missing data when confirmed group EK values exist");
-  assert(weakest.indexOf("<li><b>Backshop")>=0&&weakest.indexOf("<li><b>Backshop")<weakest.indexOf("<li><b>Spielzeug"),"Weakest margin must rank Backshop (30%) before Spielzeug (35%)");
+  assert(weakest.indexOf("<li><b>Backshop")>=0&&weakest.indexOf("<li><b>Backshop")<weakest.indexOf("<li><b>Spielzeug"),"Weakest margin must rank Backshop (30%) before Spielzeug (35%). Actual answer: "+weakest);
   const strongest=reply("Welche Warengruppe hat die höchste Marge?");
-  assert(strongest.indexOf("<li><b>Kaffee")>=0&&strongest.indexOf("<li><b>Kaffee")<strongest.indexOf("<li><b>Eis"),"Highest margin must rank Kaffee (65%) before Eis (60%)");
+  assert(strongest.indexOf("<li><b>Kaffee")>=0&&strongest.indexOf("<li><b>Kaffee")<strongest.indexOf("<li><b>Eis"),"Highest margin must rank Kaffee (65%) before Eis (60%). Actual answer: "+strongest);
 });
 
 Deno.test("two-year advisory account reports real year-over-year loss values and labels causes as unproven",()=>{
   const data=twoYearAdvisorTestAccount();
   const reply=advisorTestReply(data);
-  const answer=reply("Wie entwickeln sich Schwund und Abschriften im Vergleich zum Vorjahr?");
-  assert(answer.includes("Vorjahresmonat (2025-12)"),"Loss advice must compare the same calendar month in the previous year");
+  const answer=reply("Wie entwickeln sich meine erfassten Verlustbeträge im Vergleich zum Vorjahr?");
+  assert(answer.includes("Vorjahresmonat (2025-12)"),"Loss advice must compare the same calendar month in the previous year. Actual answer: "+answer);
   assert(answer.includes("Erfasster Schwund")&&answer.includes("Abschriften"),"Loss advice must separate recorded shrink and write-offs");
   assert(answer.includes("Die Zahlen allein erklären nicht"),"Loss advice must not claim an unproven cause");
 });
