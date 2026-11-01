@@ -699,7 +699,7 @@ Deno.test("two-year advisory account reports real year-over-year loss values and
   const answer=reply("Wie entwickeln sich meine erfassten Verlustbeträge im Vergleich zum Vorjahr?");
   assert(answer.includes("Vorjahresmonat (2025-12)"),"Loss advice must compare the same calendar month in the previous year. Actual answer: "+answer);
   assert(answer.includes("Erfasster Schwund")&&answer.includes("Abschriften"),"Loss advice must separate recorded shrink and write-offs");
-  assert(answer.includes("Aus diesen Zahlen allein lässt sich keine Ursache"),"Loss advice must not claim an unproven cause");
+  assert(answer.includes("Aus diesen Zahlen allein lässt sich keine Ursache"),"Loss advice must not claim an unproven cause. Actual answer: "+answer);
 });
 
 Deno.test("two-year advisory account calculates gross-profit comparison only with confirmed EK in both months",()=>{
