@@ -757,6 +757,7 @@ function radar(){
  enhanceRadarAccordions();
 }
 function startRadarAction(groupId){const rows=wowPriority(month()).filter(r=>r.reasons.length);const selected=rows.find(r=>r.g.id===groupId);if(!selected)return;loop(selected);const target=$('loop');if(target){target.scrollIntoView({behavior:'smooth',block:'start'});target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}const msg=$('investigationMsg');if(msg)msg.textContent='Maßnahmenplanung für '+selected.g.name+' geöffnet. Prüfen Sie die Vorschläge und wählen Sie nur passende Maßnahmen aus.';}
+function grossSafe(v){return v===null||v===undefined?0:(Number(v)||0)}
 function scenarioResult(g,rp,sp,wp,lossDataAvailable=true){
  const newRev=g.revenue*(1+rp/100);
  const actualMargin=g.actualMargin!==null&&g.actualMargin!==undefined&&Number.isFinite(Number(g.actualMargin))?Number(g.actualMargin):null;
