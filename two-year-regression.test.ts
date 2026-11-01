@@ -540,3 +540,40 @@ Deno.test("knowledge article SEO keywords never contain undefined",async()=>{
   const articlePaths=["wissen/backshop-tankstelle.html","wissen/marge-tankstellenshop.html","wissen/rohertrag-tankstellenshop.html","wissen/sortiment-tankstellenshop.html","wissen/warenwirtschaft-tankstelle.html"];
   for(const path of articlePaths){const content=await Deno.readTextFile(new URL("./"+path,import.meta.url));assert(!/name="keywords" content="undefined"/i.test(content),path+" still has undefined SEO keywords");}
 });
+
+Deno.test("annual overview never treats missing EK as zero-cost gross profit",()=>{
+  const data=appFixture();
+  data.months["2025-01"].sourceEK=false;
+  const rt=runtime(data);
+  rt.yearly();
+  assert(rt.target.innerHTML.includes("EK fehlt"),"Month without confirmed EK must be marked not calculable");
+  assert(rt.target.innerHTML.includes("EK-Teilbasis"),"Annual margin must disclose partial EK coverage");
+  assert(rt.target.innerHTML.includes("nur 11/12 Umsatzmonate mit EK"),"Annual gross profit must disclose the months included in its partial base");
+});
+Deno.test("loss reconciliation requires explicit shrink and write-off entries",()=>{
+  const data=appFixture();
+  const key="2026-10",row=data.months[key];
+  row.openingStock=4000;row.purchasesEK=3000;row.stock=4000;row.ek=2800;
+  row.inventoryClosingEntered=true;row.inventoryEkEntered=true;
+  const reconcile=appFunction("reconciliation","renderTurnoverCheck",["month","mrow"],{month:()=>key,mrow:(k:string)=>data.months[k]});
+  assert(reconcile(key).ready===false,"Missing shrink/write-off values must not be silently treated as zero");
+  row.shrinkEntered=true;row.writeoffEntered=true;
+  assert(reconcile(key).ready===true,"Reconciliation should become available once all required inputs are explicit");
+});
+Deno.test("simulation does not turn missing shrink/write-off data into zero savings",()=>{
+  const rt=runtime(appFixture());
+  const group={revenue:1000,actualMargin:40,shrink:80,writeoff:20};
+  const result=rt.scenarioResult(group,5,10,10,false);
+  assert(result.shrinkGain===null&&result.writeoffGain===null,"Unrecorded loss sources must remain unavailable in simulation");
+  assert(Math.abs(result.total-20)<.001,"Only the calculable revenue-margin component may contribute to the scenario total");
+});
+Deno.test("dashboard and quick advisory never display gross profit or margin without confirmed EK",()=>{
+  assert(html.includes("Nicht berechenbar · EK fehlt"),"Dashboard must label missing EK");
+  assert(html.includes("d.sourceEK&&d.revenue>0?pct(d.margin):'Nicht berechenbar'"),"Dashboard must guard margin without EK");
+  assert(html.includes("g.actualMargin!==null?pct(g.actualMargin):'nicht berechenbar"),"Drink advice must use actual group margin, not configured target margin");
+  assert(html.includes("d.sourceEK?eur(d.gross):'nicht berechenbar · bestätigter EK fehlt'"),"Quick advice must not present gross profit without EK");
+});
+Deno.test("monthly stock reconciliation input requires loss data to be entered explicitly",()=>{
+  assert(html.includes("r.shrinkEntered=$('shrink').value!=='';r.writeoffEntered=$('writeoff').value!==''"),"Monthly input must preserve explicit empty-vs-zero loss fields");
+  assert(html.includes("x.shrinkEntered!==true||x.writeoffEntered!==true"),"Reconciliation must gate on explicit loss inputs");
+});
