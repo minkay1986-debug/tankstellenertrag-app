@@ -88,7 +88,11 @@ jobs:
             await page.locator('#' + view.id + '.view.active').waitFor({ timeout: 5000 });
             const exists = await page.locator(view.selector).count();
             if (!exists) throw new Error('Missing content in view ' + view.id);
-            if (view.id !== 'advisorChat') {
+            if (view.id === 'monthly') {
+              if (!(await page.locator('#rev').isVisible()) || !(await page.locator('#saveMonth').isVisible())) {
+                throw new Error('Input controls are not visible in monthly view');
+              }
+            } else if (view.id !== 'advisorChat') {
               const content = await page.locator(view.selector).first().innerText().catch(() => '');
               if (content.trim().length < 10) throw new Error('View appears empty: ' + view.id);
             }
