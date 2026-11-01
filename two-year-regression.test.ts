@@ -138,7 +138,7 @@ Deno.test("advice potential is only calculated for matching detected shrink/writ
   const parts=measure(shrinkOnly);
   assert(parts.length===1&&parts[0].label.includes("Schwund reduzieren")&&parts[0].label.includes("Modellannahme 10 %"),"Only the detected shrink signal may contribute");
   assert(Math.abs(parts[0].amount-12.8)<.001,"Shrink scenario must calculate 10% of the monthly shrink amount");
-  const combined={reasons:["Schwund auffällig","Abschriften auffällig"],g:{shrink:128,writeoff:64},dataStatus:{shrinkSourceAvailable:true}};
+  const combined={reasons:["Schwund auffällig","Abschriften auffällig"],g:{shrink:128,writeoff:64},dataStatus:{shrinkSourceAvailable:true,writeoffSourceAvailable:true}};
   assert(measure(combined).length===2,"Both signals may be shown separately, with overlap warning");
 });
 
@@ -634,7 +634,7 @@ Deno.test("radar and advisor never surface stale shrink values when the source i
   const radarStart=html.indexOf("function radar()"),radarEnd=html.indexOf("function startRadarAction",radarStart);
   const radar=html.slice(radarStart,radarEnd);
   assert(radar.includes("r.dataStatus?.shrinkSourceAvailable?eur(r.g.shrink):'Nicht erfasst'"),"Radar must gate shrink amounts on a confirmed source");
-  assert(radar.includes("r.dataStatus?.shrinkSourceAvailable?eur(r.g.writeoff):'Nicht erfasst'"),"Radar must gate write-off amounts on a confirmed source");
+  assert(radar.includes("r.dataStatus?.writeoffSourceAvailable?eur(r.g.writeoff):'Nicht erfasst'"),"Radar must gate write-off amounts on a confirmed source");
   const start=html.indexOf("function advisorReplyBase"),end=html.indexOf("function advisorReply(",start),advisor=html.slice(start,end);
   assert(advisor.includes("lossAvailable&&d.groups&&d.groups.some"),"Advisor group-level loss statements must be gated on the confirmed loss source");
 });
@@ -718,6 +718,7 @@ Deno.test("unconfirmed group shrink and write-off values never become radar sign
   const data=appFixture();
   const row=data.months["2026-10"];
   row.sourceShrink=true;
+  row.groups.backshop.revenue=data.months["2026-09"].groups.backshop.revenue*.5;
   row.groups.backshop.shrink=9999;
   row.groups.backshop.writeoff=8888;
   row.groups.backshop._shrinkEntered=false;
