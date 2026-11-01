@@ -982,7 +982,7 @@ Deno.test("priority cards rank confirmed euro exposure before signal count",()=>
 });
 
 Deno.test("advisory rejects article-level analysis and keeps monthly category guidance available",()=>{
-  const norm=(v:string)=>String(v||"").toLowerCase().normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/ß/g,"ss").replace(/[^a-z0-9€%.,:+ -]/gi," ").replace(/\\s+/g," ").trim();
+  const norm=appFunction("advisorNorm","advisorScopeGuard",[],{});
   const guard=appFunction("advisorScopeGuard","advisorKnowledgeHtml",["advisorNorm"],{advisorNorm:norm});
   for(const q of ["Welche Artikel soll ich auslisten?","Artikelabsatz je SKU vergleichen","Artikelnummer und Stückmarge prüfen","Stückpreis je Einzelartikel vergleichen","Welche Artikel bei der nächsten Bestellung reduzieren?"]){
     const answer=guard(q);
