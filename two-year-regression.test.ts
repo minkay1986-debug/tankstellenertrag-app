@@ -52,6 +52,8 @@ function runtime(data:any) {
   const yearly = appFunction("yearly","economic",["keys","data","calc","eur","pct","$"],{keys,data,calc,eur,pct,$:(id:string)=>target});
   const esc = (v:unknown) => String(v??"");
   const practiceGuidance = appFunction("practiceGuidance","measurePotential",["esc"],{esc});
+  const hasData = (k:string) => Object.hasOwn(data.months,k);
+  const causeDiagnosis = appFunction("causeDiagnosis","loop",["calc","hasData","month","eur","pct"],{calc,hasData,month:()=>"2026-10",eur,pct});
   const measurePotential = appFunction("measurePotential","potentialHtml",["r"],{});
   const potentialHtml = appFunction("potentialHtml","wowCard",["measurePotential","eur"],{measurePotential,eur});
   const reportPriorityGuidance = appFunction("reportPriorityGuidance","wowCard",["practiceGuidance","potentialHtml"],{practiceGuidance,potentialHtml});
@@ -65,7 +67,7 @@ function runtime(data:any) {
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
     TEStudyContext:{htmlForReport:async()=>""},reportPriorityGuidance
   });
-  return {data,calc,wowPriority,yearly,report,practiceGuidance,potentialHtml,reportPriorityGuidance,wowCard,riskForRow,scenarioResult,inventoryMetrics,dataQuality,learnCalendarEffects,target,prev};
+  return {data,calc,wowPriority,yearly,report,practiceGuidance,causeDiagnosis,potentialHtml,reportPriorityGuidance,wowCard,riskForRow,scenarioResult,inventoryMetrics,dataQuality,learnCalendarEffects,target,prev};
 }
 Deno.test("real app calc, year table and report reconcile across all 24 months",()=>{
   const rt=runtime(appFixture());
@@ -916,24 +918,42 @@ Deno.test("advisor labels unconfirmed monthly and group revenue instead of quoti
   assert(!order.includes("Backwaren (9.876,00"),"Ordering advice must not rank unconfirmed stale group revenue");
 });
 
-Deno.test("all merchandise group guidance remains category-specific",()=>{
+Deno.test("all merchandise group guidance remains strictly category-level",()=>{
   const rt=runtime(appFixture());
-  const guidance=(id:string)=>rt.practiceGuidance({g:{id,name:id},reasons:["Ist-Marge unter Ihrem Zielwert"],dataStatus:{groupEkAvailable:true,previousMonthAvailable:true}});
+  const guidance=(id:string)=>rt.practiceGuidance({g:{id,name:id},reasons:["Ist-Marge unter Ihrem Zielwert"],dataStatus:{groupEkAvailable:true,previousMonthAvailable:true,inventorySourceAvailable:true,shrinkSourceAvailable:true}});
   const expected:Record<string,string[]> = {
-    getraenke:["Pfand","Gebindegrößen"],
-    kaffee:["Rezepturen","Bohnenmenge"],
-    backshop:["Backintervalle","Tageszeit-Abverkauf"],
-    "süsswaren":["Langsamdreher","Mindesthaltbarkeit"],
-    drogerie:["Sortimentstiefe","Doppelartikel"],
-    lebensmittel:["Frische","MHD"],
-    spielzeug:["Saison","Regalfläche"],
-    eis:["Kühltruhen","Temperatur"]
+    getraenke:["Lieferantenkonditionen","Kategorie-Verkaufspreise"],
+    kaffee:["Rezeptur","Portionsgröße"],
+    backshop:["Backintervalle","Bestandsverlauf"],
+    waschen:["Verbrauchsmaterialien","Gutscheine"],
+    "süsswaren":["Wareneinsatzquote","Zielbestand"],
+    drogerie:["Kapitalbindung","Bestandswert"],
+    lebensmittel:["Abschriften","Bestandsverlauf"],
+    spielzeug:["Vorjahresmonat","Zielreichweite"],
+    eis:["saisonalen Zusammenhang","Lieferantenkonditionen"]
   };
   for(const [id,terms] of Object.entries(expected)){
     const text=guidance(id);
     for(const term of terms)assert(text.toLowerCase().includes(term.toLowerCase()),id+" guidance missing "+term);
+    assert(!/artikel|sku|einzelartikel|artikelnummer|stückmarge/i.test(text),id+" guidance must not require or imply article-level data: "+text);
+    assert(text.includes("ERFOLGSKONTROLLE"),id+" guidance must include a follow-up check");
   }
 });
+Deno.test("cause diagnosis decomposes category gross-profit change and preserves evidence limits",()=>{
+  const data=appFixture();
+  const prior=data.months["2026-09"].groups.backshop,current=data.months["2026-10"].groups.backshop;
+  prior.revenue=10000;prior._revenueEntered=true;prior.ek=6000;prior._ekEntered=true;
+  current.revenue=12000;current._revenueEntered=true;current.ek=7800;current._ekEntered=true;
+  const rt=runtime(data),diagnosis=rt.causeDiagnosis({id:"backshop",name:"Backwaren"},"2026-10");
+  const revenueEffect=2000*(1-.6);
+  const costRatioEffect=-12000*(.65-.6);
+  const expectedGrossChange=(12000-7800)-(10000-6000);
+  assert(Math.abs(revenueEffect+costRatioEffect-expectedGrossChange)<.001,"Category effects must reconcile exactly to the gross-profit change");
+  assert(diagnosis.some((x:any)=>x.title==="Umsatzeffekt auf den Rohertrag"&&x.detail.includes("Absatzmenge lassen sich ohne Mengendaten nicht voneinander trennen")),"Revenue effect must state the quantity-data limitation");
+  assert(diagnosis.some((x:any)=>x.title==="Wareneinsatzquote verändert"&&x.detail.includes("Belastung")),"Cost-ratio effect must identify the adverse impact");
+  assert(!diagnosis.some((x:any)=>/Artikelnummer|Einzelartikel|Artikelmenge|SKU/i.test(x.title+" "+x.detail)),"Diagnosis must not request article-level data");
+});
+
 
 
 Deno.test("priority cards rank confirmed euro exposure before signal count",()=>{
