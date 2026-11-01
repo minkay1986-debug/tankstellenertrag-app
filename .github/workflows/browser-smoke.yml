@@ -157,7 +157,6 @@ jobs:
             await page.locator('#advisorChatInput').fill(question);
             await page.locator('#advisorChatForm button[type="submit"]').click();
             const replies = page.locator('#advisorChatMessages .chat-message.assistant');
-            await replies.last().locator('div').last().waitFor();
             await page.waitForFunction(() => {
               const els = document.querySelectorAll('#advisorChatMessages .chat-message.assistant');
               const last = els[els.length - 1];
