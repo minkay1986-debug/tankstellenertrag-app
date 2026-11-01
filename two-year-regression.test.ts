@@ -52,14 +52,16 @@ function runtime(data:any) {
   const yearly = appFunction("yearly","economic",["keys","data","calc","eur","pct","$"],{keys,data,calc,eur,pct,$:(id:string)=>target});
   const esc = (v:unknown) => String(v??"");
   const practiceGuidance = appFunction("practiceGuidance","measurePotential",["esc"],{esc});
+  const measurePotential = appFunction("measurePotential","potentialHtml",["r"],{});
+  const potentialHtml = appFunction("potentialHtml","wowCard",["measurePotential","eur"],{measurePotential,eur});
   const riskLevel = appFunction("riskLevel","riskForRow",[],{});
   const riskForRow = appFunction("riskForRow","riskSummary",["settings","riskLevel"],{settings,riskLevel});
   const grossSafe = (v:number|null) => v===null?0:(Number(v)||0);
   const scenarioResult = appFunction("scenarioResult","simulation",["grossSafe"],{grossSafe});
-  const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext","practiceGuidance"],{
+  const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext","practiceGuidance","potentialHtml"],{
     calc,month:()=> "2026-10",settings,wowPriority,prev,eur,pct,esc:(v:unknown)=>String(v??""),$:(id:string)=>target,
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
-    TEStudyContext:{htmlForReport:async()=>""},practiceGuidance
+    TEStudyContext:{htmlForReport:async()=>""},practiceGuidance,potentialHtml
   });
   return {data,calc,wowPriority,yearly,report,practiceGuidance,riskForRow,scenarioResult,inventoryMetrics,dataQuality,learnCalendarEffects,target,prev};
 }
@@ -77,6 +79,26 @@ Deno.test("real app calc, year table and report reconcile across all 24 months",
   assert(rt.target.innerHTML.replace(/[\s\u00a0\u202f]+/g," ").includes(eurForTest(rt.calc("2026-10").revenue)),"Report revenue differs from app calc");
 });
 function eurForTest(v:number){return new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Number(v)||0).replace(/[\s\u00a0\u202f]+/g," ").trim();}
+Deno.test("priority cards and monthly report share order, guidance and economic scenario values",()=>{
+  const rt=runtime(appFixture());
+  const rows=rt.wowPriority("2026-10").slice(0,3);
+  rt.report();
+  const report=String(rt.target.innerHTML);
+  assert(rows.length>0,"Synthetic account must produce priority cards");
+  let previousIndex=-1;
+  for(const [i,row] of rows.entries()){
+    const heading=String(i+1).padStart(2,"0")+" · "+row.g.name;
+    const index=report.indexOf(heading);
+    assert(index>previousIndex,"Report priority order must match the priority-card order: "+heading);
+    previousIndex=index;
+    const scenario=potentialHtml(row);
+    assert(report.includes(scenario),"Report must include the same potential/evidence block as the matching priority card: "+row.g.name);
+    assert(report.includes(row.reasons.join(" · ")),"Report must retain the same evidence signals as the priority card: "+row.g.name);
+  }
+  assert(report.includes("ausdrücklich ausgewiesenen Modellannahmen"),"Report must describe potential as a modelled scenario, not as confirmed loss or net profit");
+  assert(!report.includes("Ein Euro-Potenzial wird erst in der Simulation"),"Report must not contradict the scenario shown in priority cards");
+});
+
 Deno.test("actual app prioritizes an Ist-margin drop and exact calendar month comparison",()=>{
   const rt=runtime(appFixture());
   const rows=rt.wowPriority("2026-06");
