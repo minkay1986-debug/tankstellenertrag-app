@@ -704,14 +704,15 @@ function advisorTestReply(data:any, key="2026-12") {
   const potentialHtml = appFunction("potentialHtml","scenarioOptions",["measurePotential","eur"],{measurePotential,eur});
   const advisorDirectAnswer = appFunction("advisorDirectAnswer","advisorHasCurrentMonthData",
     ["advisorNorm","month","calc","data"],{advisorNorm,month,calc:rt.calc,data});
-  const advisorReplyBase = appFunction("advisorReplyBase","advisorReply",
+  const advisorEvidenceResponse = appFunction("advisorEvidenceResponse","advisorReply",[],{});
+  const advisorReplyBase = appFunction("advisorReplyBase","advisorEvidenceResponse",
     ["advisorNorm","month","calc","prev","data","reconciliation","dataQuality","settings","GROUPS","inventoryMetrics","inventoryPeriodDays","wowPriority","potentialHtml"],
     {advisorNorm,month,calc:rt.calc,prev:rt.prev,data,reconciliation,dataQuality,settings,GROUPS:groupDefs,inventoryMetrics:rt.inventoryMetrics,inventoryPeriodDays,wowPriority:rt.wowPriority,potentialHtml});
   const advisorGeneralGuidanceAnswer = appFunction("advisorGeneralGuidanceAnswer","advisorReplyBase",["advisorNorm"],{advisorNorm});
   return appFunction("advisorReply","initAdvisorChat",
-    ["advisorScopeGuard","advisorNorm","advisorDirectAnswer","advisorGeneralGuidanceAnswer","advisorNoDataAnswer","advisorHasCurrentMonthData","advisorReplyBase","advisorKnowledgeHtml"],
+    ["advisorScopeGuard","advisorNorm","advisorDirectAnswer","advisorGeneralGuidanceAnswer","advisorNoDataAnswer","advisorHasCurrentMonthData","advisorReplyBase","advisorKnowledgeHtml","advisorEvidenceResponse"],
     {advisorScopeGuard:()=>"",advisorNorm,advisorDirectAnswer,advisorGeneralGuidanceAnswer,
-      advisorNoDataAnswer:()=>"",advisorHasCurrentMonthData:()=>true,advisorReplyBase,advisorKnowledgeHtml:() => ""});
+      advisorNoDataAnswer:()=>"",advisorHasCurrentMonthData:()=>true,advisorReplyBase,advisorKnowledgeHtml:() => "",advisorEvidenceResponse});
 }
 
 Deno.test("two-year synthetic advisory account ranks real confirmed margins instead of returning a stale no-data answer",()=>{
