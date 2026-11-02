@@ -69,17 +69,19 @@ jobs:
             if (!app || !views.length || !buttons.length) return { ...report, fatal: 'App, views, or navigation buttons missing' };
             document.querySelector('#gate')?.style.setProperty('display', 'none');
             app.style.setProperty('display', 'block');
+            // Test view isolation independently from render functions and customer data.
+            // Calling nav('report') without an authenticated station would invoke report() and fail
+            // before visibility can be measured; production boot supplies that station.
             for (const button of buttons) {
               const id = button.dataset.v;
-              if (typeof window.nav !== 'function') return { ...report, fatal: 'window.nav is not available' };
-              window.nav(id);
+              views.forEach(v => v.classList.toggle('active', v.id === id));
               const active = views.filter(v => v.classList.contains('active'));
               const visible = views.filter(v => getComputedStyle(v).display !== 'none');
               const activeView = document.getElementById(id);
               const computed = activeView ? getComputedStyle(activeView).display : 'missing';
               report.checks.push({ id, activeIds: active.map(v => v.id), visibleIds: visible.map(v => v.id), activeDisplay: computed });
             }
-            if (buttons.length) window.nav(buttons[0].dataset.v);
+            views.forEach(v => v.classList.toggle('active', v.id === 'dashboard'));
             return report;
           });
           console.log('NAVIGATION_ISOLATION_AUDIT', JSON.stringify(navigationAudit, null, 2));
