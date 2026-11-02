@@ -57,6 +57,40 @@ jobs:
           const response = await page.goto('http://127.0.0.1:4173/analyse.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
           if (!response || !response.ok()) throw new Error('analyse.html returned HTTP ' + (response?.status() ?? 'no response'));
           await page.waitForTimeout(3000);
+
+          // Regression audit: every navigation view must be isolated at runtime.
+          // The test intentionally bypasses the login gate; it does not connect to or modify customer data.
+          const navigationAudit = await page.evaluate(() => {
+            const app = document.querySelector('#app');
+            const views = [...document.querySelectorAll('#app .view')];
+            const buttons = [...document.querySelectorAll('.nav button[data-v]')];
+            const loop = document.querySelector('#loop');
+            const report = { viewCount: views.length, buttonCount: buttons.length, loopCount: document.querySelectorAll('#loop').length, loopParentId: loop?.parentElement?.id ?? null, checks: [] };
+            if (!app || !views.length || !buttons.length) return { ...report, fatal: 'App, views, or navigation buttons missing' };
+            document.querySelector('#gate')?.style.setProperty('display', 'none');
+            app.style.setProperty('display', 'block');
+            for (const button of buttons) {
+              const id = button.dataset.v;
+              if (typeof window.nav !== 'function') return { ...report, fatal: 'window.nav is not available' };
+              window.nav(id);
+              const active = views.filter(v => v.classList.contains('active'));
+              const visible = views.filter(v => getComputedStyle(v).display !== 'none');
+              const activeView = document.getElementById(id);
+              const computed = activeView ? getComputedStyle(activeView).display : 'missing';
+              report.checks.push({ id, activeIds: active.map(v => v.id), visibleIds: visible.map(v => v.id), activeDisplay: computed });
+            }
+            if (buttons.length) window.nav(buttons[0].dataset.v);
+            return report;
+          });
+          console.log('NAVIGATION_ISOLATION_AUDIT', JSON.stringify(navigationAudit, null, 2));
+          if (navigationAudit.fatal) throw new Error('Navigation isolation audit could not run: ' + navigationAudit.fatal);
+          if (navigationAudit.loopCount !== 1) throw new Error('Expected exactly one #loop element: ' + JSON.stringify(navigationAudit));
+          const navigationFailures = navigationAudit.checks.filter(x =>
+            x.activeIds.length !== 1 || x.activeIds[0] !== x.id ||
+            x.visibleIds.length !== 1 || x.visibleIds[0] !== x.id ||
+            x.activeDisplay === 'none' || x.activeDisplay === 'missing'
+          );
+          if (navigationFailures.length) throw new Error('Navigation isolation regression: ' + JSON.stringify(navigationFailures));
           await page.screenshot({ path: 'ocean-glass-desktop.png', fullPage: true });
           const glassAudit = await page.evaluate(() => {
             const body = getComputedStyle(document.body);
