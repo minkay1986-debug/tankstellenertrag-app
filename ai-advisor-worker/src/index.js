@@ -52,14 +52,7 @@ export class DailyQuota {
     });
   }
 }
-export default {
-  async fetch(request, env) {
-    const response = await this.handle(request, env);
-    const responseHeaders = new Headers(response.headers);
-    for (const [key, value] of Object.entries(cors(request, env))) responseHeaders.set(key, value);
-    return new Response(response.body, { status: response.status, headers: responseHeaders });
-  },
-  async handle(request, env) {
+async function handleRequest(request, env) {
     const headers = cors(request, env);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers });
     if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
@@ -80,18 +73,18 @@ export default {
 
     const day = berlinDay();
     const limit = 3;
-    const userId = env.USER_QUOTAS.idFromName(user.id);
-    const userQuota = env.USER_QUOTAS.get(userId);
-    const reserved = await userQuota.fetch("https://quota/reserve", { method: "POST", body: JSON.stringify({ day, limit, increment: true }) });
-    if (reserved.status === 429) return json({ error: "daily_limit_reached", limit: 3 }, 429);
-    if (!reserved.ok) return json({ error: "quota_unavailable" }, 503);
-
-    // Global guard: 250 AI calls/day across this Worker. Reservation happens before inference.
+    // Reserve the global budget first, so a globally closed service never consumes a user's allowance.
     const globalId = env.GLOBAL_QUOTA.idFromName("tankstellenertrag-global");
     const globalQuota = env.GLOBAL_QUOTA.get(globalId);
     const globalReserved = await globalQuota.fetch("https://quota/reserve", { method: "POST", body: JSON.stringify({ day, limit: Number(env.GLOBAL_DAILY_LIMIT || 250), increment: true }) });
     if (globalReserved.status === 429) return json({ error: "service_daily_limit_reached" }, 429);
     if (!globalReserved.ok) return json({ error: "quota_unavailable" }, 503);
+
+    const userId = env.USER_QUOTAS.idFromName(user.id);
+    const userQuota = env.USER_QUOTAS.get(userId);
+    const reserved = await userQuota.fetch("https://quota/reserve", { method: "POST", body: JSON.stringify({ day, limit, increment: true }) });
+    if (reserved.status === 429) return json({ error: "daily_limit_reached", limit: 3 }, 429);
+    if (!reserved.ok) return json({ error: "quota_unavailable" }, 503);
 
     const context = facts ? "\n\nVon der Anwendung berechnete Stationsfakten (unverändert übernehmen):\n" + facts : "\n\nEs wurden keine Stationsfakten übergeben. Erfinde keine persönlichen Kennzahlen.";
     try {
@@ -110,5 +103,19 @@ export default {
       console.error("Workers AI inference failed", error?.message || error);
       return json({ error: "ai_unavailable", fallback: true }, 502);
     }
+  }
+}
+
+export default {
+  async fetch(request, env) {
+    let response;
+    try { response = await handleRequest(request, env); }
+    catch (error) {
+      console.error("Advisor Worker request failed", error?.message || error);
+      response = json({ error: "internal_error" }, 500);
+    }
+    const headers = new Headers(response.headers);
+    for (const [key, value] of Object.entries(cors(request, env))) headers.set(key, value);
+    return new Response(response.body, { status: response.status, headers });
   }
 };
