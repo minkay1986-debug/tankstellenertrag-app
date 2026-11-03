@@ -54,6 +54,12 @@ export class DailyQuota {
 }
 export default {
   async fetch(request, env) {
+    const response = await this.handle(request, env);
+    const responseHeaders = new Headers(response.headers);
+    for (const [key, value] of Object.entries(cors(request, env))) responseHeaders.set(key, value);
+    return new Response(response.body, { status: response.status, headers: responseHeaders });
+  },
+  async handle(request, env) {
     const headers = cors(request, env);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers });
     if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
