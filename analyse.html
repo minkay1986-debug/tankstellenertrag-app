@@ -1935,5 +1935,36 @@ window.initTeAsk=initTeAsk;window.loadTeCommunity=loadTeCommunity;
 .app #loop .small,
 .app #advisoryCasesPanel .small {color:#c3d2e0 !important}
 </style>
+<style id="continuous-blue-marble-background">
+/* Durchgehender, fixierter Hintergrund: bleibt beim Scrollen über alle Ansichten gleich kräftig. */
+html{min-height:100%;background:#071a2d}
+body{
+  min-height:100vh;
+  position:relative;
+  isolation:isolate;
+  background:#071a2d!important;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse at 14% 12%,rgba(48,119,181,.42) 0%,rgba(31,91,150,.20) 27%,transparent 57%),
+    radial-gradient(ellipse at 83% 22%,rgba(22,82,143,.48) 0%,rgba(18,65,117,.20) 34%,transparent 64%),
+    radial-gradient(ellipse at 55% 78%,rgba(42,105,162,.32) 0%,rgba(14,53,94,.16) 38%,transparent 68%),
+    radial-gradient(ellipse at 8% 88%,rgba(17,72,126,.34) 0%,transparent 52%),
+    linear-gradient(132deg,#0b2948 0%,#0a2340 38%,#071a30 72%,#0b2948 100%);
+  background-repeat:no-repeat;
+  background-size:cover;
+}
+.app{position:relative;background:transparent!important}
+.main,.view{background:transparent}
+@media print{
+  body{background:#fff!important}
+  body::before{display:none!important}
+}
+</style>
 </body></html>
 <!-- Cloudflare Pages preview trigger: branch-only deployment -->
