@@ -1094,3 +1094,35 @@ Deno.test("advisor response routing applies evidence framing to every economic a
   assert(router.includes("advisorEvidenceResponse(noData,'missing')"),"Missing-data answers are not framed");
   assert(router.includes("advisorEvidenceResponse(base,'data')")||router.includes("advisorEvidenceResponse(knowledge?base+knowledge:base,'data')"),"Data analysis answers are not framed");
 });
+
+
+Deno.test("advisor loss comparisons never treat an unconfirmed writeoff source as zero",()=>{
+  const rows:any={
+    "2026-10":{sourceShrink:true,sourceWriteoff:false,shrink:120,writeoff:0,sourceMonthly:true,sourceEK:true,groups:[]},
+    "2026-09":{sourceShrink:true,sourceWriteoff:false,shrink:80,writeoff:0,sourceMonthly:true,sourceEK:true,groups:[]},
+    "2025-10":{sourceShrink:true,sourceWriteoff:false,shrink:100,writeoff:0,sourceMonthly:true,sourceEK:true,groups:[]}
+  };
+  const reply=appFunction("advisorReplyBase","advisorReply",["advisorNorm","month","calc","prev","data","reconciliation"],{
+    advisorNorm:(q:string)=>String(q).toLowerCase(),month:()=>"2026-10",calc:(k:string)=>rows[k]||null,
+    prev:()=>"2026-09",data:{months:rows},reconciliation:()=>({ready:false})
+  });
+  const answer=reply("Schwund und Abschriften vergleichen");
+  assert(answer.includes("Schwund 80,00")&&answer.includes("Veränderung 40,00"),"Confirmed shrink must be compared using its own source flag");
+  assert(answer.includes("Abschriften: kein belastbarer Vergleich"),"Unconfirmed writeoff must be labelled unavailable");
+  assert(!answer.includes("Abschriften 0,00")&&!answer.includes("zusammen"),"Unconfirmed writeoff must not be silently treated as €0 or included in a total");
+});
+
+Deno.test("advisor loss comparison shows combined total only when both loss sources are confirmed in both periods",()=>{
+  const rows:any={
+    "2026-10":{sourceShrink:true,sourceWriteoff:true,shrink:120,writeoff:30,sourceMonthly:true,sourceEK:true,groups:[]},
+    "2026-09":{sourceShrink:true,sourceWriteoff:true,shrink:80,writeoff:20,sourceMonthly:true,sourceEK:true,groups:[]},
+    "2025-10":{sourceShrink:true,sourceWriteoff:true,shrink:100,writeoff:25,sourceMonthly:true,sourceEK:true,groups:[]}
+  };
+  const reply=appFunction("advisorReplyBase","advisorReply",["advisorNorm","month","calc","prev","data","reconciliation"],{
+    advisorNorm:(q:string)=>String(q).toLowerCase(),month:()=>"2026-10",calc:(k:string)=>rows[k]||null,
+    prev:()=>"2026-09",data:{months:rows},reconciliation:()=>({ready:false})
+  });
+  const answer=reply("Schwund und Abschriften vergleichen");
+  assert(answer.includes("Abschriften 20,00")&&answer.includes("Veränderung 10,00"),"Confirmed writeoff must be compared independently");
+  assert(answer.includes("Summe beider Positionen 150,00")&&answer.includes("100,00"),"Combined amount may appear only with both confirmed source flags");
+});
