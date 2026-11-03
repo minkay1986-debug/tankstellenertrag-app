@@ -1980,6 +1980,30 @@ window.initTeAsk=initTeAsk;window.loadTeCommunity=loadTeCommunity;
     -webkit-backdrop-filter:none;backdrop-filter:none;
   }
 }
+/* Ertragsradar: dynamisch erzeugte Accordion-Kacheln explizit als Glass-Flächen behandeln. */
+.app #radarBody > .panel,
+.app #radarBody .radar-signal-accordion,
+.app #radarBody details.tse-accordion,
+.app #radarBody .tse-accordion-content,
+.app #investigationTool .investigation-card,
+.app #customScenarioInputs .custom-scenario-row {
+  background:linear-gradient(145deg,rgba(150,202,242,.10) 0%,rgba(21,72,119,.105) 45%,rgba(3,19,39,.20) 100%) !important;
+  background-color:rgba(5,25,48,.16) !important;
+  border-color:rgba(204,229,250,.34) !important;
+  -webkit-backdrop-filter:blur(30px) saturate(165%) !important;
+  backdrop-filter:blur(30px) saturate(165%) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 1px 0 0 rgba(255,255,255,.07),0 9px 26px rgba(0,8,24,.13) !important;
+}
+.app #radarBody .radar-signal-accordion > summary {
+  background:linear-gradient(105deg,rgba(192,224,250,.075),rgba(255,255,255,.012)) !important;
+  border-radius:inherit;
+}
+.app #radarBody .radar-signal-accordion[open] {
+  background:linear-gradient(145deg,rgba(150,202,242,.13),rgba(3,19,39,.23)) !important;
+}
+.app #radarBody .radar-signal-accordion .tse-accordion-content {
+  background:rgba(3,19,39,.10) !important;
+}
 </style>
 <style id="continuous-blue-marble-background">
 /*
