@@ -1030,6 +1030,36 @@ Deno.test("operational advisor recommendations do not depend on article-level sa
   }
 });
 
+Deno.test("simulation scenario reconciles each modeled component against independent expected values",()=>{
+  const rt=runtime(appFixture());
+  const group={revenue:2000,actualMargin:40,shrink:80,shrinkEntered:true,writeoff:50,writeoffEntered:true};
+  const result=rt.scenarioResult(group,5,25,20,true);
+  assert(Math.abs(result.newRev-2100)<.001,"A 5% revenue scenario on €2,000 must produce €2,100 revenue");
+  assert(Math.abs(result.revenueGain-40)<.001,"Revenue uplift must apply the actual 40% margin to the €100 incremental revenue");
+  assert(Math.abs(result.shrinkGain-20)<.001,"25% shrink reduction on €80 must save €20");
+  assert(Math.abs(result.writeoffGain-10)<.001,"20% writeoff reduction on €50 must save €10");
+  assert(Math.abs(result.total-70)<.001,"Combined modeled monthly benefit must be €70, not revenue uplift plus total revenue");
+  assert(Math.abs(result.total*12-840)<.001,"Flat-month annualized scenario must be €840");
+});
+Deno.test("simulation does not invent revenue benefit when actual margin is missing",()=>{
+  const rt=runtime(appFixture());
+  const result=rt.scenarioResult({revenue:2000,actualMargin:null,shrink:0,shrinkEntered:false,writeoff:0,writeoffEntered:false},10,0,0,true);
+  assert(result.revenueGain===null,"Missing actual margin must keep revenue uplift uncalculated");
+  assert(result.total===null,"No confirmed calculable component must not be rendered as €0 or a guessed benefit");
+});
+Deno.test("simulation keeps shrink and writeoff unavailable without confirmed source data",()=>{
+  const rt=runtime(appFixture());
+  const group={revenue:2000,actualMargin:40,shrink:80,shrinkEntered:true,writeoff:50,writeoffEntered:true};
+  const result=rt.scenarioResult(group,0,25,20,false);
+  assert(result.shrinkGain===null&&result.writeoffGain===null,"Unconfirmed loss source must suppress both shrink and writeoff savings");
+  assert(result.total===0,"With confirmed actual margin and no revenue uplift, the modeled total is zero, not savings from unconfirmed loss values");
+});
+Deno.test("simulation supports zero-valued but explicitly confirmed loss inputs",()=>{
+  const rt=runtime(appFixture());
+  const result=rt.scenarioResult({revenue:2000,actualMargin:40,shrink:0,shrinkEntered:true,writeoff:0,writeoffEntered:true},0,50,50,true);
+  assert(result.shrinkGain===0&&result.writeoffGain===0,"Confirmed zero loss values should calculate to zero rather than appear missing");
+  assert(result.total===0,"Confirmed zero-valued components should remain a valid zero scenario");
+});
 Deno.test("simulation safe-number helper is present in production and handles missing values",()=>{
   const safe=appFunction("grossSafe","scenarioResult",[],{});
   assert(safe(null)===0&&safe(undefined)===0,"Missing numeric scenario components must safely contribute zero");
