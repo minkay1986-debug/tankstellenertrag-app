@@ -1041,6 +1041,31 @@ Deno.test("simulation scenario reconciles each modeled component against indepen
   assert(Math.abs(result.total-70)<.001,"Combined modeled monthly benefit must be €70, not revenue uplift plus total revenue");
   assert(Math.abs(result.total*12-840)<.001,"Flat-month annualized scenario must be €840");
 });
+Deno.test("simulation respects independently confirmed shrink and write-off sources",()=>{
+  const rt=runtime(appFixture());
+  const group={revenue:2000,actualMargin:40,shrink:80,shrinkEntered:true,writeoff:50,writeoffEntered:true};
+  const shrinkOnly=rt.scenarioResult(group,0,25,20,true,false);
+  assert(Math.abs(shrinkOnly.shrinkGain-20)<.001,"Confirmed shrink must remain calculable");
+  assert(shrinkOnly.writeoffGain===null,"Unconfirmed write-offs must not be monetized");
+  assert(Math.abs(shrinkOnly.total-20)<.001,"Only confirmed shrink may contribute to the total");
+  const writeoffOnly=rt.scenarioResult(group,0,25,20,false,true);
+  assert(writeoffOnly.shrinkGain===null,"Unconfirmed shrink must not be monetized");
+  assert(Math.abs(writeoffOnly.writeoffGain-10)<.001,"Confirmed write-offs must remain calculable");
+  assert(Math.abs(writeoffOnly.total-10)<.001,"Only confirmed write-offs may contribute to the total");
+});
+
+Deno.test("advisor labels current shrink and write-off independently when only one source is confirmed",()=>{
+  const data=twoYearAdvisorTestAccount();
+  const current=data.months["2026-10"];
+  delete current.sourceShrink;
+  current.shrinkEntered=true;
+  current.writeoffEntered=false;
+  const answer=advisorTestReply(data,"2026-10")("Wie hoch sind Schwund und Abschriften?");
+  assert(answer.includes("Erfasster Schwund:</b> 1.338,48 €"),"Confirmed shrink amount must be displayed");
+  assert(answer.includes("Erfasste Abschriften:</b> Nicht erfasst"),"Unconfirmed write-offs must not appear as 0,00 €");
+  assert(answer.includes("beide Datenquellen müssen bestätigt sein"),"Combined total must be withheld unless both sources are confirmed");
+});
+
 Deno.test("simulation does not invent revenue benefit when actual margin is missing",()=>{
   const rt=runtime(appFixture());
   const result=rt.scenarioResult({revenue:2000,actualMargin:null,shrink:0,shrinkEntered:false,writeoff:0,writeoffEntered:false},10,0,0,true);
