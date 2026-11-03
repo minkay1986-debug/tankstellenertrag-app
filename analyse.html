@@ -2092,5 +2092,89 @@ body::after{
   body::before,body::after{display:none!important}
 }
 </style>
+
+<style id="glass-subcards-unification-2026-11-03">
+/* Rein visuelle Vereinheitlichung großer Unterkacheln – keine Layout-, Navigations- oder Datenlogik. */
+.app .view .panel > .card,
+.app .view .panel > .panel,
+.app .view .grid > .card,
+.app .view .investigation-card,
+.app .view .custom-scenario-row,
+.app .view .study-context-card,
+.app .view .report-guidance-step,
+.app .view .report-block,
+.app .view .stockGroupPanel,
+.app .view .meinmonat-kpi-card,
+.app .view .report-month-hero,
+.app .view .month-hero,
+.app .view .wow-card:not(.risk-watch):not(.risk-critical):not(.risk-severe) {
+  background:
+    radial-gradient(ellipse at 8% 0%,rgba(177,218,250,.22) 0%,rgba(177,218,250,0) 46%),
+    radial-gradient(ellipse at 100% 100%,rgba(54,132,194,.20) 0%,rgba(54,132,194,0) 52%),
+    linear-gradient(138deg,rgba(91,157,211,.24) 0%,rgba(31,83,132,.19) 46%,rgba(3,22,45,.30) 100%) !important;
+  background-color:rgba(7,29,54,.18) !important;
+  border-color:rgba(199,228,251,.40) !important;
+  border-radius:16px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.22),
+    inset 1px 0 0 rgba(255,255,255,.065),
+    0 9px 24px rgba(0,8,24,.17) !important;
+  -webkit-backdrop-filter:blur(24px) saturate(165%);
+  backdrop-filter:blur(24px) saturate(165%);
+  transition:background .2s ease,border-color .2s ease,box-shadow .2s ease;
+}
+/* Bereichsfarben bleiben als dezente Lichtakzente erkennbar. */
+.app .view .investigation-card {
+  background:
+    radial-gradient(ellipse at 100% 0%,rgba(244,169,91,.13),transparent 44%),
+    radial-gradient(ellipse at 8% 0%,rgba(177,218,250,.20),transparent 46%),
+    linear-gradient(138deg,rgba(91,157,211,.22),rgba(31,83,132,.18) 46%,rgba(3,22,45,.30)) !important;
+}
+.app .view .custom-scenario-row {
+  background:
+    radial-gradient(ellipse at 100% 0%,rgba(102,205,218,.13),transparent 46%),
+    radial-gradient(ellipse at 8% 0%,rgba(177,218,250,.20),transparent 46%),
+    linear-gradient(138deg,rgba(91,157,211,.22),rgba(31,83,132,.18) 46%,rgba(3,22,45,.30)) !important;
+}
+.app .view .study-context-card,
+.app .view .report-guidance-step {
+  background:
+    radial-gradient(ellipse at 8% 0%,rgba(177,218,250,.24),transparent 48%),
+    linear-gradient(138deg,rgba(91,157,211,.23),rgba(31,83,132,.18) 48%,rgba(3,22,45,.29)) !important;
+}
+/* Bestehende Status- und Aktivfarben haben Vorrang vor dem neutralen Glass-Look. */
+.app .view .investigation-card.active {border-color:rgba(240,189,79,.72)!important}
+.app .view .wow-card.risk-watch {border-color:rgba(240,189,79,.72)!important}
+.app .view .wow-card.risk-critical {border-color:rgba(239,100,97,.78)!important}
+.app .view .wow-card.risk-severe {border-color:rgba(255,63,58,.90)!important}
+.app .view .panel > .card:hover,
+.app .view .panel > .panel:hover,
+.app .view .grid > .card:hover,
+.app .view .investigation-card:hover,
+.app .view .custom-scenario-row:hover,
+.app .view .study-context-card:hover,
+.app .view .report-guidance-step:hover {
+  border-color:rgba(220,241,255,.78)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.27),0 12px 28px rgba(0,8,24,.22)!important;
+}
+@media(prefers-reduced-transparency:reduce){
+  .app .view .panel > .card,
+  .app .view .panel > .panel,
+  .app .view .grid > .card,
+  .app .view .investigation-card,
+  .app .view .custom-scenario-row,
+  .app .view .study-context-card,
+  .app .view .report-guidance-step,
+  .app .view .report-block,
+  .app .view .stockGroupPanel,
+  .app .view .meinmonat-kpi-card,
+  .app .view .report-month-hero,
+  .app .view .month-hero {
+    -webkit-backdrop-filter:none;backdrop-filter:none;
+    background:rgba(16,43,75,.92)!important;
+  }
+}
+</style>
+
 </body></html>
 <!-- Cloudflare Pages preview trigger: branch-only deployment -->
