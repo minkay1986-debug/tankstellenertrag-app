@@ -1936,45 +1936,25 @@ window.initTeAsk=initTeAsk;window.loadTeCommunity=loadTeCommunity;
 .app #advisoryCasesPanel .small {color:#c3d2e0 !important}
 </style>
 <style id="continuous-blue-marble-background">
-/* Dezenter, durchgehender Marineblau-Marmor statt eines flächigen Blauschimmers. */
-html{min-height:100%;background:#071522}
-body{
-  min-height:100vh;
-  position:relative;
-  isolation:isolate;
-  background:#071522!important;
+/* Fixierter Ocean-Glass-Hintergrund mit sichtbaren Lichtquellen und feiner Marmorierung. */
+html,body{
+  min-height:100%;
+  background-color:#061426!important;
+  background-image:
+    radial-gradient(ellipse 42% 34% at 78% 14%,rgba(91,169,235,.34) 0%,rgba(55,128,196,.17) 35%,transparent 76%),
+    radial-gradient(ellipse 36% 42% at 12% 42%,rgba(49,125,195,.28) 0%,rgba(26,83,143,.13) 42%,transparent 78%),
+    radial-gradient(ellipse 48% 32% at 64% 82%,rgba(64,139,201,.22) 0%,rgba(30,84,137,.10) 46%,transparent 80%),
+    radial-gradient(ellipse 24% 20% at 34% 24%,rgba(129,190,235,.12) 0%,transparent 78%),
+    repeating-radial-gradient(ellipse at 72% 34%,rgba(127,180,222,.035) 0px,rgba(127,180,222,.012) 2px,transparent 5px,transparent 24px),
+    linear-gradient(132deg,#0b2037 0%,#081a2e 42%,#061426 76%,#0a2038 100%)!important;
+  background-attachment:fixed!important;
+  background-repeat:no-repeat!important;
+  background-size:cover!important;
 }
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  z-index:-2;
-  pointer-events:none;
-  background:
-    radial-gradient(ellipse at 18% 18%,rgba(47,91,132,.22),transparent 42%),
-    radial-gradient(ellipse at 78% 34%,rgba(27,75,116,.24),transparent 46%),
-    radial-gradient(ellipse at 46% 82%,rgba(37,77,111,.20),transparent 48%),
-    linear-gradient(145deg,#0b2035 0%,#091a2b 48%,#071522 100%);
-  background-repeat:no-repeat;
-  background-size:cover;
-}
-body::after{
-  content:"";
-  position:fixed;
-  inset:-8%;
-  z-index:-1;
-  pointer-events:none;
-  opacity:.24;
-  mix-blend-mode:screen;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 700' preserveAspectRatio='none'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.008 .014' numOctaves='3' seed='17'/%3E%3CfeColorMatrix values='.20 0 0 0 .10 .25 0 0 0 .18 .32 0 0 0 .28 0 0 0 .42 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
-  background-size:cover;
-  filter:contrast(135%) brightness(82%);
-}
-.app{position:relative;background:transparent!important}
-.main,.view{background:transparent}
+body{color:var(--t);background-position:center center!important}
+.app,.main,.view{background:transparent!important}
 @media print{
-  body{background:#fff!important}
-  body::before,body::after{display:none!important}
+  html,body{background:#fff!important;background-image:none!important}
 }
 </style>
 </body></html>
