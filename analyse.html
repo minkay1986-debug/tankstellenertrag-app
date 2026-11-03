@@ -1900,9 +1900,8 @@ window.initTeAsk=initTeAsk;window.loadTeCommunity=loadTeCommunity;
 })();
 </script><style id="uniform-dark-blue-overrides">
 /*
- * Einheitliches Navy-Glass-System:
- * Flächen bleiben dunkel genug für Kontrast, lassen aber die Marmorierung
- * sichtbar durchscheinen. Blur nur auf Oberflächen, nicht auf deren Inhalt.
+ * True navy glass: low-opacity surfaces reveal the marble below.
+ * The background blur and specular edge create depth without blurring content.
  */
 .app .panel,
 .app .card,
@@ -1923,54 +1922,62 @@ window.initTeAsk=initTeAsk;window.loadTeCommunity=loadTeCommunity;
 .app .cause-tool-intro,
 .app #loop .panel,
 .app #advisoryCasesPanel {
-  background:linear-gradient(135deg,rgba(24,67,111,.54),rgba(7,29,54,.68)) !important;
-  background-color:rgba(10,35,63,.62) !important;
-  border-color:rgba(151,198,239,.27) !important;
+  background:
+    linear-gradient(145deg,rgba(103,166,218,.13) 0%,rgba(20,66,111,.18) 38%,rgba(4,22,43,.34) 100%) !important;
+  background-color:rgba(7,29,54,.24) !important;
+  border:1px solid rgba(190,222,250,.28) !important;
   color:#f3f7fb !important;
-  -webkit-backdrop-filter:blur(14px) saturate(132%);
-  backdrop-filter:blur(14px) saturate(132%);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.075),0 8px 24px rgba(0,8,24,.13);
+  -webkit-backdrop-filter:blur(22px) saturate(150%);
+  backdrop-filter:blur(22px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.19),
+    inset 1px 0 0 rgba(255,255,255,.055),
+    0 10px 28px rgba(0,8,24,.16) !important;
 }
-/* Große Container etwas transparenter, damit die Hintergrundstruktur sichtbar bleibt. */
+/* Große Flächen transparenter als einzelne Informationskacheln. */
 .app .panel,
 .app #loop .panel,
 .app #advisoryCasesPanel {
-  background:linear-gradient(135deg,rgba(22,65,108,.42),rgba(7,27,51,.55)) !important;
-  border-color:rgba(151,198,239,.24) !important;
+  background:
+    linear-gradient(145deg,rgba(110,174,224,.095) 0%,rgba(20,66,111,.12) 42%,rgba(4,22,43,.25) 100%) !important;
+  background-color:rgba(7,29,54,.18) !important;
+  border-color:rgba(190,222,250,.24) !important;
+  -webkit-backdrop-filter:blur(26px) saturate(155%);
+  backdrop-filter:blur(26px) saturate(155%);
 }
-/* Verschachtelte Karten nicht zu einer dunklen, mehrfach gestapelten Glasschicht machen. */
+/* Karten in Karten: sichtbar eigenständig, aber keine opaken blauen Blöcke. */
 .app .panel .panel,
 .app .panel .card,
 .app #loop .panel,
 .app #loop .card,
 .app #advisoryCasesPanel {
-  background:linear-gradient(135deg,rgba(35,82,128,.30),rgba(8,31,57,.40)) !important;
-  background-color:rgba(8,31,57,.38) !important;
+  background:linear-gradient(145deg,rgba(116,181,230,.12),rgba(5,25,48,.25)) !important;
+  background-color:rgba(7,29,54,.20) !important;
 }
-/* Wetterkarten behalten ihre Bildhintergründe und den eigenen Kontrastverlauf. */
+/* Risikostufen behalten ihre semantischen Farbränder und Statusanzeigen. */
+.app .wow-card.risk-watch {border-color:rgba(240,189,79,.72)!important}
+.app .wow-card.risk-critical {border-color:rgba(239,100,97,.78)!important}
+.app .wow-card.risk-severe {border-color:rgba(255,63,58,.9)!important}
+/* Wetterkarten behalten ihre Fotos und ihren eigenen Lesbarkeitsverlauf. */
 .app .weather-day-card {
   -webkit-backdrop-filter:blur(3px) saturate(120%);
   backdrop-filter:blur(3px) saturate(120%);
 }
-/* Eingaben bleiben bewusst klar und kontrastreich statt transparent. */
-.app input,
-.app select,
-.app textarea {
-  color:#102033;
-}
+/* Eingabefelder bleiben bewusst klar und kontrastreich. */
+.app input,.app select,.app textarea {color:#102033}
 .app .panel .small,
 .app .card .small,
 .app #loop .small,
-.app #advisoryCasesPanel .small {color:#d0deeb !important}
+.app #advisoryCasesPanel .small {color:#d5e4f2!important}
 @media(prefers-reduced-transparency:reduce){
-  .app .panel,.app .card,.app .stockGroupPanel,.app .meinmonat-kpi-card,.app .report-month-hero,.app .step,.app .alert,.app .wow-card,
+  .app .panel,.app .card,.app .stockGroupPanel,.app .meinmonat-kpi-card,
+  .app .report-month-hero,.app .step,.app .alert,.app .wow-card,
   .app .investigation-card,.app .month-hero,.app .weather-dashboard,
   .app .custom-scenario-row,.app .study-context-card,.app .weather-tile,
   .app .report-guidance-step,.app .practice-box,.app .cause-tool-intro,
   .app #loop .panel,.app #advisoryCasesPanel {
-    background:#102b4b !important;
-    -webkit-backdrop-filter:none;
-    backdrop-filter:none;
+    background:#102b4b!important;
+    -webkit-backdrop-filter:none;backdrop-filter:none;
   }
 }
 </style>
