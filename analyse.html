@@ -1899,7 +1899,11 @@ window.initTeAsk=initTeAsk;window.loadTeCommunity=loadTeCommunity;
   window.addEventListener('online',function(){checkOfficialStatus();});
 })();
 </script><style id="uniform-dark-blue-overrides">
-/* Letzter, verbindlicher Farb-Override: alle App-Flächen dunkelblau */
+/*
+ * Einheitliches Navy-Glass-System:
+ * Flächen bleiben dunkel genug für Kontrast, lassen aber die Marmorierung
+ * sichtbar durchscheinen. Blur nur auf Oberflächen, nicht auf deren Inhalt.
+ */
 .app .panel,
 .app .card,
 .app .step,
@@ -1907,7 +1911,6 @@ window.initTeAsk=initTeAsk;window.loadTeCommunity=loadTeCommunity;
 .app .wow-card,
 .app .investigation-card,
 .app .month-hero,
-.app .weather-day-card,
 .app .weather-dashboard,
 .app .custom-scenario-row,
 .app .study-context-card,
@@ -1917,23 +1920,56 @@ window.initTeAsk=initTeAsk;window.loadTeCommunity=loadTeCommunity;
 .app .cause-tool-intro,
 .app #loop .panel,
 .app #advisoryCasesPanel {
-  background:#102b4b !important;
-  background-image:none !important;
-  border-color:#28517a !important;
+  background:linear-gradient(135deg,rgba(24,67,111,.54),rgba(7,29,54,.68)) !important;
+  background-color:rgba(10,35,63,.62) !important;
+  border-color:rgba(151,198,239,.27) !important;
   color:#f3f7fb !important;
+  -webkit-backdrop-filter:blur(14px) saturate(132%);
+  backdrop-filter:blur(14px) saturate(132%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.075),0 8px 24px rgba(0,8,24,.13);
 }
+/* Große Container etwas transparenter, damit die Hintergrundstruktur sichtbar bleibt. */
+.app .panel,
+.app #loop .panel,
+.app #advisoryCasesPanel {
+  background:linear-gradient(135deg,rgba(22,65,108,.42),rgba(7,27,51,.55)) !important;
+  border-color:rgba(151,198,239,.24) !important;
+}
+/* Verschachtelte Karten nicht zu einer dunklen, mehrfach gestapelten Glasschicht machen. */
 .app .panel .panel,
 .app .panel .card,
 .app #loop .panel,
 .app #loop .card,
 .app #advisoryCasesPanel {
-  background-color:#102b4b !important;
-  background-image:none !important;
+  background:linear-gradient(135deg,rgba(35,82,128,.30),rgba(8,31,57,.40)) !important;
+  background-color:rgba(8,31,57,.38) !important;
+}
+/* Wetterkarten behalten ihre Bildhintergründe und den eigenen Kontrastverlauf. */
+.app .weather-day-card {
+  -webkit-backdrop-filter:blur(3px) saturate(120%);
+  backdrop-filter:blur(3px) saturate(120%);
+}
+/* Eingaben bleiben bewusst klar und kontrastreich statt transparent. */
+.app input,
+.app select,
+.app textarea {
+  color:#102033;
 }
 .app .panel .small,
 .app .card .small,
 .app #loop .small,
-.app #advisoryCasesPanel .small {color:#c3d2e0 !important}
+.app #advisoryCasesPanel .small {color:#d0deeb !important}
+@media(prefers-reduced-transparency:reduce){
+  .app .panel,.app .card,.app .step,.app .alert,.app .wow-card,
+  .app .investigation-card,.app .month-hero,.app .weather-dashboard,
+  .app .custom-scenario-row,.app .study-context-card,.app .weather-tile,
+  .app .report-guidance-step,.app .practice-box,.app .cause-tool-intro,
+  .app #loop .panel,.app #advisoryCasesPanel {
+    background:#102b4b !important;
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+  }
+}
 </style>
 <style id="continuous-blue-marble-background">
 /*
