@@ -6,6 +6,7 @@ name: AI advisor worker tests
       - feature/ai-advisor-chat-pilot-2026-11-03
     paths:
       - "ai-advisor-worker/**"
+      - "analyse.html"
       - ".github/workflows/test-ai-advisor-worker.yml"
   pull_request:
     paths:
