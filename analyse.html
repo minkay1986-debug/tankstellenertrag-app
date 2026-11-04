@@ -1689,13 +1689,21 @@ function advisorAiFacts(){
  });
  return lines.join('\n').slice(0,5000);
 }
-async function requestAdvisorAi(question){
+function advisorChatHistory(messages){
+ const items=Array.from(messages.querySelectorAll(':scope > .chat-message')).slice(-8);
+ return items.map(item=>{
+  const role=item.classList.contains('user')?'user':'assistant';
+  const content=String(item.querySelector(':scope > div, :scope > p')?.textContent||item.textContent||'').trim().slice(0,1400);
+  return content?{role,content}:null;
+ }).filter(Boolean);
+}
+async function requestAdvisorAi(question,analysis,history){
  const endpoint=String(window.TANKSTELLENERTRAG_AI_ADVISOR_URL||'').trim();
  if(!endpoint)return null;
  if(!/^https:\/\//i.test(endpoint))throw new Error('KI-Endpunkt ist nicht als HTTPS-Adresse konfiguriert.');
  const token=await window.__tseAdvisorGetAccessToken?.();
  if(!token)throw new Error('Bitte zuerst erneut anmelden.');
- const response=await fetch(endpoint,{method:'POST',headers:{'content-type':'application/json','authorization':'Bearer '+token},body:JSON.stringify({question,facts:advisorAiFacts()})});
+ const response=await fetch(endpoint,{method:'POST',headers:{'content-type':'application/json','authorization':'Bearer '+token},body:JSON.stringify({question,facts:advisorAiFacts(),analysis:String(analysis||'').slice(0,12000),history:Array.isArray(history)?history:[]})});
  let payload={};try{payload=await response.json()}catch(_){}
  if(!response.ok){const error=new Error(payload.error||'KI-Dienst nicht verfügbar');error.status=response.status;throw error;}
  if(typeof payload.answer!=='string'||!payload.answer.trim())throw new Error('KI-Dienst lieferte keine Antwort.');
@@ -1707,7 +1715,7 @@ function initAdvisorChat(){
  const add=(role,text,html)=>{const el=document.createElement('div');el.className='chat-message '+role;const head=document.createElement('b');head.textContent=role==='user'?'Du':'TankstellenErtrag';el.appendChild(head);if(role==='user'){const p=document.createElement('p');p.textContent=text;el.appendChild(p)}else{const b=document.createElement('div');b.innerHTML=html;el.appendChild(b)}messages.appendChild(el)};
  form.addEventListener('submit',async e=>{
   e.preventDefault();e.stopPropagation();const q=input.value.trim();if(!q)return;
-  add('user',q,'');const reply=document.createElement('div');reply.className='chat-message assistant';
+  const priorHistory=advisorChatHistory(messages);add('user',q,'');const reply=document.createElement('div');reply.className='chat-message assistant';
   const head=document.createElement('b');head.textContent='TankstellenErtrag';reply.appendChild(head);
   const body=document.createElement('div');body.innerHTML='<p>Ich prüfe deine Frage …</p>';reply.appendChild(body);messages.appendChild(reply);input.value='';
   try{
@@ -1715,7 +1723,7 @@ function initAdvisorChat(){
    const fallback=advisorReply(q);
    body.innerHTML=fallback||'<p>Die Auswertung lieferte keine Antwort. Bitte prüfe, ob Monatsdaten geladen sind.</p>';
    try{
-    const aiAnswer=await requestAdvisorAi(q);
+    const aiAnswer=await requestAdvisorAi(q,fallback.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim(),priorHistory);
     if(aiAnswer){
      const section=document.createElement('section');section.className='advisor-ai-answer';
      const title=document.createElement('b');title.textContent='Ergänzende KI-Fachberatung';
