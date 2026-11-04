@@ -87,7 +87,7 @@ export class QuotaManager {
     if (input.action === "complete" || input.action === "refund") {
       const { day, userId, reservationId } = input;
       if (!["complete", "refund"].includes(input.action) ||
-          typeof day !== "string" || !/^\\d{4}-\\d{2}-\\d{2}$/.test(day) ||
+          typeof day !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(day) ||
           typeof userId !== "string" || !userId || userId.length > 128 ||
           typeof reservationId !== "string" || !reservationId || reservationId.length > 128) {
         return json({ error: "invalid_finalization" }, 400);
