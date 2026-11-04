@@ -1,8 +1,19 @@
-/* Browser-Key-Diagnosetest: vorübergehend Legacy anon statt Publishable Key; niemals service_role/Secret Keys hier eintragen. */
-window.TANKSTELLENERTRAG_SUPABASE = {
+/* KI-Pilot: getrenntes Security-Testprojekt und isolierter Worker.
+   Aktiviert sich nur auf dem lokalen Testserver bzw. dem eigenen Pages-Branch-Preview. */
+const tseAdvisorLocalTest = (location.hostname === 'localhost' && location.port === '4173') || location.hostname === 'feature-ai-advisor-chat-pilo.tankstellenertrag-preview.pages.dev';
+window.TANKSTELLENERTRAG_SUPABASE = tseAdvisorLocalTest ? {
+  url: 'https://rzydxhnphwuocttdncsm.supabase.co',
+  publishableKey: 'sb_publishable__RALPRPA1lOGxFMRj-Lz6w_23u9ZTdB'
+} : {
   url: 'https://irzlbdybtrbztjjkrlad.supabase.co',
   publishableKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlyemxiZHlidHJienRqamtybGFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MjY3MzcsImV4cCI6MjEwNjEwMjczN30.7Gk98I7vxpXd1dGfNjQ1VohXrgmNUy6LsudhVG44kF4'
 };
+if (tseAdvisorLocalTest) {
+  window.TANKSTELLENERTRAG_AI_ADVISOR_URL = 'https://tankstellenertrag-advisor-ai-test.minkay1986.workers.dev';
+} else if (location.hostname === 'app.tankstellenertrag.de') {
+  // Live-KI wird ausschließlich auf der echten Kunden-Domain aktiviert.
+  window.TANKSTELLENERTRAG_AI_ADVISOR_URL = 'https://tankstellenertrag-advisor-ai-live.minkay1986.workers.dev';
+}
 
 /* TankstellenErtrag Profil-Avatar: kleines Konto-Icon, Standard-Zapfhahn und frei wählbare Charaktere. */
 document.addEventListener('DOMContentLoaded', async () => {

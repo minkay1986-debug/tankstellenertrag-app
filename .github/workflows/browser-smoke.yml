@@ -105,7 +105,8 @@ jobs:
           if (pageErrors.length) throw new Error('Runtime errors during view navigation:\\n' + pageErrors.join('\\n---\\n'));
           await page.screenshot({ path: 'ocean-glass-desktop.png', fullPage: true });
           const glassAudit = await page.evaluate(() => {
-            const body = getComputedStyle(document.body);
+            // The Ocean Marble is rendered on body::before, not body.backgroundImage.
+            const oceanBackground = getComputedStyle(document.body, '::before');
             const candidates = [...document.querySelectorAll('.panel,.card,#stationInfo')];
             const sample = candidates.find(el => {
               const r = el.getBoundingClientRect();
@@ -113,8 +114,8 @@ jobs:
             });
             const tile = sample ? getComputedStyle(sample) : null;
             return {
-              bodyBackgroundImage: body.backgroundImage,
-              bodyBackgroundColor: body.backgroundColor,
+              bodyBackgroundImage: oceanBackground.backgroundImage,
+              bodyBackgroundColor: oceanBackground.backgroundColor,
               sampleTileFound: Boolean(sample),
               sampleTileBackground: tile?.backgroundColor ?? null,
               sampleTileBackdropFilter: tile?.backdropFilter ?? null

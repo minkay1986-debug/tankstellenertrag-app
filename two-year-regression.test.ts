@@ -643,8 +643,9 @@ Deno.test("advisor chat does not rank groups or calculate shop totals when EK is
   assert(advisor.includes("d.sourceEK?money(d.ek):'nicht erfasst'"),"Advisor must not show missing EK as zero");
   assert(advisor.includes("d.sourceEK?money(d.gross):'nicht berechenbar · bestätigter EK fehlt'"),"Advisor must not calculate gross profit without EK");
   assert(advisor.includes("d.sourceEK===true?d.groups.filter"),"Advisor must not rank groups by gross profit if EK is missing");
-  assert(advisor.includes("lossAvailable=d.sourceShrink===true"),"Loss advice must gate totals on confirmed loss data");
-  assert(advisor.includes("comparisonAvailable=lossAvailable&&p?.sourceShrink===true"),"Loss comparisons must require both source periods");
+  assert(advisor.includes("shrinkAvailable=d.sourceShrink===true,writeoffAvailable=d.sourceWriteoff===true"),"Loss advice must confirm shrink and write-off sources independently");
+  assert(advisor.includes("comparisonAvailable=shrinkAvailable&&p?.sourceShrink===true&&writeoffAvailable&&p?.sourceWriteoff===true"),"Combined loss comparisons must require both sources in both periods");
+  assert(advisor.includes("shrinkAvailable&&p?.sourceShrink===true")&&advisor.includes("writeoffAvailable&&p?.sourceWriteoff===true"),"Individual loss comparisons must remain available when only their own source is confirmed");
 });
 
 Deno.test("report does not aggregate a partially confirmed inventory as a complete station stock",()=>{
@@ -733,7 +734,7 @@ Deno.test("two-year advisory account reports real year-over-year loss values and
   const answer=reply("Wie entwickeln sich meine erfassten Verlustbeträge im Vergleich zum Vorjahr?");
   assert(answer.includes("Vorjahresmonat (2025-10)"),"Loss advice must compare the same calendar month in the previous year. Actual answer: "+answer);
   assert(answer.includes("Erfasster Schwund")&&answer.includes("Abschriften"),"Loss advice must separate recorded shrink and write-offs");
-  assert(answer.includes("1.338,48")&&answer.includes("990,00")&&answer.includes("348,48"),"Loss advice must calculate current, prior-year and delta values from the same month");
+  assert(answer.includes("1.338,48")&&answer.includes("990,00")&&answer.includes("348,48"),"Loss advice must calculate current, prior-year and delta values from the same month. Actual answer: "+answer);
   assert(!answer.includes("<li>Waschen:"),"Non-shop wash service must not appear in shop group loss breakdown");
   assert(answer.includes("Die Zahlen allein erklären nicht"),"Loss advice must not claim an unproven cause. Actual answer: "+answer);
 });
@@ -1030,6 +1031,61 @@ Deno.test("operational advisor recommendations do not depend on article-level sa
   }
 });
 
+Deno.test("simulation scenario reconciles each modeled component against independent expected values",()=>{
+  const rt=runtime(appFixture());
+  const group={revenue:2000,actualMargin:40,shrink:80,shrinkEntered:true,writeoff:50,writeoffEntered:true};
+  const result=rt.scenarioResult(group,5,25,20,true);
+  assert(Math.abs(result.newRev-2100)<.001,"A 5% revenue scenario on €2,000 must produce €2,100 revenue");
+  assert(Math.abs(result.revenueGain-40)<.001,"Revenue uplift must apply the actual 40% margin to the €100 incremental revenue");
+  assert(Math.abs(result.shrinkGain-20)<.001,"25% shrink reduction on €80 must save €20");
+  assert(Math.abs(result.writeoffGain-10)<.001,"20% writeoff reduction on €50 must save €10");
+  assert(Math.abs(result.total-70)<.001,"Combined modeled monthly benefit must be €70, not revenue uplift plus total revenue");
+  assert(Math.abs(result.total*12-840)<.001,"Flat-month annualized scenario must be €840");
+});
+Deno.test("simulation respects independently confirmed shrink and write-off sources",()=>{
+  const rt=runtime(appFixture());
+  const group={revenue:2000,actualMargin:40,shrink:80,shrinkEntered:true,writeoff:50,writeoffEntered:true};
+  const shrinkOnly=rt.scenarioResult(group,0,25,20,true,false);
+  assert(Math.abs(shrinkOnly.shrinkGain-20)<.001,"Confirmed shrink must remain calculable");
+  assert(shrinkOnly.writeoffGain===null,"Unconfirmed write-offs must not be monetized");
+  assert(Math.abs(shrinkOnly.total-20)<.001,"Only confirmed shrink may contribute to the total");
+  const writeoffOnly=rt.scenarioResult(group,0,25,20,false,true);
+  assert(writeoffOnly.shrinkGain===null,"Unconfirmed shrink must not be monetized");
+  assert(Math.abs(writeoffOnly.writeoffGain-10)<.001,"Confirmed write-offs must remain calculable");
+  assert(Math.abs(writeoffOnly.total-10)<.001,"Only confirmed write-offs may contribute to the total");
+});
+
+Deno.test("advisor labels current shrink and write-off independently when only one source is confirmed",()=>{
+  const data=twoYearAdvisorTestAccount();
+  const current=data.months["2026-10"];
+  delete current.sourceShrink;
+  current.shrinkEntered=true;
+  current.writeoffEntered=false;
+  const answer=advisorTestReply(data,"2026-10")("Wie hoch sind Schwund und Abschriften?");
+  assert(answer.includes("Erfasster Schwund:</b> 1.132,56 €"),"Confirmed shrink amount must be displayed separately from unconfirmed write-offs. Actual answer: "+answer);
+  assert(answer.includes("Erfasste Abschriften:</b> Nicht erfasst"),"Unconfirmed write-offs must not appear as 0,00 €");
+  assert(answer.includes("beide Datenquellen müssen bestätigt sein"),"Combined total must be withheld unless both sources are confirmed");
+});
+
+Deno.test("simulation does not invent revenue benefit when actual margin is missing",()=>{
+  const rt=runtime(appFixture());
+  const result=rt.scenarioResult({revenue:2000,actualMargin:null,shrink:0,shrinkEntered:false,writeoff:0,writeoffEntered:false},10,0,0,true);
+  assert(result.revenueGain===null,"Missing actual margin must keep revenue uplift uncalculated");
+  assert(result.total===null,"No confirmed calculable component must not be rendered as €0 or a guessed benefit");
+});
+Deno.test("simulation keeps shrink and writeoff unavailable without confirmed source data",()=>{
+  const rt=runtime(appFixture());
+  const group={revenue:2000,actualMargin:40,shrink:80,shrinkEntered:true,writeoff:50,writeoffEntered:true};
+  const result=rt.scenarioResult(group,0,25,20,false);
+  assert(result.shrinkGain===null&&result.writeoffGain===null,"Unconfirmed loss source must suppress both shrink and writeoff savings");
+  assert(result.total===0,"With confirmed actual margin and no revenue uplift, the modeled total is zero, not savings from unconfirmed loss values");
+});
+Deno.test("simulation supports zero-valued but explicitly confirmed loss inputs",()=>{
+  const rt=runtime(appFixture());
+  const result=rt.scenarioResult({revenue:2000,actualMargin:40,shrink:0,shrinkEntered:true,writeoff:0,writeoffEntered:true},0,50,50,true);
+  assert(result.shrinkGain===0&&result.writeoffGain===0,"Confirmed zero loss values should calculate to zero rather than appear missing");
+  assert(result.total===0,"Confirmed zero-valued components should remain a valid zero scenario");
+});
 Deno.test("simulation safe-number helper is present in production and handles missing values",()=>{
   const safe=appFunction("grossSafe","scenarioResult",[],{});
   assert(safe(null)===0&&safe(undefined)===0,"Missing numeric scenario components must safely contribute zero");
@@ -1063,4 +1119,36 @@ Deno.test("advisor response routing applies evidence framing to every economic a
   assert(router.includes("advisorEvidenceResponse(advisory,'guidance')"),"General guidance is not framed");
   assert(router.includes("advisorEvidenceResponse(noData,'missing')"),"Missing-data answers are not framed");
   assert(router.includes("advisorEvidenceResponse(base,'data')")||router.includes("advisorEvidenceResponse(knowledge?base+knowledge:base,'data')"),"Data analysis answers are not framed");
+});
+
+
+Deno.test("advisor loss comparisons never treat an unconfirmed writeoff source as zero",()=>{
+  const rows:any={
+    "2026-10":{sourceShrink:true,sourceWriteoff:false,shrink:120,writeoff:0,sourceMonthly:true,sourceEK:true,groups:[]},
+    "2026-09":{sourceShrink:true,sourceWriteoff:false,shrink:80,writeoff:0,sourceMonthly:true,sourceEK:true,groups:[]},
+    "2025-10":{sourceShrink:true,sourceWriteoff:false,shrink:100,writeoff:0,sourceMonthly:true,sourceEK:true,groups:[]}
+  };
+  const reply=appFunction("advisorReplyBase","advisorReply",["advisorNorm","month","calc","prev","data","reconciliation"],{
+    advisorNorm:(q:string)=>String(q).toLowerCase(),month:()=>"2026-10",calc:(k:string)=>rows[k]||null,
+    prev:()=>"2026-09",data:{months:rows},reconciliation:()=>({ready:false})
+  });
+  const answer=reply("Schwund und Abschriften vergleichen");
+  assert(answer.includes("Schwund 80,00")&&answer.includes("Veränderung 40,00"),"Confirmed shrink must be compared using its own source flag");
+  assert(answer.includes("Abschriften: kein belastbarer Vergleich"),"Unconfirmed writeoff must be labelled unavailable");
+  assert(!answer.includes("Abschriften 0,00")&&!answer.includes("zusammen"),"Unconfirmed writeoff must not be silently treated as €0 or included in a total");
+});
+
+Deno.test("advisor loss comparison shows combined total only when both loss sources are confirmed in both periods",()=>{
+  const rows:any={
+    "2026-10":{sourceShrink:true,sourceWriteoff:true,shrink:120,writeoff:30,sourceMonthly:true,sourceEK:true,groups:[]},
+    "2026-09":{sourceShrink:true,sourceWriteoff:true,shrink:80,writeoff:20,sourceMonthly:true,sourceEK:true,groups:[]},
+    "2025-10":{sourceShrink:true,sourceWriteoff:true,shrink:100,writeoff:25,sourceMonthly:true,sourceEK:true,groups:[]}
+  };
+  const reply=appFunction("advisorReplyBase","advisorReply",["advisorNorm","month","calc","prev","data","reconciliation"],{
+    advisorNorm:(q:string)=>String(q).toLowerCase(),month:()=>"2026-10",calc:(k:string)=>rows[k]||null,
+    prev:()=>"2026-09",data:{months:rows},reconciliation:()=>({ready:false})
+  });
+  const answer=reply("Schwund und Abschriften vergleichen");
+  assert(answer.includes("Abschriften 20,00")&&answer.includes("Veränderung 10,00"),"Confirmed writeoff must be compared independently");
+  assert(answer.includes("Summe beider Positionen 150,00")&&answer.includes("100,00"),"Combined amount may appear only with both confirmed source flags");
 });
