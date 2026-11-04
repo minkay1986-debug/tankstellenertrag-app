@@ -7,6 +7,7 @@ name: AI advisor worker tests
     paths:
       - "ai-advisor-worker/**"
       - "analyse.html"
+      - "supabase-config.js"
       - ".github/workflows/test-ai-advisor-worker.yml"
   pull_request:
     paths:
