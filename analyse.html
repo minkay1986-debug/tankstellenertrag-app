@@ -1667,6 +1667,8 @@ function advisorReply(raw){
  if(scope)return scope;
  // Datenbasierte Priorisierung muss vor allgemeinen Direkt-/Rückfrageantworten laufen.
  const priorityQuery=advisorNorm(raw);
+ // Konkrete Betragsfragen zu Schwund/Abschriften müssen immer zuerst die bestätigten Monatsquellen auswerten.
+ if(/wie\s*hoch|wieviel|wie\s*viel/.test(priorityQuery)&&/schwund|abschrift/.test(priorityQuery))return advisorEvidenceResponse(advisorReplyBase(raw),'data');
  if(/potenzial|wirtschaftlich|priorit|welche drei|drei dinge|erste drei|wichtigsten.{0,24}pruef|naechsten.{0,24}pruef|(?:drei|3).{0,32}(?:pruef|kontroll|massnahmen)|(?:pruef|kontroll|massnahmen).{0,32}(?:drei|3)/.test(priorityQuery))return advisorEvidenceResponse(advisorReplyBase(raw),'data');
  const direct=advisorDirectAnswer(raw);
  if(direct)return advisorEvidenceResponse(direct,'guidance');
@@ -1730,7 +1732,9 @@ function initAdvisorChat(){
    }catch(aiError){
     console.warn('KI-Beratung nicht verfügbar; regelbasierte Antwort bleibt aktiv:',aiError);
     if(window.TANKSTELLENERTRAG_AI_ADVISOR_URL){
-     const note=document.createElement('p');note.className='small advisor-ai-status';note.textContent=aiError.status===429?'KI-Tageslimit erreicht. Die regelbasierte Beratung steht weiterhin zur Verfügung.':'KI-Fachberatung momentan nicht erreichbar. Die regelbasierte Beratung bleibt verfügbar.';
+     const note=document.createElement('p');note.className='small advisor-ai-status';
+     const status=Number(aiError.status)||0,code=String(aiError.message||'');
+     note.textContent=status===401?'KI-Testanmeldung fehlt oder ist abgelaufen. Bitte im Testkonto anmelden. Die regelbasierte Beratung bleibt verfügbar.':status===403?'Der Test-Preview ist für den KI-Dienst nicht freigeschaltet. Die regelbasierte Beratung bleibt verfügbar.':status===429?'KI-Tageslimit erreicht. Die regelbasierte Beratung steht weiterhin zur Verfügung.':status===502?'Der KI-Anbieter hat keine Antwort geliefert. Die regelbasierte Beratung bleibt verfügbar.':status===503?'Der KI-Dienst oder die Authentifizierungsprüfung ist derzeit nicht verfügbar. Die regelbasierte Beratung bleibt verfügbar.':code==='Bitte zuerst erneut anmelden.'?'Für die KI-Fachberatung ist eine Anmeldung im separaten Testkonto erforderlich. Die regelbasierte Beratung bleibt verfügbar.':'KI-Fachberatung momentan nicht erreichbar (HTTP '+(status||'unbekannter Status')+'). Die regelbasierte Beratung bleibt verfügbar.';
      body.appendChild(note);
     }
    }
