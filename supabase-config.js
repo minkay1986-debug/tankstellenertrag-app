@@ -10,6 +10,9 @@ window.TANKSTELLENERTRAG_SUPABASE = tseAdvisorLocalTest ? {
 };
 if (tseAdvisorLocalTest) {
   window.TANKSTELLENERTRAG_AI_ADVISOR_URL = 'https://tankstellenertrag-advisor-ai-test.minkay1986.workers.dev';
+} else if (location.hostname === 'app.tankstellenertrag.de') {
+  // Live-KI wird ausschließlich auf der echten Kunden-Domain aktiviert.
+  window.TANKSTELLENERTRAG_AI_ADVISOR_URL = 'https://tankstellenertrag-advisor-ai-live.minkay1986.workers.dev';
 }
 
 /* TankstellenErtrag Profil-Avatar: kleines Konto-Icon, Standard-Zapfhahn und frei wählbare Charaktere. */
