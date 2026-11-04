@@ -40,3 +40,12 @@ test("AI integration remains opt-in until a test endpoint is configured", () => 
   assert.match(script, /window\.TANKSTELLENERTRAG_AI_ADVISOR_URL\|\|''/);
   assert.match(script, /if\(!endpoint\)return null/);
 });
+
+test("local AI pilot uses isolated Supabase project and never changes live-domain config", () => {
+  const config = fs.readFileSync(new URL("../../supabase-config.js", import.meta.url), "utf8");
+  assert.match(config, /location\.hostname === 'localhost' && location\.port === '4173'/);
+  assert.match(config, /rzydxhnphwuocttdncsm\.supabase\.co/);
+  assert.match(config, /tankstellenertrag-advisor-ai-test\.minkay1986\.workers\.dev/);
+  assert.match(config, /irzlbdybtrbztjjkrlad\.supabase\.co/);
+  assert.match(config, /tseAdvisorLocalTest \?/);
+});
