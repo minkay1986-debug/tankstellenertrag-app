@@ -1679,8 +1679,7 @@ function advisorReply(raw){
 function advisorCompactHtml(raw,fullHtml){
  const root=document.createElement('div');root.innerHTML=String(fullHtml||'');
  const evidence=root.querySelector('.advisor-evidence-frame');
- const evidenceHeading=evidence?.querySelector('p b')?.textContent?.trim()||'';
- const evidenceText=evidence?.querySelector('p')?.innerText?.replace(evidenceHeading,'').trim()||'';
+ const evidenceSections=[...(evidence?.querySelectorAll('p')||[])].map(p=>({heading:p.querySelector('b')?.textContent?.trim()||'',text:p.innerText?.replace(p.querySelector('b')?.textContent||'','').trim()||''})).filter(x=>x.heading||x.text);
  if(evidence)evidence.remove();
  const paragraphs=[...root.querySelectorAll('p')].map(x=>String(x.textContent||'').trim()).filter(Boolean).slice(0,2);
  const findings=[...root.querySelectorAll('li')].map(x=>String(x.textContent||'').trim()).filter(Boolean).slice(0,3);
@@ -1692,7 +1691,7 @@ function advisorCompactHtml(raw,fullHtml){
   reconciliationNote='<p class="small advisor-data-warning"><b>Umsatzabgleich prüfen:</b> Erfasste Warengruppenumsätze '+esc(groupSum.toLocaleString('de-DE',{style:'currency',currency:'EUR'}))+' gegenüber Shop-Umsatz '+esc(shopRevenue.toLocaleString('de-DE',{style:'currency',currency:'EUR'}))+'; Differenz '+esc(difference.toLocaleString('de-DE',{style:'currency',currency:'EUR'}))+'. Möglicherweise fehlen Warengruppenwerte oder die Daten sind unterschiedlich abgegrenzt. Das ist ein Prüfhinweis, kein automatisch festgestellter Rechenfehler.</p>';
  }
  const title=/schwund|abschrift|verlust|fehlbestand|bestand/i.test(raw)?'Verlust & Bestand':/marge|rohertrag|wareneinsatz|ertrag/i.test(raw)?'Marge & Rohertrag':/bestell|lager|reichweite/i.test(raw)?'Bestellung & Bestand':'Deine Auswertung';
- return '<section class="advisor-compact-summary">'+(evidenceHeading?'<div class="advisor-evidence-compact"><b>'+esc(evidenceHeading)+'</b>'+(evidenceText?'<p>'+esc(shortText(evidenceText))+'</p>':'')+'</div>':'')+'<div class="eyebrow">REGELBASIERTE AUSWERTUNG</div><h3>'+title+'</h3>'+(paragraphs.length?paragraphs.map(x=>'<p>'+esc(shortText(x))+'</p>').join(''):'<p>Die verfügbaren Stationsdaten wurden geprüft.</p>')+(findings.length?'<b>Wichtigste Prüfpunkte</b><ol>'+findings.map(x=>'<li>'+esc(shortText(x))+'</li>').join('')+'</ol>':'')+reconciliationNote+'</section><details class="advisor-full-details"><summary>Alle Zahlen, Vergleiche und fachlichen Details anzeigen</summary><div class="advisor-full-details-content">'+String(fullHtml||'')+'</div></details>';
+ return '<section class="advisor-compact-summary">'+(evidenceSections.length?'<div class="advisor-evidence-compact">'+evidenceSections.map(x=>'<p><b>'+esc(x.heading)+'</b>'+(x.text?'<br>'+esc(shortText(x.text)):'')+'</p>').join('')+'</div>':'')+'<div class="eyebrow">REGELBASIERTE AUSWERTUNG</div><h3>'+title+'</h3>'+(paragraphs.length?paragraphs.map(x=>'<p>'+esc(shortText(x))+'</p>').join(''):'<p>Die verfügbaren Stationsdaten wurden geprüft.</p>')+(findings.length?'<b>Wichtigste Prüfpunkte</b><ol>'+findings.map(x=>'<li>'+esc(shortText(x))+'</li>').join('')+'</ol>':'')+reconciliationNote+'</section><details class="advisor-full-details"><summary>Alle Zahlen, Vergleiche und fachlichen Details anzeigen</summary><div class="advisor-full-details-content">'+String(fullHtml||'')+'</div></details>';
 }
 
 function advisorAiFacts(){
