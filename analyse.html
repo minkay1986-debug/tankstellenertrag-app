@@ -1687,7 +1687,7 @@ function advisorAiFacts(){
  lines.push('Rohertrag: '+(d.sourceEK?money(d.gross):'nicht berechenbar, EK fehlt'));
  lines.push('Ist-Marge: '+(d.sourceEK&&d.revenue>0?Number(d.margin).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' %':'nicht berechenbar'));
  lines.push('Schwund: '+(d.sourceShrink?money(d.shrink):'nicht vollständig erfasst'));
- lines.push('Abschriften: '+(d.sourceShrink?money(d.writeoff):'nicht vollständig erfasst'));
+ lines.push('Abschriften: '+(d.sourceWriteoff?money(d.writeoff):'nicht vollständig erfasst'));
  (d.groups||[]).filter(g=>g.revenueEntered||g.ekEntered).forEach(g=>{
   lines.push(g.name+': Umsatz '+(g.revenueEntered?money(g.revenue):'nicht erfasst')+'; EK '+(g.ekEntered?money(g.ek):'nicht bestätigt')+'; Ist-Marge '+(g.actualMargin===null?'nicht berechenbar':Number(g.actualMargin).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' %'));
  });
