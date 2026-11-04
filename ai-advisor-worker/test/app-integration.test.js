@@ -49,3 +49,29 @@ test("local AI pilot uses isolated Supabase project and never changes live-domai
   assert.match(config, /irzlbdybtrbztjjkrlad\.supabase\.co/);
   assert.match(config, /tseAdvisorLocalTest \?/);
 });
+
+test("worker endpoints are isolated by exact hostname", () => {
+  const config = fs.readFileSync(new URL("../../supabase-config.js", import.meta.url), "utf8");
+  const resolve = (hostname, port = "") => {
+    const window = {};
+    vm.runInNewContext(config, {
+      window,
+      location: { hostname, port },
+      document: { addEventListener() {} }
+    });
+    return {
+      supabase: window.TANKSTELLENERTRAG_SUPABASE?.url,
+      advisor: window.TANKSTELLENERTRAG_AI_ADVISOR_URL || null
+    };
+  };
+  const preview = resolve("feature-ai-advisor-chat-pilo.tankstellenertrag-preview.pages.dev");
+  assert.equal(preview.supabase, "https://rzydxhnphwuocttdncsm.supabase.co");
+  assert.equal(preview.advisor, "https://tankstellenertrag-advisor-ai-test.minkay1986.workers.dev");
+  const local = resolve("localhost", "4173");
+  assert.equal(local.advisor, "https://tankstellenertrag-advisor-ai-test.minkay1986.workers.dev");
+  const live = resolve("app.tankstellenertrag.de");
+  assert.equal(live.supabase, "https://irzlbdybtrbztjjkrlad.supabase.co");
+  assert.equal(live.advisor, "https://tankstellenertrag-advisor-ai-live.minkay1986.workers.dev");
+  assert.equal(resolve("app.tankstellenertrag.de.evil.example").advisor, null);
+  assert.equal(resolve("some-other-preview.pages.dev").advisor, null);
+});
