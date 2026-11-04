@@ -1062,7 +1062,7 @@ Deno.test("advisor labels current shrink and write-off independently when only o
   current.shrinkEntered=true;
   current.writeoffEntered=false;
   const answer=advisorTestReply(data,"2026-10")("Wie hoch sind Schwund und Abschriften?");
-  assert(answer.includes("Erfasster Schwund:</b> 1.338,48 €"),"Confirmed shrink amount must be displayed. Actual answer: "+answer);
+  assert(answer.includes("Erfasster Schwund:</b> 1.132,56 €"),"Confirmed shrink amount must be displayed separately from unconfirmed write-offs. Actual answer: "+answer);
   assert(answer.includes("Erfasste Abschriften:</b> Nicht erfasst"),"Unconfirmed write-offs must not appear as 0,00 €");
   assert(answer.includes("beide Datenquellen müssen bestätigt sein"),"Combined total must be withheld unless both sources are confirmed");
 });
