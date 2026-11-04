@@ -1696,6 +1696,9 @@ function advisorAiFacts(){
  const k=month(),d=calc(k),lines=['Auswertungsmonat: '+k];
  const money=(v)=>Number.isFinite(Number(v))?Number(v).toLocaleString('de-DE',{style:'currency',currency:'EUR'}):'nicht verfügbar';
  lines.push('Shop-Umsatz: '+money(d.revenue));
+ const enteredRevenueGroups=(d.groups||[]).filter(g=>g.revenueEntered===true),groupRevenueSum=enteredRevenueGroups.reduce((sum,g)=>sum+(Number(g.revenue)||0),0);
+ lines.push('Erfasste Warengruppenumsätze: '+money(groupRevenueSum)+' ('+enteredRevenueGroups.length+' Gruppen mit Umsatzwert)');
+ if(d.revenue>0&&enteredRevenueGroups.length)lines.push('Differenz Shop-Umsatz minus erfasste Warengruppenumsätze: '+money(Number(d.revenue)-groupRevenueSum)+'; Abdeckung/Vollständigkeit prüfen, nicht automatisch als Rechenfehler werten.');
  lines.push('Wareneinsatz: '+(d.sourceEK?money(d.ek):'nicht bestätigt'));
  lines.push('Rohertrag: '+(d.sourceEK?money(d.gross):'nicht berechenbar, EK fehlt'));
  lines.push('Ist-Marge: '+(d.sourceEK&&d.revenue>0?Number(d.margin).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' %':'nicht berechenbar'));
