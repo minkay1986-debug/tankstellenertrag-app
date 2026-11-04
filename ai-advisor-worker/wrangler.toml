@@ -1,0 +1,19 @@
+name = "tankstellenertrag-advisor-ai-test"
+main = "src/index.js"
+compatibility_date = "2026-11-03"
+
+[ai]
+binding = "AI"
+
+[[durable_objects.bindings]]
+name = "QUOTAS"
+class_name = "QuotaManager"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["QuotaManager"]
+
+[vars]
+GLOBAL_DAILY_LIMIT = "250"
+# Set SUPABASE_URL, SUPABASE_ANON_KEY and ALLOWED_ORIGINS as Worker secrets/vars.
+# This is an isolated test Worker; do not deploy before reviewing bindings and spend controls.

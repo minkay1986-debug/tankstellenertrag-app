@@ -1,0 +1,86 @@
+name: AI advisor chat browser test
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'analyse.html'
+      - 'supabase-config.js'
+      - 'ai-advisor-worker/**'
+      - '.github/workflows/test-ai-advisor-browser.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ai-advisor-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Start local static server
+        run: |
+          echo '127.0.0.1 feature-ai-advisor-chat-pilo.tankstellenertrag-preview.pages.dev' | sudo tee -a /etc/hosts
+          openssl req -x509 -newkey rsa:2048 -keyout /tmp/tse-preview-key.pem -out /tmp/tse-preview-cert.pem -days 1 -nodes -subj "/CN=feature-ai-advisor-chat-pilo.tankstellenertrag-preview.pages.dev" -addext "subjectAltName=DNS:feature-ai-advisor-chat-pilo.tankstellenertrag-preview.pages.dev"
+          python3 - <<'PY' > /tmp/tse-ai-browser.log 2>&1 &
+          import ssl
+          from http.server import HTTPServer, SimpleHTTPRequestHandler
+          server = HTTPServer(("127.0.0.1", 4173), SimpleHTTPRequestHandler)
+          context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+          context.load_cert_chain("/tmp/tse-preview-cert.pem", "/tmp/tse-preview-key.pem")
+          server.socket = context.wrap_socket(server.socket, server_side=True)
+          server.serve_forever()
+          PY
+          echo $! > /tmp/tse-ai-browser.pid
+          for i in $(seq 1 30); do
+            if curl --insecure --fail --silent https://feature-ai-advisor-chat-pilo.tankstellenertrag-preview.pages.dev:4173/analyse.html > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/tse-ai-browser.log
+          exit 1
+      - name: Verify advisor chat in Chromium
+        run: |
+          node --input-type=module <<'NODE'
+          import { chromium } from 'playwright';
+          const browser = await chromium.launch({ headless: true });
+          const page = await browser.newPage({ ignoreHTTPSErrors: true });
+          const errors = [];
+          page.on('pageerror', e => errors.push(e.stack || e.message));
+          const response = await page.goto('https://feature-ai-advisor-chat-pilo.tankstellenertrag-preview.pages.dev:4173/analyse.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
+          if (!response?.ok()) throw new Error('analyse.html failed: HTTP ' + (response?.status() ?? 'no response'));
+          await page.locator('#advisorChatForm').waitFor({ state: 'attached', timeout: 15000 });
+          await page.evaluate(() => {
+            document.querySelector('#app').style.display = 'block';
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelector('#advisorChat').classList.add('active');
+            if (typeof initAdvisorChat === 'function') initAdvisorChat();
+          });
+          await page.waitForTimeout(700);
+          const endpoint = await page.evaluate(() => window.TANKSTELLENERTRAG_AI_ADVISOR_URL || '');
+          if (!endpoint.includes('tankstellenertrag-advisor-ai-test')) throw new Error('Browser did not resolve isolated test AI endpoint: ' + endpoint);
+          const input = page.locator('#advisorChatInput');
+          const submit = page.locator('#advisorChatForm button[type="submit"]');
+          if (!(await input.isVisible()) || !(await submit.isVisible())) throw new Error('Advisor chat input or submit button is not visible');
+          await input.fill('Wie optimiere ich meinen Wareneinsatz?');
+          await submit.click();
+          await page.waitForFunction(() => {
+            const messages = document.querySelectorAll('#advisorChatMessages .chat-message.assistant');
+            const last = messages[messages.length - 1];
+            return last && !last.innerText.includes('Ich prüfe deine Frage …');
+          }, { timeout: 15000 });
+          const answer = await page.locator('#advisorChatMessages .chat-message.assistant').last().innerText();
+          if (!answer.trim()) throw new Error('Advisor chat returned an empty answer');
+          if (errors.length) throw new Error('Browser runtime errors: ' + errors.join('\n---\n'));
+          console.log(JSON.stringify({ status: response.status(), title: await page.title(), testEndpointIsolated: true, chatInputVisible: true, answerReturned: true, answerPreview: answer.slice(0, 300), runtimeErrors: errors.length }, null, 2));
+          await browser.close();
+          NODE

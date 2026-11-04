@@ -1,0 +1,38 @@
+name: AI advisor worker tests
+
+"on":
+  push:
+    branches:
+      - feature/ai-advisor-chat-pilot-2026-11-03
+    paths:
+      - "ai-advisor-worker/**"
+      - "analyse.html"
+      - "supabase-config.js"
+      - ".github/workflows/test-ai-advisor-worker.yml"
+  pull_request:
+    paths:
+      - "ai-advisor-worker/**"
+      - ".github/workflows/test-ai-advisor-worker.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  quota-tests:
+    name: Quota and worker tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: ai-advisor-worker
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Run tests
+        env:
+          TSE_ADVISOR_TEST_URL: https://tankstellenertrag-advisor-ai-test.minkay1986.workers.dev
+        run: npm test
