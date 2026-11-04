@@ -6,18 +6,14 @@ compatibility_date = "2026-11-03"
 binding = "AI"
 
 [[durable_objects.bindings]]
-name = "USER_QUOTAS"
-class_name = "DailyQuota"
-
-[[durable_objects.bindings]]
-name = "GLOBAL_QUOTA"
-class_name = "DailyQuota"
+name = "QUOTAS"
+class_name = "QuotaManager"
 
 [[migrations]]
 tag = "v1"
-new_sqlite_classes = ["DailyQuota"]
+new_sqlite_classes = ["QuotaManager"]
 
 [vars]
 GLOBAL_DAILY_LIMIT = "250"
 # Set SUPABASE_URL, SUPABASE_ANON_KEY and ALLOWED_ORIGINS as Worker secrets/vars.
-# Do not commit credentials or deploy this test Worker before reviewing its bindings.
+# This is an isolated test Worker; do not deploy before reviewing bindings and spend controls.
