@@ -113,3 +113,26 @@ test("expired reservations cannot refund a later day's counters", async () => {
   const newDay = await call({ ...reserve("user-a"), day: "2026-11-05" });
   assert.equal(newDay.status, 200);
 });
+
+
+test("quota finalization rejects unknown actions and malformed identifiers", async () => {
+  const { call } = setup();
+  const reserved = await (await call(reserve("user-a"))).json();
+  const unknownAction = await call(finalize("release", "user-a", reserved.reservationId));
+  assert.equal(unknownAction.status, 400);
+  const malformedDay = await call({ ...finalize("refund", "user-a", reserved.reservationId), day: "yesterday" });
+  assert.equal(malformedDay.status, 400);
+  const malformedId = await call(finalize("refund", "user-a", "x".repeat(129)));
+  assert.equal(malformedId.status, 400);
+  // Rejected finalization attempts must not consume or refund the reservation.
+  const valid = await call(finalize("complete", "user-a", reserved.reservationId));
+  assert.equal(valid.status, 200);
+});
+
+test("global quota remains atomic under concurrent requests from different users", async () => {
+  const { call } = setup();
+  const users = Array.from({ length: 20 }, (_, index) => call(reserve("user-" + index, 7)));
+  const responses = await Promise.all(users);
+  assert.equal(responses.filter(response => response.status === 200).length, 7);
+  assert.equal(responses.filter(response => response.status === 429).length, 13);
+});
