@@ -734,7 +734,7 @@ Deno.test("two-year advisory account reports real year-over-year loss values and
   const answer=reply("Wie entwickeln sich meine erfassten Verlustbeträge im Vergleich zum Vorjahr?");
   assert(answer.includes("Vorjahresmonat (2025-10)"),"Loss advice must compare the same calendar month in the previous year. Actual answer: "+answer);
   assert(answer.includes("Erfasster Schwund")&&answer.includes("Abschriften"),"Loss advice must separate recorded shrink and write-offs");
-  assert(answer.includes("1.338,48")&&answer.includes("990,00")&&answer.includes("348,48"),"Loss advice must calculate current, prior-year and delta values from the same month");
+  assert(answer.includes("1.338,48")&&answer.includes("990,00")&&answer.includes("348,48"),"Loss advice must calculate current, prior-year and delta values from the same month. Actual answer: "+answer);
   assert(!answer.includes("<li>Waschen:"),"Non-shop wash service must not appear in shop group loss breakdown");
   assert(answer.includes("Die Zahlen allein erklären nicht"),"Loss advice must not claim an unproven cause. Actual answer: "+answer);
 });
@@ -1062,7 +1062,7 @@ Deno.test("advisor labels current shrink and write-off independently when only o
   current.shrinkEntered=true;
   current.writeoffEntered=false;
   const answer=advisorTestReply(data,"2026-10")("Wie hoch sind Schwund und Abschriften?");
-  assert(answer.includes("Erfasster Schwund:</b> 1.338,48 €"),"Confirmed shrink amount must be displayed");
+  assert(answer.includes("Erfasster Schwund:</b> 1.338,48 €"),"Confirmed shrink amount must be displayed. Actual answer: "+answer);
   assert(answer.includes("Erfasste Abschriften:</b> Nicht erfasst"),"Unconfirmed write-offs must not appear as 0,00 €");
   assert(answer.includes("beide Datenquellen müssen bestätigt sein"),"Combined total must be withheld unless both sources are confirmed");
 });
