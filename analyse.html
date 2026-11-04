@@ -527,12 +527,13 @@ function calc(k){
  const enteredWriteoffGroups=positiveRevenueGroups.filter(g=>g.writeoffEntered);
  const groupShrinkComplete=positiveRevenueGroups.length>0&&enteredShrinkGroups.length===positiveRevenueGroups.length;
  const groupWriteoffComplete=positiveRevenueGroups.length>0&&enteredWriteoffGroups.length===positiveRevenueGroups.length;
- /* Legacy sourceShrink represented the old combined monthly confirmation. An
-    explicit false now suppresses both legacy totals and stale group amounts. */
- const hasShrinkTotal=x.sourceShrink===false?false:(x.shrinkEntered===true||x.sourceShrink===true);
- const hasWriteoffTotal=x.sourceShrink===false?false:(x.writeoffEntered===true||x.sourceShrink===true);
- const sourceShrink=x.sourceShrink===false?false:(hasShrinkTotal||groupShrinkComplete);
- const sourceWriteoff=x.sourceShrink===false?false:(hasWriteoffTotal||groupWriteoffComplete);
+ /* Legacy sourceShrink represented the old combined monthly confirmation.
+    Explicit per-measure monthly false flags now take precedence over group-level
+    completeness, so a missing monthly source cannot be silently re-confirmed. */
+ const hasShrinkTotal=x.sourceShrink===false||x.shrinkEntered===false?false:(x.shrinkEntered===true||x.sourceShrink===true);
+ const hasWriteoffTotal=x.sourceShrink===false||x.writeoffEntered===false?false:(x.writeoffEntered===true||x.sourceShrink===true);
+ const sourceShrink=x.sourceShrink===false||x.shrinkEntered===false?false:(hasShrinkTotal||groupShrinkComplete);
+ const sourceWriteoff=x.sourceShrink===false||x.writeoffEntered===false?false:(hasWriteoffTotal||groupWriteoffComplete);
  const shrink=sourceShrink?(hasShrinkTotal?Number(x.shrink)||0:gs.reduce((a,g)=>a+(g.shrinkEntered?g.shrink:0),0)):0;
  const writeoff=sourceWriteoff?(hasWriteoffTotal?Number(x.writeoff)||0:gs.reduce((a,g)=>a+(g.writeoffEntered?g.writeoff:0),0)):0;
  const shrinkPartial=sourceShrink&&!hasShrinkTotal&&enteredShrinkGroups.length>0&&!groupShrinkComplete;
