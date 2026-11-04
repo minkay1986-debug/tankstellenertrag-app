@@ -4,6 +4,7 @@ name: AI advisor worker tests
   push:
     branches:
       - feature/ai-advisor-chat-pilot-2026-11-03
+      - feature/ai-advisor-chat-only-2026-11-04
     paths:
       - "ai-advisor-worker/**"
       - "analyse.html"
