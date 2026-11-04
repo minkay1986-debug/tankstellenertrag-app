@@ -536,7 +536,7 @@ function calc(k){
  const enteredStockGroups=gs.filter(g=>g.id!=='waschen'&&g.stockEntered);
  const stockTotal=enteredStockGroups.reduce((sum,g)=>sum+g.stock,0);
  const allStockGroupsEntered=gs.filter(g=>g.id!=='waschen').every(g=>g.stockEntered);
- const hasStockTotal=x.sourceInventory===true||x.inventoryClosingEntered===true||Number(x.stock)>0;
+ const hasStockTotal=x.sourceInventory===true||(x.sourceInventory!==false&&(x.inventoryClosingEntered===true||Number(x.stock)>0));
  const stock=hasStockTotal?Number(x.stock):stockTotal;
  const sourceInventory=x.sourceInventory===false?false:(hasStockTotal||allStockGroupsEntered);
  return {key:k,revenue:shop,ek,gross,margin:shop?gross/shop*100:0,shrink,writeoff,stock,groups:gs,fuel:Number(x.fuel)||0,wash:Number(x.wash)||0,other:Number(x.other)||0,costs:Number(x.costs)||0,sourceMonthly,sourceEK,sourceShrink,sourceWriteoff,sourceInventory,revenuePartial,ekPartial,shrinkPartial,writeoffPartial,shrinkReportTotal:Number(x.shrinkReportTotal)||0};
