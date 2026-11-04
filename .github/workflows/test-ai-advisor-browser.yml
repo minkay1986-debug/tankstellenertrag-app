@@ -30,8 +30,8 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Start local static server
         run: |
-          echo '127.0.0.1 feature.tankstellenertrag-preview.pages.dev' | sudo tee -a /etc/hosts
-          openssl req -x509 -newkey rsa:2048 -keyout /tmp/tse-preview-key.pem -out /tmp/tse-preview-cert.pem -days 1 -nodes -subj "/CN=feature.tankstellenertrag-preview.pages.dev" -addext "subjectAltName=DNS:feature.tankstellenertrag-preview.pages.dev"
+          echo '127.0.0.1 feature-ai-advisor-chat-pilo.tankstellenertrag-preview.pages.dev' | sudo tee -a /etc/hosts
+          openssl req -x509 -newkey rsa:2048 -keyout /tmp/tse-preview-key.pem -out /tmp/tse-preview-cert.pem -days 1 -nodes -subj "/CN=feature-ai-advisor-chat-pilo.tankstellenertrag-preview.pages.dev" -addext "subjectAltName=DNS:feature-ai-advisor-chat-pilo.tankstellenertrag-preview.pages.dev"
           python3 - <<'PY' > /tmp/tse-ai-browser.log 2>&1 &
           import ssl
           from http.server import HTTPServer, SimpleHTTPRequestHandler
@@ -43,7 +43,7 @@ jobs:
           PY
           echo $! > /tmp/tse-ai-browser.pid
           for i in $(seq 1 30); do
-            if curl --insecure --fail --silent https://feature.tankstellenertrag-preview.pages.dev:4173/analyse.html > /dev/null; then exit 0; fi
+            if curl --insecure --fail --silent https://feature-ai-advisor-chat-pilo.tankstellenertrag-preview.pages.dev:4173/analyse.html > /dev/null; then exit 0; fi
             sleep 1
           done
           cat /tmp/tse-ai-browser.log
@@ -56,7 +56,7 @@ jobs:
           const page = await browser.newPage({ ignoreHTTPSErrors: true });
           const errors = [];
           page.on('pageerror', e => errors.push(e.stack || e.message));
-          const response = await page.goto('https://feature.tankstellenertrag-preview.pages.dev:4173/analyse.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
+          const response = await page.goto('https://feature-ai-advisor-chat-pilo.tankstellenertrag-preview.pages.dev:4173/analyse.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
           if (!response?.ok()) throw new Error('analyse.html failed: HTTP ' + (response?.status() ?? 'no response'));
           await page.locator('#advisorChatForm').waitFor({ state: 'attached', timeout: 15000 });
           await page.evaluate(() => {
