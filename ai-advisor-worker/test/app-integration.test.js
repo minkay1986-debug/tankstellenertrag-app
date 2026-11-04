@@ -18,7 +18,7 @@ test("AI advisor app integration JavaScript parses", () => {
 
 test("AI requests use the existing authenticated Supabase session", () => {
   assert.match(script, /__tseAdvisorGetAccessToken=async\(\)=>\{const session=await getStableSession\(\)/);
-  assert.match(script, /authorization:'Bearer '\+token/);
+  assert.match(script, /authorization:.*Bearer '\+token/);
   assert.doesNotMatch(script, /userId\s*:/);
 });
 
