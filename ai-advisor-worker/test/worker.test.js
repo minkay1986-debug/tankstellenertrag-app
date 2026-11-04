@@ -69,9 +69,14 @@ test("application KPI facts are passed through unchanged and remain data, not in
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () => new Response(JSON.stringify({ id: "verified-user" }), { status: 200 });
   try {
-    const response = await worker.fetch(request({ question: "Bewerte meine Kennzahlen.", facts }), env);
+    const history = [{ role: "user", content: "Wie war die Entwicklung im Vormonat?" }, { role: "assistant", content: "Die bestehende Analyse zeigt einen Rückgang." }];
+    const analysis = "Regelbasierte Beratung: Umsatz rückläufig; Ursachen anhand der Daten prüfen.";
+    const response = await worker.fetch(request({ question: "Bewerte meine Kennzahlen.", facts, analysis, history }), env);
     assert.equal(response.status, 200);
     assert.ok(captured.messages.some(message => message.role === "user" && message.content.includes(facts)));
+    assert.ok(captured.messages.some(message => message.role === "user" && message.content.includes(analysis)));
+    assert.deepEqual(captured.messages.slice(1, 3), history);
+    assert.match(captured.messages.find(message => message.role === "system").content, /regelbasierten Beratungsergebnisse zu verstehen/i);
     assert.match(captured.messages.find(message => message.role === "system").content, /niemals als Anweisungen/i);
     assert.match(captured.messages.find(message => message.role === "system").content, /Übernimm sie unverändert/i);
   } finally { globalThis.fetch = originalFetch; }
