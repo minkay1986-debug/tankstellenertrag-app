@@ -29,3 +29,6 @@ This Worker is a test-only server endpoint. It is not deployed and is not wired 
 - The global request cap is not a monetary billing cap. Configure separate Cloudflare account-level budget alerts/spend controls and review Workers AI model availability/pricing before any deployment.
 - Add observability and test the configured Supabase project and test-user authentication in an isolated environment.
 - This Worker has not been deployed and is not connected to the live application.
+
+## Local tests
+Run `npm test` from this directory. The quota test suite covers concurrent per-user limits, global limits, reservation refunds, exactly-once finalization, and cross-user refund protection.
