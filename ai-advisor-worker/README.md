@@ -1,34 +1,31 @@
-# TankstellenErtrag AI Advisor – isolated pilot
+# TankstellenErtrag AI Advisor Worker
 
-This Worker is a test-only server endpoint. It is not deployed and is not wired into the live app.
+This directory contains the isolated **test Worker** configuration and source. It is not the production deployment configuration.
+
+The application selects the test endpoint only for the local test server and the dedicated Pages preview. The exact production host `app.tankstellenertrag.de` selects the separately deployed Cloudflare Worker `tankstellenertrag-advisor-ai-live`. That live Worker is managed in Cloudflare; its production bindings and secrets are not stored in this repository.
 
 ## Security and behavior
-- Validates the Supabase access token against the Supabase Auth user endpoint.
+- Validates the Supabase access token against the configured Supabase Auth user endpoint.
 - Uses only the verified Supabase user UUID for quota accounting; client-supplied identity is ignored.
 - Enforces 3 successful AI responses per verified user per Europe/Berlin calendar day.
-- Enforces a global daily request cap (default 250) in the same atomic transaction as the user cap.
+- Enforces a global daily request cap through the Durable Object quota manager. The test configuration below sets 250; production has its own Cloudflare environment setting and is configured separately.
 - Uses one SQLite-backed Durable Object namespace for both counters and reservation state.
-- Reserves both limits atomically before inference. If inference throws or returns an empty answer, the reservation is refunded exactly once.
-- If refund bookkeeping fails, the reservation remains counted (fail closed); it is never silently restored.
-- On a successful response, the reservation is finalized and remains counted.
+- Reserves both limits atomically before inference. Failed or empty inference attempts are refunded exactly once where possible; if refund bookkeeping fails, the reservation remains counted (fail closed).
 - Stores only daily counters and opaque pending reservation IDs; it does not persist prompts, answers, or station facts.
 - Uses Workers AI model `@cf/zai-org/glm-4.7-flash`.
 - Accepts a question (max 1,600 chars) and optional precomputed facts (max 5,000 chars).
 - The system prompt treats application KPI as authoritative and disallows recalculation, invented facts, HTML, and out-of-scope advice.
-- CORS allows only exact origins listed in `ALLOWED_ORIGINS`; disallowed origins receive 403.
+- CORS allows only exact origins listed in `ALLOWED_ORIGINS`.
 
-## Required bindings/secrets
+## Test Worker bindings/secrets
 - AI binding
 - Durable Object binding `QUOTAS` to class `QuotaManager`
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY` (publishable/anon key only)
 - `ALLOWED_ORIGINS` (comma-separated exact HTTPS origins)
-- Optional `GLOBAL_DAILY_LIMIT` (default 250)
+- Optional `GLOBAL_DAILY_LIMIT` (test configuration default: 250)
 
-## Important limits before deployment
-- The global request cap is not a monetary billing cap. Configure separate Cloudflare account-level budget alerts/spend controls and review Workers AI model availability/pricing before any deployment.
-- Add observability and test the configured Supabase project and test-user authentication in an isolated environment.
-- This Worker has not been deployed and is not connected to the live application.
+Never put service-role keys or other secrets in source control. The production Worker has its own Cloudflare-managed bindings and secrets and must not be deployed from this test configuration.
 
 ## Local tests
 Run `npm test` from this directory. The quota test suite covers concurrent per-user limits, global limits, reservation refunds, exactly-once finalization, and cross-user refund protection.
