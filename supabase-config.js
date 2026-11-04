@@ -1,6 +1,6 @@
-/* Lokaler KI-Pilot: getrenntes Security-Testprojekt und isolierter Worker.
-   Aktiviert sich ausschließlich auf localhost:4173; Live-Domain bleibt unverändert. */
-const tseAdvisorLocalTest = location.hostname === 'localhost' && location.port === '4173';
+/* KI-Pilot: getrenntes Security-Testprojekt und isolierter Worker.
+   Aktiviert sich nur auf dem lokalen Testserver bzw. dem eigenen Pages-Branch-Preview. */
+const tseAdvisorLocalTest = (location.hostname === 'localhost' && location.port === '4173') || location.hostname === 'feature-ai-advisor-chat-pilot-2026-11-03.tankstellenertrag-preview.pages.dev';
 window.TANKSTELLENERTRAG_SUPABASE = tseAdvisorLocalTest ? {
   url: 'https://rzydxhnphwuocttdncsm.supabase.co',
   publishableKey: 'sb_publishable__RALPRPA1lOGxFMRj-Lz6w_23u9ZTdB'
