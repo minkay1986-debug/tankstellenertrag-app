@@ -32,4 +32,6 @@ jobs:
         with:
           node-version: 24
       - name: Run tests
+        env:
+          TSE_ADVISOR_TEST_URL: https://tankstellenertrag-advisor-ai-test.minkay1986.workers.dev
         run: npm test
