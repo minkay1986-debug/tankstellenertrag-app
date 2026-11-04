@@ -8,7 +8,7 @@ const baseEnv = {
   SUPABASE_URL: "https://project.supabase.co",
   SUPABASE_ANON_KEY: "test-publishable-key",
   GLOBAL_DAILY_LIMIT: "250",
-  QUOTAS: { idFromName: () => ({ fetch: async () => new Response(JSON.stringify({ reservationId: "reservation-1", remaining: 2 }), { status: 200 }) }) },
+  QUOTAS: { idFromName: () => "quota-id", get: () => ({ fetch: async () => new Response(JSON.stringify({ reservationId: "reservation-1", remaining: 2 }), { status: 200 }) }) },
   AI: { run: async () => ({ response: "Antwort aus dem Testmodell." }) }
 };
 function request(body = { question: "Wie verbessere ich die Warenverfügbarkeit?" }, token = "valid-token", origin = ORIGIN) {
