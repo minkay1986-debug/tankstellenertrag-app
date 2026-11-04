@@ -106,6 +106,9 @@ jobs:
           await page.screenshot({ path: 'ocean-glass-desktop.png', fullPage: true });
           const glassAudit = await page.evaluate(() => {
             const body = getComputedStyle(document.body);
+            // The Ocean Marble texture is intentionally rendered on body::before
+            // so it can cover the full document height while content scrolls.
+            const texture = getComputedStyle(document.body, '::before');
             const candidates = [...document.querySelectorAll('.panel,.card,#stationInfo')];
             const sample = candidates.find(el => {
               const r = el.getBoundingClientRect();
@@ -114,15 +117,17 @@ jobs:
             const tile = sample ? getComputedStyle(sample) : null;
             return {
               bodyBackgroundImage: body.backgroundImage,
-              bodyBackgroundColor: body.backgroundColor,
+              textureBackgroundImage: texture.backgroundImage,
+              texturePosition: texture.position,
               sampleTileFound: Boolean(sample),
               sampleTileBackground: tile?.backgroundColor ?? null,
               sampleTileBackdropFilter: tile?.backdropFilter ?? null
             };
           });
-          if (!glassAudit.bodyBackgroundImage.includes('radial-gradient') ||
-              !glassAudit.bodyBackgroundImage.includes('linear-gradient')) {
-            throw new Error('Ocean-Blue background gradients are not applied: ' + JSON.stringify(glassAudit));
+          if (!glassAudit.textureBackgroundImage.includes('radial-gradient') ||
+              !glassAudit.textureBackgroundImage.includes('linear-gradient') ||
+              glassAudit.texturePosition !== 'absolute') {
+            throw new Error('Ocean-Blue full-page texture is not applied: ' + JSON.stringify(glassAudit));
           }
           if (!glassAudit.sampleTileFound) throw new Error('No panel/card tile found for glass style audit');
           const title = await page.title();

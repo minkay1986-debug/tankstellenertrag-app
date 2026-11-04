@@ -22,9 +22,13 @@ test("AI requests use the existing authenticated Supabase session", () => {
   assert.doesNotMatch(script, /userId\s*:/);
 });
 
-test("AI advisor keeps deterministic answer as fallback and appends model output as text", () => {
+test("AI advisor keeps deterministic answer as fallback, presents it compactly and appends model output as text", () => {
   assert.match(script, /const fallback=advisorReply\(q\)/);
-  assert.match(script, /body\.innerHTML=fallback/);
+  assert.match(script, /function advisorCompactHtml\(raw,fullHtml\)/);
+  assert.match(script, /body\.innerHTML=advisorCompactHtml\(q,fallback/);
+  assert.match(script, /REGELBASIERTE AUSWERTUNG/);
+  assert.match(script, /Alle Zahlen, Vergleiche und fachlichen Details anzeigen/);
+  assert.match(script, /Umsatzabgleich prüfen/);
   assert.match(script, /content\.textContent=aiAnswer/);
   assert.match(script, /KI-Fachberatung momentan nicht erreichbar/);
 });
@@ -74,4 +78,22 @@ test("worker endpoints are isolated by exact hostname", () => {
   assert.equal(live.advisor, "https://tankstellenertrag-advisor-ai-live.minkay1986.workers.dev");
   assert.equal(resolve("app.tankstellenertrag.de.evil.example").advisor, null);
   assert.equal(resolve("some-other-preview.pages.dev").advisor, null);
+});
+
+
+test("AI prompt requests concise answers and cautious handling of group-sales differences", () => {
+  const worker = fs.readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
+  assert.match(worker, /maximal etwa 120 Wörter/);
+  assert.match(worker, /höchstens 3 Stichpunkte/);
+  assert.match(worker, /Abdeckungs-\/Plausibilitätsprüfung/);
+});
+
+test("loss advice reports prior-year data independently and never treats missing loss sources as zero", () => {
+  assert.match(script, /const lossSnapshot=period=>/);
+  assert.match(script, /yearLoss=lossSnapshot\(y\)/);
+  assert.ok(script.includes("lossPeriodText('Vorjahresmonat ("));
+  assert.match(script, /snapshot\.total!==null&&currentLoss\.total!==null/);
+  assert.match(script, /lossTotal=shrinkAvailable&&writeoffAvailable/);
+  assert.match(script, /shrinkAvailable\?money\(shrink\):'Nicht erfasst'/);
+  assert.match(script, /writeoffAvailable\?money\(writeoff\):'Nicht erfasst'/);
 });
