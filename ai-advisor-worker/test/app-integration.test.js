@@ -91,7 +91,7 @@ test("AI prompt requests concise answers and cautious handling of group-sales di
 test("loss advice reports prior-year data independently and never treats missing loss sources as zero", () => {
   assert.match(script, /const lossSnapshot=period=>/);
   assert.match(script, /const yearLoss=lossSnapshot\(y\)/);
-  assert.match(script, /lossPeriodText\('Vorjahresmonat \\('/);
+  assert.ok(script.includes("lossPeriodText('Vorjahresmonat ("));
   assert.match(script, /snapshot\.total!==null&&currentLoss\.total!==null/);
   assert.match(script, /lossTotal=shrinkAvailable&&writeoffAvailable/);
   assert.match(script, /shrinkAvailable\?money\(shrink\):'Nicht erfasst'/);
