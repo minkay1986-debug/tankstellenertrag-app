@@ -1682,7 +1682,7 @@ function advisorCompactHtml(raw,fullHtml){
  const paragraphs=[...root.querySelectorAll('p')].map(x=>String(x.textContent||'').trim()).filter(Boolean).slice(0,2);
  const findings=[...root.querySelectorAll('li')].map(x=>String(x.textContent||'').trim()).filter(Boolean).slice(0,3);
  const shortText=value=>{const s=String(value||'').replace(/\s+/g,' ').trim();return s.length>260?s.slice(0,257)+'…':s};
- const d=calc(month()),groupRows=(d.groups||[]).filter(g=>g.revenueEntered===true),groupSum=groupRows.reduce((sum,g)=>sum+(Number(g.revenue)||0),0),shopRevenue=Number(d.revenue)||0;
+ const d=calc(month()),groupRows=(d.groups||[]).filter(g=>g.id!=='waschen'&&g.revenueEntered===true),groupSum=groupRows.reduce((sum,g)=>sum+(Number(g.revenue)||0),0),shopRevenue=Number(d.revenue)||0;
  let reconciliationNote='';
  if(shopRevenue>0&&groupRows.length&&Math.abs(groupSum-shopRevenue)>Math.max(1,shopRevenue*.01)){
   const difference=shopRevenue-groupSum;
@@ -1696,7 +1696,7 @@ function advisorAiFacts(){
  const k=month(),d=calc(k),lines=['Auswertungsmonat: '+k];
  const money=(v)=>Number.isFinite(Number(v))?Number(v).toLocaleString('de-DE',{style:'currency',currency:'EUR'}):'nicht verfügbar';
  lines.push('Shop-Umsatz: '+money(d.revenue));
- const enteredRevenueGroups=(d.groups||[]).filter(g=>g.revenueEntered===true),groupRevenueSum=enteredRevenueGroups.reduce((sum,g)=>sum+(Number(g.revenue)||0),0);
+ const enteredRevenueGroups=(d.groups||[]).filter(g=>g.id!=='waschen'&&g.revenueEntered===true),groupRevenueSum=enteredRevenueGroups.reduce((sum,g)=>sum+(Number(g.revenue)||0),0);
  lines.push('Erfasste Warengruppenumsätze: '+money(groupRevenueSum)+' ('+enteredRevenueGroups.length+' Gruppen mit Umsatzwert)');
  if(d.revenue>0&&enteredRevenueGroups.length)lines.push('Differenz Shop-Umsatz minus erfasste Warengruppenumsätze: '+money(Number(d.revenue)-groupRevenueSum)+'; Abdeckung/Vollständigkeit prüfen, nicht automatisch als Rechenfehler werten.');
  lines.push('Wareneinsatz: '+(d.sourceEK?money(d.ek):'nicht bestätigt'));
