@@ -82,3 +82,42 @@ test("preflight responds only for an allowed origin", async () => {
   assert.equal(response.status, 204);
   assert.equal(response.headers.get("access-control-allow-origin"), ORIGIN);
 });
+
+test("quota day follows Europe/Berlin midnight and both DST transitions", async () => {
+  const NativeDate = globalThis.Date;
+  const cases = [
+    ["2026-03-28T22:59:59.000Z", "2026-03-28"],
+    ["2026-03-28T23:00:00.000Z", "2026-03-29"],
+    ["2026-03-29T01:00:00.000Z", "2026-03-29"],
+    ["2026-10-25T00:59:59.000Z", "2026-10-25"],
+    ["2026-10-25T01:00:00.000Z", "2026-10-25"]
+  ];
+  const originalFetch = globalThis.fetch;
+  try {
+    for (const [instant, expectedDay] of cases) {
+      globalThis.Date = class extends NativeDate {
+        constructor(...args) { super(...(args.length ? args : [instant])); }
+        static now() { return new NativeDate(instant).getTime(); }
+      };
+      let reservedDay;
+      const env = {
+        ...baseEnv,
+        QUOTAS: {
+          idFromName: () => "quota-id",
+          get: () => ({ fetch: async (_url, options) => {
+            const payload = JSON.parse(options.body);
+            if (payload.action === "reserve") reservedDay = payload.day;
+            return new Response(JSON.stringify({ reservationId: "dst-test", remaining: 2 }), { status: 200 });
+          } })
+        }
+      };
+      globalThis.fetch = async () => new Response(JSON.stringify({ id: "verified-user" }), { status: 200 });
+      const response = await worker.fetch(request(), env);
+      assert.equal(response.status, 200);
+      assert.equal(reservedDay, expectedDay, instant);
+    }
+  } finally {
+    globalThis.Date = NativeDate;
+    globalThis.fetch = originalFetch;
+  }
+});
