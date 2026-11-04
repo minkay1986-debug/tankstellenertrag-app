@@ -33,7 +33,10 @@ test("only application-calculated KPI facts are sent, with missing sources marke
   assert.match(script, /function advisorAiFacts\(\)/);
   assert.match(script, /d\.sourceEK\?money\(d\.gross\):'nicht berechenbar, EK fehlt'/);
   assert.match(script, /d\.sourceWriteoff\?money\(d\.writeoff\):'nicht vollständig erfasst'/);
-  assert.match(script, /JSON\.stringify\(\{question,facts:advisorAiFacts\(\)\}\)/);
+  assert.match(script, /JSON\.stringify\(\{question,facts:advisorAiFacts\(\),analysis:/);
+  assert.match(script, /history:Array\.isArray\(history\)\?history:\[\]/);
+  assert.match(script, /function advisorChatHistory\(messages\)/);
+  assert.match(script, /requestAdvisorAi\(q,fallback\.replace/);
 });
 
 test("AI integration remains opt-in until a test endpoint is configured", () => {
