@@ -1675,6 +1675,23 @@ function advisorReply(raw){
  return advisorEvidenceResponse(knowledge?base+knowledge:base,'data');
 }
 
+
+function advisorCompactHtml(raw,fullHtml){
+ const root=document.createElement('div');root.innerHTML=String(fullHtml||'');
+ const evidence=root.querySelector('.advisor-evidence-frame');if(evidence)evidence.remove();
+ const paragraphs=[...root.querySelectorAll('p')].map(x=>String(x.textContent||'').trim()).filter(Boolean).slice(0,2);
+ const findings=[...root.querySelectorAll('li')].map(x=>String(x.textContent||'').trim()).filter(Boolean).slice(0,3);
+ const shortText=value=>{const s=String(value||'').replace(/\\s+/g,' ').trim();return s.length>260?s.slice(0,257)+'…':s};
+ const d=calc(month()),groupRows=(d.groups||[]).filter(g=>g.revenueEntered===true),groupSum=groupRows.reduce((sum,g)=>sum+(Number(g.revenue)||0),0),shopRevenue=Number(d.revenue)||0;
+ let reconciliationNote='';
+ if(shopRevenue>0&&groupRows.length&&Math.abs(groupSum-shopRevenue)>Math.max(1,shopRevenue*.01)){
+  const difference=shopRevenue-groupSum;
+  reconciliationNote='<p class="small advisor-data-warning"><b>Umsatzabgleich prüfen:</b> Erfasste Warengruppenumsätze '+esc(groupSum.toLocaleString('de-DE',{style:'currency',currency:'EUR'}))+' gegenüber Shop-Umsatz '+esc(shopRevenue.toLocaleString('de-DE',{style:'currency',currency:'EUR'}))+'; Differenz '+esc(difference.toLocaleString('de-DE',{style:'currency',currency:'EUR'}))+'. Möglicherweise fehlen Warengruppenwerte oder die Daten sind unterschiedlich abgegrenzt. Das ist ein Prüfhinweis, kein automatisch festgestellter Rechenfehler.</p>';
+ }
+ const title=/schwund|abschrift|verlust|fehlbestand|bestand/i.test(raw)?'Verlust & Bestand':/marge|rohertrag|wareneinsatz|ertrag/i.test(raw)?'Marge & Rohertrag':/bestell|lager|reichweite/i.test(raw)?'Bestellung & Bestand':'Deine Auswertung';
+ return '<section class="advisor-compact-summary"><div class="eyebrow">REGELBASIERTE AUSWERTUNG</div><h3>'+title+'</h3>'+(paragraphs.length?paragraphs.map(x=>'<p>'+esc(shortText(x))+'</p>').join(''):'<p>Die verfügbaren Stationsdaten wurden geprüft.</p>')+(findings.length?'<b>Wichtigste Prüfpunkte</b><ol>'+findings.map(x=>'<li>'+esc(shortText(x))+'</li>').join('')+'</ol>':'')+reconciliationNote+'</section><details class="advisor-full-details"><summary>Alle Zahlen, Vergleiche und fachlichen Details anzeigen</summary><div class="advisor-full-details-content">'+String(fullHtml||'')+'</div></details>';
+}
+
 function advisorAiFacts(){
  const k=month(),d=calc(k),lines=['Auswertungsmonat: '+k];
  const money=(v)=>Number.isFinite(Number(v))?Number(v).toLocaleString('de-DE',{style:'currency',currency:'EUR'}):'nicht verfügbar';
@@ -1713,7 +1730,7 @@ function initAdvisorChat(){
   try{
    await advisorKnowledgePromise;
    const fallback=advisorReply(q);
-   body.innerHTML=fallback||'<p>Die Auswertung lieferte keine Antwort. Bitte prüfe, ob Monatsdaten geladen sind.</p>';
+   body.innerHTML=advisorCompactHtml(q,fallback||'<p>Die Auswertung lieferte keine Antwort. Bitte prüfe, ob Monatsdaten geladen sind.</p>');
    try{
     const aiAnswer=await requestAdvisorAi(q);
     if(aiAnswer){
