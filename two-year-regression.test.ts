@@ -643,8 +643,9 @@ Deno.test("advisor chat does not rank groups or calculate shop totals when EK is
   assert(advisor.includes("d.sourceEK?money(d.ek):'nicht erfasst'"),"Advisor must not show missing EK as zero");
   assert(advisor.includes("d.sourceEK?money(d.gross):'nicht berechenbar · bestätigter EK fehlt'"),"Advisor must not calculate gross profit without EK");
   assert(advisor.includes("d.sourceEK===true?d.groups.filter"),"Advisor must not rank groups by gross profit if EK is missing");
-  assert(advisor.includes("lossAvailable=d.sourceShrink===true"),"Loss advice must gate totals on confirmed loss data");
-  assert(advisor.includes("comparisonAvailable=lossAvailable&&p?.sourceShrink===true"),"Loss comparisons must require both source periods");
+  assert(advisor.includes("shrinkAvailable=d.sourceShrink===true,writeoffAvailable=d.sourceWriteoff===true"),"Loss advice must confirm shrink and write-off sources independently");
+  assert(advisor.includes("comparisonAvailable=shrinkAvailable&&p?.sourceShrink===true&&writeoffAvailable&&p?.sourceWriteoff===true"),"Combined loss comparisons must require both sources in both periods");
+  assert(advisor.includes("shrinkAvailable&&p?.sourceShrink===true")&&advisor.includes("writeoffAvailable&&p?.sourceWriteoff===true"),"Individual loss comparisons must remain available when only their own source is confirmed");
 });
 
 Deno.test("report does not aggregate a partially confirmed inventory as a complete station stock",()=>{
