@@ -1681,7 +1681,7 @@ function advisorCompactHtml(raw,fullHtml){
  const evidence=root.querySelector('.advisor-evidence-frame');if(evidence)evidence.remove();
  const paragraphs=[...root.querySelectorAll('p')].map(x=>String(x.textContent||'').trim()).filter(Boolean).slice(0,2);
  const findings=[...root.querySelectorAll('li')].map(x=>String(x.textContent||'').trim()).filter(Boolean).slice(0,3);
- const shortText=value=>{const s=String(value||'').replace(/\\s+/g,' ').trim();return s.length>260?s.slice(0,257)+'…':s};
+ const shortText=value=>{const s=String(value||'').replace(/\s+/g,' ').trim();return s.length>260?s.slice(0,257)+'…':s};
  const d=calc(month()),groupRows=(d.groups||[]).filter(g=>g.revenueEntered===true),groupSum=groupRows.reduce((sum,g)=>sum+(Number(g.revenue)||0),0),shopRevenue=Number(d.revenue)||0;
  let reconciliationNote='';
  if(shopRevenue>0&&groupRows.length&&Math.abs(groupSum-shopRevenue)>Math.max(1,shopRevenue*.01)){
