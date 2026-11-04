@@ -82,12 +82,34 @@ test("successful completion consumes the reservation and cannot be refunded late
   assert.equal(completed.status, "completed");
   const refund = await (await call(finalize("refund", "user-a", reserved.reservationId))).json();
   assert.equal(refund.status, "already_finalized");
-  const afterThree = await Promise.all([call(reserve("user-a")), call(reserve("user-a"))]);
-  assert.equal(afterThree.filter(response => response.status === 200).length, 1);
+  const afterFirst = await Promise.all([call(reserve("user-a")), call(reserve("user-a"))]);
+  assert.equal(afterFirst.filter(response => response.status === 200).length, 2);
+  assert.equal((await call(reserve("user-a"))).status, 429);
 });
 
 test("malformed quota requests are rejected", async () => {
   const { call } = setup();
   assert.equal((await call({ action: "reserve", day: "not-a-date", userId: "u", userLimit: 3, globalLimit: 5 })).status, 400);
   assert.equal((await call({ action: "unknown" })).status, 400);
+});
+
+
+test("a new Berlin calendar day starts with fresh counters", async () => {
+  const { call } = setup();
+  const firstDay = await call(reserve("user-a"));
+  assert.equal(firstDay.status, 200);
+  const nextDay = await call({ ...reserve("user-a"), day: "2026-11-05" });
+  assert.equal(nextDay.status, 200);
+});
+
+test("expired reservations cannot refund a later day's counters", async () => {
+  const { call } = setup();
+  const first = await (await call(reserve("user-a"))).json();
+  const nextDayRefund = await (await call({
+    ...finalize("refund", "user-a", first.reservationId),
+    day: "2026-11-05"
+  })).json();
+  assert.equal(nextDayRefund.status, "expired");
+  const newDay = await call({ ...reserve("user-a"), day: "2026-11-05" });
+  assert.equal(newDay.status, 200);
 });
