@@ -1696,7 +1696,7 @@ function advisorCompactHtml(raw,fullHtml){
  return '<section class="advisor-compact-summary">'+(evidenceSections.length?'<div class="advisor-evidence-compact">'+evidenceSections.map(x=>'<p><b>'+esc(x.heading)+'</b>'+(x.text?'<br>'+esc(shortText(x.text)):'')+'</p>').join('')+'</div>':'')+'<div class="eyebrow">REGELBASIERTE AUSWERTUNG</div><h3>'+title+'</h3>'+(paragraphs.length?paragraphs.map(x=>'<p>'+esc(shortText(x))+'</p>').join(''):'<p>Die verfügbaren Stationsdaten wurden geprüft.</p>')+(yearComparison?'<p class="advisor-year-comparison"><b>Vorjahresvergleich:</b> '+esc(shortText(yearComparison))+'</p>':'')+(findings.length?'<b>Wichtigste Prüfpunkte</b><ol>'+findings.map(x=>'<li>'+esc(shortText(x))+'</li>').join('')+'</ol>':'')+reconciliationNote+'</section><details class="advisor-full-details"><summary>Alle Zahlen, Vergleiche und fachlichen Details anzeigen</summary><div class="advisor-full-details-content">'+String(fullHtml||'')+'</div></details>';
 }
 
-function advisorAiFacts(){
+function advisorAiFacts(analysis){
  const k=month(),d=calc(k),lines=['Auswertungsmonat: '+k];
  const money=(v)=>Number.isFinite(Number(v))?Number(v).toLocaleString('de-DE',{style:'currency',currency:'EUR'}):'nicht verfügbar';
  lines.push('Shop-Umsatz: '+money(d.revenue));
@@ -1711,15 +1711,17 @@ function advisorAiFacts(){
  (d.groups||[]).filter(g=>g.revenueEntered||g.ekEntered).forEach(g=>{
   lines.push(g.name+': Umsatz '+(g.revenueEntered?money(g.revenue):'nicht erfasst')+'; EK '+(g.ekEntered?money(g.ek):'nicht bestätigt')+'; Ist-Marge '+(g.actualMargin===null?'nicht berechenbar':Number(g.actualMargin).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' %'));
  });
- return lines.join('\n').slice(0,5000);
+ const baseFacts=lines.join('\n').slice(0,3000);
+ const analysisText=String(analysis||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim().slice(0,1900);
+ return (baseFacts+(analysisText?'\n\nBestehendes regelbasiertes Beratungsergebnis (maßgebliche Anwendungsanalyse, nicht neu berechnen):\n'+analysisText:'')).slice(0,5000);
 }
-async function requestAdvisorAi(question){
+async function requestAdvisorAi(question,analysis){
  const endpoint=String(window.TANKSTELLENERTRAG_AI_ADVISOR_URL||'').trim();
  if(!endpoint)return null;
  if(!/^https:\/\//i.test(endpoint))throw new Error('KI-Endpunkt ist nicht als HTTPS-Adresse konfiguriert.');
  const token=await window.__tseAdvisorGetAccessToken?.();
  if(!token)throw new Error('Bitte zuerst erneut anmelden.');
- const response=await fetch(endpoint,{method:'POST',headers:{'content-type':'application/json','authorization':'Bearer '+token},body:JSON.stringify({question,facts:advisorAiFacts()})});
+ const response=await fetch(endpoint,{method:'POST',headers:{'content-type':'application/json','authorization':'Bearer '+token},body:JSON.stringify({question,facts:advisorAiFacts(analysis)})});
  let payload={};try{payload=await response.json()}catch(_){}
  if(!response.ok){const error=new Error(payload.error||'KI-Dienst nicht verfügbar');error.status=response.status;throw error;}
  if(typeof payload.answer!=='string'||!payload.answer.trim())throw new Error('KI-Dienst lieferte keine Antwort.');
@@ -1739,7 +1741,7 @@ function initAdvisorChat(){
    const fallback=advisorReply(q);
    body.innerHTML=advisorCompactHtml(q,fallback||'<p>Die Auswertung lieferte keine Antwort. Bitte prüfe, ob Monatsdaten geladen sind.</p>');
    try{
-    const aiAnswer=await requestAdvisorAi(q);
+    const aiAnswer=await requestAdvisorAi(q,fallback||'');
     if(aiAnswer){
      const section=document.createElement('section');section.className='advisor-ai-answer';
      const title=document.createElement('b');title.textContent='Ergänzende KI-Fachberatung';
