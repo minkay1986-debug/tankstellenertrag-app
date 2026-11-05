@@ -55,7 +55,8 @@ function runtime(data:any) {
   const hasData = (k:string) => Object.hasOwn(data.months,k);
   const causeDiagnosis = appFunction("causeDiagnosis","loop",["calc","hasData","month","eur","pct"],{calc,hasData,month:()=>"2026-10",eur,pct});
   const measurePotential = appFunction("measurePotential","potentialHtml",["r"],{});
-  const potentialHtml = appFunction("potentialHtml","wowCard",["measurePotential","eur"],{measurePotential,eur});
+  const eurPrecise = (v:number) => Number(v)>0&&Number(v)<0.005?"< 0,01 €":new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(v)||0);
+  const potentialHtml = appFunction("potentialHtml","wowCard",["measurePotential","eur","eurPrecise"],{measurePotential,eur,eurPrecise});
   const reportPriorityGuidance = appFunction("reportPriorityGuidance","wowCard",["practiceGuidance","potentialHtml"],{practiceGuidance,potentialHtml});
   const riskLevel = appFunction("riskLevel","riskForRow",[],{});
   const riskForRow = appFunction("riskForRow","riskSummary",["settings","riskLevel"],{settings,riskLevel});
@@ -1119,4 +1120,11 @@ Deno.test("print stylesheet expands report guidance and compacts the source card
   assert(html.includes(".report-guidance-step:not([open])>*:not(summary){display:block!important}"),"Closed guidance details must be expanded in print");
   assert(html.includes("grid-template-columns:repeat(2,minmax(0,1fr))!important"),"Sources should use a compact two-column print grid");
   assert(html.includes(".report-compare-table"),"Year comparison table print styling is missing");
+});
+
+Deno.test("small positive scenario savings are never rounded to a misleading zero euro",()=>{
+  const rt=runtime(appFixture());
+  const html=rt.potentialHtml({g:{id:"backshop",revenue:10,actualMargin:59.2,shrink:0.3,writeoff:0,shrinkEntered:true,writeoffEntered:false,ekEntered:true},reasons:["Schwund auffällig"],dataStatus:{shrinkSourceAvailable:true,writeoffSourceAvailable:false}});
+  assert(html.includes("0,03 €"),"A 10% modelled saving of €0.03 must be shown with cents");
+  assert(!html.includes("+0 €"),"Positive scenario values must never be displayed as +€0");
 });
