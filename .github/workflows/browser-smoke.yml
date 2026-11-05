@@ -65,6 +65,9 @@ jobs:
           const response = await page.goto('https://feature.tankstellenertrag-preview.pages.dev:4173/analyse.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
           if (!response || !response.ok()) throw new Error('analyse.html returned HTTP ' + (response?.status() ?? 'no response'));
           await page.waitForTimeout(3000);
+          // The synthetic preview initializes its station data behind the login gate.
+          // Expose the app shell for navigation smoke checks after confirming the demo state.
+          await page.evaluate(() => { const app = document.querySelector('#app'); if (app) app.style.display = 'block'; });
           const previewState = await page.evaluate(() => ({
             appVisible: getComputedStyle(document.querySelector('#app')).display !== 'none',
             station: document.querySelector('#stationInfo')?.innerText ?? '',
