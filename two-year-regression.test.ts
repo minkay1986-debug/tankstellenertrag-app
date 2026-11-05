@@ -5,6 +5,40 @@ const html = await Deno.readTextFile(new URL("./analyse.html", import.meta.url))
 const assert = (ok: unknown, message: string) => { if (!ok) throw new Error(message); };
 const months = Array.from({length:24},(_,i)=>{const year=2025+Math.floor(i/12),month=i%12+1;const seasonal=[.86,.88,.93,.96,1.02,1.08,1.16,1.13,1.04,.99,.94,1.12][month-1];const revenue=Math.round(100000*seasonal*(year===2026?1.04:1)*100)/100;const marginPct=year===2026&&month>=6?48:52;const shrinkPct=year===2026&&month===10?3.2:.8;return{key:`${year}-${String(month).padStart(2,"0")}`,year,month,revenue,ek:revenue*(1-marginPct/100),marginPct,shrinkPct};});
 Deno.test("24-month fixture covers two complete years without duplicate keys",()=>{assert(months.length===24,"Expected 24 months");assert(months[0].key==="2025-01"&&months[11].key==="2025-12","2025 range incorrect");assert(months[12].key==="2026-01"&&months[23].key==="2026-12","2026 range incorrect");assert(new Set(months.map(x=>x.key)).size===24,"Duplicate month key");});
+Deno.test("trend coverage excludes future calendar months after the selected reporting month",()=>{
+  const rt=runtime(appFixture());
+  const rows=Array.from({length:12},(_,i)=>i<10?{month:i+1}:null);
+  const coverage=rt.trendCoverage(rows,10);
+  assert(coverage.count===10&&coverage.expected===10&&coverage.missing===0&&coverage.complete,
+    "A Jan–Oct reporting period must be complete without counting Nov/Dec as missing");
+  const gap=rt.trendCoverage(rows.map((x,i)=>i===8?null:x),10);
+  assert(gap.count===9&&gap.missing===1&&!gap.complete,
+    "A missing month inside the selected period must remain visible as a real gap");
+});
+Deno.test("unconfirmed write-offs cannot raise the risk status when only shrink is confirmed",()=>{
+  const rt=runtime(appFixture());
+  const row={targetMarginGap:null,marginDrop:null,prevRevenue:0,shrinkRate:null,stockRatioChange:null,prevStockRatio:null,
+    g:{revenue:1000,writeoff:80,margin:50},stockMetrics:{excessCapital:null},
+    dataStatus:{shrinkSourceAvailable:true,writeoffSourceAvailable:false}};
+  assert(rt.riskForRow(row).key==="normal",
+    "Unconfirmed write-off values must not create a critical or severe risk signal");
+  row.dataStatus.writeoffSourceAvailable=true;
+  assert(rt.riskForRow(row).key==="severe",
+    "The same write-off rate must be evaluated once its own source is confirmed");
+});
+Deno.test("modeled potential overlaps gross-profit levers but keeps confirmed shrink and write-offs separate",()=>{
+  const rt=runtime(appFixture());
+  const row={g:{id:"backshop",revenue:1000,actualMargin:50,margin:55,shrink:20,writeoff:10},
+    reasons:["Ist-Marge unter Ihrem Zielwert","Ist-Marge liegt 3 %-Pkt. unter dem Vormonat","Umsatz rückläufig","Schwund auffällig","Abschriften auffällig"],
+    targetMarginGap:2,marginDrop:3,prevRevenue:1100,
+    dataStatus:{groupEkAvailable:true,monthlySourceAvailable:true,previousMonthAvailable:true,shrinkSourceAvailable:true,writeoffSourceAvailable:true}};
+  const parts=rt.measurePotential(row);
+  const gross=parts.filter(p=>p.kind==="zusätzlicher Rohertrag").reduce((sum,p)=>sum+p.amount,0);
+  const savings=parts.filter(p=>p.kind==="direkte Einsparung").reduce((sum,p)=>sum+p.amount,0);
+  assert(Math.abs(gross-12.5)<0.001,"Overlapping margin and sales scenarios must use only the largest gross-profit lever");
+  assert(Math.abs(savings-3)<0.001,"Confirmed shrink and write-offs must remain separate 10% savings levers");
+  assert(parts.length===3,"Expected one overlap-adjusted gross-profit lever plus two separate loss-reduction levers");
+});
 Deno.test("all 24 monthly report calculations preserve revenue and margin",()=>{for(const m of months){const prior=months.find(x=>x.key===`${m.year-1}-${String(m.month).padStart(2,"0")}`);const prev=months.find(x=>x.key===`${m.year}-${String(m.month-1).padStart(2,"0")}`)||months.find(x=>x.key===`${m.year-1}-12`);const r=optimizer.evaluateGroup({name:"Shop",actualRevenue:m.revenue,previousRevenue:prev?.revenue??null,priorYearRevenue:prior?.revenue??null,marginPct:m.marginPct,previousMarginPct:prev?.marginPct??null,shrinkPct:m.shrinkPct,dataComplete:true});assert(r.actualRevenue===m.revenue,`${m.key}: revenue mismatch`);assert(r.marginPct===m.marginPct,`${m.key}: margin mismatch`);if(prior)assert(Number.isFinite(r.expectedRevenue),`${m.key}: expected revenue missing`);}});
 Deno.test("annual aggregation and year-on-year growth reconcile",()=>{const y25=months.filter(x=>x.year===2025).reduce((s,x)=>s+x.revenue,0),y26=months.filter(x=>x.year===2026).reduce((s,x)=>s+x.revenue,0);assert(y26>y25,"2026 should exceed 2025");assert(Math.abs((y26/y25-1)*100-4)<.02,"Expected approximately +4% YoY");assert(months.filter(x=>x.year===2025).length===12&&months.filter(x=>x.year===2026).length===12,"Each year must contain 12 months");});
 Deno.test("known shrink incident is retained without claiming a cause",()=>{const m=months.find(x=>x.key==="2026-10")!;const r=optimizer.evaluateGroup({name:"Shop",actualRevenue:m.revenue,previousRevenue:months.find(x=>x.key==="2026-09")!.revenue,priorYearRevenue:months.find(x=>x.key==="2025-10")!.revenue,marginPct:m.marginPct,previousMarginPct:48,shrinkPct:m.shrinkPct,dataComplete:true});assert(r.shrinkPct===3.2,"October shrink spike lost");assert(!r.alerts.some((a:any)=>/Diebstahl|Ursache bewiesen/i.test(a.title+" "+a.detail)),"Unproven cause was asserted");});
@@ -57,6 +91,7 @@ function runtime(data:any) {
   const measurePotential = appFunction("measurePotential","potentialHtml",["r"],{});
   const potentialHtml = appFunction("potentialHtml","wowCard",["measurePotential","eur"],{measurePotential,eur});
   const reportPriorityGuidance = appFunction("reportPriorityGuidance","wowCard",["practiceGuidance","potentialHtml"],{practiceGuidance,potentialHtml});
+  const trendCoverage = appFunction("trendCoverage","riskLevel",[],{});
   const riskLevel = appFunction("riskLevel","riskForRow",[],{});
   const riskForRow = appFunction("riskForRow","riskSummary",["settings","riskLevel"],{settings,riskLevel});
   const wowCard = appFunction("wowCard","knowledgeWhy",["riskForRow","eur","pct","esc","reportPriorityGuidance"],{riskForRow,eur,pct,esc,reportPriorityGuidance});
@@ -67,7 +102,7 @@ function runtime(data:any) {
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
     TEStudyContext:{htmlForReport:async()=>""},reportPriorityGuidance
   });
-  return {data,calc,wowPriority,yearly,report,practiceGuidance,causeDiagnosis,potentialHtml,reportPriorityGuidance,wowCard,riskForRow,scenarioResult,inventoryMetrics,dataQuality,learnCalendarEffects,target,prev};
+  return {data,calc,wowPriority,yearly,report,practiceGuidance,causeDiagnosis,potentialHtml,reportPriorityGuidance,wowCard,riskForRow,trendCoverage,measurePotential,scenarioResult,inventoryMetrics,dataQuality,learnCalendarEffects,target,prev};
 }
 Deno.test("real app calc, year table and report reconcile across all 24 months",()=>{
   const rt=runtime(appFixture());
