@@ -5,6 +5,14 @@ const html = await Deno.readTextFile(new URL("./analyse.html", import.meta.url))
 const assert = (ok: unknown, message: string) => { if (!ok) throw new Error(message); };
 const months = Array.from({length:24},(_,i)=>{const year=2025+Math.floor(i/12),month=i%12+1;const seasonal=[.86,.88,.93,.96,1.02,1.08,1.16,1.13,1.04,.99,.94,1.12][month-1];const revenue=Math.round(100000*seasonal*(year===2026?1.04:1)*100)/100;const marginPct=year===2026&&month>=6?48:52;const shrinkPct=year===2026&&month===10?3.2:.8;return{key:`${year}-${String(month).padStart(2,"0")}`,year,month,revenue,ek:revenue*(1-marginPct/100),marginPct,shrinkPct};});
 Deno.test("24-month fixture covers two complete years without duplicate keys",()=>{assert(months.length===24,"Expected 24 months");assert(months[0].key==="2025-01"&&months[11].key==="2025-12","2025 range incorrect");assert(months[12].key==="2026-01"&&months[23].key==="2026-12","2026 range incorrect");assert(new Set(months.map(x=>x.key)).size===24,"Duplicate month key");});
+Deno.test("advisory follow-up requires the independent confirmed write-off source",()=>{
+  const outcome=appFunction("calculateAdvisoryOutcome","initAdvisorCaseActions",[],{});
+  const c={groupId:"backshop",measures:["Abschriften reduzieren"],baseline:{writeoffRate:1,writeoffConfirmed:true,revenue:1000,revenueConfirmed:true}};
+  const d={sourceShrink:true,sourceWriteoff:false,groups:[{id:"backshop",revenue:1000,revenueEntered:true,writeoff:20,writeoffEntered:true}]};
+  assert(outcome(c,d).length===0,"Shrink confirmation alone must not validate write-off follow-up");
+  d.sourceWriteoff=true;
+  assert(outcome(c,d).some((m:any)=>m.key==="writeoffRate"),"Confirmed write-off source must enable the write-off follow-up metric");
+});
 Deno.test("trend coverage excludes future calendar months after the selected reporting month",()=>{
   const rt=runtime(appFixture());
   const rows=Array.from({length:12},(_,i)=>i<10?{month:i+1}:null);
