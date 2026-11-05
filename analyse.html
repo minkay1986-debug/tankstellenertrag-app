@@ -829,7 +829,7 @@ function initMeasureEconomics(){
   if(raw!==''&&(!Number.isFinite(Number(raw))||Number(raw)<0)){input.value='';return;}
   data.measureEconomics??={};data.measureEconomics[groupId]??={};
   data.measureEconomics[groupId][field]=raw===''?null:Number(raw);
-  document.querySelectorAll('[data-measure-cost]').forEach(el=>{if(el.dataset.measureGroup===groupId&&el!==input)el.value=raw});
+  document.querySelectorAll('[data-measure-cost]').forEach(el=>{if(el.dataset.measureGroup===groupId&&el.dataset.measureCost===field&&el!==input)el.value=raw});
   const row=wowPriority(month()).find(x=>x.g.id===groupId);
   const benefit=row?measurePotential(row).reduce((sum,p)=>sum+p.amount,0):null;
   const summary=row?measureEconomicsSummary(row,benefit):'<p class="small">Kein aktuelles Prüfsignal mit Euro-Potenzial für diese Warengruppe. Der Saldo bleibt offen.</p>';
