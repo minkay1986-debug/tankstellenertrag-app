@@ -1099,3 +1099,5 @@ Deno.test("advisor response routing applies evidence framing to every economic a
   assert(router.includes("advisorEvidenceResponse(noData,'missing')"),"Missing-data answers are not framed");
   assert(router.includes("advisorEvidenceResponse(base,'data')")||router.includes("advisorEvidenceResponse(knowledge?base+knowledge:base,'data')"),"Data analysis answers are not framed");
 });
+
+// CI trigger: report trend, risk-source and modeled-potential regression checks.
