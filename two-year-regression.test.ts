@@ -904,6 +904,32 @@ Deno.test("two-year advisor routes plural critical-stock wording and prioritizat
 });
 
 
+Deno.test("shop reconciliation excludes wash from both monthly totals and merchandise groups",()=>{
+  const data=appFixture();
+  const month=data.months["2026-10"];
+  const washRevenue=10359, washEk=570;
+  month.groups.waschen.revenue=washRevenue;
+  month.groups.waschen.ek=washEk;
+  month.groups.waschen._revenueEntered=true;
+  month.groups.waschen._ekEntered=true;
+  month.revenue+=washRevenue;
+  month.ek+=washEk;
+  const rt=runtime(data);
+  const quality=rt.dataQuality("2026-10");
+  assert(!quality.findings.some((f:any)=>f.label==="Umsatzabgleich"||f.label==="EK-Abgleich"),
+    "Wash turnover and EK must not be reported as unallocated shop-group differences");
+  assert(quality.status!=="check"||!quality.anomalies.some((x:string)=>/Umsatzabgleich|EK-Abgleich/.test(x)),
+    "Like-for-like shop reconciliation must not create false positives");
+});
+Deno.test("confirmed write-off data uses the derived independent source status",()=>{
+  const data=appFixture();
+  data.months["2026-10"].sourceShrink=true;
+  data.months["2026-10"].writeoffEntered=true;
+  const rt=runtime(data);
+  const quality=rt.dataQuality("2026-10");
+  assert(!quality.anomalies.some((x:string)=>/Abschriften sind gespeichert|Abschriftenwert ist gespeichert/.test(x)),
+    "A confirmed legacy write-off source and confirmed group entries must not be shown as unconfirmed");
+});
 Deno.test("intelligent data quality detects unallocated group totals without inventing causes",()=>{
   const data=appFixture();
   const month=data.months["2026-10"];
