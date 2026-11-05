@@ -680,7 +680,7 @@ function twoYearAdvisorTestAccount() {
   const key = "2026-10";
   const marginByGroup: Record<string,number> = {
     backshop:30,spielzeug:35,getraenke:40,lebensmittel:45,drogerie:50,
-    "süsswaren":55,eis:60,kaffee:65,waschen:0
+    "süsswaren":59,eis:60,kaffee:65,waschen:0
   };
   for (const [id,margin] of Object.entries(marginByGroup)) {
     const g = data.months[key].groups[id];
