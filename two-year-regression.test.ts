@@ -644,7 +644,7 @@ Deno.test("dashboard and quick advisory never display gross profit or margin wit
   assert(html.includes("d.sourceEK&&d.revenue>0?pct(d.margin):'Nicht berechenbar'"),"Dashboard must guard margin without EK");
   assert(html.includes("valid=g.revenueEntered===true&&g.revenue>0&&g.ekEntered===true&&g.ek>0"),"Drink advice must require confirmed positive group EK before calculating actual margin");
   assert(html.includes("valid?g.actualMargin.toLocaleString('de-DE',{maximumFractionDigits:1})+' %':'nicht berechenbar'"),"Drink advice must display calculated actual group margin, not configured target margin");
-  assert(html.includes("d.sourceEK?eur(d.gross):'nicht berechenbar · bestätigter EK fehlt'"),"Quick advice must not present gross profit without EK");
+  assert(html.includes("d.sourceMonthly&&d.sourceEK?money(d.gross):'nicht berechenbar · bestätigter Umsatz/EK fehlt'"),"Quick advice must not present gross profit without confirmed monthly revenue and EK");
 });
 Deno.test("monthly stock reconciliation input requires loss data to be entered explicitly",()=>{
   assert(html.includes("r.shrinkEntered=$('shrink').value!=='';r.writeoffEntered=$('writeoff').value!==''"),"Monthly input must preserve explicit empty-vs-zero loss fields");
