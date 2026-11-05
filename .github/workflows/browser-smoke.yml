@@ -207,7 +207,11 @@ jobs:
             throw new Error('Inventory question was not routed to stock analysis: ' + inventoryAnswer);
           }
           const priorityAnswer = await ask('Welche drei wichtigsten nächsten Prüfungen sollte ich zuerst angehen?');
-          if (!priorityAnswer.includes('Priorisierte Prüffelder') ||
+          if (!priorityAnswer.includes('Wichtigste Prüfpunkte') ||
+              !priorityAnswer.includes('Getränke') ||
+              !priorityAnswer.includes('Kaffee') ||
+              !priorityAnswer.includes('Backshop') ||
+              !priorityAnswer.includes('wirtschaftliche Exposition') ||
               priorityAnswer.includes('Ich brauche noch eine konkrete Zielgröße') ||
               priorityAnswer.includes('Ich ordne deine Frage noch nicht sicher zu')) {
             throw new Error('Priority question did not return a data-backed prioritization: ' + priorityAnswer);
