@@ -1773,9 +1773,9 @@ async function requestAdvisorAi(question,analysis){
 }
 function advisorAiAnswerIsSafe(answer){
  const text=String(answer||'').toLocaleLowerCase('de-DE');
- const blocks=text.split(/\\n\\s*\\n|(?<=[.!?])\\s+/);
- const unsafeShrink=blocks.some(line=>/schwund|abschrift/.test(line)&&/(wareneinsatz|waren\\s*einsatz|\\bek\\b|einkauf)/.test(line)&&/(\\d[\\d.,]*\\s*%|prozent|quote|verhältnis|anteil|fast der gesamte|fast alles|verloren|verlustquote)/.test(line));
- const unsafeStock=blocks.some(line=>/(bestandsdifferenz|buchbestand|physisch(?:er)? bestand|inventurdifferenz)/.test(line)&&/(monats?wareneinsatz|wareneinsatz|umsatz)/.test(line)&&/(extrem|massiv|riesig|\\d[\\d.,]*\\s*%|verhältnis|anteil)/.test(line));
+ const blocks=text.split(/\n\s*\n|(?<=[.!?])\s+/);
+ const unsafeShrink=blocks.some(line=>/schwund|abschrift/.test(line)&&/(wareneinsatz|waren\s*einsatz|\bek\b|einkauf)/.test(line)&&/(\d[\d.,]*\s*%|prozent|quote|verhältnis|anteil|fast der gesamte|fast alles|verloren|verlustquote)/.test(line));
+ const unsafeStock=blocks.some(line=>/(bestandsdifferenz|buchbestand|physisch(?:er)? bestand|inventurdifferenz)/.test(line)&&/(monats?wareneinsatz|wareneinsatz|umsatz)/.test(line)&&/(extrem|massiv|riesig|\d[\d.,]*\s*%|verhältnis|anteil)/.test(line));
  const unsafeProfit=blocks.some(line=>/(höchste marge|margenführer|margenstärkste)/.test(line)&&/(profitabelste|profitabelster|größter rohertrag|wichtigster ertragspfeiler)/.test(line));
  const unsupportedCause=blocks.some(line=>/(umsatzlücke|umsatzdifferenz)/.test(line)&&/(liegt an|verursacht durch|fehlen definitiv|stammt von)/.test(line));
  return !(unsafeShrink||unsafeStock||unsafeProfit||unsupportedCause);
