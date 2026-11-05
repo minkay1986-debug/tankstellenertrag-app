@@ -1713,7 +1713,8 @@ function advisorAiFacts(analysis){
  });
  const baseFacts=lines.join('\n').slice(0,3000);
  const analysisText=String(analysis||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim().slice(0,1900);
- return (baseFacts+(analysisText?'\n\nBestehendes regelbasiertes Beratungsergebnis (maßgebliche Anwendungsanalyse, nicht neu berechnen):\n'+analysisText:'')).slice(0,5000);
+ const guardrails='FACHLICHE GRENZEN: Die regelbasierte Auswertung ist maßgeblich. Umsatzlücken nur als ungeklärte Abdeckungs-/Plausibilitätsprüfung benennen. Schwund und Abschriften niemals ohne bestätigte Definition, Zeitraum und Berechnungsbasis ins Verhältnis zum Wareneinsatz setzen; daraus keine Prozentquote, Schadenshöhe, Diebstahl- oder Existenzgefährdungsbehauptung ableiten. Fehlende oder unbestätigte Werte sind nicht null. Keine Ursachen als Tatsachen darstellen. Bei ungeklärter Datenqualität keine Gesamtmarge als belastbare Rentabilitätsbewertung bezeichnen. Nur kurze Ergänzung mit maximal 3 Prüfschritten liefern.'; 
+ return (guardrails+'\n\n'+baseFacts+(analysisText?'\n\nBestehendes regelbasiertes Beratungsergebnis (maßgebliche Anwendungsanalyse, nicht neu berechnen):\n'+analysisText:'')).slice(0,5000);
 }
 function advisorAiFormat(markdown){
  const escapeHtml=value=>String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -1760,8 +1761,11 @@ function initAdvisorChat(){
    await advisorKnowledgePromise;
    const fallback=advisorReply(q);
    body.innerHTML=advisorCompactHtml(q,fallback||'<p>Die Auswertung lieferte keine Antwort. Bitte prüfe, ob Monatsdaten geladen sind.</p>');
+   const aiStatus=document.createElement('p');aiStatus.className='small advisor-ai-status';aiStatus.textContent='Die obige Auswertung ist die sofortige regelbasierte Beratung. Die ergänzende KI-Fachberatung wird separat erstellt und kann etwas länger dauern.';
+   body.appendChild(aiStatus);
    try{
     const aiAnswer=await requestAdvisorAi(q,fallback||'');
+    aiStatus.remove();
     if(aiAnswer){
      const section=document.createElement('section');section.className='advisor-ai-answer';
      const title=document.createElement('b');title.textContent='Ergänzende KI-Fachberatung';
@@ -1770,6 +1774,7 @@ function initAdvisorChat(){
      section.append(title,content,note);body.appendChild(section);
     }
    }catch(aiError){
+    aiStatus.remove();
     console.warn('KI-Beratung nicht verfügbar; regelbasierte Antwort bleibt aktiv:',aiError);
     if(window.TANKSTELLENERTRAG_AI_ADVISOR_URL){
      const note=document.createElement('p');note.className='small advisor-ai-status';
