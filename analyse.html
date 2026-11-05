@@ -537,7 +537,7 @@ function calc(k){
   const revenueEntered=q._revenueEntered===true;
   const ekEntered=q._ekEntered===true||(q._ekEntered!==false&&q.ek!==undefined&&q.ek!==null&&q.ek!==''&&Number(q.ek)>0);
   const groupEk=ekEntered?Number(q.ek):null;
-  const actualMargin=revenue>0&&revenueEntered&&ekEntered&&groupEk>0?(revenue-groupEk)/revenue*100:null;
+  const actualMargin=revenue>0&&revenueEntered&&ekEntered&&Number.isFinite(groupEk)&&groupEk>=0?(revenue-groupEk)/revenue*100:null;
   return {id:g[0],name:g[1],revenue,revenueEntered,ek:groupEk,ekEntered,margin:target,actualMargin,shrink:Number(q.shrink)||0,shrinkEntered:q._shrinkEntered===true,writeoff:Number(q.writeoff)||0,writeoffEntered:q._writeoffEntered===true,stock:Number(q.stock)||0,stockEntered:q._stockEntered===true,openingStock:Number(q.openingStock)||0,openingStockEntered:q._openingStockEntered===true,targetStockDays:Number.isFinite(Number(q.targetStockDays))&&Number(q.targetStockDays)>0?Number(q.targetStockDays):null,operationalMinStockEK:Number.isFinite(Number(q.operationalMinStockEK))&&Number(q.operationalMinStockEK)>=0&&q._operationalMinStockEntered===true?Number(q.operationalMinStockEK):null,operationalMinStockEntered:q._operationalMinStockEntered===true,stockPurchasesEK:Number(q.stockPurchasesEK)||0,stockPurchasesEntered:q._stockPurchasesEntered===true,supplierReturnsEK:Number(q.supplierReturnsEK)||0,supplierReturnsEntered:q._supplierReturnsEntered===true,stockLossesEK:Number(q.stockLossesEK)||0,stockLossesEntered:q._stockLossesEntered===true,stockAdjustmentsEK:Number.isFinite(Number(q.stockAdjustmentsEK))?Number(q.stockAdjustmentsEK):0,stockAdjustmentsEntered:q._stockAdjustmentsEntered===true,periodDays};
  });
  const salesGroups=gs.filter(g=>g.id!=='waschen');
