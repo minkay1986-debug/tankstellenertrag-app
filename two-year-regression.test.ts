@@ -1127,6 +1127,7 @@ Deno.test("print stylesheet expands report guidance and compacts the source card
 Deno.test("small positive scenario savings are never rounded to a misleading zero euro",()=>{
   const rt=runtime(appFixture());
   const html=rt.potentialHtml({g:{id:"backshop",revenue:10,actualMargin:59.2,shrink:0.3,writeoff:0,shrinkEntered:true,writeoffEntered:false,ekEntered:true},reasons:["Schwund auffällig"],dataStatus:{shrinkSourceAvailable:true,writeoffSourceAvailable:false}});
-  assert(html.includes("0,03 €"),"A 10% modelled saving of €0.03 must be shown with cents");
+  const normalized=html.replace(/[\\s\\u00a0\\u202f]+/g," ");
+  assert(normalized.includes("0,03 €"),"A 10% modelled saving of €0.03 must be shown with cents: "+html);
   assert(!html.includes("+0 €"),"Positive scenario values must never be displayed as +€0");
 });
