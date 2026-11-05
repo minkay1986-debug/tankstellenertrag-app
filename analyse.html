@@ -1734,7 +1734,7 @@ function advisorAiFacts(analysis){
  });
  const baseFacts=lines.join('\n').slice(0,3000);
  const analysisText=String(analysis||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim().slice(0,1900);
- const guardrails='FACHLICHE GRENZEN: Die regelbasierte Auswertung ist maßgeblich. Umsatzlücken nur als ungeklärte Abdeckungs-/Plausibilitätsprüfung benennen. Schwund und Abschriften niemals ohne bestätigte Definition, Zeitraum und Berechnungsbasis ins Verhältnis zum Wareneinsatz setzen; daraus keine Prozentquote, Schadenshöhe, Diebstahl- oder Existenzgefährdungsbehauptung ableiten. Fehlende oder unbestätigte Werte sind nicht null. Keine Ursachen als Tatsachen darstellen. Bei ungeklärter Datenqualität keine Gesamtmarge als belastbare Rentabilitätsbewertung bezeichnen. Nur kurze Ergänzung mit maximal 3 Prüfschritten liefern.'; 
+ const guardrails='VERBINDLICHE FACHREGELN FÜR DIE ERGÄNZENDE KI: Die regelbasierte Stationsauswertung ist die einzige Quelle für berechnete Kennzahlen und Befunde. Du bist Erklärungs- und Einordnungsassistent, keine zweite Rechen- oder Diagnose-Engine. Berechne keine neuen Quoten, Kennzahlen, Bestandsdifferenzen oder Potenziale. Wiederhole Zahlen nur mit exakt gleicher Definition, Einheit und Periode wie in den gelieferten Daten. Schwund/Abschriften NICHT mit Wareneinsatz/EK vergleichen und daraus niemals Prozente oder Aussagen wie „fast alles verloren“ ableiten. Bestandswerte/Stichtagsdifferenzen NICHT mit Monatsumsatz oder Monatswareneinsatz vergleichen. Eine rechnerische Bestandsdifferenz beweist keinen physischen Fehlbestand, Diebstahl oder Buchungsfehler. Eine Umsatzlücke ist ausschließlich eine ungeklärte Abdeckungs-/Zuordnungsfrage; nenne keine vermuteten Ursachen als Fakten. Hohe prozentuale Marge bedeutet nicht automatisch größten Rohertragsbeitrag oder profitabelste Warengruppe. Vergleiche Warengruppen nur bei gleicher Berechnungsbasis; Waschen/Dienstleistungen nicht direkt mit Handelsware gleichsetzen. Fehlende/unbestätigte Werte sind unbekannt, niemals null. Bei widersprüchlichen oder unvollständigen Daten ausdrücklich „nicht belastbar beurteilbar“ sagen. Die drei wichtigsten Empfehlungen müssen direkt aus bestätigten Befunden folgen; falls das nicht möglich ist, nenne Prüfungen statt Maßnahmen. Antworte knapp, maximal 3 konkrete Prüfschritte, keine dramatisierenden Aussagen.'; 
  return (guardrails+'\n\n'+baseFacts+(analysisText?'\n\nBestehendes regelbasiertes Beratungsergebnis (maßgebliche Anwendungsanalyse, nicht neu berechnen):\n'+analysisText:'')).slice(0,5000);
 }
 function advisorAiFormat(markdown){
@@ -1767,7 +1767,18 @@ async function requestAdvisorAi(question,analysis){
  let payload={};try{payload=await response.json()}catch(_){}
  if(!response.ok){const error=new Error(payload.error||'KI-Dienst nicht verfügbar');error.status=response.status;throw error;}
  if(typeof payload.answer!=='string'||!payload.answer.trim())throw new Error('KI-Dienst lieferte keine Antwort.');
- return payload.answer.trim();
+ const answer=payload.answer.trim();
+ if(!advisorAiAnswerIsSafe(answer))return 'Die KI-Antwort wurde vorsichtshalber nicht angezeigt: Sie enthält einen fachlich nicht abgesicherten Zahlenvergleich oder eine Schlussfolgerung, die aus den vorliegenden Stationsdaten nicht belegt ist. Maßgeblich bleibt die regelbasierte Auswertung. Bitte prüfe Schwund und Abschriften anhand ihrer bestätigten Definition und Periode sowie Bestände anhand einer passenden Inventur- und Bewegungsrechnung.';
+ return answer;
+}
+function advisorAiAnswerIsSafe(answer){
+ const text=String(answer||'').toLocaleLowerCase('de-DE');
+ const blocks=text.split(/\\n\\s*\\n|(?<=[.!?])\\s+/);
+ const unsafeShrink=blocks.some(line=>/schwund|abschrift/.test(line)&&/(wareneinsatz|waren\\s*einsatz|\\bek\\b|einkauf)/.test(line)&&/(\\d[\\d.,]*\\s*%|prozent|quote|verhältnis|anteil|fast der gesamte|fast alles|verloren|verlustquote)/.test(line));
+ const unsafeStock=blocks.some(line=>/(bestandsdifferenz|buchbestand|physisch(?:er)? bestand|inventurdifferenz)/.test(line)&&/(monats?wareneinsatz|wareneinsatz|umsatz)/.test(line)&&/(extrem|massiv|riesig|\\d[\\d.,]*\\s*%|verhältnis|anteil)/.test(line));
+ const unsafeProfit=blocks.some(line=>/(höchste marge|margenführer|margenstärkste)/.test(line)&&/(profitabelste|profitabelster|größter rohertrag|wichtigster ertragspfeiler)/.test(line));
+ const unsupportedCause=blocks.some(line=>/(umsatzlücke|umsatzdifferenz)/.test(line)&&/(liegt an|verursacht durch|fehlen definitiv|stammt von)/.test(line));
+ return !(unsafeShrink||unsafeStock||unsafeProfit||unsupportedCause);
 }
 function initAdvisorChat(){
  const form=$('advisorChatForm'),input=$('advisorChatInput'),messages=$('advisorChatMessages');
