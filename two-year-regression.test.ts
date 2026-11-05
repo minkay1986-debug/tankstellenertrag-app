@@ -32,9 +32,9 @@ Deno.test("modeled potential overlaps gross-profit levers but keeps confirmed sh
     reasons:["Ist-Marge unter Ihrem Zielwert","Ist-Marge liegt 3 %-Pkt. unter dem Vormonat","Umsatz rückläufig","Schwund auffällig","Abschriften auffällig"],
     targetMarginGap:2,marginDrop:3,prevRevenue:1100,
     dataStatus:{groupEkAvailable:true,monthlySourceAvailable:true,previousMonthAvailable:true,shrinkSourceAvailable:true,writeoffSourceAvailable:true}};
-  const parts=rt.measurePotential(row);
-  const gross=parts.filter(p=>p.kind==="zusätzlicher Rohertrag").reduce((sum,p)=>sum+p.amount,0);
-  const savings=parts.filter(p=>p.kind==="direkte Einsparung").reduce((sum,p)=>sum+p.amount,0);
+  const parts:any[]=rt.measurePotential(row);
+  const gross=parts.filter((p:any)=>p.kind==="zusätzlicher Rohertrag").reduce((sum:number,p:any)=>sum+p.amount,0);
+  const savings=parts.filter((p:any)=>p.kind==="direkte Einsparung").reduce((sum:number,p:any)=>sum+p.amount,0);
   assert(Math.abs(gross-12.5)<0.001,"Overlapping margin and sales scenarios must use only the largest gross-profit lever");
   assert(Math.abs(savings-3)<0.001,"Confirmed shrink and write-offs must remain separate 10% savings levers");
   assert(parts.length===3,"Expected one overlap-adjusted gross-profit lever plus two separate loss-reduction levers");
