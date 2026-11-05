@@ -109,11 +109,13 @@ jobs:
                 throw new Error('Monthly report is missing its prior-year comparison: ' + content.slice(0, 900));
               }
               await page.emulateMedia({ media: 'print' });
+              await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
               const printGuidanceVisible = await page.locator('.report-guidance-step').first().evaluate(el => {
                 const body = el.querySelector('.report-guidance-content');
-                return Boolean(body) && getComputedStyle(body).display !== 'none';
+                return el.open && Boolean(body) && getComputedStyle(body).display !== 'none';
               });
               if (!printGuidanceVisible) throw new Error('Detailed report guidance is hidden in print mode');
+              await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
               await page.emulateMedia({ media: 'screen' });
             } else if (view.id !== 'advisorChat') {
               const content = await page.locator(view.selector).first().innerText().catch(() => '');
