@@ -77,7 +77,7 @@ jobs:
             month: document.querySelector('#month')?.value ?? ''
           }));
           if (!previewState.appVisible || !previewState.station.includes('Musterstation') || !previewState.month) {
-            throw new Error('Synthetic preview data did not initialize: ' + JSON.stringify(previewState));
+            throw new Error('Synthetic preview data did not initialize: ' + JSON.stringify({ previewState, pageErrors }));
           }
           const views = [
             { id: 'monthly', selector: '#rev' },
