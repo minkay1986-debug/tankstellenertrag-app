@@ -192,15 +192,26 @@ jobs:
           }
           assertEvidenceFrame(grossProfitComparison, 'DATENBEFUND', 'Rohertragsvergleich');
           const lossComparison = await ask('Wie entwickeln sich meine erfassten Verlustbeträge im Vergleich zum Vorjahr?');
-          if (!lossComparison.includes('Verlustanalyse im Tankstellenshop') || !lossComparison.includes('Vorjahresmonat')) {
-            throw new Error('Loss advice did not use the same month in the prior year: ' + lossComparison);
+          if (!lossComparison.includes('Vorjahresmonat (2025-11)') ||
+              !lossComparison.includes('Schwund') ||
+              !lossComparison.includes('Abschriften') ||
+              !lossComparison.includes('1.048,00') ||
+              !lossComparison.includes('1.115,00')) {
+            throw new Error('Loss advice did not show the confirmed current and prior-year loss values: ' + lossComparison);
           }
           const inventoryAnswer = await ask('Welche Lagerbestände sind kritisch?');
-          if (!inventoryAnswer.includes('Bestandsanalyse') || inventoryAnswer.includes('Verlustanalyse')) {
+          if (!inventoryAnswer.includes('Bestellung & Bestand') ||
+              !inventoryAnswer.includes('Endbestand') ||
+              !inventoryAnswer.includes('rechnerische Reichweite') ||
+              inventoryAnswer.includes('Verlustanalyse')) {
             throw new Error('Inventory question was not routed to stock analysis: ' + inventoryAnswer);
           }
           const priorityAnswer = await ask('Welche drei wichtigsten nächsten Prüfungen sollte ich zuerst angehen?');
-          if (!priorityAnswer.includes('Priorisierte Prüffelder') ||
+          if (!priorityAnswer.includes('Wichtigste Prüfpunkte') ||
+              !priorityAnswer.includes('Getränke') ||
+              !priorityAnswer.includes('Kaffee') ||
+              !priorityAnswer.includes('Backshop') ||
+              !priorityAnswer.includes('wirtschaftliche Exposition') ||
               priorityAnswer.includes('Ich brauche noch eine konkrete Zielgröße') ||
               priorityAnswer.includes('Ich ordne deine Frage noch nicht sicher zu')) {
             throw new Error('Priority question did not return a data-backed prioritization: ' + priorityAnswer);
