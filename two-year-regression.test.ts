@@ -1070,8 +1070,10 @@ Deno.test("advisor response routing applies evidence framing to every economic a
 Deno.test("monthly report uses shop-only inventory totals and never mixes wash stock into the shop ratio",()=>{
   const fixture=appFixture(),row=fixture.months["2026-10"];
   const stockValues=[1356,1276,957,558,798,319,1436,319];
+  const revenueValues=[6163,5800,4350,2538,3625,1450,6525,1449];
   const ids=["süsswaren","backshop","kaffee","drogerie","lebensmittel","spielzeug","getraenke","eis"];
-  ids.forEach((id,i)=>{row.groups[id].stock=stockValues[i];row.groups[id]._stockEntered=true;row.groups[id]._revenueEntered=true;});
+  ids.forEach((id,i)=>{row.groups[id].stock=stockValues[i];row.groups[id].revenue=revenueValues[i];row.groups[id]._stockEntered=true;row.groups[id]._revenueEntered=true;});
+  row.revenue=31900;
   row.groups.waschen.stock=956;row.groups.waschen._stockEntered=true;
   row.stock=7975;row.sourceInventory=true;
   const rt=runtime(fixture);rt.report();
