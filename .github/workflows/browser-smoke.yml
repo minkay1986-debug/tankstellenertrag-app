@@ -1,6 +1,12 @@
 name: Browser smoke test (analyse.html)
 
 on:
+  push:
+    branches: [fix/monthly-report-integrity-2026-11-05]
+    paths:
+      - 'analyse.html'
+      - 'two-year-regression.test.ts'
+      - '.github/workflows/browser-smoke.yml'
   pull_request:
     branches: [main]
     paths:
