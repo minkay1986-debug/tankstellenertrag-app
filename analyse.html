@@ -447,6 +447,14 @@ p,.muted,.subtle,.description{color:rgba(218,231,247,.82)}
 .view.active:not([hidden]){display:block!important;visibility:visible!important;position:relative!important;inset:auto!important;width:auto!important;height:auto!important;overflow:visible!important;pointer-events:auto!important}
 </style>
 <style id="advisor-coffee-loader">
+.advisor-ai-answer{display:block;margin:14px 0 2px;padding:15px 16px;border:1px solid rgba(255,153,51,.3);border-radius:14px;background:linear-gradient(145deg,rgba(255,153,51,.075),rgba(255,255,255,.025));box-shadow:inset 3px 0 0 rgba(255,153,51,.7)}
+.advisor-ai-answer> b{display:block;margin:0 0 10px;color:#ffc078;font-size:13px;letter-spacing:.02em}
+.advisor-ai-answer-text p{margin:9px 0;line-height:1.65}
+.advisor-ai-answer-text h2,.advisor-ai-answer-text h3,.advisor-ai-answer-text h4{margin:15px 0 7px;color:#f4c18a}
+.advisor-ai-answer-text ul,.advisor-ai-answer-text ol{padding-left:22px;margin:8px 0}
+.advisor-ai-answer-text li{margin:6px 0;line-height:1.55}
+.advisor-ai-answer .advisor-ai-loading{margin:0;border:0;background:transparent;padding:4px 0}
+.advisor-ai-answer .small{margin:12px 0 0;padding-top:9px;border-top:1px solid rgba(255,255,255,.1)}
 .advisor-ai-loading{display:flex;align-items:center;gap:12px;margin:12px 0;padding:11px 13px;border:1px solid rgba(255,153,51,.28);border-radius:12px;background:rgba(255,153,51,.07);color:#dce8f3;font-size:12px;line-height:1.45}
 .advisor-coffee{position:relative;display:inline-block;flex:0 0 31px;width:31px;height:27px}
 .advisor-coffee-cup{position:absolute;left:1px;bottom:3px;width:21px;height:19px;overflow:hidden;border:2px solid #f3a34f;border-radius:3px 3px 7px 7px;background:rgba(255,255,255,.06)}
@@ -1775,17 +1783,17 @@ function initAdvisorChat(){
    const fallback=advisorReply(q);
    body.innerHTML=advisorCompactHtml(q,fallback||'<p>Die Auswertung lieferte keine Antwort. Bitte prüfe, ob Monatsdaten geladen sind.</p>');
    const aiStatus=document.createElement('div');aiStatus.className='advisor-ai-loading';aiStatus.setAttribute('role','status');aiStatus.setAttribute('aria-live','polite');aiStatus.innerHTML='<span class="advisor-coffee" aria-hidden="true"><span class="advisor-coffee-steam">〰</span><span class="advisor-coffee-cup"></span><span class="advisor-coffee-handle"></span></span><span class="advisor-ai-loading-text"><strong>Die KI brüht deine Beratung auf …</strong>Die regelbasierte Auswertung steht bereits oben. Die ergänzende KI-Fachberatung wird separat erstellt.</span>';
-   body.appendChild(aiStatus);
+   const aiTile=document.createElement('section');aiTile.className='advisor-ai-answer';aiTile.setAttribute('aria-label','Ergänzende KI-Fachberatung');
+   const aiTitle=document.createElement('b');aiTitle.textContent='Ergänzende KI-Fachberatung';aiTile.appendChild(aiTitle);
+   aiTile.appendChild(aiStatus);reply.appendChild(aiTile);
    try{
     const aiAnswer=await requestAdvisorAi(q,fallback||'');
     aiStatus.remove();
     if(aiAnswer){
-     const section=document.createElement('section');section.className='advisor-ai-answer';
-     const title=document.createElement('b');title.textContent='Ergänzende KI-Fachberatung';
      const content=document.createElement('div');content.className='advisor-ai-answer-text';content.innerHTML=advisorAiFormat(aiAnswer);
      const note=document.createElement('p');note.className='small';note.textContent='KI-Hinweis: Ergänzende Einschätzung auf Basis der übergebenen Anwendungsdaten. Die bestehende regelbasierte Auswertung bleibt maßgeblich.';
-     section.append(title,content,note);body.appendChild(section);
-    }
+     aiTile.append(content,note);
+    }else{aiTile.remove();}
    }catch(aiError){
     aiStatus.remove();
     console.warn('KI-Beratung nicht verfügbar; regelbasierte Antwort bleibt aktiv:',aiError);
@@ -1793,7 +1801,7 @@ function initAdvisorChat(){
      const note=document.createElement('p');note.className='small advisor-ai-status';
      const status=Number(aiError.status)||0,code=String(aiError.message||'');
      note.textContent=status===401?'Die Anmeldung für die KI-Fachberatung fehlt oder ist abgelaufen. Bitte erneut anmelden. Die regelbasierte Beratung bleibt verfügbar.':status===403?'Diese Domain ist für den KI-Dienst nicht freigeschaltet. Die regelbasierte Beratung bleibt verfügbar.':status===429?'Das Tageslimit von drei KI-Anfragen ist erreicht. Die regelbasierte Beratung steht weiterhin zur Verfügung.':status===502?'Der KI-Anbieter hat keine Antwort geliefert. Die regelbasierte Beratung bleibt verfügbar.':status===503?'Der KI-Dienst oder die Authentifizierungsprüfung ist derzeit nicht verfügbar. Die regelbasierte Beratung bleibt verfügbar.':code==='Bitte zuerst erneut anmelden.'?'Für die KI-Fachberatung ist eine gültige Anmeldung erforderlich. Die regelbasierte Beratung bleibt verfügbar.':'KI-Fachberatung momentan nicht erreichbar (HTTP '+(status||'unbekannter Status')+'). Die regelbasierte Beratung bleibt verfügbar.';
-     body.appendChild(note);
+     aiTile.appendChild(note);
     }
    }
   }catch(err){
