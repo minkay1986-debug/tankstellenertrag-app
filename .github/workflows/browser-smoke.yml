@@ -103,6 +103,18 @@ jobs:
               if (!(await page.locator('#rev').isVisible()) || !(await page.locator('#saveMonth').isVisible())) {
                 throw new Error('Input controls are not visible in monthly view');
               }
+            } else if (view.id === 'report') {
+              const content = await page.locator('#reportBody').innerText().catch(() => '');
+              if (!content.includes('Vorjahresvergleich') || !content.includes('Warengruppen · Umsatz und Ist-Marge')) {
+                throw new Error('Monthly report is missing its prior-year comparison: ' + content.slice(0, 900));
+              }
+              await page.emulateMedia({ media: 'print' });
+              const printGuidanceVisible = await page.locator('.report-guidance-step').first().evaluate(el => {
+                const body = el.querySelector('.report-guidance-content');
+                return Boolean(body) && getComputedStyle(body).display !== 'none';
+              });
+              if (!printGuidanceVisible) throw new Error('Detailed report guidance is hidden in print mode');
+              await page.emulateMedia({ media: 'screen' });
             } else if (view.id !== 'advisorChat') {
               const content = await page.locator(view.selector).first().innerText().catch(() => '');
               if (content.trim().length < 10) throw new Error('View appears empty: ' + view.id);
