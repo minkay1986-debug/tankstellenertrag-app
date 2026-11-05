@@ -161,7 +161,8 @@ Deno.test("advice potential is only calculated for matching detected shrink/writ
   const rt=runtime(appFixture());
   const measure=appFunction("measurePotential","potentialHtml",["r"],{});
   const eur=(v:number)=>new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(v);
-  const potential=appFunction("potentialHtml","wowCard",["r","measurePotential","eur"],{measurePotential:measure,eur});
+  const eurPrecise=(v:number)=>Number(v)>0&&Number(v)<0.005?"unter 0,01 €":new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(v)||0);
+  const potential=appFunction("potentialHtml","wowCard",["r","measurePotential","eur","eurPrecise"],{r:null,measurePotential:measure,eur,eurPrecise});
   const salesOnly={reasons:["Umsatz rückläufig"],g:{shrink:128,writeoff:64}};
   assert(measure(salesOnly).length===0,"Sales-only alert must not inherit unrelated shrink/write-off euro potential");
   assert(potential(salesOnly,measure,eur).includes("Vergleichbarer Vormonatsumsatz fehlt"),"Sales-only advice must name the missing comparison/source data instead of a blanket no-potential statement");
@@ -703,8 +704,9 @@ function advisorTestReply(data:any, key="2026-12") {
   const settings = () => data.settings || {};
   const inventoryPeriodDays = appFunction("inventoryPeriodDays","inventoryMetrics",["key"],{});
   const eur = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:2}).format(Number(v)||0);
+  const eurPrecise = (v:number) => Number(v)>0&&Number(v)<0.005?"unter 0,01 €":new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(v)||0);
   const measurePotential = appFunction("measurePotential","potentialHtml",[],{});
-  const potentialHtml = appFunction("potentialHtml","scenarioOptions",["measurePotential","eur"],{measurePotential,eur});
+  const potentialHtml = appFunction("potentialHtml","scenarioOptions",["measurePotential","eur","eurPrecise"],{measurePotential,eur,eurPrecise});
   const advisorDirectAnswer = appFunction("advisorDirectAnswer","advisorHasCurrentMonthData",
     ["advisorNorm","month","calc","data"],{advisorNorm,month,calc:rt.calc,data});
   const advisorEvidenceResponse = appFunction("advisorEvidenceResponse","advisorReply",[],{});
@@ -1078,7 +1080,7 @@ Deno.test("monthly report uses shop-only inventory totals and never mixes wash s
   row.groups.waschen.stock=956;row.groups.waschen._stockEntered=true;
   row.stock=7975;row.sourceInventory=true;
   const rt=runtime(fixture);rt.report();
-  const report=rt.target.innerHTML.replace(/[\\s\\u00a0\\u202f]+/g," ");
+  const report=rt.target.innerHTML.replace(/[\s\u00a0\u202f]+/g," ");
   assert(report.includes("7.019 €"),"Report inventory KPI must sum the eight shop categories only");
   assert(report.includes("22,0 %"),"Shop stock ratio must use shop stock divided by shop revenue");
   assert(!report.includes("7.975 €"),"Wash stock must not leak into the shop inventory KPI");
