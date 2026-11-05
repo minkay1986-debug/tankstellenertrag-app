@@ -1108,3 +1108,13 @@ Deno.test("advisor response routing applies evidence framing to every economic a
   assert(router.includes("advisorEvidenceResponse(noData,'missing')"),"Missing-data answers are not framed");
   assert(router.includes("advisorEvidenceResponse(base,'data')")||router.includes("advisorEvidenceResponse(knowledge?base+knowledge:base,'data')"),"Data analysis answers are not framed");
 });
+
+
+Deno.test("measure economics inputs update only their own cost field",()=>{
+  const start=html.indexOf("function initMeasureEconomics(){");
+  const end=html.indexOf("\nfunction calculateAdvisoryOutcome",start);
+  assert(start>=0&&end>start,"Could not locate measure economics input handler");
+  const handler=html.slice(start,end);
+  assert(handler.includes("el.dataset.measureGroup===groupId&&el.dataset.measureCost===field&&el!==input"),"Changing one cost input must not copy its value into the other three fields");
+  assert(!handler.includes("el.dataset.measureGroup===groupId&&el!==input)el.value=raw"),"Broad group-level synchronization would overwrite independent cost inputs");
+});
