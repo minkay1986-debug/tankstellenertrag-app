@@ -1,4 +1,5 @@
 name: AI advisor worker tests
+# CI retrigger: validate the current advisor chat integration branch
 
 "on":
   push:
