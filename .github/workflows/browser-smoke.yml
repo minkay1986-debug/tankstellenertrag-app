@@ -200,7 +200,10 @@ jobs:
             throw new Error('Loss advice did not show the confirmed current and prior-year loss values: ' + lossComparison);
           }
           const inventoryAnswer = await ask('Welche Lagerbestände sind kritisch?');
-          if (!inventoryAnswer.includes('Bestandsanalyse') || inventoryAnswer.includes('Verlustanalyse')) {
+          if (!inventoryAnswer.includes('Bestellung & Bestand') ||
+              !inventoryAnswer.includes('Endbestand') ||
+              !inventoryAnswer.includes('rechnerische Reichweite') ||
+              inventoryAnswer.includes('Verlustanalyse')) {
             throw new Error('Inventory question was not routed to stock analysis: ' + inventoryAnswer);
           }
           const priorityAnswer = await ask('Welche drei wichtigsten nächsten Prüfungen sollte ich zuerst angehen?');
