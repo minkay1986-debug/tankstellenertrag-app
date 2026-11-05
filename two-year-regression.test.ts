@@ -603,7 +603,7 @@ Deno.test("simulation does not turn missing shrink/write-off data into zero savi
 Deno.test("dashboard and quick advisory never display gross profit or margin without confirmed EK",()=>{
   assert(html.includes("Nicht berechenbar · EK fehlt"),"Dashboard must label missing EK");
   assert(html.includes("d.sourceEK&&d.revenue>0?pct(d.margin):'Nicht berechenbar'"),"Dashboard must guard margin without EK");
-  assert(html.includes("g.actualMargin!==null?pct(g.actualMargin):'nicht berechenbar"),"Drink advice must use actual group margin, not configured target margin");
+  assert(html.includes("g.actualMargin===null?'nicht berechenbar':Number(g.actualMargin)"),"Drink advice must use actual group margin, not configured target margin");
   assert(html.includes("d.sourceEK?eur(d.gross):'nicht berechenbar · bestätigter EK fehlt'"),"Quick advice must not present gross profit without EK");
 });
 Deno.test("monthly stock reconciliation input requires loss data to be entered explicitly",()=>{
