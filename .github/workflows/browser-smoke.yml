@@ -192,8 +192,12 @@ jobs:
           }
           assertEvidenceFrame(grossProfitComparison, 'DATENBEFUND', 'Rohertragsvergleich');
           const lossComparison = await ask('Wie entwickeln sich meine erfassten Verlustbeträge im Vergleich zum Vorjahr?');
-          if (!lossComparison.includes('Verlustanalyse im Tankstellenshop') || !lossComparison.includes('Vorjahresmonat')) {
-            throw new Error('Loss advice did not use the same month in the prior year: ' + lossComparison);
+          if (!lossComparison.includes('Vorjahresmonat (2025-11)') ||
+              !lossComparison.includes('Schwund') ||
+              !lossComparison.includes('Abschriften') ||
+              !lossComparison.includes('1.048,00') ||
+              !lossComparison.includes('1.115,00')) {
+            throw new Error('Loss advice did not show the confirmed current and prior-year loss values: ' + lossComparison);
           }
           const inventoryAnswer = await ask('Welche Lagerbestände sind kritisch?');
           if (!inventoryAnswer.includes('Bestandsanalyse') || inventoryAnswer.includes('Verlustanalyse')) {
