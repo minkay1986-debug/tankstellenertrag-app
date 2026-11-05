@@ -62,12 +62,14 @@ function runtime(data:any) {
   const wowCard = appFunction("wowCard","knowledgeWhy",["riskForRow","eur","pct","esc","reportPriorityGuidance"],{riskForRow,eur,pct,esc,reportPriorityGuidance});
   const grossSafe = appFunction("grossSafe","scenarioResult",[],{});
   const scenarioResult = appFunction("scenarioResult","simulation",["grossSafe"],{grossSafe});
-  const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext","reportPriorityGuidance"],{
+  const reportYearComparison = appFunction("reportYearComparison","reportYearComparisonHtml",["calc","data"],{calc,data});
+  const reportYearComparisonHtml = appFunction("reportYearComparisonHtml","report",["reportYearComparison","eur","pct","esc"],{reportYearComparison,eur,pct,esc});
+  const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext","reportPriorityGuidance","reportYearComparisonHtml"],{
     calc,month:()=> "2026-10",settings,wowPriority,prev,eur,pct,esc:(v:unknown)=>String(v??""),$:(id:string)=>target,
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
-    TEStudyContext:{htmlForReport:async()=>""},reportPriorityGuidance
+    TEStudyContext:{htmlForReport:async()=>""},reportPriorityGuidance,reportYearComparisonHtml
   });
-  return {data,calc,wowPriority,yearly,report,practiceGuidance,causeDiagnosis,potentialHtml,reportPriorityGuidance,wowCard,riskForRow,scenarioResult,inventoryMetrics,dataQuality,learnCalendarEffects,target,prev};
+  return {data,calc,wowPriority,yearly,report,reportYearComparison,reportYearComparisonHtml,practiceGuidance,causeDiagnosis,potentialHtml,reportPriorityGuidance,wowCard,riskForRow,scenarioResult,inventoryMetrics,dataQuality,learnCalendarEffects,target,prev};
 }
 Deno.test("real app calc, year table and report reconcile across all 24 months",()=>{
   const rt=runtime(appFixture());
@@ -1063,4 +1065,56 @@ Deno.test("advisor response routing applies evidence framing to every economic a
   assert(router.includes("advisorEvidenceResponse(advisory,'guidance')"),"General guidance is not framed");
   assert(router.includes("advisorEvidenceResponse(noData,'missing')"),"Missing-data answers are not framed");
   assert(router.includes("advisorEvidenceResponse(base,'data')")||router.includes("advisorEvidenceResponse(knowledge?base+knowledge:base,'data')"),"Data analysis answers are not framed");
+});
+
+Deno.test("monthly report uses shop-only inventory totals and never mixes wash stock into the shop ratio",()=>{
+  const fixture=appFixture(),row=fixture.months["2026-10"];
+  const stockValues=[1356,1276,957,558,798,319,1436,319];
+  const ids=["süsswaren","backshop","kaffee","drogerie","lebensmittel","spielzeug","getraenke","eis"];
+  ids.forEach((id,i)=>{row.groups[id].stock=stockValues[i];row.groups[id]._stockEntered=true;row.groups[id]._revenueEntered=true;});
+  row.groups.waschen.stock=956;row.groups.waschen._stockEntered=true;
+  row.stock=7975;row.sourceInventory=true;
+  const rt=runtime(fixture);rt.report();
+  const report=rt.target.innerHTML;
+  assert(report.includes("7.019 €"),"Report inventory KPI must sum the eight shop categories only");
+  assert(report.includes("22,0 %"),"Shop stock ratio must use shop stock divided by shop revenue");
+  assert(!report.includes("7.975 €"),"Wash stock must not leak into the shop inventory KPI");
+});
+Deno.test("target margin equality after report rounding is not flagged as a miss",()=>{
+  const fixture=appFixture();fixture.settings.targetMargins={backshop:59.2};
+  for(const key of ["2026-10","2026-09"]){const g=fixture.months[key].groups.backshop;g.ek=g.revenue*(1-59.2/100);g._ekEntered=true;}
+  const rt=runtime(fixture),backshop=rt.wowPriority("2026-10").find((r:any)=>r.g.id==="backshop");
+  assert(backshop,"Backshop should remain available for other confirmed signals");
+  assert(!backshop.reasons.includes("Ist-Marge unter Ihrem Zielwert"),"Displayed equal Ist- and target margin must not create a false target-miss signal");
+  assert(backshop.targetMarginGap===0,"Sub-display-precision floating-point residue must be normalized to zero");
+});
+Deno.test("monthly report compares the same calendar month with the prior year using confirmed metrics",()=>{
+  const rt=runtime(appFixture()),comparison=rt.reportYearComparison("2026-10");
+  assert(comparison.available&&comparison.priorKey==="2025-10","October 2026 must compare with October 2025");
+  assert(comparison.metrics.revenue!==null&&comparison.metrics.gross!==null&&comparison.metrics.margin!==null,"Confirmed shop revenue, gross profit and margin must be compared");
+  assert(comparison.metrics.stock!==null&&comparison.metrics.stockRatio!==null,"Complete shop inventory must be compared without wash stock");
+  assert(comparison.groups.some((g:any)=>g.id==="backshop"&&g.revenue!==null&&g.margin!==null),"Warengruppen Umsatz and margin comparison missing");
+  const output=rt.reportYearComparisonHtml("2026-10");
+  for(const value of ["Vorjahresvergleich","2026-10","2025-10","Shop-Umsatz","Rohertrag","Warengruppen · Umsatz und Ist-Marge"])assert(output.includes(value),"Year comparison report is missing "+value);
+});
+Deno.test("missing prior-year metrics stay unavailable instead of being shown as zero",()=>{
+  const fixture=appFixture();fixture.months["2025-10"].sourceShrink=false;fixture.months["2025-10"].sourceWriteoff=false;
+  const rt=runtime(fixture),comparison=rt.reportYearComparison("2026-10");
+  assert(comparison.metrics.shrink===null&&comparison.metrics.writeoff===null,"Unconfirmed loss values must not be compared as zero");
+  assert(rt.reportYearComparisonHtml("2026-10").includes("Nicht vergleichbar · Datenquelle fehlt"),"Report must label unavailable prior-year metrics");
+});
+Deno.test("aggregate shrink without category allocation is explained and not converted into category savings",()=>{
+  const fixture=appFixture(),row=fixture.months["2026-10"];
+  row.shrink=255;row.sourceShrink=true;
+  for(const id of ["süsswaren","backshop","kaffee","drogerie","lebensmittel","spielzeug","getraenke","eis"]){row.groups[id]._shrinkEntered=false;row.groups[id].shrink=0;}
+  const rt=runtime(fixture);rt.report();
+  assert(rt.target.innerHTML.includes("Schwund gesamt: 255"),"Report must show the confirmed aggregate shrink amount");
+  assert(rt.target.innerHTML.includes("Eine vollständige Zuordnung zu den Warengruppen liegt nicht vor"),"Report must explain missing category allocation");
+  const backshop=rt.wowPriority("2026-10").find((r:any)=>r.g.id==="backshop");
+  assert(!backshop?.reasons.includes("Schwund auffällig"),"Aggregate shrink must not be attributed to an individual category");
+});
+Deno.test("print stylesheet expands report guidance and compacts the source cards",()=>{
+  assert(html.includes(".report-guidance-step:not([open])>*:not(summary){display:block!important}"),"Closed guidance details must be expanded in print");
+  assert(html.includes("grid-template-columns:repeat(2,minmax(0,1fr))!important"),"Sources should use a compact two-column print grid");
+  assert(html.includes(".report-compare-table"),"Year comparison table print styling is missing");
 });
