@@ -1118,3 +1118,17 @@ Deno.test("measure economics inputs update only their own cost field",()=>{
   assert(handler.includes("el.dataset.measureGroup===groupId&&el.dataset.measureCost===field&&el!==input"),"Changing one cost input must not copy its value into the other three fields");
   assert(!handler.includes("el.dataset.measureGroup===groupId&&el!==input)el.value=raw"),"Broad group-level synchronization would overwrite independent cost inputs");
 });
+
+
+Deno.test("one-time measure implementation costs are deducted once, not twelve times",()=>{
+  const calculate=appFunction("calculateMeasureEconomics","measureEconomicsSummary",[],{});
+  const result=calculate(41,{hoursPerMonth:5,hourlyCost:25,oneTimeCost:100,monthlyCost:40});
+  assert(result.complete,"Complete cost inputs must produce a balance");
+  assert(result.labour===125&&result.recurring===165,"Monthly personnel and recurring costs must remain separate");
+  assert(result.monthlyBalance===-124,"Monthly balance must exclude the one-time implementation cost");
+  assert(result.firstMonthBalance===-224,"The first month must deduct the one-time cost exactly once");
+  assert(result.annualBalance===-1588,"The 12-month balance must deduct recurring costs twelve times and the one-time cost only once");
+  assert(result.annualBalance===result.monthlyBalance*12-result.oneTime,"Annual formula must subtract oneTime only once");
+  assert(html.includes("Saldo im ersten Monat inklusive Einmalaufwand"),"The first-month balance must be clearly labelled");
+  assert(html.includes("12-Monats-Saldo inklusive einmaligem Aufwand (nicht × 12)"),"The annual summary must state that one-time costs are not multiplied by twelve");
+});
