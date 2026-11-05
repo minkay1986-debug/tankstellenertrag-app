@@ -1131,3 +1131,14 @@ Deno.test("small positive scenario savings are never rounded to a misleading zer
   assert(normalized.includes("0,03 €"),"A 10% modelled saving of €0.03 must be shown with cents: "+html);
   assert(!html.includes("+0 €"),"Positive scenario values must never be displayed as +€0");
 });
+
+Deno.test("monthly report explains display rounding and the reference basis of each threshold",()=>{
+  const rt=runtime(appFixture());rt.report();
+  assert(rt.target.innerHTML.includes("Einzelwerte werden auf volle Euro gerundet"),"Rounded category totals need a reconciliation note");
+  assert(rt.target.innerHTML.includes("Bezugsbasis: Umsatzrückgang gegenüber dem Vormonat"),"Report must explain the threshold comparison bases");
+});
+Deno.test("inventory coverage uses the actual calendar length of each month",()=>{
+  const rt=runtime(appFixture());
+  assert(rt.calc("2025-02").groups[0].periodDays===28,"February 2025 must use 28 days");
+  assert(rt.calc("2026-10").groups[0].periodDays===31,"October must use 31 days");
+});
