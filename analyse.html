@@ -546,16 +546,18 @@ function calc(k){
  const hasGroupRevenue=enteredRevenueGroups.length>0;
  const allGroupRevenueEntered=salesGroups.length>0&&enteredRevenueGroups.length===salesGroups.length;
  const hasMonthlyTotal=x.sourceMonthly===true||(x.sourceMonthly!==false&&Number(x.revenue)>0);
- const shop=hasMonthlyTotal?Number(x.revenue):groupRevenueTotal;
- const sourceMonthly=x.sourceMonthly===false?false:(hasMonthlyTotal||allGroupRevenueEntered);
- const revenuePartial=!hasMonthlyTotal&&hasGroupRevenue&&!allGroupRevenueEntered;
+ // Manually entered group values are authoritative; monthly totals are legacy fallback only.
+ const shop=hasGroupRevenue?groupRevenueTotal:(hasMonthlyTotal?Number(x.revenue):0);
+ const sourceMonthly=hasGroupRevenue?allGroupRevenueEntered:hasMonthlyTotal;
+ const revenuePartial=hasGroupRevenue&&!allGroupRevenueEntered;
  const positiveRevenueGroups=enteredRevenueGroups.filter(g=>g.revenue>0);
  const groupEkComplete=positiveRevenueGroups.length>0&&positiveRevenueGroups.every(g=>g.ekEntered&&Number.isFinite(g.ek)&&g.ek>=0);
  const hasEkTotal=x.sourceEK===true||(x.sourceEK!==false&&Number(x.ek)>0);
  const groupEkTotal=positiveRevenueGroups.reduce((sum,g)=>sum+(g.ekEntered&&Number.isFinite(g.ek)?g.ek:0),0);
- const ek=hasEkTotal?Number(x.ek):groupEkTotal;
- const sourceEK=x.sourceEK===false?false:(hasEkTotal||groupEkComplete);
- const ekPartial=!hasEkTotal&&positiveRevenueGroups.some(g=>g.ekEntered);
+ const hasAnyGroupEk=positiveRevenueGroups.some(g=>g.ekEntered);
+ const ek=hasAnyGroupEk?groupEkTotal:(hasEkTotal?Number(x.ek):0);
+ const sourceEK=hasAnyGroupEk?groupEkComplete:hasEkTotal;
+ const ekPartial=hasAnyGroupEk&&!groupEkComplete;
  const gross=shop-ek;
  const enteredShrinkGroups=positiveRevenueGroups.filter(g=>g.shrinkEntered);
  const enteredWriteoffGroups=positiveRevenueGroups.filter(g=>g.writeoffEntered);
@@ -564,12 +566,15 @@ function calc(k){
  /* Legacy sourceShrink represented the old combined monthly confirmation. */
  const hasShrinkTotal=x.sourceShrink===true||x.shrinkEntered===true||(x.sourceShrink!==false&&Number(x.shrink)>0);
  const hasWriteoffTotal=x.sourceShrink===true||x.writeoffEntered===true||(x.sourceShrink!==false&&Number(x.writeoff)>0);
- const shrink=hasShrinkTotal?Number(x.shrink)||0:gs.reduce((a,g)=>a+(g.shrinkEntered?g.shrink:0),0);
- const writeoff=hasWriteoffTotal?Number(x.writeoff)||0:gs.reduce((a,g)=>a+(g.writeoffEntered?g.writeoff:0),0);
- const sourceShrink=x.sourceShrink===false?false:(hasShrinkTotal||groupShrinkComplete);
- const sourceWriteoff=x.sourceShrink===false?false:(hasWriteoffTotal||groupWriteoffComplete);
- const shrinkPartial=!hasShrinkTotal&&enteredShrinkGroups.length>0&&!groupShrinkComplete;
- const writeoffPartial=!hasWriteoffTotal&&enteredWriteoffGroups.length>0&&!groupWriteoffComplete;
+ const shrinkGroupTotal=enteredShrinkGroups.reduce((a,g)=>a+g.shrink,0);
+ const writeoffGroupTotal=enteredWriteoffGroups.reduce((a,g)=>a+g.writeoff,0);
+ const hasAnyGroupShrink=enteredShrinkGroups.length>0,hasAnyGroupWriteoff=enteredWriteoffGroups.length>0;
+ const shrink=hasAnyGroupShrink?shrinkGroupTotal:(hasShrinkTotal?Number(x.shrink)||0:0);
+ const writeoff=hasAnyGroupWriteoff?writeoffGroupTotal:(hasWriteoffTotal?Number(x.writeoff)||0:0);
+ const sourceShrink=hasAnyGroupShrink?groupShrinkComplete:hasShrinkTotal;
+ const sourceWriteoff=hasAnyGroupWriteoff?groupWriteoffComplete:hasWriteoffTotal;
+ const shrinkPartial=hasAnyGroupShrink&&!groupShrinkComplete;
+ const writeoffPartial=hasAnyGroupWriteoff&&!groupWriteoffComplete;
  const enteredStockGroups=gs.filter(g=>g.id!=='waschen'&&g.stockEntered);
  const stockTotal=enteredStockGroups.reduce((sum,g)=>sum+g.stock,0);
  const allStockGroupsEntered=gs.filter(g=>g.id!=='waschen').every(g=>g.stockEntered);
