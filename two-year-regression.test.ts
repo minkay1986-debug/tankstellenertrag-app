@@ -1077,7 +1077,7 @@ Deno.test("monthly report uses shop-only inventory totals and never mixes wash s
   row.groups.waschen.stock=956;row.groups.waschen._stockEntered=true;
   row.stock=7975;row.sourceInventory=true;
   const rt=runtime(fixture);rt.report();
-  const report=rt.target.innerHTML;
+  const report=rt.target.innerHTML.replace(/[\\s\\u00a0\\u202f]+/g," ");
   assert(report.includes("7.019 €"),"Report inventory KPI must sum the eight shop categories only");
   assert(report.includes("22,0 %"),"Shop stock ratio must use shop stock divided by shop revenue");
   assert(!report.includes("7.975 €"),"Wash stock must not leak into the shop inventory KPI");
