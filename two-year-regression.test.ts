@@ -55,7 +55,7 @@ function runtime(data:any) {
   const hasData = (k:string) => Object.hasOwn(data.months,k);
   const causeDiagnosis = appFunction("causeDiagnosis","loop",["calc","hasData","month","eur","pct"],{calc,hasData,month:()=>"2026-10",eur,pct});
   const measurePotential = appFunction("measurePotential","potentialHtml",["r"],{});
-  const eurPrecise = (v:number) => Number(v)>0&&Number(v)<0.005?"< 0,01 €":new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(v)||0);
+  const eurPrecise = (v:number) => Number(v)>0&&Number(v)<0.005?"unter 0,01 €":new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(v)||0);
   const potentialHtml = appFunction("potentialHtml","wowCard",["measurePotential","eur","eurPrecise"],{measurePotential,eur,eurPrecise});
   const reportPriorityGuidance = appFunction("reportPriorityGuidance","wowCard",["practiceGuidance","potentialHtml"],{practiceGuidance,potentialHtml});
   const riskLevel = appFunction("riskLevel","riskForRow",[],{});
