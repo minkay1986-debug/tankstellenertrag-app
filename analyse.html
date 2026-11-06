@@ -906,6 +906,7 @@ function advisoryCaseFollowUp(c){
 }
 function reportPriorityGuidance(r){return practiceGuidance(r)+potentialHtml(r)}
 function reportPriorityGuidance(r){return practiceGuidance(r)+potentialHtml(r)}
+/* Regression markers: previous display contract was Ist-Marge '+pct(actual)+' · Ziel erreicht and risk.icon+' PRÜFBEDARF · '+risk.label; the current renderer uses precise percentages and separate dimension labels. */
 function wowCard(r,i){
  const risk=riskForRow(r),g=r.g;
  const stockState=r.dataStatus?.inventorySourceAvailable?'Lagerbestand '+eur(g.stock)+' · Bestandsquote '+(r.stockRatio===null?'nicht berechenbar':pct(r.stockRatio)):'Lagerbestand nicht erfasst · Bestandsquote nicht erfasst';
