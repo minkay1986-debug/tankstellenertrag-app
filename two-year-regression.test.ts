@@ -1142,3 +1142,15 @@ Deno.test("inventory coverage uses the actual calendar length of each month",()=
   assert(rt.calc("2025-02").groups[0].periodDays===28,"February 2025 must use 28 days");
   assert(rt.calc("2026-10").groups[0].periodDays===31,"October must use 31 days");
 });
+
+Deno.test("overall severity requires independent problem areas, not one isolated extreme signal",()=>{
+  const rt=runtime(appFixture());
+  const lossOnly={targetMarginGap:null,marginDrop:null,shrinkRate:3.2,prevRevenue:0,prevStockRatio:null,stockRatioChange:null,stockMetrics:{excessCapital:null},g:{margin:55,revenue:1000,writeoff:0},dataStatus:{shrinkSourceAvailable:true,writeoffSourceAvailable:true}};
+  const isolated=rt.riskForRow(lossOnly);
+  assert(isolated.key==="critical","A single extreme loss-control signal must remain critical, not automatically very critical");
+  const combined={...lossOnly,prevRevenue:1000,g:{...lossOnly.g,revenue:900}};
+  const multiple=rt.riskForRow(combined);
+  assert(multiple.key==="severe","Very critical requires a second independent area with a strong signal");
+  const watch=rt.riskForRow({...lossOnly,shrinkRate:1.1});
+  assert(watch.key==="watch","A small threshold exceedance should remain a watch signal");
+});
