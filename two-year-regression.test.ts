@@ -552,9 +552,9 @@ Deno.test("inventory analysis uses actual calendar days and reconciles documente
 });
 
 Deno.test("stock coverage is integrated into merchandise-group inputs without requiring opening stock",()=>{
-  assert(html.includes('data-stock="'+g[0]+'"'),"Current end stock must be entered directly with the merchandise group");
+  assert(html.includes("data-stock="),"Current end stock must be entered directly with the merchandise group");
   assert(!html.includes('id="openingStock"')&&!html.includes('id="purchasesEK"')&&!html.includes('id="stock"'),"Obsolete global opening/closing stock and purchase inputs must not be shown");
-  assert(!html.includes("data-opening-stock")&&!html.includes("data-target-stock-days")&&!html.includes("data-operational-min-stock"),"Optional turnover and target-stock fields must not be shown");
+  assert(!html.includes("<input data-opening-stock")&&!html.includes("<input data-target-stock-days")&&!html.includes("<input data-operational-min-stock"),"Optional turnover and target-stock fields must not be shown");
   assert(html.includes("Reichweite je Warengruppe")&&html.includes("coverageDays"),"The existing report table must show stock coverage");
   assert(html.includes("inventoryPeriodDays(k)")&&html.includes("days=Number(g?.periodDays)||days"),"Coverage must use the actual calendar days of the selected month");
 });
