@@ -533,7 +533,7 @@ Deno.test("inventory metrics calculate coverage, turnover and target-based capit
   assert(optionalOpening.available&&Math.abs(optionalOpening.coverageDays-12)<.001,"Coverage must remain available without an opening stock");
   assert(optionalOpening.monthlyTurnover===null&&!optionalOpening.openingAvailable,"Turnover must stay unavailable when opening stock was not explicitly entered");
   const explicitZero=metric({stock:1200,stockEntered:true,ek:3000,ekEntered:true,openingStock:0,openingStockEntered:true},30);
-  assert(explicitZero.monthlyTurnover===2.5,"An explicitly entered zero opening stock must remain distinguishable from no entry");
+  assert(explicitZero.monthlyTurnover===5,"An explicitly entered zero opening stock must remain distinguishable from no entry; turnover uses the average of 0 EUR opening and 1,200 EUR closing stock");
 });
 
 Deno.test("inventory analysis uses actual calendar days and reconciles documented stock movements",()=>{
