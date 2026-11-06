@@ -518,22 +518,16 @@ Deno.test("economic potential never monetizes unconfirmed EK, monthly sales or i
 });
 
 
-Deno.test("inventory metrics calculate coverage, turnover and target-based capital separately",()=>{
+Deno.test("inventory metrics calculate only calendar-day stock coverage",()=>{
   const metric=appFunction("inventoryMetrics","reconciliation",["g","days"],{});
   const m=metric({stock:1200,stockEntered:true,ek:3000,ekEntered:true,openingStock:1000,openingStockEntered:true,targetStockDays:10},30);
   assert(m.available,"Confirmed inventory should be available");
   assert(Math.abs(m.coverageDays-12)<.001,"Expected 12 days stock coverage");
-  assert(Math.abs(m.monthlyTurnover-(3000/1100))<.001,"Turnover must use average opening/closing stock");
-  assert(Math.abs(m.targetStock-1000)<.001&&Math.abs(m.excessCapital-200)<.001,"Capital above target must be calculated from the operator's target days");
-  const noTarget=metric({stock:1200,stockEntered:true,ek:3000,ekEntered:true,openingStock:1000,openingStockEntered:true,targetStockDays:null},30);
-  assert(noTarget.excessCapital===null,"No arbitrary overstock or capital-release value without a user target");
+  assert(m.monthlyTurnover===null&&m.targetStock===null&&m.excessCapital===null,"Opening stock and manually configured targets must not affect the simplified analysis");
   const missing=metric({stock:1200,stockEntered:false,ek:3000,ekEntered:true},30);
   assert(!missing.available&&missing.coverageDays===null,"Unconfirmed inventory must not create a coverage estimate");
   const optionalOpening=metric({stock:1200,stockEntered:true,ek:3000,ekEntered:true,openingStock:null,openingStockEntered:false},30);
-  assert(optionalOpening.available&&Math.abs(optionalOpening.coverageDays-12)<.001,"Coverage must remain available without an opening stock");
-  assert(optionalOpening.monthlyTurnover===null&&!optionalOpening.openingAvailable,"Turnover must stay unavailable when opening stock was not explicitly entered");
-  const explicitZero=metric({stock:1200,stockEntered:true,ek:3000,ekEntered:true,openingStock:0,openingStockEntered:true},30);
-  assert(explicitZero.monthlyTurnover===5,"An explicitly entered zero opening stock must remain distinguishable from no entry; turnover uses the average of 0 EUR opening and 1,200 EUR closing stock");
+  assert(optionalOpening.available&&Math.abs(optionalOpening.coverageDays-12)<.001&&optionalOpening.monthlyTurnover===null,"Coverage must work without opening stock");
 });
 
 Deno.test("inventory analysis uses actual calendar days and reconciles documented stock movements",()=>{
@@ -582,15 +576,11 @@ Deno.test("priority tie-break uses economic exposure after signal strength",()=>
   assert(d.economicExposure>b.economicExposure&&rows.indexOf(d)<rows.indexOf(b),"Higher euro exposure must rank first when signal strength is equal");
 });
 
-Deno.test("avoidable excess stock is only estimated above both target and operational minimum",()=>{
+Deno.test("legacy opening-stock and target fields are ignored by the simplified coverage calculation",()=>{
   const metric=appFunction("inventoryMetrics","inventoryMovementBalance",["g","days"],{});
-  const base={stock:4050,stockEntered:true,ek:2800,ekEntered:true,openingStock:4000,openingStockEntered:true,targetStockDays:30,periodDays:31};
-  const withoutFloor=metric(base,31);
-  assert(withoutFloor.excessCapital!==null&&withoutFloor.avoidableExcessCapital===null,"No avoidable capital without an operator-confirmed operational floor");
-  const withFloor=metric({...base,operationalMinStockEntered:true,operationalMinStockEK:3200},31);
-  assert(Math.abs(withFloor.avoidableExcessCapital-850)<.01,"Avoidable capital must be measured above the higher of target stock and operational minimum");
-  const floorHigher=metric({...base,operationalMinStockEntered:true,operationalMinStockEK:4300},31);
-  assert(floorHigher.avoidableExcessCapital===0,"No avoidable capital when operational minimum exceeds actual stock");
+  const result=metric({stock:4050,stockEntered:true,ek:2800,ekEntered:true,openingStock:4000,openingStockEntered:true,targetStockDays:30,operationalMinStockEntered:true,operationalMinStockEK:3200,periodDays:31},31);
+  assert(Math.abs(result.coverageDays-(4050/(2800/31)))<.001,"Coverage must use current stock and actual month length only");
+  assert(result.monthlyTurnover===null&&result.excessCapital===null&&result.avoidableExcessCapital===null,"Legacy values must not reactivate inventory-management metrics");
 });
 
 Deno.test("data quality treats possible negative gross margin and high shrink as review hints, not hard errors",()=>{
