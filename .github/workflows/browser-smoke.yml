@@ -1,6 +1,13 @@
 name: Browser smoke test (analyse.html)
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'analyse.html'
+      - 'two-year-regression.test.ts'
+      - 'ertragsoptimierer.test.ts'
+      - '.github/workflows/browser-smoke.yml'
   pull_request:
     branches: [main]
     paths:
