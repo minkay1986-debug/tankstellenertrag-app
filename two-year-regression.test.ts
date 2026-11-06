@@ -529,6 +529,11 @@ Deno.test("inventory metrics calculate coverage, turnover and target-based capit
   assert(noTarget.excessCapital===null,"No arbitrary overstock or capital-release value without a user target");
   const missing=metric({stock:1200,stockEntered:false,ek:3000,ekEntered:true},30);
   assert(!missing.available&&missing.coverageDays===null,"Unconfirmed inventory must not create a coverage estimate");
+  const optionalOpening=metric({stock:1200,stockEntered:true,ek:3000,ekEntered:true,openingStock:null,openingStockEntered:false},30);
+  assert(optionalOpening.available&&Math.abs(optionalOpening.coverageDays-12)<.001,"Coverage must remain available without an opening stock");
+  assert(optionalOpening.monthlyTurnover===null&&!optionalOpening.openingAvailable,"Turnover must stay unavailable when opening stock was not explicitly entered");
+  const explicitZero=metric({stock:1200,stockEntered:true,ek:3000,ekEntered:true,openingStock:0,openingStockEntered:true},30);
+  assert(explicitZero.monthlyTurnover===2.5,"An explicitly entered zero opening stock must remain distinguishable from no entry");
 });
 
 Deno.test("inventory analysis uses actual calendar days and reconciles documented stock movements",()=>{
@@ -912,7 +917,7 @@ Deno.test("intelligent data quality detects unallocated group totals without inv
   month.sourceMonthly=true;
   const rt=runtime(data);
   const quality=rt.dataQuality("2026-10");
-  const turnover=quality.findings.find((f:any)=>f.label==="Umsatzabgleich");
+  const turnover=quality.findings.find((f:any)=>String(f.label).startsWith("Umsatzabgleich"));
   assert(turnover,"Confirmed monthly and group revenue should be reconciled");
   assert(Math.abs(turnover.amount-1234)<0.01,"Unallocated turnover amount must be exact");
   assert(turnover.complete===true,"Fixture has confirmed values for every merchandise group");
