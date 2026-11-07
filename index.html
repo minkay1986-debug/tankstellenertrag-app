@@ -2009,6 +2009,41 @@ boot();
   #wissen.publicOnly.section,
   .ctaSection.publicOnly { background:linear-gradient(180deg,#0b2b50,#08182e)!important; }
 }
+
+/* KI-Beratung: responsive Startseiten-Kachel */
+@media (max-width: 760px) {
+  #ki-beratung-start .wrap { width: calc(100% - 32px) !important; }
+  #ki-beratung-start .kiAdvisorPromo {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+    padding: 22px 20px !important;
+  }
+  #ki-beratung-start .kiAdvisorPromo > div:first-child {
+    width: 54px !important;
+    height: 54px !important;
+    flex: 0 0 54px !important;
+  }
+  #ki-beratung-start .kiAdvisorPromo > div:nth-child(2) { width: 100% !important; }
+  #ki-beratung-start .kiAdvisorPromo h2 {
+    font-size: clamp(23px, 6vw, 29px) !important;
+    line-height: 1.18 !important;
+    overflow-wrap: normal !important;
+    hyphens: none !important;
+  }
+  #ki-beratung-start .kiAdvisorPromo p {
+    max-width: none !important;
+    font-size: 15px !important;
+    line-height: 1.55 !important;
+  }
+  #ki-beratung-start .kiAdvisorPromo button {
+    width: 100% !important;
+    min-height: 48px !important;
+    white-space: normal !important;
+    margin-top: 2px !important;
+  }
+}
 </style>
 
 
