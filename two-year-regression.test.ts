@@ -88,6 +88,7 @@ function runtime(data:any) {
   const wowPriority = appFunction("wowPriority","riskLevel",["calc","prev","settings","data","inventoryMetrics"],{calc,prev,settings,data,inventoryMetrics});
   const keys = () => Object.keys(data.months).sort();
   const eur = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Number(v)||0);
+  const eurExact = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(v)||0);
   const dataQuality = appFunction("dataQuality","hasData",["mrow","calc","prev","eur","GROUPS"],{mrow,calc,prev,eur,GROUPS});
   const pct = (v:number) => (Number(v)||0).toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1})+" %";
   const target = {value:"",innerHTML:""};
@@ -97,7 +98,7 @@ function runtime(data:any) {
   const hasData = (k:string) => Object.hasOwn(data.months,k);
   const causeDiagnosis = appFunction("causeDiagnosis","loop",["calc","hasData","month","eur","pct"],{calc,hasData,month:()=>"2026-10",eur,pct});
   const measurePotential = appFunction("measurePotential","potentialHtml",["r"],{});
-  const potentialHtml = appFunction("potentialHtml","wowCard",["measurePotential","eur"],{measurePotential,eur});
+  const potentialHtml = appFunction("potentialHtml","wowCard",["measurePotential","eur","eurExact"],{measurePotential,eur,eurExact});
   const reportPriorityGuidance = appFunction("reportPriorityGuidance","wowCard",["practiceGuidance","potentialHtml"],{practiceGuidance,potentialHtml});
   const trendCoverage = appFunction("trendCoverage","riskLevel",[],{});
   const riskLevel = appFunction("riskLevel","riskForRow",[],{});
@@ -703,7 +704,7 @@ Deno.test("radar and advisor never surface stale shrink values when the source i
   const radarStart=html.indexOf("function radar()"),radarEnd=html.indexOf("function startRadarAction",radarStart);
   const radar=html.slice(radarStart,radarEnd);
   assert(radar.includes("r.dataStatus?.shrinkSourceAvailable?eur(r.g.shrink):'Nicht erfasst'"),"Radar must gate shrink amounts on a confirmed source");
-  assert(radar.includes("r.dataStatus?.writeoffSourceAvailable?eur(r.g.writeoff):'Nicht erfasst'"),"Radar must gate write-off amounts on a confirmed source");
+  assert(radar.includes("r.dataStatus?.writeoffSourceAvailable?eur(r.g.writeoff):'nicht zugeordnet'"),"Radar must gate write-off amounts on a confirmed source and label unallocated values");
   const start=html.indexOf("function advisorReplyBase"),end=html.indexOf("function advisorReply(",start),advisor=html.slice(start,end);
   assert(advisor.includes("lossAvailable&&d.groups&&d.groups.some"),"Advisor group-level loss statements must be gated on the confirmed loss source");
 });
