@@ -904,12 +904,12 @@ Deno.test("two-year advisor routes plural critical-stock wording and prioritizat
 Deno.test("intelligent data quality detects unallocated group totals without inventing causes",()=>{
   const data=appFixture();
   const month=data.months["2026-10"];
-  const groupRevenue=Object.values(month.groups).reduce((sum:number,g:any)=>sum+Number(g.revenue||0),0);
+  const groupRevenue=Object.entries(month.groups).filter(([id])=>id!=="waschen").reduce((sum:number,[,g]:any)=>sum+Number(g.revenue||0),0);
   month.revenue=groupRevenue+1234;
   month.sourceMonthly=true;
   const rt=runtime(data);
   const quality=rt.dataQuality("2026-10");
-  const turnover=quality.findings.find((f:any)=>String(f.label).startsWith("Umsatzabgleich"));
+  const turnover=quality.findings.find((f:any)=>String(f.label).startsWith("Shop-Umsatz"));
   assert(turnover,"Confirmed monthly and group revenue should be reconciled");
   assert(Math.abs(turnover.amount-1234)<0.01,"Unallocated turnover amount must be exact");
   assert(turnover.complete===true,"Fixture has confirmed values for every merchandise group");
@@ -923,7 +923,7 @@ Deno.test("intelligent data quality labels partial group coverage instead of tre
   month.groups.backshop._revenueEntered=false;
   const rt=runtime(data);
   const quality=rt.dataQuality("2026-10");
-  const turnover=quality.findings.find((f:any)=>f.label==="Umsatzabgleich");
+  const turnover=quality.findings.find((f:any)=>f.label==="Shop-Umsatz ohne Waschen");
   assert(turnover,"Remaining confirmed groups should still be compared with the monthly total");
   assert(turnover.complete===false&&turnover.coverage==="7/8","Missing group data must show the seven of eight merchandise groups actually covered");
   assert(quality.status==="check","Incomplete allocation must remain a check, not a critical error");
