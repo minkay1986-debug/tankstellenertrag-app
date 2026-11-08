@@ -103,7 +103,7 @@ function runtime(data:any) {
   const trendCoverage = appFunction("trendCoverage","riskLevel",[],{});
   const riskLevel = appFunction("riskLevel","riskForRow",[],{});
   const riskForRow = appFunction("riskForRow","riskSummary",["settings","riskLevel"],{settings,riskLevel});
-  const wowCard = appFunction("wowCard","knowledgeWhy",["riskForRow","eur","pct","esc","reportPriorityGuidance"],{riskForRow,eur,pct,esc,reportPriorityGuidance});
+  const wowCard = appFunction("wowCard","knowledgeWhy",["riskForRow","eur","pct","esc","reportPriorityGuidance","settings"],{riskForRow,eur,pct,esc,reportPriorityGuidance,settings});
   const grossSafe = appFunction("grossSafe","scenarioResult",[],{});
   const scenarioResult = appFunction("scenarioResult","simulation",["grossSafe"],{grossSafe});
   const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext","reportPriorityGuidance"],{
@@ -742,8 +742,9 @@ function advisorTestReply(data:any, key="2026-12") {
   const settings = () => data.settings || {};
   const inventoryPeriodDays = appFunction("inventoryPeriodDays","inventoryMetrics",["key"],{});
   const eur = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:2}).format(Number(v)||0);
+  const eurExact = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(v)||0);
   const measurePotential = appFunction("measurePotential","potentialHtml",[],{});
-  const potentialHtml = appFunction("potentialHtml","scenarioOptions",["measurePotential","eur"],{measurePotential,eur});
+  const potentialHtml = appFunction("potentialHtml","scenarioOptions",["measurePotential","eur","eurExact"],{measurePotential,eur,eurExact});
   const advisorDirectAnswer = appFunction("advisorDirectAnswer","advisorHasCurrentMonthData",
     ["advisorNorm","month","calc","data"],{advisorNorm,month,calc:rt.calc,data});
   const advisorEvidenceResponse = appFunction("advisorEvidenceResponse","advisorReply",[],{});
@@ -910,7 +911,7 @@ Deno.test("intelligent data quality detects unallocated group totals without inv
   month.sourceMonthly=true;
   const rt=runtime(data);
   const quality=rt.dataQuality("2026-10");
-  const turnover=quality.findings.find((f:any)=>String(f.label).startsWith("Umsatzabgleich"));
+  const turnover=quality.findings.find((f:any)=>String(f.label).startsWith("Shop-Umsatz"));
   assert(turnover,"Confirmed monthly and group revenue should be reconciled");
   assert(Math.abs(turnover.amount-1234)<0.01,"Unallocated turnover amount must be exact");
   assert(turnover.complete===true,"Fixture has confirmed values for every merchandise group");
@@ -924,7 +925,7 @@ Deno.test("intelligent data quality labels partial group coverage instead of tre
   month.groups.backshop._revenueEntered=false;
   const rt=runtime(data);
   const quality=rt.dataQuality("2026-10");
-  const turnover=quality.findings.find((f:any)=>f.label==="Umsatzabgleich");
+  const turnover=quality.findings.find((f:any)=>f.label==="Shop-Umsatz ohne Waschen");
   assert(turnover,"Remaining confirmed groups should still be compared with the monthly total");
   assert(turnover.complete===false&&turnover.coverage==="7/8","Missing group data must show the seven of eight merchandise groups actually covered");
   assert(quality.status==="check","Incomplete allocation must remain a check, not a critical error");
