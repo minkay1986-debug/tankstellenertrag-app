@@ -145,3 +145,5 @@ The typed parser now preserves the `Warengruppe` summary row so the Schwund comp
 HUTH header detection now normalizes spacing so combined headers such as `Schwundnetto` and spaced variants are recognized consistently.
 
 The header classifier's EK checks now compare the whitespace-normalized header consistently.
+
+Schwund report detection accepts spacing variants in the HUTH column heading while still requiring Schwund, Anteil and Gesamt markers.
