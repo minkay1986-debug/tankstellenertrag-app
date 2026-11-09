@@ -108,9 +108,10 @@ function rowLabel(line){
 }
 function classifyHuthReport(text){
   const t=text.toLocaleLowerCase('de-DE').replace(/\s+/g,' ');
-  if(t.includes('gesamt ek-netto(fifo)') || (t.includes('marge abschlag') && t.includes('vk-netto'))) return 'margin_fifo';
-  if(t.includes('schwund netto') && t.includes('anteil schwund')) return 'shrinkage';
-  if(t.includes('gesamt ek-netto') && t.includes('statistik von')) return 'ek_netto';
+  const compact=t.replace(/\s/g,'');
+  if(compact.includes('gesamt ek-netto(fifo)') || (compact.includes('margeabschlag') && compact.includes('vk-netto'))) return 'margin_fifo';
+  if(compact.includes('schwundnetto') && compact.includes('anteilschwund')) return 'shrinkage';
+  if(compact.includes('gesamt ek-netto') && compact.includes('statistikvon')) return 'ek_netto';
   return 'unknown';
 }
 function parseHuthStatistics(pages){
