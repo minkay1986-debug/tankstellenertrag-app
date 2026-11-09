@@ -139,3 +139,5 @@ Parser test follow-up: the initial typed-parser contract run exposed over-escape
 Typed parser fixture correction: synthetic rows now use actual line breaks, matching PDF.js page text extraction.
 
 Diagnostic assertion added to expose any unparsed synthetic shrinkage rows in CI.
+
+The typed parser now preserves the `Warengruppe` summary row so the Schwund component reconciliation can be calculated against the report total.
