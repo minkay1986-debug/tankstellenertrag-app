@@ -147,3 +147,5 @@ HUTH header detection now normalizes spacing so combined headers such as `Schwun
 The header classifier's EK checks now compare the whitespace-normalized header consistently.
 
 Schwund report detection accepts spacing variants in the HUTH column heading while still requiring Schwund, Anteil and Gesamt markers.
+
+Schwund document classification now uses independent header markers rather than relying on one exact compound heading spelling.
