@@ -1,0 +1,96 @@
+name: Homepage quality
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - '.github/workflows/homepage-quality.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - '.github/workflows/homepage-quality.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  html-structure:
+    name: HTML structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse homepage HTML
+        run: |
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+
+          class CheckHTML(HTMLParser):
+              def error(self, message):
+                  raise RuntimeError(message)
+
+          source = Path("index.html").read_text(encoding="utf-8")
+          parser = CheckHTML(convert_charrefs=True)
+          parser.feed(source)
+          parser.close()
+          if not source.strip():
+              raise SystemExit("index.html is empty")
+          print("Homepage HTML parsed successfully")
+          PY
+
+  homepage-copy:
+    name: Homepage copy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify key product statements and integrated benefits
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          html = Path("index.html").read_text(encoding="utf-8")
+          required = [
+              "Umsatz, Wareneinsatz und Schwund",
+              "Bestellabläufe, Warenverfügbarkeit und Sortimentsentscheidungen",
+              "monatliche Erfassung",
+              "ersetzt weder Kasse noch Warenwirtschaft oder Buchhaltung",
+          ]
+          missing = [item for item in required if item.casefold() not in html.casefold()]
+          if missing:
+              raise SystemExit("Missing required homepage statements: " + "; ".join(missing))
+          print("Required homepage statements are present")
+          PY
+
+  internal-anchor-check:
+    name: Internal anchor integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check internal fragment links
+        run: |
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import unquote
+
+          class Anchors(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.ids = set()
+                  self.fragments = []
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  if attrs.get("id"):
+                      self.ids.add(attrs["id"])
+                  href = attrs.get("href", "")
+                  if href.startswith("#") and len(href) > 1:
+                      self.fragments.append(unquote(href[1:]))
+
+          parser = Anchors()
+          parser.feed(Path("index.html").read_text(encoding="utf-8"))
+          missing = sorted(set(parser.fragments) - parser.ids)
+          if missing:
+              raise SystemExit("Broken internal anchors: " + ", ".join(missing))
+          print(f"Checked {len(parser.fragments)} internal fragment links")
+          PY
