@@ -74,3 +74,15 @@ Die endgültige Feldzuordnung muss gegen das bestehende Datenmodell und die best
 ## Nächster technischer Schritt
 
 Bestehende Import- und Kennzahlenlogik im Repository lokalisieren und prüfen. Danach ein minimales, isoliertes Importmodul mit Testfixtures und Vorschau bauen. Erst nach dieser Bestandsaufnahme wird entschieden, welcher OCR-/Dokumentenextraktionsweg am besten zur bestehenden Architektur passt.
+
+
+## 7. Parser contract test added
+
+A Node.js built-in test file, `tests/huth-parser-contract.test.cjs`, now extracts and tests the existing `parseHuth` function directly from `analyse.html` using synthetic report text. It covers:
+- existing aliases for Kaffee, Backshop/Backwaren and Getränke;
+- unknown groups remaining visible for manual mapping;
+- no inferred EK, Schwund or Abschriften from a revenue-only report;
+- German decimal/thousands parsing;
+- HUTH shop total remaining distinct from the sum of mapped groups.
+
+Run locally with `node --test tests/huth-parser-contract.test.cjs`. The test is committed on this branch; it has not yet been executed in a repository CI environment. This is a parser contract test, not yet an end-to-end upload/OCR/AI test.
