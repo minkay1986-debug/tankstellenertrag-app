@@ -143,3 +143,5 @@ Diagnostic assertion added to expose any unparsed synthetic shrinkage rows in CI
 The typed parser now preserves the `Warengruppe` summary row so the Schwund component reconciliation can be calculated against the report total.
 
 HUTH header detection now normalizes spacing so combined headers such as `Schwundnetto` and spaced variants are recognized consistently.
+
+The header classifier's EK checks now compare the whitespace-normalized header consistently.
