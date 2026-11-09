@@ -86,3 +86,8 @@ A Node.js built-in test file, `tests/huth-parser-contract.test.cjs`, now extract
 - HUTH shop total remaining distinct from the sum of mapped groups.
 
 Run locally with `node --test tests/huth-parser-contract.test.cjs`. The test is committed on this branch; it has not yet been executed in a repository CI environment. This is a parser contract test, not yet an end-to-end upload/OCR/AI test.
+
+
+## 8. CI wiring
+
+Added `.github/workflows/huth-parser-contract.yml` on this feature branch. It runs the synthetic parser contract tests with Node.js 24 on pushes to this branch and on pull requests targeting `main`. The workflow requests read-only repository contents permission. The first workflow result still needs to be inspected before treating the tests as passing.
