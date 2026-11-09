@@ -121,3 +121,14 @@ Added `.github/workflows/huth-parser-contract.yml` on this feature branch. It ru
 - Created a separate anonymized five-page synthetic monthly statement PDF for repeatable manual testing. It contains only fabricated operator labels and figures and explicitly labels itself as test data.
 - The original user PDF is not copied into the repository or CI artifacts.
 - Required semantic guard: shrinkage values on the neutral-payments page must remain shrinkage; they must never populate EK/COGS. Storno and returns also remain distinct from sales and shrinkage. Fuel meter quantities remain separate from shop turnover.
+
+
+## 11. Typed HUTH statistics parsing (2026-11-09)
+
+- Added separate document classification and row mapping for EK-Netto, Schwund and Marge/FIFO statistics.
+- EK-Netto parser reads only the dedicated EK-Netto column.
+- Schwund parser maps Verderb, MHD, Bruch, VK-Netto, Schwund Gesamt and percentage as distinct columns; it checks the total row against the three shrinkage components.
+- FIFO margin parser keeps Marge EUR, VK-Netto, margin percentage and EK-Netto (FIFO) as separate values.
+- The parser refuses to classify unknown documents as one of these types. Rows are considered only when the expected column count is present.
+- Synthetic tests now cover representative table rows and verify that the FIFO EK value is not confused with the separate EK-Netto report and that shrinkage components reconcile to the reported total.
+- The implementation is still prototype-level: actual PDF.js line ordering, OCR table reconstruction and a broader set of HUTH export variants must be validated with the supplied reports locally before this can be called production-safe. Real uploaded reports are not committed to the repository.
