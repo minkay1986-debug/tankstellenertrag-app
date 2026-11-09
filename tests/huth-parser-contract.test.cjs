@@ -95,7 +95,7 @@ test('runs German OCR locally for images and scanned PDF pages', () => {
 });
 
 
-test('classifies EK, shrinkage and FIFO margin reports without cross-assigning columns', () => {
+test('classifies EK, shrinkage and margin reports while ignoring FIFO', () => {
   const prototype = fs.readFileSync(path.join(__dirname, '..', 'ai-report-import-prototype.html'), 'utf8');
   const numberFn = prototype.slice(prototype.indexOf('function parseGermanNumber'), prototype.indexOf('const rules'));
   const parserFns = prototype.slice(prototype.indexOf('function numericTokens'), prototype.indexOf('function renderPages'));
@@ -118,8 +118,11 @@ test('classifies EK, shrinkage and FIFO margin reports without cross-assigning c
   assert.deepEqual([total.details.verderb,total.details.mhd,total.details.bruch],[775.03,0,83.06]);
   assert.equal(shrink.diagnostics.find(x=>x.check==='Schwund-Aufteilung').ok,true);
 
-  const margin = parse([{file:'marge.pdf',page:1,text:'Statistik von August 2026\nMarge Abschlag (%)\nGesamt EK-Netto(FIFO) (EUR)\nWarengruppe 0 30.509,10 115.754,32 26,36 % 84.764,84\nBackwaren 0 953,29 2.699,30 35,32 % 973,10'}]);
-  assert.equal(margin.diagnostics[0].type, 'margin_fifo');
-  assert.equal(margin.candidates.find(x=>x.group==='Warengruppe').value, 84764.84);
-  assert.equal(margin.candidates.find(x=>x.group==='Backwaren').value, 973.10);
+  const margin = parse([{file:'marge.pdf',page:1,text:'Statistik von August 2026\nMarge Abschlag (%)\nWarengruppe 0 30.509,10 115.754,32 26,36 % 84.764,84\nBackwaren 0 953,29 2.699,30 35,32 % 973,10'}]);
+  assert.equal(margin.diagnostics.find(d=>d.type)?.type, 'margin_report');
+  const marginTotal = margin.candidates.find(x=>x.group==='Warengruppe');
+  assert.equal(marginTotal.value, 30509.10);
+  assert.equal(marginTotal.details.vkNetto, 115754.32);
+  assert.equal(marginTotal.details.abschlagProzent, 26.36);
+  assert.equal(margin.candidates.some(x=>String(x.key).toLowerCase().includes('fifo')), false);
 });
