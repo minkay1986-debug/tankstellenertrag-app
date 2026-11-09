@@ -129,7 +129,7 @@ function parseHuthStatistics(pages){
         const nums=numericTokens(line);
         if(nums.length!==expected)continue;
         const label=rowLabel(line).replace(/^\d+\s*/,'').trim();
-        if(!label || /^(nummer|artikel|warengruppe)$/i.test(label))continue;
+        if(!label || /^(nummer|artikel)$/i.test(label))continue;
         const values=nums.map(x=>parseGermanNumber(x.replace(/%$/,'')));
         if(values.some(v=>v===null)){invalid++;continue;}
         const base={id:crypto.randomUUID(),source:file+' · Seite '+page.page,raw:line,confirmed:false,group:label};
