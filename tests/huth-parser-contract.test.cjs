@@ -111,6 +111,7 @@ test('classifies EK, shrinkage and FIFO margin reports without cross-assigning c
   const shrink = parse([{file:'schwund.pdf',page:1,text:'Statistik von August 2026\nSchwund Netto (Gesamt)\nAnteil Schwund (Gesamt) von Verkauf (%)\nWarengruppe 0 775,03 0,00 83,06 115.754,32 858,09 0,74 %\nBackwaren 0 772,91 0,00 0,00 2.699,30 772,91 28,63 %'}]);
   assert.equal(shrink.diagnostics[0].type, 'shrinkage');
   const total = shrink.candidates.find(x=>x.group==='Warengruppe');
+  assert.ok(total, JSON.stringify(shrink));
   assert.equal(total.value, 858.09);
   assert.deepEqual([total.details.verderb,total.details.mhd,total.details.bruch],[775.03,0,83.06]);
   assert.equal(shrink.diagnostics.find(x=>x.check==='Schwund-Aufteilung').ok,true);
