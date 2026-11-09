@@ -129,7 +129,6 @@ $('process').addEventListener('click',processFiles);
 $('reset').addEventListener('click',()=>{extractedPages=[];candidates=[];$('files').value='';$('pagesPanel').classList.add('hidden');$('reviewPanel').classList.add('hidden');$('status').className='status';$('status').textContent='Zurückgesetzt. Es wurden keine Daten gespeichert.';$('confirmStatus').textContent='';});
 $('confirm').addEventListener('click',()=>{
   const checks=[...document.querySelectorAll('[data-confirm]')];
-  const checks=[...document.querySelectorAll('[data-confirm]')];
   const values=new Map([...document.querySelectorAll('[data-value]')].map(el=>[el.dataset.value,parseGermanNumber(el.value)]));
   let accepted=0;
   for(const c of candidates){
