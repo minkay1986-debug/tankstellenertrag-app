@@ -137,3 +137,5 @@ Added `.github/workflows/huth-parser-contract.yml` on this feature branch. It ru
 Parser test follow-up: the initial typed-parser contract run exposed over-escaped regular expressions in the parser source. These were corrected; the test suite is rerun against the corrected parser.
 
 Typed parser fixture correction: synthetic rows now use actual line breaks, matching PDF.js page text extraction.
+
+Diagnostic assertion added to expose any unparsed synthetic shrinkage rows in CI.
