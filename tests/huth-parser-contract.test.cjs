@@ -118,7 +118,7 @@ test('classifies EK, shrinkage and margin reports while ignoring FIFO', () => {
   assert.deepEqual([total.details.verderb,total.details.mhd,total.details.bruch],[775.03,0,83.06]);
   assert.equal(shrink.diagnostics.find(x=>x.check==='Schwund-Aufteilung').ok,true);
 
-  const margin = parse([{file:'marge.pdf',page:1,text:'Statistik von August 2026\nMarge Abschlag (%)\nWarengruppe 0 30.509,10 115.754,32 26,36 % 84.764,84\nBackwaren 0 953,29 2.699,30 35,32 % 973,10'}]);
+  const margin = parse([{file:'marge.pdf',page:1,text:'Statistik von August 2026\nMarge Abschlag (%) VK-Netto (EUR)\nWarengruppe 0 30.509,10 115.754,32 26,36 % 84.764,84\nBackwaren 0 953,29 2.699,30 35,32 % 973,10'}]);
   assert.equal(margin.diagnostics.find(d=>d.type)?.type, 'margin_report');
   const marginTotal = margin.candidates.find(x=>x.group==='Warengruppe');
   assert.equal(marginTotal.value, 30509.10);
