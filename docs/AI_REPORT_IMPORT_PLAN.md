@@ -132,3 +132,6 @@ Added `.github/workflows/huth-parser-contract.yml` on this feature branch. It ru
 - The parser refuses to classify unknown documents as one of these types. Rows are considered only when the expected column count is present.
 - Synthetic tests now cover representative table rows and verify that the FIFO EK value is not confused with the separate EK-Netto report and that shrinkage components reconcile to the reported total.
 - The implementation is still prototype-level: actual PDF.js line ordering, OCR table reconstruction and a broader set of HUTH export variants must be validated with the supplied reports locally before this can be called production-safe. Real uploaded reports are not committed to the repository.
+
+
+Parser test follow-up: the initial typed-parser contract run exposed over-escaped regular expressions in the parser source. These were corrected; the test suite is rerun against the corrected parser.
