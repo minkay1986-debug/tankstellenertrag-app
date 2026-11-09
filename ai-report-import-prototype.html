@@ -108,9 +108,9 @@ function rowLabel(line){
 }
 function classifyHuthReport(text){
   const t=text.toLocaleLowerCase('de-DE').replace(/\\s+/g,' ');
-  if(t.includes('gesamt ek-netto') && t.includes('statistik von')) return 'ek_netto';
-  if(t.includes('schwund netto') && t.includes('anteil schwund')) return 'shrinkage';
   if(t.includes('gesamt ek-netto(fifo)') || (t.includes('marge abschlag') && t.includes('vk-netto'))) return 'margin_fifo';
+  if(t.includes('schwund netto') && t.includes('anteil schwund')) return 'shrinkage';
+  if(t.includes('gesamt ek-netto') && t.includes('statistik von')) return 'ek_netto';
   return 'unknown';
 }
 function parseHuthStatistics(pages){
@@ -121,7 +121,7 @@ function parseHuthStatistics(pages){
     const allText=filePages.map(p=>p.text).join('\\n');
     const type=classifyHuthReport(allText);
     if(type==='unknown') continue;
-    const expected=type==='ek_netto'?2:type==='shrinkage'?8:5;
+    const expected=type==='ek_netto'?2:type==='shrinkage'?7:5;
     let rows=0,invalid=0;
     for(const page of filePages){
       for(const line0 of page.text.split(/\\n+/)){
