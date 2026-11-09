@@ -49,7 +49,7 @@
 </main>
 <script type="module">
 const $=id=>document.getElementById(id);
-let pdfjsPromise=null, extractedPages=[], candidates=[];
+let pdfjsPromise=null, ocrWorkerPromise=null, extractedPages=[], candidates=[];
 async function getPdfJs(){
   if(!pdfjsPromise){
     pdfjsPromise=import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs').then(pdfjs=>{
@@ -58,6 +58,31 @@ async function getPdfJs(){
     });
   }
   return pdfjsPromise;
+}
+async function getOcrWorker(){
+  if(!ocrWorkerPromise){
+    ocrWorkerPromise=import('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js').then(async mod=>{
+      const api=mod.default||mod;
+      return api.createWorker('deu',1,{logger:m=>{
+        if(m.status==='recognizing text') $('status').textContent='OCR läuft … '+Math.round((m.progress||0)*100)+' %';
+      }});
+    }).catch(err=>{ocrWorkerPromise=null;throw new Error('Deutsche OCR konnte nicht geladen werden: '+(err.message||err));});
+  }
+  return ocrWorkerPromise;
+}
+async function recognizeCanvas(canvas,worker){
+  const result=await worker.recognize(canvas);
+  return String(result.data?.text||'').trim();
+}
+async function ocrImage(file,worker){
+  const bitmap=await createImageBitmap(file);
+  const canvas=document.createElement('canvas');
+  const scale=Math.min(2,3000/Math.max(bitmap.width,bitmap.height));
+  canvas.width=Math.round(bitmap.width*scale);canvas.height=Math.round(bitmap.height*scale);
+  const ctx=canvas.getContext('2d',{willReadFrequently:false});
+  ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close?.();
+  const text=await recognizeCanvas(canvas,worker);canvas.width=0;canvas.height=0;
+  return {file:file.name,page:1,text,ocr:true};
 }
 function parseGermanNumber(raw){
   const s=String(raw??'').trim().replace(/\s/g,'').replace(/EUR|€/gi,'');
@@ -89,7 +114,7 @@ function extractCandidates(pages){
   return found;
 }
 function renderPages(){
-  $('pages').innerHTML=extractedPages.map(p=>'<article class="page"><h3>'+escapeHtml(p.file)+' · Seite '+p.page+'</h3><span class="tag">'+(p.text.trim()?'Text erkannt':'Kein Textlayer erkannt')+'</span><pre>'+escapeHtml(p.text.slice(0,5000)||'Kein auslesbarer Text. Bei Scans wird später OCR benötigt.')+'</pre></article>').join('');
+  $('pages').innerHTML=extractedPages.map(p=>'<article class="page"><h3>'+escapeHtml(p.file)+' · Seite '+p.page+'</h3><span class="tag">'+(p.ocr?'OCR erkannt':p.text.trim()?'Text erkannt':'Kein Text erkannt')+'</span><pre>'+escapeHtml(p.text.slice(0,5000)||'Kein auslesbarer Text. Bei Scans wird später OCR benötigt.')+'</pre></article>').join('');
   $('pagesPanel').classList.remove('hidden');
 }
 function renderCandidates(){
@@ -98,12 +123,21 @@ function renderCandidates(){
   $('reviewPanel').classList.remove('hidden');
 }
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-async function readPdf(file){
+async function readPdf(file,worker){
   const pdfjs=await getPdfJs(),pdf=await pdfjs.getDocument({data:await file.arrayBuffer()}).promise;
   const out=[];
   for(let n=1;n<=pdf.numPages;n++){
     const page=await pdf.getPage(n),tc=await page.getTextContent();
-    out.push({file:file.name,page:n,text:tc.items.map(i=>(i.str||'')+(i.hasEOL?'\n':' ')).join('').replace(/[ \t]+\n/g,'\n').trim()});
+    let text=tc.items.map(i=>(i.str||'')+(i.hasEOL?'\n':' ')).join('').replace(/[ \t]+\n/g,'\n').trim();
+    let ocr=false;
+    if(!text){
+      const viewport=page.getViewport({scale:2});
+      const canvas=document.createElement('canvas');
+      canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
+      await page.render({canvas,canvasContext:canvas.getContext('2d'),viewport}).promise;
+      text=await recognizeCanvas(canvas,worker);ocr=true;canvas.width=0;canvas.height=0;
+    }
+    out.push({file:file.name,page:n,text,ocr});
   }
   return out;
 }
@@ -112,16 +146,17 @@ async function processFiles(){
   $('process').disabled=true;$('status').className='status';$('status').textContent='Dokumente werden lokal geprüft …';
   extractedPages=[];candidates=[];
   try{
+    const worker=await getOcrWorker();
     for(const file of files){
-      if(file.type==='application/pdf'||/\.pdf$/i.test(file.name)) extractedPages.push(...await readPdf(file));
-      else if(/^image\//.test(file.type)) extractedPages.push({file:file.name,page:1,text:''});
+      if(file.type==='application/pdf'||/\.pdf$/i.test(file.name)) extractedPages.push(...await readPdf(file,worker));
+      else if(/^image\//.test(file.type)) extractedPages.push(await ocrImage(file,worker));
       else throw new Error('Nicht unterstütztes Dateiformat: '+file.name);
     }
     candidates=extractCandidates(extractedPages);
     renderPages();renderCandidates();
     const noText=extractedPages.filter(p=>!p.text.trim()).length;
     $('status').className='status '+(noText?'warn':'ok');
-    $('status').textContent=files.length+' Datei(en), '+extractedPages.length+' Seite(n) geprüft · '+candidates.length+' Kennzahlen-Kandidat(en) · '+noText+' Seite(n) ohne Textlayer (OCR fehlt noch).';
+    $('status').textContent=files.length+' Datei(en), '+extractedPages.length+' Seite(n) geprüft · '+candidates.length+' Kennzahlen-Kandidat(en) · '+noText+' Seite(n) ohne erkannten Text.';
   }catch(e){$('status').className='status err';$('status').textContent='Prüfung fehlgeschlagen: '+(e.message||String(e));}
   finally{$('process').disabled=false;}
 }
