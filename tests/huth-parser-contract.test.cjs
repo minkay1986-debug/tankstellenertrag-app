@@ -21,7 +21,7 @@ const GROUPS = [
   ['lebensmittel', 'Lebensmittel', 50], ['spielzeug', 'Spielzeug', 45],
   ['waschen', 'Waschen', 0], ['getraenke', 'Getränke', 50], ['eis', 'Eis', 56.8]
 ];
-const context = { GROUPS };
+const context = { GROUPS, data: { settings: {} } };
 vm.createContext(context);
 vm.runInContext(source.slice(start, end), context);
 const parseHuth = context.parseHuth;
