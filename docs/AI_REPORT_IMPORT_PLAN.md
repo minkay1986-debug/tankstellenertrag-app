@@ -149,3 +149,11 @@ The header classifier's EK checks now compare the whitespace-normalized header c
 Schwund report detection accepts spacing variants in the HUTH column heading while still requiring Schwund, Anteil and Gesamt markers.
 
 Schwund document classification now uses independent header markers rather than relying on one exact compound heading spelling.
+
+
+## 12. Scope correction: no FIFO import (2026-11-09)
+
+- TankstellenErtrag does not use FIFO as an application metric; the import therefore must not create an EK-Netto-FIFO candidate or field.
+- The margin report parser extracts only Marge EUR, VK-Netto and Marge-Abschlag percentage from the corresponding columns.
+- The FIFO column is ignored, even if present in the source report.
+- Contract tests explicitly assert that no FIFO candidate/key is emitted.
