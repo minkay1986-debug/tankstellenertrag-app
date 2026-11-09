@@ -101,3 +101,14 @@ Added `.github/workflows/huth-parser-contract.yml` on this feature branch. It ru
 - CI now parses the prototype's inline module script for JavaScript syntax errors and checks the strict review-value path.
 - Latest CI evidence: 7/7 tests passed on commit `d52cb8a`.
 - Still not implemented: OCR for image/scanned PDFs, duplicate-content detection, document-type classification, confidence scoring, end-to-end browser tests, and integration with the monthly data model.
+
+
+## 10. Local OCR prototype (2026-11-09)
+
+- Added German-language OCR using the browser ESM build of Tesseract.js 5.1.1.
+- Image uploads (PNG/JPEG/WebP) are decoded locally and passed to OCR in a browser canvas.
+- PDF pages with no extracted text are rendered by PDF.js and passed to the same OCR worker.
+- The source document bytes are not posted to an AI/OCR service by this prototype. The OCR JavaScript bundle, worker/core assets and German language data are fetched from the configured CDN as required at runtime.
+- OCR output remains an untrusted candidate and is subject to the same manual review; OCR does not write to monthly data.
+- Latest CI run: run 12, commit `2e644da`, 8 tests passed, 0 failed.
+- Not yet verified with representative real-world scans or browser/device end-to-end tests. OCR accuracy, table layout reconstruction, duplicate detection, document classification and reconciliation remain open.
