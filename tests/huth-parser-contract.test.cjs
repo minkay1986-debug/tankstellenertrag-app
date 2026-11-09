@@ -104,18 +104,18 @@ test('classifies EK, shrinkage and FIFO margin reports without cross-assigning c
   vm.runInContext(numberFn + parserFns, context);
   const parse = context.parseHuthStatistics;
 
-  const ek = parse([{file:'ek.pdf',page:1,text:'Statistik von August 2026\\nGesamt EK-Netto (EUR)\\nWarengruppe 0 71.506,62\\nBackwaren 0 1.348,15'}]);
+  const ek = parse([{file:'ek.pdf',page:1,text:'Statistik von August 2026\nGesamt EK-Netto (EUR)\nWarengruppe 0 71.506,62\nBackwaren 0 1.348,15'}]);
   assert.equal(ek.diagnostics[0].type, 'ek_netto');
   assert.equal(ek.candidates.find(x=>x.group==='Backwaren').value, 1348.15);
 
-  const shrink = parse([{file:'schwund.pdf',page:1,text:'Statistik von August 2026\\nSchwund Netto (Gesamt)\\nAnteil Schwund (Gesamt) von Verkauf (%)\\nWarengruppe 0 775,03 0,00 83,06 115.754,32 858,09 0,74 %\\nBackwaren 0 772,91 0,00 0,00 2.699,30 772,91 28,63 %'}]);
+  const shrink = parse([{file:'schwund.pdf',page:1,text:'Statistik von August 2026\nSchwund Netto (Gesamt)\nAnteil Schwund (Gesamt) von Verkauf (%)\nWarengruppe 0 775,03 0,00 83,06 115.754,32 858,09 0,74 %\nBackwaren 0 772,91 0,00 0,00 2.699,30 772,91 28,63 %'}]);
   assert.equal(shrink.diagnostics[0].type, 'shrinkage');
   const total = shrink.candidates.find(x=>x.group==='Warengruppe');
   assert.equal(total.value, 858.09);
   assert.deepEqual([total.details.verderb,total.details.mhd,total.details.bruch],[775.03,0,83.06]);
   assert.equal(shrink.diagnostics.find(x=>x.check==='Schwund-Aufteilung').ok,true);
 
-  const margin = parse([{file:'marge.pdf',page:1,text:'Statistik von August 2026\\nMarge Abschlag (%)\\nGesamt EK-Netto(FIFO) (EUR)\\nWarengruppe 0 30.509,10 115.754,32 26,36 % 84.764,84\\nBackwaren 0 953,29 2.699,30 35,32 % 973,10'}]);
+  const margin = parse([{file:'marge.pdf',page:1,text:'Statistik von August 2026\nMarge Abschlag (%)\nGesamt EK-Netto(FIFO) (EUR)\nWarengruppe 0 30.509,10 115.754,32 26,36 % 84.764,84\nBackwaren 0 953,29 2.699,30 35,32 % 973,10'}]);
   assert.equal(margin.diagnostics[0].type, 'margin_fifo');
   assert.equal(margin.candidates.find(x=>x.group==='Warengruppe').value, 84764.84);
   assert.equal(margin.candidates.find(x=>x.group==='Backwaren').value, 973.10);
