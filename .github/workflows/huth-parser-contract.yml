@@ -1,9 +1,7 @@
 name: HUTH parser contract
 
 on:
-  push:
-    branches:
-      - feature/ai-report-import-2026-11-09
+  workflow_dispatch:
   pull_request:
     branches:
       - main
