@@ -90,4 +90,14 @@ Run locally with `node --test tests/huth-parser-contract.test.cjs`. The test is 
 
 ## 8. CI wiring
 
-Added `.github/workflows/huth-parser-contract.yml` on this feature branch. It runs the synthetic parser contract tests with Node.js 24 on pushes to this branch and on pull requests targeting `main`. The workflow requests read-only repository contents permission. The first workflow result still needs to be inspected before treating the tests as passing.
+Added `.github/workflows/huth-parser-contract.yml` on this feature branch. It runs the synthetic parser contract tests with Node.js 24 on pushes to this branch and on pull requests targeting `main`. The workflow requests read-only repository contents permission. The latest workflow run (run 8, commit `d52cb8a`) completed successfully: 7 tests passed, 0 failed. This includes the HUTH parser contract, prototype JavaScript syntax parsing, and guards against permissive empty-value conversion. Earlier failed runs were traced to the test harness itself and corrected.
+
+
+## 9. Prototype hardening (2026-11-09)
+
+- PDF.js text extraction now preserves explicit end-of-line boundaries where provided by PDF.js, improving source-line matching.
+- Review edits use the same strict German-number parser as extracted values. Empty or malformed values cannot be confirmed as zero.
+- Checked invalid values remain unconfirmed and are reported to the reviewer.
+- CI now parses the prototype's inline module script for JavaScript syntax errors and checks the strict review-value path.
+- Latest CI evidence: 7/7 tests passed on commit `d52cb8a`.
+- Still not implemented: OCR for image/scanned PDFs, duplicate-content detection, document-type classification, confidence scoring, end-to-end browser tests, and integration with the monthly data model.
