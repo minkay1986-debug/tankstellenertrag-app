@@ -60,8 +60,8 @@ async function getPdfJs(){
   return pdfjsPromise;
 }
 function parseGermanNumber(raw){
-  const s=String(raw??'').replace(/\s/g,'').replace(/EUR|€/gi,'');
-  if(!/^-?\d{1,3}(?:\.\d{3})*(?:,\d{1,2})?$|^-?\d+(?:,\d{1,2})?$/.test(s))return null;
+  const s=String(raw??'').trim().replace(/\s/g,'').replace(/EUR|€/gi,'');
+  if(!s||! /^-?\d{1,3}(?:\.\d{3})*(?:,\d{1,2})?$|^-?\d+(?:,\d{1,2})?$/.test(s))return null;
   const n=Number(s.replace(/\./g,'').replace(',','.'));
   return Number.isFinite(n)?n:null;
 }
@@ -103,7 +103,7 @@ async function readPdf(file){
   const out=[];
   for(let n=1;n<=pdf.numPages;n++){
     const page=await pdf.getPage(n),tc=await page.getTextContent();
-    out.push({file:file.name,page:n,text:tc.items.map(i=>i.str||'').join(' ')});
+    out.push({file:file.name,page:n,text:tc.items.map(i=>(i.str||'')+(i.hasEOL?'\\n':' ')).join('').replace(/[ \\t]+\\n/g,'\\n').trim()});
   }
   return out;
 }
@@ -134,10 +134,11 @@ $('confirm').addEventListener('click',()=>{
   for(const c of candidates){
     const checked=document.querySelector('[data-confirm="'+c.id+'"]')?.checked;
     const raw=values.get(c.id);
-    if(checked&&Number.isFinite(raw)){c.value=raw;c.confirmed=true;accepted++;}
+    if(checked&&raw!==null){c.value=raw;c.confirmed=true;accepted++;}else if(checked&&raw===null){c.confirmed=false;}
   }
-  $('confirmStatus').className='status '+(accepted?'ok':'warn');
-  $('confirmStatus').textContent=accepted+' Wert(e) lokal als geprüft markiert. Noch keine Übernahme oder Speicherung.';
+  const invalid=checks.filter(el=>el.checked&&values.get(el.dataset.confirm)===null).length;
+  $('confirmStatus').className='status '+(accepted&&!invalid?'ok':'warn');
+  $('confirmStatus').textContent=accepted+' Wert(e) lokal als geprüft markiert.'+(invalid?' · '+invalid+' angehaktes Feld enthält keine gültige deutsche Zahl und bleibt ungeprüft.':'')+' Noch keine Übernahme oder Speicherung.';
 });
 const drop=$('drop');
 drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('drag');});
