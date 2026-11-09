@@ -72,14 +72,14 @@ test('returns the HUTH shop total independently from mapped group totals', () =>
 
 test('parses the isolated report-import prototype script without syntax errors', () => {
   const prototype = fs.readFileSync(path.join(__dirname, '..', 'ai-report-import-prototype.html'), 'utf8');
-  const match = prototype.match(/<script type="module">([\\s\\S]*?)<\\/script>/i);
+  const match = prototype.match(/<script type="module">([\s\S]*?)<\/script>/i);
   assert.ok(match, 'prototype module script must exist');
   assert.doesNotThrow(() => new vm.Script(match[1], { filename: 'ai-report-import-prototype.html' }));
 });
 
 test('review value parser rejects empty or malformed values instead of converting them to zero', () => {
   const prototype = fs.readFileSync(path.join(__dirname, '..', 'ai-report-import-prototype.html'), 'utf8');
-  assert.match(prototype, /if\\(!s\\|\\|/);
-  assert.match(prototype, /map\\(el=>\\[el\\.dataset\\.value,parseGermanNumber\\(el\\.value\\)\\]\\)/);
-  assert.doesNotMatch(prototype, /Number\\(String\\(el\\.value\\)\\.trim\\(\\)\\.replace/);
+  assert.match(prototype, /if\(!s\|\|/);
+  assert.match(prototype, /map\(el=>\[el\.dataset\.value,parseGermanNumber\(el\.value\)\]\)/);
+  assert.doesNotMatch(prototype, /Number\(String\(el\.value\)\.trim\(\)\.replace/);
 });
