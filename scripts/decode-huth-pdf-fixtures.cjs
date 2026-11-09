@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const root = path.resolve(__dirname, '..', '..');
+const root = path.resolve(__dirname, '..');
 const source = path.join(root, 'test-fixtures', 'huth');
 const target = path.join(os.tmpdir(), 'tankstellenertrag-huth-fixtures');
 fs.mkdirSync(target, { recursive: true });
