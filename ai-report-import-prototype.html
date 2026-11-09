@@ -107,11 +107,12 @@ function rowLabel(line){
   return line.replace(/-?\d{1,3}(?:\.\d{3})*(?:,\d{1,2})?%?/g,' ').replace(/%/g,' ').replace(/\s+/g,' ').trim();
 }
 function classifyHuthReport(text){
-  const t=text.toLocaleLowerCase('de-DE').replace(/\s+/g,' ');
-  const compact=t.replace(/\s/g,'');
-  if(compact.includes('gesamtek-netto(fifo)') || (compact.includes('margeabschlag') && compact.includes('vk-netto'))) return 'margin_fifo';
-  if(t.includes('schwund') && t.includes('anteil') && t.includes('gesamt')) return 'shrinkage';
-  if(compact.includes('gesamtek-netto') && compact.includes('statistikvon')) return 'ek_netto';
+  const normalized=String(text||'').toLocaleLowerCase('de-DE').normalize('NFKC').replace(/[\\s\\u00a0]+/g,' ');
+  const compact=normalized.replace(/[^a-z0-9%]/g,'');
+  const has=token=>compact.includes(token);
+  if(has('gesamteknettofifo') || (has('margeabschlag') && has('vknetto'))) return 'margin_fifo';
+  if(has('schwund') && has('anteil') && has('gesamt')) return 'shrinkage';
+  if(has('gesamteknetto') && has('statistikvon')) return 'ek_netto';
   return 'unknown';
 }
 function parseHuthStatistics(pages){
