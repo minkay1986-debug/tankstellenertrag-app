@@ -110,7 +110,7 @@ function classifyHuthReport(text){
   const normalized=String(text||'').toLocaleLowerCase('de-DE').normalize('NFKC').replace(/[\s\u00a0]+/g,' ');
   const compact=normalized.replace(/[^a-z0-9%]/g,'');
   const has=token=>compact.includes(token);
-  if(has('gesamteknettofifo') || (has('margeabschlag') && has('vknetto'))) return 'margin_fifo';
+  if(has('margeabschlag') && has('vknetto')) return 'margin_report';
   if(has('schwund') && has('anteil') && has('gesamt')) return 'shrinkage';
   if(has('gesamteknetto') && has('statistikvon')) return 'ek_netto';
   return 'unknown';
@@ -145,10 +145,10 @@ function parseHuthStatistics(pages){
             const sum=verderb+mhd+bruch;
             diagnostics.push({file,page:page.page,check:'Schwund-Aufteilung',expected:gesamt,actual:sum,ok:Math.abs(sum-gesamt)<0.011,raw:line});
           }
-        }else{
-          // HUTH table order: Marge EUR, VK-Netto, Marge Abschlag %, EK-Netto FIFO.
-          const [marge,umsatz,quote,ekFifo]=values.slice(1);
-          found.push({...base,key:'margin_fifo_group',label:'EK-Netto FIFO · '+label,kind:'EK-Netto FIFO',value:ekFifo,details:{marge,umsatz,quote}});
+        }else if(type==='margin_report'){
+          // Only the app-relevant margin fields are extracted; the FIFO column is ignored.
+          const [marge,umsatz,quote]=values.slice(1,4);
+          found.push({...base,key:'margin_eur_group',label:'Marge € · '+label,kind:'Marge',value:marge,details:{vkNetto:umsatz,abschlagProzent:quote}});
         }
         rows++;
       }
