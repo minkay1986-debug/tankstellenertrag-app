@@ -112,3 +112,12 @@ Added `.github/workflows/huth-parser-contract.yml` on this feature branch. It ru
 - OCR output remains an untrusted candidate and is subject to the same manual review; OCR does not write to monthly data.
 - Latest CI run: run 12, commit `2e644da`, 8 tests passed, 0 failed.
 - Not yet verified with representative real-world scans or browser/device end-to-end tests. OCR accuracy, table layout reconstruction, duplicate detection, document classification and reconciliation remain open.
+
+
+## 11. Monthly statement sample review (2026-11-09)
+
+- Reviewed a user-supplied five-page monthly statement locally. All five pages contain an extractable PDF text layer; this validates the text-PDF path on one real-world document, not scanned-document OCR accuracy.
+- Page structure observed: page 1 merchandise groups and turnover; page 2 payment types/cashbook/vouchers; page 3 corrections; page 4 neutral payment types including separately labeled shrinkage reasons (MHD, breakage, spoilage), cancellations and returns; page 5 fuel meter readings.
+- Created a separate anonymized five-page synthetic monthly statement PDF for repeatable manual testing. It contains only fabricated operator labels and figures and explicitly labels itself as test data.
+- The original user PDF is not copied into the repository or CI artifacts.
+- Required semantic guard: shrinkage values on the neutral-payments page must remain shrinkage; they must never populate EK/COGS. Storno and returns also remain distinct from sales and shrinkage. Fuel meter quantities remain separate from shop turnover.
