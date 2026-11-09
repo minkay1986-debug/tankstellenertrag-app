@@ -61,7 +61,7 @@ async function getPdfJs(){
 }
 async function getOcrWorker(){
   if(!ocrWorkerPromise){
-    ocrWorkerPromise=import('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js').then(async mod=>{
+    ocrWorkerPromise=import('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.esm.min.js').then(async mod=>{
       const api=mod.default||mod;
       return api.createWorker('deu',1,{logger:m=>{
         if(m.status==='recognizing text') $('status').textContent='OCR läuft … '+Math.round((m.progress||0)*100)+' %';
