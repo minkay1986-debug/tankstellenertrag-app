@@ -103,7 +103,7 @@ async function readPdf(file){
   const out=[];
   for(let n=1;n<=pdf.numPages;n++){
     const page=await pdf.getPage(n),tc=await page.getTextContent();
-    out.push({file:file.name,page:n,text:tc.items.map(i=>(i.str||'')+(i.hasEOL?'\\n':' ')).join('').replace(/[ \\t]+\\n/g,'\\n').trim()});
+    out.push({file:file.name,page:n,text:tc.items.map(i=>(i.str||'')+(i.hasEOL?'\n':' ')).join('').replace(/[ \t]+\n/g,'\n').trim()});
   }
   return out;
 }
@@ -129,7 +129,8 @@ $('process').addEventListener('click',processFiles);
 $('reset').addEventListener('click',()=>{extractedPages=[];candidates=[];$('files').value='';$('pagesPanel').classList.add('hidden');$('reviewPanel').classList.add('hidden');$('status').className='status';$('status').textContent='Zurückgesetzt. Es wurden keine Daten gespeichert.';$('confirmStatus').textContent='';});
 $('confirm').addEventListener('click',()=>{
   const checks=[...document.querySelectorAll('[data-confirm]')];
-  const values=new Map([...document.querySelectorAll('[data-value]')].map(el=>{const n=Number(String(el.value).trim().replace(/\./g,'').replace(',','.'));return [el.dataset.value,Number.isFinite(n)?n:null]}));
+  const checks=[...document.querySelectorAll('[data-confirm]')];
+  const values=new Map([...document.querySelectorAll('[data-value]')].map(el=>[el.dataset.value,parseGermanNumber(el.value)]));
   let accepted=0;
   for(const c of candidates){
     const checked=document.querySelector('[data-confirm="'+c.id+'"]')?.checked;
