@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TankstellenErtrag · KI-Berichtsimport (Prototyp)</title>
+<style>
+:root{color-scheme:dark;--bg:#0d0f10;--panel:#181c1f;--panel2:#22272b;--line:#353c41;--text:#f5f6f7;--muted:#aeb6bc;--orange:#f47b20;--green:#45c477;--yellow:#f0bd4f;--red:#ef6461}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px Inter,system-ui,sans-serif}.wrap{max-width:1100px;margin:auto;padding:28px 18px 60px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:24px}.eyebrow{color:var(--orange);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.title{font-size:30px;font-weight:900;margin:5px 0}.muted{color:var(--muted);line-height:1.5}.pill{border:1px solid #315d43;background:#17271f;color:#83e0a5;padding:7px 11px;border-radius:20px;font-size:12px;font-weight:800}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin:14px 0}.drop{border:2px dashed #596168;border-radius:12px;padding:28px;text-align:center;background:#141719}.drop.drag{border-color:var(--orange);background:#211a15}.btn{border:0;border-radius:8px;padding:11px 15px;font-weight:800;cursor:pointer;background:var(--orange);color:white}.btn:disabled{opacity:.45;cursor:not-allowed}.btn.secondary{background:#30363a}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.status{font-size:13px;margin-top:12px;color:var(--muted)}.status.ok{color:var(--green)}.status.warn{color:var(--yellow)}.status.err{color:var(--red)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.page{border:1px solid var(--line);border-radius:10px;padding:12px;background:#141719}.page h3{font-size:14px;margin:0 0 8px}.page pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:190px;overflow:auto;color:#d8dde0;font:12px/1.5 ui-monospace,monospace}.metric{display:grid;grid-template-columns:1.1fr 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.metric:last-child{border-bottom:0}.metric input{width:100%;background:#fff1e7;color:#171717;border:1px solid #d9c1b1;border-radius:7px;padding:9px}.metric small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.tag{font-size:11px;padding:4px 7px;border-radius:12px;background:#30363a;color:#d8dde0}.tag.warn{background:#332b1b;color:#ffd36f}.tag.good{background:#17271f;color:#83e0a5}.notice{border-left:3px solid var(--yellow);background:#24201a;padding:11px 13px;border-radius:8px;color:#e8d6b4;font-size:13px;line-height:1.5}.hidden{display:none!important}table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:9px;border-bottom:1px solid var(--line);font-size:13px}th{color:var(--muted)}@media(max-width:760px){.grid{grid-template-columns:1fr}.metric{grid-template-columns:1fr}.top{display:block}.title{font-size:25px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <div><div class="eyebrow">Isolierter Feature-Prototyp · keine Live-Verbindung</div><h1 class="title">KI-Berichtsimport</h1><p class="muted">Mehrseitige Monatsberichte prüfen und Kennzahlen mit nachvollziehbarer Quelle vorbereiten.</p></div>
+    <span class="pill">Nur Testzweig</span>
+  </header>
+  <section class="panel">
+    <h2>1. Monatsbericht auswählen</h2>
+    <p class="muted">PDF-Berichte mit Textschicht können lokal im Browser ausgelesen werden. Bilder und gescannte PDFs werden in dieser ersten technischen Vorschau noch nicht automatisch per OCR erkannt.</p>
+    <div id="drop" class="drop">
+      <p><strong>PDF oder Bilddatei hier ablegen</strong></p>
+      <p class="muted">Mehrere Dateien möglich · Verarbeitung zunächst nur lokal im Browser</p>
+      <div class="row" style="justify-content:center"><input id="files" type="file" accept=".pdf,image/png,image/jpeg,image/webp" multiple><button class="btn" id="process">Dokumente prüfen</button></div>
+    </div>
+    <div id="status" class="status" role="status">Noch keine Dokumente ausgewählt.</div>
+  </section>
+  <section id="pagesPanel" class="panel hidden">
+    <h2>2. Erkannte Dokumentseiten</h2>
+    <div id="pages" class="grid"></div>
+  </section>
+  <section id="reviewPanel" class="panel hidden">
+    <h2>3. Kennzahlen-Kandidaten prüfen</h2>
+    <div class="notice">Dies ist eine technische Vorschau, keine KI-Freigabe. Jeder Wert bleibt ungeprüft, bis ein Mensch ihn bestätigt. Unklare Zuordnungen werden nicht automatisch übernommen.</div>
+    <div id="candidates"></div>
+    <div class="row" style="margin-top:16px"><button id="confirm" class="btn" disabled>Geprüfte Werte lokal bestätigen</button><button id="reset" class="btn secondary">Zurücksetzen</button></div>
+    <div id="confirmStatus" class="status"></div>
+  </section>
+  <section class="panel">
+    <h2>Fachliche Schutzregeln</h2>
+    <ul class="muted">
+      <li>Umsatz, EK/Wareneinsatz, Schwund und Abschriften bleiben strikt getrennt.</li>
+      <li>Schwund wird niemals als EK interpretiert.</li>
+      <li>Fehlende oder mehrdeutige Werte werden nicht geschätzt.</li>
+      <li>Jeder Kandidat muss auf Datei, Seite und Originaltext zurückführbar sein.</li>
+      <li>Es erfolgt keine Speicherung in Supabase und keine Änderung bestehender Monatsdaten.</li>
+    </ul>
+  </section>
+</main>
+<script type="module">
+const $=id=>document.getElementById(id);
+let pdfjsPromise=null, extractedPages=[], candidates=[];
+async function getPdfJs(){
+  if(!pdfjsPromise){
+    pdfjsPromise=import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs').then(pdfjs=>{
+      pdfjs.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs';
+      return pdfjs;
+    });
+  }
+  return pdfjsPromise;
+}
+function parseGermanNumber(raw){
+  const s=String(raw??'').replace(/\s/g,'').replace(/EUR|€/gi,'');
+  if(!/^-?\d{1,3}(?:\.\d{3})*(?:,\d{1,2})?$|^-?\d+(?:,\d{1,2})?$/.test(s))return null;
+  const n=Number(s.replace(/\./g,'').replace(',','.'));
+  return Number.isFinite(n)?n:null;
+}
+const rules=[
+  {key:'shop_revenue',label:'Shop-Umsatz gesamt',kind:'Umsatz',re:/\b(?:shop[- ]?umsatz|umsatz\s+shop|shopware\s+umsatz)\b[^\d-]{0,35}(-?\d[\d.]*,\d{2})/i},
+  {key:'cogs_total',label:'Wareneinsatz / EK gesamt',kind:'EK',re:/\b(?:wareneinsatz|waren[- ]?einsatz|einkauf\s+gesamt|ek\s+gesamt)\b[^\d-]{0,35}(-?\d[\d.]*,\d{2})/i},
+  {key:'shrinkage',label:'Schwund',kind:'Schwund',re:/\b(?:schwund|inventurdifferenz)\b[^\d-]{0,35}(-?\d[\d.]*,\d{2})/i},
+  {key:'writeoffs',label:'Abschriften',kind:'Abschriften',re:/\b(?:abschriften|warenabschriften)\b[^\d-]{0,35}(-?\d[\d.]*,\d{2})/i},
+  {key:'coffee_revenue',label:'Kaffee-Umsatz',kind:'Umsatz',re:/\b(?:kaffee[- ]?umsatz|umsatz\s+kaffee)\b[^\d-]{0,35}(-?\d[\d.]*,\d{2})/i},
+  {key:'bakery_revenue',label:'Backshop-Umsatz',kind:'Umsatz',re:/\b(?:backshop[- ]?umsatz|umsatz\s+backshop|backwaren[- ]?umsatz)\b[^\d-]{0,35}(-?\d[\d.]*,\d{2})/i},
+  {key:'wash_revenue',label:'Waschumsatz',kind:'Umsatz',re:/\b(?:waschumsatz|umsatz\s+waschen|wäscheumsatz)\b[^\d-]{0,35}(-?\d[\d.]*,\d{2})/i},
+  {key:'eloading_revenue',label:'E-Loading-Umsatz',kind:'Umsatz',re:/\b(?:e[- ]?loading|eloading)\b[^\d-]{0,35}(-?\d[\d.]*,\d{2})/i}
+];
+function extractCandidates(pages){
+  const found=[];
+  for(const page of pages){
+    for(const line of page.text.split(/\n+/).map(x=>x.trim()).filter(Boolean)){
+      for(const rule of rules){
+        const m=line.match(rule.re);if(!m)continue;
+        const value=parseGermanNumber(m[1]);if(value===null)continue;
+        found.push({id:crypto.randomUUID(),key:rule.key,label:rule.label,kind:rule.kind,value,source:page.file+' · Seite '+page.page,raw:line,confirmed:false});
+      }
+    }
+  }
+  return found;
+}
+function renderPages(){
+  $('pages').innerHTML=extractedPages.map(p=>'<article class="page"><h3>'+escapeHtml(p.file)+' · Seite '+p.page+'</h3><span class="tag">'+(p.text.trim()?'Text erkannt':'Kein Textlayer erkannt')+'</span><pre>'+escapeHtml(p.text.slice(0,5000)||'Kein auslesbarer Text. Bei Scans wird später OCR benötigt.')+'</pre></article>').join('');
+  $('pagesPanel').classList.remove('hidden');
+}
+function renderCandidates(){
+  $('candidates').innerHTML=candidates.length?candidates.map(c=>'<div class="metric"><div><strong>'+escapeHtml(c.label)+'</strong><small>'+escapeHtml(c.kind)+' · '+escapeHtml(c.source)+'</small><small>Original: '+escapeHtml(c.raw)+'</small></div><div><input aria-label="Erkannter Wert '+escapeHtml(c.label)+'" data-value="'+c.id+'" value="'+c.value.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+'"></div><label><input type="checkbox" data-confirm="'+c.id+'"> geprüft</label></div>').join(''):'<p class="muted">Keine eindeutig erkennbaren Kennzahlen gefunden. Bitte Originalbericht und Format prüfen.</p>';
+  $('confirm').disabled=!candidates.length;
+  $('reviewPanel').classList.remove('hidden');
+}
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function readPdf(file){
+  const pdfjs=await getPdfJs(),pdf=await pdfjs.getDocument({data:await file.arrayBuffer()}).promise;
+  const out=[];
+  for(let n=1;n<=pdf.numPages;n++){
+    const page=await pdf.getPage(n),tc=await page.getTextContent();
+    out.push({file:file.name,page:n,text:tc.items.map(i=>i.str||'').join(' ')});
+  }
+  return out;
+}
+async function processFiles(){
+  const files=[...$('files').files];if(!files.length){$('status').className='status warn';$('status').textContent='Bitte zuerst mindestens ein Dokument auswählen.';return;}
+  $('process').disabled=true;$('status').className='status';$('status').textContent='Dokumente werden lokal geprüft …';
+  extractedPages=[];candidates=[];
+  try{
+    for(const file of files){
+      if(file.type==='application/pdf'||/\.pdf$/i.test(file.name)) extractedPages.push(...await readPdf(file));
+      else if(/^image\//.test(file.type)) extractedPages.push({file:file.name,page:1,text:''});
+      else throw new Error('Nicht unterstütztes Dateiformat: '+file.name);
+    }
+    candidates=extractCandidates(extractedPages);
+    renderPages();renderCandidates();
+    const noText=extractedPages.filter(p=>!p.text.trim()).length;
+    $('status').className='status '+(noText?'warn':'ok');
+    $('status').textContent=files.length+' Datei(en), '+extractedPages.length+' Seite(n) geprüft · '+candidates.length+' Kennzahlen-Kandidat(en) · '+noText+' Seite(n) ohne Textlayer (OCR fehlt noch).';
+  }catch(e){$('status').className='status err';$('status').textContent='Prüfung fehlgeschlagen: '+(e.message||String(e));}
+  finally{$('process').disabled=false;}
+}
+$('process').addEventListener('click',processFiles);
+$('reset').addEventListener('click',()=>{extractedPages=[];candidates=[];$('files').value='';$('pagesPanel').classList.add('hidden');$('reviewPanel').classList.add('hidden');$('status').className='status';$('status').textContent='Zurückgesetzt. Es wurden keine Daten gespeichert.';$('confirmStatus').textContent='';});
+$('confirm').addEventListener('click',()=>{
+  const checks=[...document.querySelectorAll('[data-confirm]')];
+  const values=new Map([...document.querySelectorAll('[data-value]')].map(el=>[el.dataset.value,parseGermanNumber(el.value.replace(/\./g,'').replace(',','.'))]));
+  let accepted=0;
+  for(const c of candidates){
+    const checked=document.querySelector('[data-confirm="'+c.id+'"]')?.checked;
+    const raw=values.get(c.id);
+    if(checked&&Number.isFinite(raw)){c.value=raw;c.confirmed=true;accepted++;}
+  }
+  $('confirmStatus').className='status '+(accepted?'ok':'warn');
+  $('confirmStatus').textContent=accepted+' Wert(e) lokal als geprüft markiert. Noch keine Übernahme oder Speicherung.';
+});
+const drop=$('drop');
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('drag');});
+drop.addEventListener('dragleave',()=>drop.classList.remove('drag'));
+drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('drag');if(e.dataTransfer?.files?.length)$('files').files=e.dataTransfer.files;});
+</script>
+</body>
+</html>
