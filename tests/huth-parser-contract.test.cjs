@@ -83,3 +83,13 @@ test('review value parser rejects empty or malformed values instead of convertin
   assert.match(prototype, /map\(el=>\[el\.dataset\.value,parseGermanNumber\(el\.value\)\]\)/);
   assert.doesNotMatch(prototype, /Number\(String\(el\.value\)\.trim\(\)\.replace/);
 });
+
+
+test('runs German OCR locally for images and scanned PDF pages', () => {
+  const prototype = fs.readFileSync(path.join(__dirname, '..', 'ai-report-import-prototype.html'), 'utf8');
+  assert.match(prototype, /tesseract\.esm\.min\.js/);
+  assert.match(prototype, /createWorker\('deu'/);
+  assert.match(prototype, /async function ocrImage\(file,worker\)/);
+  assert.match(prototype, /if\(!text\)\s*\{[\s\S]*?recognizeCanvas\(canvas,worker\)/);
+  assert.match(prototype, /await ocrImage\(file,worker\)/);
+});
