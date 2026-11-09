@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'analyse.html'
+      - 'index.html'
       - 'two-year-regression.test.ts'
       - 'ertragsoptimierer.test.ts'
       - '.github/workflows/browser-smoke.yml'
