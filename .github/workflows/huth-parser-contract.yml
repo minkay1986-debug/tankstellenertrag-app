@@ -1,0 +1,25 @@
+name: HUTH parser contract
+
+on:
+  push:
+    branches:
+      - feature/ai-report-import-2026-11-09
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  huth-parser-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout test branch
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Run synthetic HUTH parser tests
+        run: node --test tests/huth-parser-contract.test.cjs
