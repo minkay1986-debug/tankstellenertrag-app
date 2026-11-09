@@ -110,7 +110,9 @@ function classifyHuthReport(text){
   const normalized=String(text||'').toLocaleLowerCase('de-DE').normalize('NFKC').replace(/[\s\u00a0]+/g,' ');
   const compact=normalized.replace(/[^a-z0-9%]/g,'');
   const has=token=>compact.includes(token);
-  if(has('margeabschlag') && has('vknetto')) return 'margin_report';
+  // HUTH may split "Marge" and "Abschlag" across separate header cells.
+  // Match the three independent header terms; never inspect or map the FIFO column.
+  if(has('marge') && has('abschlag') && has('vknetto')) return 'margin_report';
   if(has('schwund') && has('anteil') && has('gesamt')) return 'shrinkage';
   if(has('gesamteknetto') && has('statistikvon')) return 'ek_netto';
   return 'unknown';
