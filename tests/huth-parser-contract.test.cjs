@@ -103,11 +103,13 @@ test('classifies EK, shrinkage and FIFO margin reports without cross-assigning c
   vm.createContext(context);
   vm.runInContext(numberFn + parserFns, context);
   const parse = context.parseHuthStatistics;
+  const classify = context.classifyHuthReport;
 
   const ek = parse([{file:'ek.pdf',page:1,text:'Statistik von August 2026\nGesamt EK-Netto (EUR)\nWarengruppe 0 71.506,62\nBackwaren 0 1.348,15'}]);
   assert.equal(ek.diagnostics[0].type, 'ek_netto');
   assert.equal(ek.candidates.find(x=>x.group==='Backwaren').value, 1348.15);
 
+  assert.equal(classify('Statistik von August 2026\\nSchwund Netto (Gesamt)\\nAnteil Schwund (Gesamt) von Verkauf (%)'), 'shrinkage');
   const shrink = parse([{file:'schwund.pdf',page:1,text:'Statistik von August 2026\nSchwund Netto (Gesamt)\nAnteil Schwund (Gesamt) von Verkauf (%)\nWarengruppe 0 775,03 0,00 83,06 115.754,32 858,09 0,74 %\nBackwaren 0 772,91 0,00 0,00 2.699,30 772,91 28,63 %'}]);
   assert.equal(shrink.diagnostics[0].type, 'shrinkage');
   const total = shrink.candidates.find(x=>x.group==='Warengruppe');
