@@ -100,10 +100,66 @@ const rules=[
   {key:'wash_revenue',label:'Waschumsatz',kind:'Umsatz',re:/\b(?:waschumsatz|umsatz\s+waschen|wäscheumsatz)\b[^\d-]{0,35}(-?\d[\d.]*,\d{2})/i},
   {key:'eloading_revenue',label:'E-Loading-Umsatz',kind:'Umsatz',re:/\b(?:e[- ]?loading|eloading)\b[^\d-]{0,35}(-?\d[\d.]*,\d{2})/i}
 ];
+function numericTokens(line){
+  return [...line.matchAll(/-?\\d{1,3}(?:\\.\\d{3})*(?:,\\d{1,2})?%?/g)].map(m=>m[0]);
+}
+function rowLabel(line){
+  return line.replace(/-?\\d{1,3}(?:\\.\\d{3})*(?:,\\d{1,2})?%?/g,' ').replace(/\\s+/g,' ').trim();
+}
+function classifyHuthReport(text){
+  const t=text.toLocaleLowerCase('de-DE').replace(/\\s+/g,' ');
+  if(t.includes('gesamt ek-netto') && t.includes('statistik von')) return 'ek_netto';
+  if(t.includes('schwund netto') && t.includes('anteil schwund')) return 'shrinkage';
+  if(t.includes('gesamt ek-netto(fifo)') || (t.includes('marge abschlag') && t.includes('vk-netto'))) return 'margin_fifo';
+  return 'unknown';
+}
+function parseHuthStatistics(pages){
+  const byFile=new Map();
+  for(const p of pages){if(!byFile.has(p.file))byFile.set(p.file,[]);byFile.get(p.file).push(p);}
+  const found=[],diagnostics=[];
+  for(const [file,filePages] of byFile){
+    const allText=filePages.map(p=>p.text).join('\\n');
+    const type=classifyHuthReport(allText);
+    if(type==='unknown') continue;
+    const expected=type==='ek_netto'?2:type==='shrinkage'?8:5;
+    let rows=0,invalid=0;
+    for(const page of filePages){
+      for(const line0 of page.text.split(/\\n+/)){
+        const line=line0.trim();if(!line)continue;
+        const nums=numericTokens(line);
+        if(nums.length!==expected)continue;
+        const label=rowLabel(line).replace(/^\\d+\\s*/,'').trim();
+        if(!label || /^(nummer|artikel|warengruppe)$/i.test(label))continue;
+        const values=nums.map(x=>parseGermanNumber(x.replace(/%$/,'')));
+        if(values.some(v=>v===null)){invalid++;continue;}
+        const base={id:crypto.randomUUID(),source:file+' · Seite '+page.page,raw:line,confirmed:false,group:label};
+        if(type==='ek_netto'){
+          found.push({...base,key:'ek_netto_group',label:'EK-Netto · '+label,kind:'EK-Netto',value:values[1]});
+        }else if(type==='shrinkage'){
+          // HUTH table order: Verderb, MHD, Bruch, VK-Netto, Schwund gesamt, Quote.
+          const [verderb,mhd,bruch,umsatz,gesamt,quote]=values.slice(1);
+          found.push({...base,key:'shrinkage_group',label:'Schwund gesamt · '+label,kind:'Schwund',value:gesamt,details:{verderb,mhd,bruch,umsatz,quote}});
+          if(label.toLocaleLowerCase('de-DE')==='warengruppe'){
+            const sum=verderb+mhd+bruch;
+            diagnostics.push({file,page:page.page,check:'Schwund-Aufteilung',expected:gesamt,actual:sum,ok:Math.abs(sum-gesamt)<0.011,raw:line});
+          }
+        }else{
+          // HUTH table order: Marge EUR, VK-Netto, Marge Abschlag %, EK-Netto FIFO.
+          const [marge,umsatz,quote,ekFifo]=values.slice(1);
+          found.push({...base,key:'margin_fifo_group',label:'EK-Netto FIFO · '+label,kind:'EK-Netto FIFO',value:ekFifo,details:{marge,umsatz,quote}});
+        }
+        rows++;
+      }
+    }
+    diagnostics.push({file,type,rows,invalid,ok:rows>0});
+  }
+  return {candidates:found,diagnostics};
+}
 function extractCandidates(pages){
+  // Keep generic extraction only for the explicitly supported monthly-summary labels.
   const found=[];
   for(const page of pages){
-    for(const line of page.text.split(/\n+/).map(x=>x.trim()).filter(Boolean)){
+    for(const line of page.text.split(/\\n+/).map(x=>x.trim()).filter(Boolean)){
       for(const rule of rules){
         const m=line.match(rule.re);if(!m)continue;
         const value=parseGermanNumber(m[1]);if(value===null)continue;
@@ -111,7 +167,8 @@ function extractCandidates(pages){
       }
     }
   }
-  return found;
+  const typed=parseHuthStatistics(pages);
+  return [...found,...typed.candidates];
 }
 function renderPages(){
   $('pages').innerHTML=extractedPages.map(p=>'<article class="page"><h3>'+escapeHtml(p.file)+' · Seite '+p.page+'</h3><span class="tag">'+(p.ocr?'OCR erkannt':p.text.trim()?'Text erkannt':'Kein Text erkannt')+'</span><pre>'+escapeHtml(p.text.slice(0,5000)||'Kein auslesbarer Text. Bei Scans wird später OCR benötigt.')+'</pre></article>').join('');
@@ -153,7 +210,9 @@ async function processFiles(){
       else throw new Error('Nicht unterstütztes Dateiformat: '+file.name);
     }
     candidates=extractCandidates(extractedPages);
+    const typed=parseHuthStatistics(extractedPages);
     renderPages();renderCandidates();
+    if(typed.diagnostics.length){$('status').textContent=typed.diagnostics.map(d=>d.check?d.check+': '+(d.ok?'Summen stimmen':'Abweichung erkannt')+' ('+d.file+')':d.file+': '+d.type+' · '+d.rows+' Tabellenzeilen · '+d.invalid+' ungültige Zeilen').join(' | ');}
     const noText=extractedPages.filter(p=>!p.text.trim()).length;
     $('status').className='status '+(noText?'warn':'ok');
     $('status').textContent=files.length+' Datei(en), '+extractedPages.length+' Seite(n) geprüft · '+candidates.length+' Kennzahlen-Kandidat(en) · '+noText+' Seite(n) ohne erkannten Text.';
