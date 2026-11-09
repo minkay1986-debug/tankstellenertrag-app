@@ -110,7 +110,7 @@ function classifyHuthReport(text){
   const t=text.toLocaleLowerCase('de-DE').replace(/\s+/g,' ');
   const compact=t.replace(/\s/g,'');
   if(compact.includes('gesamtek-netto(fifo)') || (compact.includes('margeabschlag') && compact.includes('vk-netto'))) return 'margin_fifo';
-  if(/schwund/i.test(text) && /anteil/i.test(text) && /gesamt/i.test(text)) return 'shrinkage';
+  if(t.includes('schwund') && t.includes('anteil') && t.includes('gesamt')) return 'shrinkage';
   if(compact.includes('gesamtek-netto') && compact.includes('statistikvon')) return 'ek_netto';
   return 'unknown';
 }
