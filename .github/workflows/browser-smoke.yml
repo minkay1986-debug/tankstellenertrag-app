@@ -17,7 +17,6 @@ on:
       - '.github/workflows/browser-smoke.yml'
       - 'two-year-regression.test.ts'
       - 'ertragsoptimierer.test.ts'
-      - '.github/workflows/browser-smoke.yml'
   workflow_dispatch:
 
 permissions:
@@ -67,8 +66,8 @@ jobs:
           parser.close()
           if not source.strip():
               raise SystemExit("index.html is empty")
-          visible_text = "\\n".join(parser.text_parts)
-          if "\\\\n" in visible_text:
+          visible_text = "\n".join(parser.text_parts)
+          if "\\n" in visible_text:
               raise SystemExit("Visible escaped newline sequence found in homepage text")
           for i, script in enumerate(parser.inline_scripts):
               Path(f"/tmp/homepage-inline-{i}.js").write_text(script, encoding="utf-8")
