@@ -46,6 +46,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 <section class="panel" aria-labelledby="reviewTitle">
 <h2 id="reviewTitle">Fundstelle manuell bewerten</h2>
 <p class="hint">Minimale Angaben genügen. Die Liste bleibt nur während dieser Browser-Sitzung im Arbeitsspeicher. Kein Upload, keine Datenbank.</p>
+<div class="notice"><strong>Transparente Prüfpriorität (0–100 Punkte):</strong> Suchabsicht max. 30, Tankstellen-/Reisebezug max. 25, manuell eingeschätzte Signalstärke max. 20, eigenständiger Thread max. 10 und Aktualität max. 15. Das ist eine Sortierhilfe – keine Nachfrage-, Absatz- oder Umsatzprognose.</div>
 <div class="grid">
 <div><label for="reviewProduct">Produktbegriff</label><input id="reviewProduct" maxlength="100" placeholder="z. B. Haferdrink"></div>
 <div><label for="reviewSource">Quelle</label><select id="reviewSource"><option>Reddit</option><option>gutefrage</option><option>Discourse-Forum</option><option>Stack Exchange</option><option>Sonstige öffentliche Quelle</option></select></div>
@@ -110,19 +111,34 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
  renderVerified();
 
  const reviewRows=[];
- const reviewFields=['Produktbegriff','Quelle','Original-URL','Funddatum','Signaltyp','Orts-/Anlassbezug','Signalstärke','Eigenständiger Thread','Begründung'];
+ const reviewFields=['Produktbegriff','Quelle','Original-URL','Funddatum','Signaltyp','Orts-/Anlassbezug','Signalstärke','Eigenständiger Thread','Prüfpriorität Punkte','Prioritätsklasse','Begründung'];
  const reviewIds=['reviewProduct','reviewSource','reviewUrl','reviewDate','reviewIntent','reviewLocation','reviewStrength','reviewDuplicate','reviewNote'];
  const reviewStatus=document.getElementById('reviewStatus'),exportButton=document.getElementById('exportReviews');
  function csvCell(value){return '"'+String(value??'').replace(/"/g,'""')+'"';}
+ function scoreFinding(values){
+  const intentPoints={'Konkrete Suche':30,'Vermisstes Produkt':25,'Sortimentsfrage':20,'Wunsch/Verbesserung':15,'Allgemeine Meinung':0}[values[4]]??0;
+  const locationPoints={'Direkt Tankstelle/Raststätte':25,'Indirekt unterwegs/Reise':12,'Kein erkennbarer Bezug':0}[values[5]]??0;
+  const strengthPoints={'Stark':20,'Mittel':12,'Schwach':5,'Nicht relevant':0}[values[6]]??0;
+  const threadPoints={'Ja':10,'Unklar':4,'Nein/Dublette':0}[values[7]]??0;
+  const ageDays=Math.floor((new Date().setHours(0,0,0,0)-new Date(values[3]+'T00:00:00').getTime())/86400000);
+  const freshnessPoints=ageDays<=90?15:ageDays<=365?10:ageDays<=730?5:2;
+  const total=intentPoints+locationPoints+strengthPoints+threadPoints+freshnessPoints;
+  const level=total>=75?'Hohe Prüfpriorität':total>=50?'Mittlere Prüfpriorität':total>=25?'Niedrige Prüfpriorität':'Nicht priorisieren';
+  return {total,level,ageDays,parts:{intentPoints,locationPoints,strengthPoints,threadPoints,freshnessPoints}};
+ }
  function renderReviewRows(){
   const holder=document.getElementById('reviewList');holder.replaceChildren();
-  reviewRows.forEach((row,index)=>{
+  reviewRows.forEach((entry,index)=>{
+   const row=entry.values,score=entry.score;
    const card=document.createElement('article');card.className='source';
+   const tag=document.createElement('span');tag.className='tag';tag.textContent=score.total+'/100 · '+score.level;
    const title=document.createElement('h3');title.textContent=(index+1)+'. '+row[0];
-   const info=document.createElement('p');info.textContent=row[1]+' · '+row[4]+' · '+row[6]+' · '+row[3];
+   const info=document.createElement('p');info.textContent=row[1]+' · '+row[4]+' · '+row[5]+' · '+row[3];
+   const breakdown=document.createElement('p');breakdown.className='hint';breakdown.textContent='Absicht '+score.parts.intentPoints+'/30 · Bezug '+score.parts.locationPoints+'/25 · Signal '+score.parts.strengthPoints+'/20 · Thread '+score.parts.threadPoints+'/10 · Aktualität '+score.parts.freshnessPoints+'/15';
+   const caution=document.createElement('p');caution.className='hint';caution.textContent='Nur Prüfpriorität. Kein Beleg für tatsächliche Kaufbereitschaft.';
    const link=document.createElement('a');link.href=row[2];link.target='_blank';link.rel='noopener noreferrer';link.textContent='Originalquelle öffnen ↗';
    const remove=document.createElement('button');remove.type='button';remove.style.marginTop='12px';remove.style.background='#244665';remove.textContent='Entfernen';remove.addEventListener('click',()=>{reviewRows.splice(index,1);renderReviewRows();});
-   card.append(title,info,link,remove);holder.append(card);
+   card.append(tag,title,info,breakdown,caution,link,remove);holder.append(card);
   });
   exportButton.disabled=reviewRows.length===0;exportButton.textContent='CSV exportieren ('+reviewRows.length+')';
   reviewStatus.textContent=reviewRows.length+' Fundstelle(n) in dieser Sitzung erfasst.';
@@ -132,17 +148,21 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
   if(!values[0]||!values[2]||!values[3]){reviewStatus.textContent='Bitte Produktbegriff, Original-URL und Funddatum ausfüllen.';return;}
   let parsed;try{parsed=new URL(values[2]);}catch(_){reviewStatus.textContent='Bitte eine gültige Original-URL eingeben.';return;}
   if(!['http:','https:'].includes(parsed.protocol)){reviewStatus.textContent='Nur http- oder https-Links sind zulässig.';return;}
-  if(reviewRows.some(row=>row[2].replace(/\/$/,'')===parsed.href.replace(/\/$/,''))){reviewStatus.textContent='Diese URL ist bereits erfasst.';return;}
-  reviewRows.push(values);renderReviewRows();
+  const foundDate=new Date(values[3]+'T00:00:00'),today=new Date();today.setHours(0,0,0,0);
+  if(Number.isNaN(foundDate.getTime())||foundDate>today){reviewStatus.textContent='Das Funddatum darf nicht in der Zukunft liegen.';return;}
+  const normalizedUrl=parsed.href.replace(/\/$/,'');
+  if(reviewRows.some(entry=>entry.values[2].replace(/\/$/,'')===normalizedUrl)){reviewStatus.textContent='Diese URL ist bereits erfasst.';return;}
+  values[2]=parsed.href;
+  reviewRows.push({values,score:scoreFinding(values)});renderReviewRows();
   ['reviewProduct','reviewUrl','reviewNote'].forEach(id=>document.getElementById(id).value='');
  });
  exportButton.addEventListener('click',function(){
   if(!reviewRows.length)return;
-  const csv='\uFEFF'+[reviewFields,...reviewRows].map(row=>row.map(csvCell).join(';')).join('\r\n');
+  const rows=reviewRows.map(entry=>{const v=entry.values,s=entry.score;return [...v.slice(0,8),s.total,s.level,v[8]];});
+  const csv='\uFEFF'+[reviewFields,...rows].map(row=>row.map(csvCell).join(';')).join('\r\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');
   a.href=url;a.download='sortimentsradar-fundstellen.csv';document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url);
  });
-
  document.getElementById('searchBtn').addEventListener('click',function(){
   const q=term.value.trim();
   if(!q){status.textContent='Bitte zuerst ein Produkt oder Thema eingeben.';term.focus();return;}
