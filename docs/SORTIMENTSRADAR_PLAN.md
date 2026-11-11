@@ -17,12 +17,13 @@
 `sortimentsradar-test.html` ist eine isolierte Rechercheoberfläche. Sie erzeugt gezielte Google-Suchlinks für Reddit, gutefrage und tankstellenbezogene Foren. Es findet kein automatischer Abruf statt, es wird nichts gespeichert und es gibt keine Verbindung zu Supabase oder zur Live-App.
 
 ## Phasen
-1. **Quellenvalidierung:** Welche Foren erlauben Suche und Verlinkung? Welche APIs/RSS-Feeds existieren tatsächlich und sind nutzbar?
+1. **Quellenvalidierung (abgeschlossen als Vorprüfung):** Reddit verlangt Freigabe; für gutefrage wurde keine offizielle öffentliche Recherche-API bestätigt. Brave Search ist technischer Kandidat, aber Speicherrechte müssen vor Nutzung geklärt werden. Details: `docs/SORTIMENTSRADAR_API_FREIGABE.md`.
 2. **Such- und Trefferqualität:** Suchbegriffe nach Produktwunsch, konkreter Suche und vermisstem Artikel testen; irrelevante Treffer und Dubletten dokumentieren.
-3. **Zulässige Automatisierung:** Erst nach Quellenprüfung offizielle APIs/RSS/zulässige Suchschnittstellen anbinden. Keine pauschale Foren-Scraping-Lösung.
-4. **Regelbasierte Normalisierung:** Produktbegriffe und Warengruppen zuordnen, Wiederholungen vorsichtig zählen und Original-URLs behalten.
-5. **Standortbezug:** Relevanz erst anhand expliziter Betreiber-/Standortdaten beurteilen; allgemeine Online-Diskussionen nicht als lokale Nachfrage ausgeben.
-6. **Spätere KI-Option:** Separater Adapter/Interface, aber keine Implementierung oder Kosten vor wirtschaftlichem Nutzen.
+3. **API-Freigabe:** Anbieter-Konto, Schlüssel, ausdrückliche Speicherrechte für minimale Metadaten und Kostenlimit klären. Bis dahin keine automatische Speicherung.
+4. **Zulässige Automatisierung:** Serverseitigen Adapter für freigegebene APIs anbinden; niemals Schlüssel im Browser, keine pauschale Foren-Scraping-Lösung.
+5. **Regelbasierte Normalisierung:** Produktbegriffe und Warengruppen zuordnen, Wiederholungen vorsichtig zählen und Original-URLs behalten.
+6. **Standortbezug:** Relevanz erst anhand expliziter Betreiber-/Standortdaten beurteilen; allgemeine Online-Diskussionen nicht als lokale Nachfrage ausgeben.
+7. **Spätere KI-Option:** Separater Adapter/Interface, aber keine Implementierung oder Kosten vor wirtschaftlichem Nutzen.
 
 ## Datenmodell – nur Entwurf, noch keine Migration
 - `id`
