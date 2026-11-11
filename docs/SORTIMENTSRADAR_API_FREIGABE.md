@@ -64,3 +64,26 @@ Offizielle Information:
 ## Sicherheitsgrenze
 
 Bis alle Freigabekriterien erfüllt sind, bleibt der bestehende Prototyp unverändert: Suchlinks und manuell geprüfte Fundstellen, kein automatischer Abruf, keine Datenbankänderung, keine Live-App-Änderung.
+
+
+## Ergänzende Prüfung: alternative offizielle APIs (11.11.2026)
+
+### Brave Search API – Speicherung im Standardtarif nicht zulässig
+- Die aktuellen API-Nutzungsbedingungen untersagen das Speichern, Cachen oder den Aufbau einer Datenbank aus Suchergebnissen, auch auszugsweise, abgesehen von vorübergehender technischer Speicherung für den Betrieb.
+- Brave nennt ausdrücklich Tarife mit gesonderten Speicherrechten. Die allgemeine Preisseite nennt aktuell 4 USD je 1.000 Anfragen und 5 USD monatliches Guthaben; daraus folgt ausdrücklich kein Speicherrecht.
+- Entscheidung: nicht für eine dauerhaft gespeicherte Fundstellen-Datenbank verwenden, solange kein passender Tarif und keine ausreichenden Rechte schriftlich bestätigt sind.
+- Quellen: https://api-dashboard.search.brave.com/documentation/resources/terms-of-service und https://brave.com/search/api/
+
+### Stack Exchange API – technisch offen, fachlich nur Nischenquelle
+- Offizielle API mit Suchendpunkten für Fragen; die Suche ist auf Stack-Exchange-Netzwerkseiten begrenzt und nicht als allgemeine Websuche gedacht.
+- Die API hat Quoten/Drosselungen; Inhalte und Nutzungsrechte müssen je nach zurückgegebenen Daten und Lizenzvorgaben behandelt werden.
+- Entscheidung: derzeit keine Integration. Allenfalls später ein begrenzter Test auf einer tatsächlich relevanten Netzwerkseite; keine belastbare Hauptquelle für Tankstellen-Sortimentswünsche.
+- Quellen: https://api.stackexchange.com/docs und https://api.stackexchange.com/docs/search
+
+### Discourse – nur bei konkret identifizierter Community
+- Discourse dokumentiert eine offizielle API einschließlich Suche. Sie ist aber jeweils an eine konkrete Discourse-Instanz gebunden; das ist keine zentrale Suche über beliebige Foren.
+- Entscheidung: möglicher Adapter, wenn eine relevante Tankstellen-, Kiosk- oder Reise-Community identifiziert ist und deren Betreiberbedingungen/API-Zugang die Nutzung erlauben.
+- Quelle: https://docs.discourse.org/
+
+## Aktualisierte Entscheidung
+Es gibt aktuell keine geprüfte, kostengünstige, universelle API, die gleichzeitig relevante öffentliche Diskussionen zuverlässig findet und die dauerhafte Speicherung unserer Fundstellen-Metadaten eindeutig erlaubt. Daher bleibt der Prototyp manuell. Als nächstes wird die Trefferqualität mit einem nachvollziehbar bewerteten Beispieldatensatz geprüft; eine API wird erst nach Rechte- und Kostenfreigabe angebunden.
