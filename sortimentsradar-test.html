@@ -33,6 +33,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 <div id="results" class="results" hidden></div>
 <div class="notice"><strong>Wichtig:</strong> Treffer sind zunächst nur Hinweise. Ein Forenbeitrag belegt weder lokale Nachfrage noch Kaufbereitschaft. Wir speichern in dieser Testversion keine Beiträge und keine personenbezogenen Daten.</div>
 </section>
+<section class="panel" aria-labelledby="findingsTitle">
+<h2 id="findingsTitle">Geprüfte Fundstellen <span class="tag">Pilot · 3 Quellen</span></h2>
+<p class="hint">Reale öffentliche Diskussionen, manuell bewertet. Keine Nachfrage-Hochrechnung, keine gespeicherten Beiträge. Nur Artikelthema, Einordnung und Original-Link.</p>
+<div class="grid">
+<div><label for="filterSignal">Signaltyp</label><select id="filterSignal"><option value="all">Alle Signale</option><option value="availability">Konkrete Verfügbarkeitsfrage</option><option value="gap">Wahrgenommene Sortimentslücke</option><option value="travel">Unterwegs-Bedarf</option></select></div>
+<div><label for="filterRelevance">Tankstellenbezug</label><select id="filterRelevance"><option value="all">Alle</option><option value="direct">Direkt</option><option value="indirect">Indirekt</option></select></div>
+</div>
+<div id="verifiedFindings" class="results" aria-live="polite"></div>
+<p class="hint" id="findingsCount" aria-live="polite"></p>
+</section>
 <section class="panel">
 <h2>Geplanter nächster Ausbauschritt</h2>
 <div class="results">
@@ -56,6 +66,30 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
   const query='site:'+source.domain+' '+q+' '+phrases[intent.value];
   return 'https://www.google.com/search?q='+encodeURIComponent(query);
  }
+ const verified=[
+  {topic:'Hafer- und Sojamilch',source:'gutefrage',date:'18.04.2025',signal:'availability',relevance:'direct',reason:'Frage nach Verfügbarkeit an Tankstellen an einem Feiertag; kein belegter Kaufabschluss.',url:'https://www.gutefrage.net/frage/kann-man-an-der-tankstelle-pflanzenmilch-kaufen'},
+  {topic:'Vegane Snack- und Essensauswahl',source:'Reddit · r/VeganDE',date:'13.07.2026',signal:'gap',relevance:'direct',reason:'Diskussion benennt eingeschränkte vegane Auswahl an Tankstellen und Kiosken; keine konkrete Artikelbestellung.',url:'https://www.reddit.com/r/VeganDE/comments/1uvm0ka/ist_die_verf%C3%BCgbarkeit_im_alltag_das_was_die/'},
+  {topic:'Vegane Verpflegung auf Autobahnfahrten',source:'Reddit · r/VeganDE',date:'04.10.2022',signal:'travel',relevance:'indirect',reason:'Reisebedarf und Raststätten werden diskutiert; ältere, allgemeine Diskussion ohne spezifischen Tankstellenkauf.',url:'https://www.reddit.com/r/VeganDE/comments/xvqkmi'}
+ ];
+ const labels={availability:'Verfügbarkeit',gap:'Sortimentslücke',travel:'Unterwegs-Bedarf'};
+ function renderVerified(){
+  const type=document.getElementById('filterSignal').value, relevance=document.getElementById('filterRelevance').value;
+  const list=verified.filter(x=>(type==='all'||x.signal===type)&&(relevance==='all'||x.relevance===relevance));
+  const holder=document.getElementById('verifiedFindings');holder.replaceChildren();
+  list.forEach(x=>{
+   const card=document.createElement('article');card.className='source';
+   const tag=document.createElement('span');tag.className='tag';tag.textContent=labels[x.signal];
+   const heading=document.createElement('h3');heading.textContent=x.topic;
+   const info=document.createElement('p');info.textContent=x.source+' · '+x.date+' · Tankstellenbezug: '+(x.relevance==='direct'?'direkt':'indirekt');
+   const reason=document.createElement('p');reason.textContent=x.reason;
+   const link=document.createElement('a');link.href=x.url;link.target='_blank';link.rel='noopener noreferrer';link.textContent='Originaldiskussion öffnen ↗';
+   card.append(tag,heading,info,reason,link);holder.append(card);
+  });
+  document.getElementById('findingsCount').textContent=list.length+' von '+verified.length+' geprüften Fundstellen angezeigt.';
+ }
+ document.getElementById('filterSignal').addEventListener('change',renderVerified);
+ document.getElementById('filterRelevance').addEventListener('change',renderVerified);
+ renderVerified();
  document.getElementById('searchBtn').addEventListener('click',function(){
   const q=term.value.trim();
   if(!q){status.textContent='Bitte zuerst ein Produkt oder Thema eingeben.';term.focus();return;}
