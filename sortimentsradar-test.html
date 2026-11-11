@@ -43,6 +43,24 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 <div id="verifiedFindings" class="results" aria-live="polite"></div>
 <p class="hint" id="findingsCount" aria-live="polite"></p>
 </section>
+<section class="panel" aria-labelledby="reviewTitle">
+<h2 id="reviewTitle">Fundstelle manuell bewerten</h2>
+<p class="hint">Minimale Angaben genügen. Die Liste bleibt nur während dieser Browser-Sitzung im Arbeitsspeicher. Kein Upload, keine Datenbank.</p>
+<div class="grid">
+<div><label for="reviewProduct">Produktbegriff</label><input id="reviewProduct" maxlength="100" placeholder="z. B. Haferdrink"></div>
+<div><label for="reviewSource">Quelle</label><select id="reviewSource"><option>Reddit</option><option>gutefrage</option><option>Discourse-Forum</option><option>Stack Exchange</option><option>Sonstige öffentliche Quelle</option></select></div>
+<div><label for="reviewUrl">Original-URL</label><input id="reviewUrl" type="url" maxlength="500" placeholder="https://…"></div>
+<div><label for="reviewDate">Funddatum</label><input id="reviewDate" type="date"></div>
+<div><label for="reviewIntent">Signaltyp</label><select id="reviewIntent"><option>Konkrete Suche</option><option>Vermisstes Produkt</option><option>Sortimentsfrage</option><option>Wunsch/Verbesserung</option><option>Allgemeine Meinung</option></select></div>
+<div><label for="reviewLocation">Orts-/Anlassbezug</label><select id="reviewLocation"><option>Direkt Tankstelle/Raststätte</option><option>Indirekt unterwegs/Reise</option><option>Kein erkennbarer Bezug</option></select></div>
+<div><label for="reviewStrength">Signalstärke</label><select id="reviewStrength"><option>Stark</option><option>Mittel</option><option>Schwach</option><option>Nicht relevant</option></select></div>
+<div><label for="reviewDuplicate">Eigenständiger Thread?</label><select id="reviewDuplicate"><option>Ja</option><option>Nein/Dublette</option><option>Unklar</option></select></div>
+</div>
+<div style="margin-top:14px"><label for="reviewNote">Kurze sachliche Begründung (keine Beitragstexte kopieren)</label><input id="reviewNote" maxlength="180" placeholder="z. B. konkrete Verfügbarkeitsfrage mit Tankstellenbezug"></div>
+<div class="actions"><button id="addReview" type="button">Zur Sitzungsliste hinzufügen</button><button id="exportReviews" type="button" style="background:#244665" disabled>CSV exportieren (0)</button></div>
+<p id="reviewStatus" class="hint" aria-live="polite">Noch keine Fundstellen erfasst.</p><div id="reviewList" class="results"></div>
+<div class="notice"><strong>Datenschutz:</strong> Keine Namen, Profile, Kommentare oder Beitragstexte erfassen. Beim Neuladen wird die Sitzungsliste verworfen. CSV-Export nur auf ausdrücklichen Klick.</div>
+</section>
 <section class="panel">
 <h2>Geplanter nächster Ausbauschritt</h2>
 <div class="results">
@@ -90,6 +108,41 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
  document.getElementById('filterSignal').addEventListener('change',renderVerified);
  document.getElementById('filterRelevance').addEventListener('change',renderVerified);
  renderVerified();
+
+ const reviewRows=[];
+ const reviewFields=['Produktbegriff','Quelle','Original-URL','Funddatum','Signaltyp','Orts-/Anlassbezug','Signalstärke','Eigenständiger Thread','Begründung'];
+ const reviewIds=['reviewProduct','reviewSource','reviewUrl','reviewDate','reviewIntent','reviewLocation','reviewStrength','reviewDuplicate','reviewNote'];
+ const reviewStatus=document.getElementById('reviewStatus'),exportButton=document.getElementById('exportReviews');
+ function csvCell(value){return '"'+String(value??'').replace(/"/g,'""')+'"';}
+ function renderReviewRows(){
+  const holder=document.getElementById('reviewList');holder.replaceChildren();
+  reviewRows.forEach((row,index)=>{
+   const card=document.createElement('article');card.className='source';
+   const title=document.createElement('h3');title.textContent=(index+1)+'. '+row[0];
+   const info=document.createElement('p');info.textContent=row[1]+' · '+row[4]+' · '+row[6]+' · '+row[3];
+   const link=document.createElement('a');link.href=row[2];link.target='_blank';link.rel='noopener noreferrer';link.textContent='Originalquelle öffnen ↗';
+   const remove=document.createElement('button');remove.type='button';remove.style.marginTop='12px';remove.style.background='#244665';remove.textContent='Entfernen';remove.addEventListener('click',()=>{reviewRows.splice(index,1);renderReviewRows();});
+   card.append(title,info,link,remove);holder.append(card);
+  });
+  exportButton.disabled=reviewRows.length===0;exportButton.textContent='CSV exportieren ('+reviewRows.length+')';
+  reviewStatus.textContent=reviewRows.length+' Fundstelle(n) in dieser Sitzung erfasst.';
+ }
+ document.getElementById('addReview').addEventListener('click',function(){
+  const values=reviewIds.map(id=>document.getElementById(id).value.trim());
+  if(!values[0]||!values[2]||!values[3]){reviewStatus.textContent='Bitte Produktbegriff, Original-URL und Funddatum ausfüllen.';return;}
+  let parsed;try{parsed=new URL(values[2]);}catch(_){reviewStatus.textContent='Bitte eine gültige Original-URL eingeben.';return;}
+  if(!['http:','https:'].includes(parsed.protocol)){reviewStatus.textContent='Nur http- oder https-Links sind zulässig.';return;}
+  if(reviewRows.some(row=>row[2].replace(/\/$/,'')===parsed.href.replace(/\/$/,''))){reviewStatus.textContent='Diese URL ist bereits erfasst.';return;}
+  reviewRows.push(values);renderReviewRows();
+  ['reviewProduct','reviewUrl','reviewNote'].forEach(id=>document.getElementById(id).value='');
+ });
+ exportButton.addEventListener('click',function(){
+  if(!reviewRows.length)return;
+  const csv='\uFEFF'+[reviewFields,...reviewRows].map(row=>row.map(csvCell).join(';')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='sortimentsradar-fundstellen.csv';document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url);
+ });
+
  document.getElementById('searchBtn').addEventListener('click',function(){
   const q=term.value.trim();
   if(!q){status.textContent='Bitte zuerst ein Produkt oder Thema eingeben.';term.focus();return;}
