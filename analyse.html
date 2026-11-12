@@ -589,8 +589,8 @@ function calc(k){
  const stockTotal=enteredStockGroups.reduce((sum,g)=>sum+g.stock,0);
  const allStockGroupsEntered=gs.filter(g=>g.id!=='waschen').every(g=>g.stockEntered);
  const hasStockTotal=x.sourceInventory===true||x.inventoryClosingEntered===true;
- const stock=allStockGroupsEntered?stockTotal:(hasStockTotal?Number(x.stock):stockTotal);
- const sourceInventory=allStockGroupsEntered||hasStockTotal;
+ const stock=x.sourceInventory===false?0:(allStockGroupsEntered?stockTotal:(hasStockTotal?Number(x.stock):stockTotal));
+ const sourceInventory=x.sourceInventory===false?false:(allStockGroupsEntered||hasStockTotal);
  return {key:k,revenue:shop,ek,gross,margin:shop?gross/shop*100:0,shrink,writeoff,stock,groups:gs,fuel:Number(x.fuel)||0,wash:Number(x.wash)||0,other:Number(x.other)||0,costs:Number(x.costs)||0,sourceMonthly,sourceEK,sourceShrink,sourceWriteoff,sourceInventory,revenuePartial,ekPartial,shrinkPartial,writeoffPartial,shrinkReportTotal:Number(x.shrinkReportTotal)||0};
 }
 function inventoryPeriodDays(key){const m=String(key||'').match(/^(\d{4})-(\d{2})$/);return m?new Date(Number(m[1]),Number(m[2]),0).getDate():30}
