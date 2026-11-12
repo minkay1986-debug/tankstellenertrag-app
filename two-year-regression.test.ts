@@ -38,7 +38,7 @@ Deno.test("modeled potential overlaps gross-profit levers but keeps confirmed sh
   const rt=runtime(appFixture());
   const row={g:{id:"backshop",revenue:1000,actualMargin:50,margin:55,shrink:20,writeoff:10},
     reasons:["Ist-Marge unter Ihrem Zielwert","Ist-Marge liegt 3 %-Pkt. unter dem Vormonat","Umsatz rückläufig","Schwund auffällig","Abschriften auffällig"],
-    targetMarginGap:2,marginDrop:3,prevRevenue:1100,
+    targetMarginGap:2,marginDrop:3,prevRevenue:1100,salesDropSignal:true,
     dataStatus:{groupEkAvailable:true,monthlySourceAvailable:true,previousMonthAvailable:true,shrinkSourceAvailable:true,writeoffSourceAvailable:true}};
   const parts:any[]=rt.measurePotential(row);
   const gross=parts.filter((p:any)=>p.kind==="zusätzlicher Rohertrag").reduce((sum:number,p:any)=>sum+p.amount,0);
