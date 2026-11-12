@@ -1255,6 +1255,6 @@ Deno.test("critical data-quality findings are visible in overview and analysis t
   const rt=runtime(data),panel=rt.dataQualityPanel("2026-10");
   assert(panel.includes("Datenqualität")&&panel.includes("Getränke-EK ist gespeichert"),"Shared data-quality panel must surface the critical stored-but-unconfirmed EK");
   assert(html.includes("dataQualityPanel(k)+riskStatusPanel(k)"),"Dashboard must show the shared data-quality and risk summaries");
-  assert(html.includes("let html=dataQualityPanel(k)+riskStatusPanel(k)"),"Analysis must show the same shared data-quality and risk summaries");
+  assert(html.includes("let html=dataQualityPanel(k)+riskStatusPanel(k,true)"),"Analysis must show the shared data-quality and risk summaries with analysis-specific detail wording");
   assert(html.includes("'+dataQualityPanel(month())+riskStatusPanel(month())+'"),"Report must show the same shared data-quality and risk summaries");
 });
