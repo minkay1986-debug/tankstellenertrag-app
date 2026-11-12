@@ -767,10 +767,10 @@ function renderMeinMonat(){
  const k=month(),d=calc(k),p=prev(k)?calc(prev(k)):null,dq=dataQuality(k),rows=wowPriority(k),has=hasData(k);
  function fmtPts(v){return Math.abs(v).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %-Pkt.';}
  const change=(a,b)=>b&&a!==null?((a/b)-1)*100:null;
- const revChange=p&&p.revenue>0?change(d.revenue,p.revenue):null;
- const marginChange=p&&d.sourceEK===true&&p.sourceEK===true&&d.revenue>0&&p.revenue>0?d.margin-p.margin:null;
- const grossChange=p&&d.sourceEK===true&&p.sourceEK===true&&p.gross!==0?change(d.gross,p.gross):null;
- const shrinkRate=d.sourceShrink===true&&d.revenue>0?d.shrink/d.revenue*100:null,prevShrinkRate=p&&p.sourceShrink===true&&p.revenue>0?p.shrink/p.revenue*100:null,shrinkDeltaRaw=shrinkRate!==null&&prevShrinkRate!==null?shrinkRate-prevShrinkRate:null,shrinkDelta=shrinkDeltaRaw===null?null:Math.round(shrinkDeltaRaw*10)/10;
+ const revChange=p&&d.sourceMonthly===true&&p.sourceMonthly===true&&p.revenue>0?change(d.revenue,p.revenue):null;
+ const marginChange=p&&d.sourceMonthly===true&&p.sourceMonthly===true&&d.sourceEK===true&&p.sourceEK===true&&d.revenue>0&&p.revenue>0?d.margin-p.margin:null;
+ const grossChange=p&&d.sourceMonthly===true&&p.sourceMonthly===true&&d.sourceEK===true&&p.sourceEK===true&&p.gross!==0?change(d.gross,p.gross):null;
+ const shrinkRate=d.sourceMonthly===true&&d.sourceShrink===true&&d.revenue>0?d.shrink/d.revenue*100:null,prevShrinkRate=p&&p.sourceMonthly===true&&p.sourceShrink===true&&p.revenue>0?p.shrink/p.revenue*100:null,shrinkDeltaRaw=shrinkRate!==null&&prevShrinkRate!==null?shrinkRate-prevShrinkRate:null,shrinkDelta=shrinkDeltaRaw===null?null:Math.round(shrinkDeltaRaw*10)/10;
  const focus=rows.length?rows.slice(0,3).map((r,i)=>wowCard(r,i)).join(''):'<div class="alert ok"><strong>Kein besonderes Prüffeld</strong><br>Aktuell zeigen die vorhandenen Daten keinen klaren Schwerpunkt. Die normale Bestands- und Margensteuerung kann beibehalten werden.</div>';
  const qualityTone=dq.status==='critical'?'danger':dq.status==='check'?'warn':'ok';
  const qualityTitle=dq.status==='critical'?'🔴 Datenqualität kritisch · Prüfung erforderlich':dq.status==='check'?'🟡 Datenqualität · Abgleich offen':'🟢 Datenqualität · keine Auffälligkeit erkannt';
