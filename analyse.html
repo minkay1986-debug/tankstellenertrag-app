@@ -803,7 +803,7 @@ function riskSummary(k){
  const rows=wowPriority(k).filter(r=>r.reasons.length),items=rows.map(row=>({row,risk:riskForRow(row)}));
  const dimensions=[
   ['profitability','Ertragsqualität'],['loss','Verlustkontrolle'],['inventory','Bestandskontrolle'],['sales','Umsatzentwicklung'],['data','Datenqualität']
- ].map(([key,label])=>({key,label,items:items.filter(x=>x.risk.dimensions[key].key!=='normal').map(x=>({name:x.row.g.name,level:x.risk.dimensions[key]}))})).filter(x=>x.items.length);
+ ].map(([key,label])=>({key,label,items:items.filter(x=>x.risk.dimensions[key].key!=='normal').map(x=>({name:x.row.g.name,level:x.risk.dimensions[key],row:x.row,risk:x.risk}))})).filter(x=>x.items.length);
  return {rows,items,dimensions,affected:items.length};
 }
 function riskStatusPanel(k){
