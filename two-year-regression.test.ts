@@ -47,6 +47,17 @@ Deno.test("modeled potential overlaps gross-profit levers but keeps confirmed sh
   assert(Math.abs(savings-3)<0.001,"Confirmed shrink and write-offs must remain separate 10% savings levers");
   assert(parts.length===3,"Expected one overlap-adjusted gross-profit lever plus two separate loss-reduction levers");
 });
+Deno.test("seasonally suppressed sales decline cannot create modeled sales potential",()=>{
+  const rt=runtime(appFixture());
+  const row={g:{id:"backshop",revenue:1000,actualMargin:50,margin:55,shrink:0,writeoff:0},
+    reasons:["Umsatz rückläufig"],targetMarginGap:0,marginDrop:0,prevRevenue:1100,
+    dataStatus:{groupEkAvailable:true,monthlySourceAvailable:true,previousMonthAvailable:true,shrinkSourceAvailable:false,writeoffSourceAvailable:false}};
+  row.salesDropSignal=false;
+  assert(rt.measurePotential(row).length===0,"Seasonally explained revenue decline must not create a sales scenario");
+  row.salesDropSignal=true;
+  const parts=rt.measurePotential(row);
+  assert(parts.length===1&&Math.abs(parts[0].amount-12.5)<0.001,"A confirmed non-seasonal sales signal must retain its modeled potential");
+});
 Deno.test("all 24 monthly report calculations preserve revenue and margin",()=>{for(const m of months){const prior=months.find(x=>x.key===`${m.year-1}-${String(m.month).padStart(2,"0")}`);const prev=months.find(x=>x.key===`${m.year}-${String(m.month-1).padStart(2,"0")}`)||months.find(x=>x.key===`${m.year-1}-12`);const r=optimizer.evaluateGroup({name:"Shop",actualRevenue:m.revenue,previousRevenue:prev?.revenue??null,priorYearRevenue:prior?.revenue??null,marginPct:m.marginPct,previousMarginPct:prev?.marginPct??null,shrinkPct:m.shrinkPct,dataComplete:true});assert(r.actualRevenue===m.revenue,`${m.key}: revenue mismatch`);assert(r.marginPct===m.marginPct,`${m.key}: margin mismatch`);if(prior)assert(Number.isFinite(r.expectedRevenue),`${m.key}: expected revenue missing`);}});
 Deno.test("annual aggregation and year-on-year growth reconcile",()=>{const y25=months.filter(x=>x.year===2025).reduce((s,x)=>s+x.revenue,0),y26=months.filter(x=>x.year===2026).reduce((s,x)=>s+x.revenue,0);assert(y26>y25,"2026 should exceed 2025");assert(Math.abs((y26/y25-1)*100-4)<.02,"Expected approximately +4% YoY");assert(months.filter(x=>x.year===2025).length===12&&months.filter(x=>x.year===2026).length===12,"Each year must contain 12 months");});
 Deno.test("known shrink incident is retained without claiming a cause",()=>{const m=months.find(x=>x.key==="2026-10")!;const r=optimizer.evaluateGroup({name:"Shop",actualRevenue:m.revenue,previousRevenue:months.find(x=>x.key==="2026-09")!.revenue,priorYearRevenue:months.find(x=>x.key==="2025-10")!.revenue,marginPct:m.marginPct,previousMarginPct:48,shrinkPct:m.shrinkPct,dataComplete:true});assert(r.shrinkPct===3.2,"October shrink spike lost");assert(!r.alerts.some((a:any)=>/Diebstahl|Ursache bewiesen/i.test(a.title+" "+a.detail)),"Unproven cause was asserted");});
