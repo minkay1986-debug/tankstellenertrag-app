@@ -1167,3 +1167,13 @@ Deno.test("inventory review never claims overstock from coverage or stock-to-sal
   const explanation=rt.wowCard(row,0);
   assert(explanation.includes("kein Warenumschlag")&&explanation.includes("kein Verlustnachweis"),"The visible risk explanation must explain the ratio's limits");
 });
+
+
+Deno.test("advisory loop uses confirmed category-level checks and never infers overstock from a fixed ratio",()=>{
+  const start=html.indexOf("function loop(top){"),end=html.indexOf("\nfunction",start+20);
+  assert(start>=0&&end>start,"Could not locate advisory loop");
+  const loop=html.slice(start,end);
+  assert(loop.includes("Stichprobeninventur")&&loop.includes("Lieferschein")&&loop.includes("Retouren")&&loop.includes("Buchungsfehler"),"Loop must provide concrete inventory and posting checks");
+  assert(!loop.includes("top.g.stock/top.g.revenue")&&!loop.includes("Artikelbewegungen")&&!loop.includes("Einzelartikel"),"Loop must not infer overstock from a fixed ratio or require article-level data");
+  assert(loop.includes("Schwund, Abschriften, Inventurkorrekturen")&&loop.includes("nicht als Ursache voraussetzen"),"Loss types and hypotheses must remain separate");
+});
