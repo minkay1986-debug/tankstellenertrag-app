@@ -94,6 +94,7 @@ function runtime(data:any) {
   const prev = (k:string) => {const [y,mo]=k.split("-").map(Number);const d=new Date(y,mo-2,1);const p=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;return Object.hasOwn(data.months,p)?p:null;};
   const calc = appFunction("calc","reconciliation",["GROUPS","data","settings","mrow"],{GROUPS,data,settings,mrow});
   const inventoryMetrics = appFunction("inventoryMetrics","reconciliation",["g","days"],{});
+  const latestConfirmedStock = appFunction("latestConfirmedStock","inventoryMetrics",["data"],{data});
 
   const learnCalendarEffects = appFunction("learnCalendarEffects","forecastSeason",["months","calFn","calcFn","station"],{station:{city:"Testort"}});
   const wowPriority = appFunction("wowPriority","riskLevel",["calc","prev","settings","data","inventoryMetrics"],{calc,prev,settings,data,inventoryMetrics});
@@ -125,7 +126,7 @@ function runtime(data:any) {
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
     TEStudyContext:{htmlForReport:async()=>""},reportPriorityGuidance,dataQualityPanel,riskStatusPanel
   });
-  return {data,calc,wowPriority,yearly,report,practiceGuidance,causeDiagnosis,potentialHtml,reportPriorityGuidance,wowCard,riskForRow,riskSummary,riskStatusPanel,trendCoverage,measurePotential,scenarioResult,inventoryMetrics,dataQuality,dataQualityPanel,learnCalendarEffects,target,prev};
+  return {data,calc,wowPriority,yearly,report,practiceGuidance,causeDiagnosis,potentialHtml,reportPriorityGuidance,wowCard,riskForRow,riskSummary,riskStatusPanel,trendCoverage,measurePotential,scenarioResult,inventoryMetrics,latestConfirmedStock,dataQuality,dataQualityPanel,learnCalendarEffects,target,prev};
 }
 Deno.test("real app calc, year table and report reconcile across all 24 months",()=>{
   const rt=runtime(appFixture());
@@ -1228,6 +1229,17 @@ Deno.test("group-level write-off confirmation remains separate from shrink",()=>
   assert(d.sourceWriteoff===false&&d.writeoffPartial===true,"One confirmed write-off group must not make all group write-offs complete");
 });
 
+
+Deno.test("reachability reuses the last confirmed end stock and exposes its age",()=>{
+  const data=appFixture();
+  data.months["2026-10"].groups.getraenke._stockEntered=false;
+  const rt=runtime(data),latest=rt.latestConfirmedStock("getraenke","2026-10");
+  assert(latest?.month==="2026-09"&&latest.ageMonths===1,"Missing current-month inventory must use the latest confirmed prior end stock and show its age");
+  data.months["2026-10"].groups.getraenke.stock=4321;
+  data.months["2026-10"].groups.getraenke._stockEntered=true;
+  const current=rt.latestConfirmedStock("getraenke","2026-10");
+  assert(current?.month==="2026-10"&&current.ageMonths===0&&current.stock===4321,"A newly confirmed current-month stock must take precedence");
+});
 Deno.test("complete category inventory sum is canonical and a differing monthly total is surfaced",()=>{
   const data=appFixture(),m=data.months["2026-10"];
   m.sourceInventory=true;m.stock=99999;
