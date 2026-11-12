@@ -1209,7 +1209,7 @@ Deno.test("monthly shrink and write-off confirmations are independent",()=>{
   assert(d.sourceShrink===true&&d.sourceWriteoff===false,"Confirmed shrink must not automatically confirm write-offs");
 });
 
-Deno.test("group-level write-off confirmation remains separate from shrink",()=>{
+Deno.test("unconfirmed monthly write-off total is distinguished from fully confirmed group values",()=>{\n  const data=appFixture(),m=data.months["2026-10"];\n  delete m.sourceWriteoff;\n  m.writeoff=100;\n  const rt=runtime(data),d=rt.calc("2026-10"),quality=rt.dataQuality("2026-10");\n  assert(d.sourceWriteoff===true,"Complete confirmed group write-off values remain usable without a confirmed monthly aggregate");\n  assert(quality.anomalies.some((x:string)=>x.includes("Abschriften-Monatsgesamtwert ist nicht bestätigt")&&x.includes("Warengruppenwerte werden separat ausgewertet")),"Data quality must distinguish an unconfirmed monthly aggregate from confirmed category values");\n});\n\nDeno.test("group-level write-off confirmation remains separate from shrink",()=>{
   const data=appFixture(),m=data.months["2026-10"];
   for(const g of Object.values(m.groups) as any[]){g._shrinkEntered=true;g._writeoffEntered=false;}
   delete m.sourceShrink;delete m.sourceWriteoff;
