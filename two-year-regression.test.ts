@@ -450,6 +450,7 @@ Deno.test("report renders every signal, separates actual and target margin, and 
 Deno.test("missing shrink source suppresses shrink signals, risk and euro potential even if stale amounts remain",()=>{
   const rt=runtime(appFixture()),key="2026-10";
   rt.data.months[key].sourceShrink=false;
+  rt.data.months[key].sourceWriteoff=false;
   setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,shrink:80,writeoff:60});
   const row=scenarioRow(rt,key,"backshop");
   assert(!row||(!row.reasons.includes("Schwund auffällig")&&!row.reasons.includes("Abschriften auffällig")),"Unconfirmed shrink data must not create operational alerts");
