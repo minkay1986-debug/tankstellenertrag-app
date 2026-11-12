@@ -606,7 +606,7 @@ function dataQuality(k){
  if(n(x.revenue)>0&&x.sourceMonthly!==true)anomalies.push('Shop-Umsatz ist gespeichert, aber die Monatsquelle ist nicht bestätigt');
  if(n(x.ek)>0&&x.sourceEK!==true)anomalies.push('Shop-EK ist gespeichert, aber die EK-Quelle ist nicht bestätigt');
  if(n(x.shrink)>0&&x.sourceShrink!==true)anomalies.push('Schwund ist gespeichert, aber die Quelle ist nicht bestätigt');
- if(n(x.writeoff)>0&&x.sourceWriteoff!==true)anomalies.push('Abschriften sind gespeichert, aber die Quelle ist nicht bestätigt');
+ if(n(x.writeoff)>0&&x.sourceWriteoff!==true)anomalies.push(d.sourceWriteoff===true?'Abschriften-Monatsgesamtwert ist nicht bestätigt; vollständig bestätigte Warengruppenwerte werden separat ausgewertet':'Abschriften sind gespeichert, aber die Monatsquelle ist nicht bestätigt');
  if(n(x.stock)>0&&x.sourceInventory!==true)anomalies.push('Bestand ist gespeichert, aber die Inventurquelle ist nicht bestätigt');
  top.forEach(([name,value,flag])=>{if(!entered(value,flag))return;if(n(value)<0)errors.push(name+' ist negativ ('+eur(n(value))+') und sollte vor der Auswertung korrigiert werden.');else if(n(value)===0)anomalies.push(name+' ist ausdrücklich mit 0,00 € erfasst')});
  if(x.sourceMonthly===true&&x.sourceEK===true&&n(x.revenue)>0&&n(x.ek)>n(x.revenue))anomalies.push('Shop-EK liegt über dem Shop-Umsatz; ein negativer Rohertrag ist möglich und nicht automatisch ein Eingabefehler');
