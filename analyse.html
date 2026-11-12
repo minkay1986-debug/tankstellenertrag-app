@@ -147,6 +147,13 @@ button.btn,button:not(.nav button){border-radius:11px}
 .risk-dimensions{display:grid;gap:9px;margin-top:12px}
 .risk-dimension{display:grid;grid-template-columns:minmax(125px,.7fr) minmax(0,1.5fr);gap:10px;padding:10px 12px;border:1px solid rgba(190,220,246,.14);border-radius:10px;background:rgba(155,196,231,.055)}
 .risk-dimension b{color:#d8eaff}.risk-dimension span{color:#b8cce0;font-size:13px}
+.risk-overview-items{display:flex;flex-wrap:wrap;gap:7px}
+.risk-overview-item{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;color:#d8e5f2!important;font-size:12px!important}
+.risk-overview-state{display:inline-flex;align-items:center;padding:3px 7px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.01em;border:1px solid rgba(190,220,246,.18);background:rgba(155,196,231,.08);color:#c6d8e9}
+.risk-overview-state.watch{background:rgba(240,189,79,.10);border-color:rgba(240,189,79,.25);color:#f0d28a}
+.risk-overview-state.review{background:rgba(91,163,224,.12);border-color:rgba(91,163,224,.28);color:#b8dcff}
+.risk-overview-state.priority{background:rgba(244,153,76,.12);border-color:rgba(244,153,76,.30);color:#ffc18f}
+
 .risk-dimension-label{margin:5px 0 8px;color:#b8cce0;font-weight:700}
 @media(max-width:700px){.trend-summary{grid-template-columns:1fr 1fr}#trend{padding:8px 0}.trend-summary>div{padding:9px}.risk-dimension{grid-template-columns:1fr;gap:4px}}
 </style><style id="meinmonat-kpi-polish">
@@ -801,9 +808,11 @@ function riskSummary(k){
 }
 function riskStatusPanel(k){
  const x=riskSummary(k);
- if(!x.dimensions.length)return '<div class="panel"><div class="eyebrow">Gesamtstatus</div><div class="risk-status-title">✓ Keine auffälligen Prüfsignale</div><div class="small" style="margin-top:6px">Die bestätigten Werte überschreiten aktuell keine Ihrer hinterlegten Prüfschwellen.</div></div>';
- const details=x.dimensions.map(d=>'<div class="risk-dimension"><b>'+d.label+'</b><span>'+d.items.map(item=>esc(item.name)+' · '+item.level.label.toLowerCase()).join(', ')+'</span></div>').join('');
- return '<div class="panel"><div class="eyebrow">Gesamtstatus</div><div class="risk-status-title">Prüfbedarf in '+x.affected+' Warengruppen</div><div class="small" style="margin-top:6px">Die Auffälligkeiten werden nach ihrem fachlichen Bereich getrennt dargestellt. Ein Prüfbedarf ist kein Nachweis einer Verlustursache.</div><div class="risk-dimensions">'+details+'</div></div>';
+ if(!x.dimensions.length)return '<div class="panel"><div class="eyebrow">Gesamtstatus</div><div class="risk-status-title">✓ Keine besonderen Prüfsignale</div><div class="small" style="margin-top:6px">Die bestätigten Werte liegen innerhalb Ihrer hinterlegten Prüfschwellen.</div></div>';
+ const overviewLabel=level=>level.key==='severe'?'Auffällig – Prüfung priorisieren':level.key==='critical'?'Prüfung empfohlen':level.key==='watch'?'Im Blick behalten':'Unauffällig';
+ const overviewClass=level=>level.key==='severe'?'priority':level.key==='critical'?'review':level.key==='watch'?'watch':'normal';
+ const details=x.dimensions.map(d=>'<div class="risk-dimension"><b>'+d.label+'</b><span class="risk-overview-items">'+d.items.map(item=>'<span class="risk-overview-item">'+esc(item.name)+' <span class="risk-overview-state '+overviewClass(item.level)+'">'+overviewLabel(item.level)+'</span></span>').join('')+'</span></div>').join('');
+ return '<div class="panel"><div class="eyebrow">Gesamtstatus</div><div class="risk-status-title">Prüfhinweise in '+x.affected+' Warengruppen</div><div class="small" style="margin-top:6px">Mehrere Kennzahlen weichen von Ihren hinterlegten Prüfschwellen ab. Die Einstufung dient der Priorisierung einer fachlichen Prüfung – sie ist weder ein Verlustnachweis noch eine Aussage über die Ursache.</div><div class="risk-dimensions">'+details+'</div></div>';
 }
 function practiceGuidance(r){
  const reasons=Array.isArray(r&&r.reasons)?r.reasons:[],has=x=>reasons.some(v=>String(v).toLowerCase().includes(x)),ds=r.dataStatus||{},g=r.g||{},checks=[],measures=[],category={
