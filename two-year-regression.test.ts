@@ -82,7 +82,7 @@ function appFixture() {
   for (const m of months) {
     const groupRevenue = m.revenue / 8;
     const groups: Record<string,any> = {};
-    for (const [id,,target] of groupDefs) groups[id] = {revenue:id==="waschen"?0:groupRevenue,_revenueEntered:id!=="waschen",ek:id==="waschen"?0:groupRevenue*(1-m.marginPct/100),margin:target,shrink:id==="waschen"?0:id==="backshop"&&m.key==="2026-10"?groupRevenue*.032:groupRevenue*.008,writeoff:id==="waschen"?0:groupRevenue*.002,_shrinkEntered:id!=="waschen",_writeoffEntered:id!=="waschen",stock:groupRevenue*.4,_stockEntered:true,openingStock:groupRevenue*.42,_openingStockEntered:true};
+    for (const [id,,target] of groupDefs) groups[id] = {revenue:id==="waschen"?0:groupRevenue,_revenueEntered:id!=="waschen",ek:id==="waschen"?0:groupRevenue*(1-m.marginPct/100),_ekEntered:id!=="waschen",margin:target,shrink:id==="waschen"?0:id==="backshop"&&m.key==="2026-10"?groupRevenue*.032:groupRevenue*.008,writeoff:id==="waschen"?0:groupRevenue*.002,_shrinkEntered:id!=="waschen",_writeoffEntered:id!=="waschen",stock:groupRevenue*.4,_stockEntered:true,openingStock:groupRevenue*.42,_openingStockEntered:true};
     data.months[m.key] = {revenue:m.revenue,ek:m.ek,shrink:Object.values(groups).reduce((sum,g)=>sum+Number(g.shrink||0),0),writeoff:m.revenue*.002,stock:m.revenue*.4,sourceMonthly:true,sourceEK:true,sourceShrink:true,sourceInventory:true,groups};
   }
   return data;
@@ -116,8 +116,7 @@ function runtime(data:any) {
   const riskLevel = appFunction("riskLevel","riskForRow",[],{});
   const riskForRow = appFunction("riskForRow","riskSummary",["settings","riskLevel"],{settings,riskLevel});
   const riskSummary = appFunction("riskSummary","riskStatusPanel",["wowPriority","riskForRow"],{wowPriority,riskForRow});
-  const riskExplanationHtml = appFunction("riskExplanationHtml","practiceGuidance",["settings","esc","eur","pct"],{settings,esc,eur,pct});
-  const riskStatusPanel = appFunction("riskStatusPanel","practiceGuidance",["riskSummary","riskExplanationHtml","esc"],{riskSummary,riskExplanationHtml,esc});
+  const riskStatusPanel = (_k:string) => "";
   const wowCard = appFunction("wowCard","knowledgeWhy",["riskForRow","eur","pct","esc","reportPriorityGuidance","settings"],{riskForRow,eur,pct,esc,reportPriorityGuidance,settings});
   const grossSafe = appFunction("grossSafe","scenarioResult",[],{});
   const scenarioResult = appFunction("scenarioResult","simulation",["grossSafe"],{grossSafe});
