@@ -115,15 +115,18 @@ function runtime(data:any) {
   const trendCoverage = appFunction("trendCoverage","riskLevel",[],{});
   const riskLevel = appFunction("riskLevel","riskForRow",[],{});
   const riskForRow = appFunction("riskForRow","riskSummary",["settings","riskLevel"],{settings,riskLevel});
+  const riskSummary = appFunction("riskSummary","riskStatusPanel",["wowPriority","riskForRow"],{wowPriority,riskForRow});
+  const riskExplanationHtml = appFunction("riskExplanationHtml","practiceGuidance",["settings","esc","eur","pct"],{settings,esc,eur,pct});
+  const riskStatusPanel = appFunction("riskStatusPanel","practiceGuidance",["riskSummary","riskExplanationHtml","esc"],{riskSummary,riskExplanationHtml,esc});
   const wowCard = appFunction("wowCard","knowledgeWhy",["riskForRow","eur","pct","esc","reportPriorityGuidance","settings"],{riskForRow,eur,pct,esc,reportPriorityGuidance,settings});
   const grossSafe = appFunction("grossSafe","scenarioResult",[],{});
   const scenarioResult = appFunction("scenarioResult","simulation",["grossSafe"],{grossSafe});
-  const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext","reportPriorityGuidance"],{
+  const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext","reportPriorityGuidance","dataQualityPanel","riskStatusPanel"],{
     calc,month:()=> "2026-10",settings,wowPriority,prev,eur,pct,esc:(v:unknown)=>String(v??""),$:(id:string)=>target,
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
-    TEStudyContext:{htmlForReport:async()=>""},reportPriorityGuidance
+    TEStudyContext:{htmlForReport:async()=>""},reportPriorityGuidance,dataQualityPanel,riskStatusPanel
   });
-  return {data,calc,wowPriority,yearly,report,practiceGuidance,causeDiagnosis,potentialHtml,reportPriorityGuidance,wowCard,riskForRow,trendCoverage,measurePotential,scenarioResult,inventoryMetrics,dataQuality,dataQualityPanel,learnCalendarEffects,target,prev};
+  return {data,calc,wowPriority,yearly,report,practiceGuidance,causeDiagnosis,potentialHtml,reportPriorityGuidance,wowCard,riskForRow,riskSummary,riskStatusPanel,trendCoverage,measurePotential,scenarioResult,inventoryMetrics,dataQuality,dataQualityPanel,learnCalendarEffects,target,prev};
 }
 Deno.test("real app calc, year table and report reconcile across all 24 months",()=>{
   const rt=runtime(appFixture());
@@ -1195,6 +1198,7 @@ Deno.test("group EK is never treated as confirmed without its explicit confirmat
 
 Deno.test("monthly shrink and write-off confirmations are independent",()=>{
   const data=appFixture(),m=data.months["2026-10"];
+  for(const g of Object.values(m.groups) as any[]){g._shrinkEntered=false;g._writeoffEntered=false;}
   m.sourceShrink=false;m.shrinkEntered=false;m.shrink=30;
   m.sourceWriteoff=true;m.writeoffEntered=true;m.writeoff=80;
   let d=runtime(data).calc("2026-10");
