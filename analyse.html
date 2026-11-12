@@ -581,8 +581,8 @@ function calc(k){
  const hasAnyGroupShrink=enteredShrinkGroups.length>0,hasAnyGroupWriteoff=enteredWriteoffGroups.length>0;
  const shrink=hasAnyGroupShrink?shrinkGroupTotal:(hasShrinkTotal?Number(x.shrink)||0:0);
  const writeoff=hasAnyGroupWriteoff?writeoffGroupTotal:(hasWriteoffTotal?Number(x.writeoff)||0:0);
- const sourceShrink=x.sourceShrink===false?false:(hasAnyGroupShrink?groupShrinkComplete:hasShrinkTotal);
- const sourceWriteoff=x.sourceWriteoff===true||x.writeoffEntered===true?(hasAnyGroupWriteoff?groupWriteoffComplete:true):(hasAnyGroupWriteoff?groupWriteoffComplete:false);
+ const sourceShrink=hasAnyGroupShrink?groupShrinkComplete:hasShrinkTotal;
+ const sourceWriteoff=hasAnyGroupWriteoff?groupWriteoffComplete:hasWriteoffTotal;
  const shrinkPartial=hasAnyGroupShrink&&!groupShrinkComplete;
  const writeoffPartial=hasAnyGroupWriteoff&&!groupWriteoffComplete;
  const enteredStockGroups=gs.filter(g=>g.id!=='waschen'&&g.stockEntered);
