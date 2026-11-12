@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SortimentsRadar – Test</title>
+<style>
+:root{color-scheme:dark;--bg:#071b32;--panel:rgba(7,27,53,.88);--line:rgba(93,177,255,.32);--blue:#159fe8;--text:#f4f8ff;--muted:#b7c9dc}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#0c4b85 0,#071b32 62%);color:var(--text);font:16px/1.5 system-ui,Segoe UI,sans-serif;min-height:100vh}
+main{max-width:1050px;margin:0 auto;padding:42px 22px 70px}.eyebrow{color:#77d1ff;font-weight:700;letter-spacing:.12em;font-size:.78rem}h1{font-size:clamp(2rem,5vw,3rem);margin:.35rem 0}.lead{color:var(--muted);max-width:760px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:24px;margin-top:24px;box-shadow:0 18px 55px #00101f66}
+label{display:block;font-weight:650;margin:0 0 8px}input,select{width:100%;border:1px solid #477da8;background:#0b2745;color:white;border-radius:12px;padding:14px;font:inherit;min-width:0}
+.grid{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+button,.link{border:0;border-radius:12px;background:linear-gradient(110deg,#087fc6,#12a8e8);color:white;font-weight:750;padding:13px 18px;font:inherit;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #9de4ff;outline-offset:3px}
+.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:18px}.source{border:1px solid var(--line);border-radius:15px;padding:18px;background:#0a2340}.source h3{margin:0 0 6px}.source p,.hint{color:var(--muted);font-size:.92rem}.source a{color:#82d6ff;overflow-wrap:anywhere}.tag{display:inline-block;background:#0a5484;color:#d9f4ff;border-radius:20px;padding:4px 9px;font-size:.78rem;font-weight:700}
+.notice{border-left:3px solid #e6ad4d;padding:10px 14px;color:#e9d7b8;background:#30271366;border-radius:8px;margin-top:18px;font-size:.9rem}
+.empty{color:var(--muted);padding:14px 0}.foot{color:#91a9c0;font-size:.82rem;margin-top:24px}
+@media(max-width:700px){.grid,.results{grid-template-columns:1fr}main{padding:28px 15px}.panel{padding:18px}}
+</style>
+</head>
+<body><main>
+<div class="eyebrow">TANKSTELLENERTRAG · TESTZWEIG</div>
+<h1>SortimentsRadar</h1>
+<p class="lead">Finde öffentliche Diskussionen, in denen Menschen konkrete Produkte suchen, vermissen oder sich ein besseres Angebot wünschen. Der Prototyp öffnet gezielte Forensuchen – ohne KI, ohne Nutzerprofile und ohne Beiträge zu speichern.</p>
+<section class="panel" aria-labelledby="searchTitle">
+<h2 id="searchTitle">Kundenwunsch recherchieren</h2>
+<div class="grid">
+<div><label for="term">Produkt oder Wunschthema</label><input id="term" maxlength="100" placeholder="z. B. vegane Snacks, bestimmte Energy-Drinks" value=""></div>
+<div><label for="intent">Gesuchte Aussage</label><select id="intent"><option value="suchen">„Wo bekomme ich …?“ / konkrete Suche</option><option value="vermissen">„Warum gibt es … nicht?“ / vermisst</option><option value="wuenschen">„Ich würde mir … wünschen“</option><option value="tankstelle">Bezug zu Tankstelle / Raststätte</option></select></div>
+</div>
+<div class="actions"><button id="searchBtn" type="button">Foren durchsuchen</button><button id="clearBtn" type="button" style="background:#244665">Zurücksetzen</button></div>
+<p class="hint" id="status" aria-live="polite">Gib ein Produkt oder Thema ein. Die Suche öffnet öffentliche Suchergebnisse in einem neuen Tab.</p>
+<div id="results" class="results" hidden></div>
+<div class="notice"><strong>Wichtig:</strong> Treffer sind zunächst nur Hinweise. Ein Forenbeitrag belegt weder lokale Nachfrage noch Kaufbereitschaft. Wir speichern in dieser Testversion keine Beiträge und keine personenbezogenen Daten.</div>
+</section>
+<section class="panel" aria-labelledby="findingsTitle">
+<h2 id="findingsTitle">Geprüfte Fundstellen <span class="tag">Pilot · 3 Quellen</span></h2>
+<p class="hint">Reale öffentliche Diskussionen, manuell bewertet. Keine Nachfrage-Hochrechnung, keine gespeicherten Beiträge. Nur Artikelthema, Einordnung und Original-Link.</p>
+<div class="grid">
+<div><label for="filterSignal">Signaltyp</label><select id="filterSignal"><option value="all">Alle Signale</option><option value="availability">Konkrete Verfügbarkeitsfrage</option><option value="gap">Wahrgenommene Sortimentslücke</option><option value="travel">Unterwegs-Bedarf</option></select></div>
+<div><label for="filterRelevance">Tankstellenbezug</label><select id="filterRelevance"><option value="all">Alle</option><option value="direct">Direkt</option><option value="indirect">Indirekt</option></select></div>
+</div>
+<div id="verifiedFindings" class="results" aria-live="polite"></div>
+<p class="hint" id="findingsCount" aria-live="polite"></p>
+</section>
+<section class="panel" aria-labelledby="reviewTitle">
+<h2 id="reviewTitle">Fundstelle manuell bewerten</h2>
+<p class="hint">Minimale Angaben genügen. Die Liste bleibt nur während dieser Browser-Sitzung im Arbeitsspeicher. Kein Upload, keine Datenbank.</p>
+<div class="notice"><strong>Transparente Prüfpriorität (0–100 Punkte):</strong> Suchabsicht max. 30, Tankstellen-/Reisebezug max. 25, manuell eingeschätzte Signalstärke max. 20, eigenständiger Thread max. 10 und Aktualität max. 15. Das ist eine Sortierhilfe – keine Nachfrage-, Absatz- oder Umsatzprognose.</div>
+<div class="grid">
+<div><label for="reviewProduct">Produktbegriff</label><input id="reviewProduct" maxlength="100" placeholder="z. B. Haferdrink"></div>
+<div><label for="reviewSource">Quelle</label><select id="reviewSource"><option>Reddit</option><option>gutefrage</option><option>Discourse-Forum</option><option>Stack Exchange</option><option>Sonstige öffentliche Quelle</option></select></div>
+<div><label for="reviewUrl">Original-URL</label><input id="reviewUrl" type="url" maxlength="500" placeholder="https://…"></div>
+<div><label for="reviewDate">Funddatum</label><input id="reviewDate" type="date"></div>
+<div><label for="reviewIntent">Signaltyp</label><select id="reviewIntent"><option>Konkrete Suche</option><option>Vermisstes Produkt</option><option>Sortimentsfrage</option><option>Wunsch/Verbesserung</option><option>Allgemeine Meinung</option></select></div>
+<div><label for="reviewLocation">Orts-/Anlassbezug</label><select id="reviewLocation"><option>Direkt Tankstelle/Raststätte</option><option>Indirekt unterwegs/Reise</option><option>Kein erkennbarer Bezug</option></select></div>
+<div><label for="reviewStrength">Signalstärke</label><select id="reviewStrength"><option>Stark</option><option>Mittel</option><option>Schwach</option><option>Nicht relevant</option></select></div>
+<div><label for="reviewDuplicate">Eigenständiger Thread?</label><select id="reviewDuplicate"><option>Ja</option><option>Nein/Dublette</option><option>Unklar</option></select></div>
+</div>
+<div style="margin-top:14px"><label for="reviewNote">Kurze sachliche Begründung (keine Beitragstexte kopieren)</label><input id="reviewNote" maxlength="180" placeholder="z. B. konkrete Verfügbarkeitsfrage mit Tankstellenbezug"></div>
+<div class="actions"><button id="addReview" type="button">Zur Sitzungsliste hinzufügen</button><button id="exportReviews" type="button" style="background:#244665" disabled>CSV exportieren (0)</button></div>
+<p id="reviewStatus" class="hint" aria-live="polite">Noch keine Fundstellen erfasst.</p><div id="reviewList" class="results"></div>
+<div class="notice"><strong>Datenschutz:</strong> Keine Namen, Profile, Kommentare oder Beitragstexte erfassen. Beim Neuladen wird die Sitzungsliste verworfen. CSV-Export nur auf ausdrücklichen Klick.</div>
+</section>
+<section class="panel">
+<h2>Geplanter nächster Ausbauschritt</h2>
+<div class="results">
+<div class="source"><span class="tag">Phase 1 · jetzt</span><h3>Recherche testen</h3><p>Suchbegriffe und Quellen prüfen. Nur Fundstellen manuell bewerten und Originalbeiträge direkt verlinken.</p></div>
+<div class="source"><span class="tag">Phase 2 · später</span><h3>Quellen automatisieren</h3><p>Nur zulässige APIs, RSS-Feeds oder offizielle Suchschnittstellen anbinden. Funddatum, Produktbegriff und Original-Link speichern – keine Beitragstexte.</p></div>
+<div class="source"><span class="tag">Phase 3 · später</span><h3>Nachfrage bündeln</h3><p>Regelbasierte Gruppierung ähnlicher Produktwünsche, Dublettenprüfung und transparente Häufigkeiten.</p></div>
+<div class="source"><span class="tag">Phase 4 · optional</span><h3>KI erst bei Umsatz</h3><p>KI-Anbindung bleibt bewusst außerhalb des aktuellen Umfangs und wird erst bei wirtschaftlichem Nutzen ergänzt.</p></div>
+</div>
+</section>
+<p class="foot">Interner Prototyp · Keine Verbindung zur Live-App · Sitzungsbasierte manuelle Erfassung · CSV nur auf Export-Klick · Keine Server-Speicherung · Keine KI-Schnittstelle</p>
+</main>
+<script>
+(function(){
+ const term=document.getElementById('term'), intent=document.getElementById('intent'), results=document.getElementById('results'), status=document.getElementById('status');
+ const phrases={suchen:'("wo bekomme ich" OR "wo gibt es" OR "suche")',vermissen:'("warum gibt es" OR "gibt es nicht" OR "vermisse")',wuenschen:'("ich wünsche mir" OR "wäre schön wenn" OR "sollte es geben")',tankstelle:'(Tankstelle OR Raststätte OR Tankstellen-Shop)'};
+ const sources=[
+  {name:'Reddit',domain:'reddit.com',note:'Öffentliche Diskussionen auf Reddit'},
+  {name:'gutefrage',domain:'gutefrage.net',note:'Öffentliche Fragen und Antworten'}
+ ];
+ function makeSearch(source,q){
+  const query='site:'+source.domain+' '+q+' '+phrases[intent.value];
+  return 'https://www.google.com/search?q='+encodeURIComponent(query);
+ }
+ const verified=[
+  {topic:'Hafer- und Sojamilch',source:'gutefrage',date:'18.04.2025',signal:'availability',relevance:'direct',reason:'Frage nach Verfügbarkeit an Tankstellen an einem Feiertag; kein belegter Kaufabschluss.',url:'https://www.gutefrage.net/frage/kann-man-an-der-tankstelle-pflanzenmilch-kaufen'},
+  {topic:'Vegane Snack- und Essensauswahl',source:'Reddit · r/VeganDE',date:'13.07.2026',signal:'gap',relevance:'direct',reason:'Diskussion benennt eingeschränkte vegane Auswahl an Tankstellen und Kiosken; keine konkrete Artikelbestellung.',url:'https://www.reddit.com/r/VeganDE/comments/1uvm0ka/ist_die_verf%C3%BCgbarkeit_im_alltag_das_was_die/'},
+  {topic:'Vegane Verpflegung auf Autobahnfahrten',source:'Reddit · r/VeganDE',date:'04.10.2022',signal:'travel',relevance:'indirect',reason:'Reisebedarf und Raststätten werden diskutiert; ältere, allgemeine Diskussion ohne spezifischen Tankstellenkauf.',url:'https://www.reddit.com/r/VeganDE/comments/xvqkmi'}
+ ];
+ const labels={availability:'Verfügbarkeit',gap:'Sortimentslücke',travel:'Unterwegs-Bedarf'};
+ function renderVerified(){
+  const type=document.getElementById('filterSignal').value, relevance=document.getElementById('filterRelevance').value;
+  const list=verified.filter(x=>(type==='all'||x.signal===type)&&(relevance==='all'||x.relevance===relevance));
+  const holder=document.getElementById('verifiedFindings');holder.replaceChildren();
+  list.forEach(x=>{
+   const card=document.createElement('article');card.className='source';
+   const tag=document.createElement('span');tag.className='tag';tag.textContent=labels[x.signal];
+   const heading=document.createElement('h3');heading.textContent=x.topic;
+   const info=document.createElement('p');info.textContent=x.source+' · '+x.date+' · Tankstellenbezug: '+(x.relevance==='direct'?'direkt':'indirekt');
+   const reason=document.createElement('p');reason.textContent=x.reason;
+   const link=document.createElement('a');link.href=x.url;link.target='_blank';link.rel='noopener noreferrer';link.textContent='Originaldiskussion öffnen ↗';
+   card.append(tag,heading,info,reason,link);holder.append(card);
+  });
+  document.getElementById('findingsCount').textContent=list.length+' von '+verified.length+' geprüften Fundstellen angezeigt.';
+ }
+ document.getElementById('filterSignal').addEventListener('change',renderVerified);
+ document.getElementById('filterRelevance').addEventListener('change',renderVerified);
+ renderVerified();
+
+ const reviewRows=[];
+ const reviewFields=['Produktbegriff','Quelle','Original-URL','Funddatum','Signaltyp','Orts-/Anlassbezug','Signalstärke','Eigenständiger Thread','Prüfpriorität Punkte','Prioritätsklasse','Begründung'];
+ const reviewIds=['reviewProduct','reviewSource','reviewUrl','reviewDate','reviewIntent','reviewLocation','reviewStrength','reviewDuplicate','reviewNote'];
+ const reviewStatus=document.getElementById('reviewStatus'),exportButton=document.getElementById('exportReviews');
+ function csvCell(value){return '"'+String(value??'').replace(/"/g,'""')+'"';}
+ function scoreFinding(values){
+  const intentPoints={'Konkrete Suche':30,'Vermisstes Produkt':25,'Sortimentsfrage':20,'Wunsch/Verbesserung':15,'Allgemeine Meinung':0}[values[4]]??0;
+  const locationPoints={'Direkt Tankstelle/Raststätte':25,'Indirekt unterwegs/Reise':12,'Kein erkennbarer Bezug':0}[values[5]]??0;
+  const strengthPoints={'Stark':20,'Mittel':12,'Schwach':5,'Nicht relevant':0}[values[6]]??0;
+  const threadPoints={'Ja':10,'Unklar':4,'Nein/Dublette':0}[values[7]]??0;
+  const ageDays=Math.floor((new Date().setHours(0,0,0,0)-new Date(values[3]+'T00:00:00').getTime())/86400000);
+  const freshnessPoints=ageDays<=90?15:ageDays<=365?10:ageDays<=730?5:2;
+  const total=intentPoints+locationPoints+strengthPoints+threadPoints+freshnessPoints;
+  const level=total>=75?'Hohe Prüfpriorität':total>=50?'Mittlere Prüfpriorität':total>=25?'Niedrige Prüfpriorität':'Nicht priorisieren';
+  return {total,level,ageDays,parts:{intentPoints,locationPoints,strengthPoints,threadPoints,freshnessPoints}};
+ }
+ function renderReviewRows(){
+  const holder=document.getElementById('reviewList');holder.replaceChildren();
+  reviewRows.forEach((entry,index)=>{
+   const row=entry.values,score=entry.score;
+   const card=document.createElement('article');card.className='source';
+   const tag=document.createElement('span');tag.className='tag';tag.textContent=score.total+'/100 · '+score.level;
+   const title=document.createElement('h3');title.textContent=(index+1)+'. '+row[0];
+   const info=document.createElement('p');info.textContent=row[1]+' · '+row[4]+' · '+row[5]+' · '+row[3];
+   const breakdown=document.createElement('p');breakdown.className='hint';breakdown.textContent='Absicht '+score.parts.intentPoints+'/30 · Bezug '+score.parts.locationPoints+'/25 · Signal '+score.parts.strengthPoints+'/20 · Thread '+score.parts.threadPoints+'/10 · Aktualität '+score.parts.freshnessPoints+'/15';
+   const caution=document.createElement('p');caution.className='hint';caution.textContent='Nur Prüfpriorität. Kein Beleg für tatsächliche Kaufbereitschaft.';
+   const link=document.createElement('a');link.href=row[2];link.target='_blank';link.rel='noopener noreferrer';link.textContent='Originalquelle öffnen ↗';
+   const remove=document.createElement('button');remove.type='button';remove.style.marginTop='12px';remove.style.background='#244665';remove.textContent='Entfernen';remove.addEventListener('click',()=>{reviewRows.splice(index,1);renderReviewRows();});
+   card.append(tag,title,info,breakdown,caution,link,remove);holder.append(card);
+  });
+  exportButton.disabled=reviewRows.length===0;exportButton.textContent='CSV exportieren ('+reviewRows.length+')';
+  reviewStatus.textContent=reviewRows.length+' Fundstelle(n) in dieser Sitzung erfasst.';
+ }
+ document.getElementById('addReview').addEventListener('click',function(){
+  const values=reviewIds.map(id=>document.getElementById(id).value.trim());
+  if(!values[0]||!values[2]||!values[3]){reviewStatus.textContent='Bitte Produktbegriff, Original-URL und Funddatum ausfüllen.';return;}
+  let parsed;try{parsed=new URL(values[2]);}catch(_){reviewStatus.textContent='Bitte eine gültige Original-URL eingeben.';return;}
+  if(!['http:','https:'].includes(parsed.protocol)){reviewStatus.textContent='Nur http- oder https-Links sind zulässig.';return;}
+  const foundDate=new Date(values[3]+'T00:00:00'),today=new Date();today.setHours(0,0,0,0);
+  if(Number.isNaN(foundDate.getTime())||foundDate>today){reviewStatus.textContent='Das Funddatum darf nicht in der Zukunft liegen.';return;}
+  const normalizedUrl=parsed.href.replace(/\/$/,'');
+  if(reviewRows.some(entry=>entry.values[2].replace(/\/$/,'')===normalizedUrl)){reviewStatus.textContent='Diese URL ist bereits erfasst.';return;}
+  values[2]=parsed.href;
+  reviewRows.push({values,score:scoreFinding(values)});renderReviewRows();
+  ['reviewProduct','reviewUrl','reviewNote'].forEach(id=>document.getElementById(id).value='');
+ });
+ exportButton.addEventListener('click',function(){
+  if(!reviewRows.length)return;
+  const rows=reviewRows.map(entry=>{const v=entry.values,s=entry.score;return [...v.slice(0,8),s.total,s.level,v[8]];});
+  const csv='\uFEFF'+[reviewFields,...rows].map(row=>row.map(csvCell).join(';')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='sortimentsradar-fundstellen.csv';document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url);
+ });
+ document.getElementById('searchBtn').addEventListener('click',function(){
+  const q=term.value.trim();
+  if(!q){status.textContent='Bitte zuerst ein Produkt oder Thema eingeben.';term.focus();return;}
+  results.innerHTML='';
+  sources.forEach(source=>{
+   const card=document.createElement('article');card.className='source';
+   const title=document.createElement('h3');title.textContent=source.name;
+   const desc=document.createElement('p');desc.textContent=source.note+' – öffnet eine gezielte Websuche.';
+   const link=document.createElement('a');link.href=makeSearch(source,q);link.target='_blank';link.rel='noopener noreferrer';link.textContent='Suchergebnisse öffnen ↗';
+   card.append(title,desc,link);results.append(card);
+  });
+  const broad=document.createElement('article');broad.className='source';
+  const h=document.createElement('h3');h.textContent='Tankstellen-Foren allgemein';
+  const p=document.createElement('p');p.textContent='Ergänzende Suche nach dem Produkt im Zusammenhang mit Tankstellen und Raststätten.';
+  const a=document.createElement('a');a.href='https://www.google.com/search?q='+encodeURIComponent('"'+q+'" '+phrases.tankstelle+' forum');a.target='_blank';a.rel='noopener noreferrer';a.textContent='Weitere Forensuche öffnen ↗';
+  broad.append(h,p,a);results.append(broad);
+  results.hidden=false;status.textContent='Suchlinks erstellt. Prüfe die Originaldiskussionen selbst; es wurden keine Beiträge abgerufen oder gespeichert.';
+ });
+ document.getElementById('clearBtn').addEventListener('click',function(){term.value='';results.replaceChildren();results.hidden=true;status.textContent='Gib ein Produkt oder Thema ein. Die Suche öffnet öffentliche Suchergebnisse in einem neuen Tab.';});
+})();
+</script>
+</body></html>
