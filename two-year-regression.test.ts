@@ -1150,7 +1150,7 @@ Deno.test("data quality exposes unconfirmed category EK and partial group source
   month.groups.kaffee._shrinkEntered=false;month.groups.kaffee.shrink=17;
   month.groups.backshop.writeoff=9;month.groups.backshop._writeoffEntered=false;
   const quality=runtime(data).dataQuality("2026-10");
-  assert(quality.notes.some((x:string)=>x.includes("Backshop-EK ist gespeichert, aber nicht bestätigt")),"Unconfirmed stored group EK must be visible");
+  assert(quality.notes.some((x:string)=>x.includes("EK ist gespeichert, aber nicht bestätigt")),"Unconfirmed stored group EK must be visible");
   assert(quality.notes.some((x:string)=>x.includes("Schwund ist nur für")),"Partial shrink coverage must be visible");
   assert(quality.notes.some((x:string)=>x.includes("Abschriftenwert ist gespeichert, aber nicht separat bestätigt")),"Unconfirmed group writeoff must be visible");
 });
@@ -1162,7 +1162,7 @@ Deno.test("inventory review never claims overstock from coverage or stock-to-sal
   current.sourceInventory=true;previous.sourceInventory=true;
   const rt=runtime(data),row=rt.wowPriority("2026-10").find((x:any)=>x.g.id==="backshop");
   assert(row,"Confirmed category should be available for review");
-  assert(row.reasons.includes("Bestand/Umsatz gestiegen"),"A changed ratio may trigger a review signal");
+  assert(row.reasons.includes("Bestandsquote gestiegen"),"A changed ratio may trigger a review signal");
   assert(!row.reasons.some((x:string)=>/Überbestand|Zielreichweite/.test(x)),"No overstock claim may be generated without movement and target data");
   const explanation=rt.wowCard(row,0);
   assert(explanation.includes("kein Warenumschlag")&&explanation.includes("kein Verlustnachweis"),"The visible risk explanation must explain the ratio's limits");
