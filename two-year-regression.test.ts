@@ -906,7 +906,7 @@ Deno.test("two-year advisor routes plural critical-stock wording and prioritizat
 Deno.test("intelligent data quality detects unallocated group totals without inventing causes",()=>{
   const data=appFixture();
   const month=data.months["2026-10"];
-  const groupRevenue=Object.values(month.groups).reduce((sum:number,g:any)=>sum+Number(g.revenue||0),0);
+  const groupRevenue=Object.entries(month.groups).filter(([id])=>id!=="waschen").reduce((sum:number,[,g]:any)=>sum+Number(g.revenue||0),0);
   month.revenue=groupRevenue+1234;
   month.sourceMonthly=true;
   const rt=runtime(data);
