@@ -49,7 +49,7 @@ Deno.test("modeled potential overlaps gross-profit levers but keeps confirmed sh
 });
 Deno.test("seasonally suppressed sales decline cannot create modeled sales potential",()=>{
   const rt=runtime(appFixture());
-  const row={g:{id:"backshop",revenue:1000,actualMargin:50,margin:55,shrink:0,writeoff:0},
+  const row:any={g:{id:"backshop",revenue:1000,actualMargin:50,margin:55,shrink:0,writeoff:0},
     reasons:["Umsatz rückläufig"],targetMarginGap:0,marginDrop:0,prevRevenue:1100,
     dataStatus:{groupEkAvailable:true,monthlySourceAvailable:true,previousMonthAvailable:true,shrinkSourceAvailable:false,writeoffSourceAvailable:false}};
   row.salesDropSignal=false;
