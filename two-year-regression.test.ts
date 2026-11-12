@@ -101,10 +101,11 @@ function runtime(data:any) {
   const eur = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Number(v)||0);
   const eurExact = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(v)||0);
   const dataQuality = appFunction("dataQuality","hasData",["mrow","calc","prev","eur","GROUPS"],{mrow,calc,prev,eur,GROUPS});
+  const esc = (v:unknown) => String(v??"");
+  const dataQualityPanel = appFunction("dataQualityPanel","dashboard",["dataQuality","esc"],{dataQuality,esc});
   const pct = (v:number) => (Number(v)||0).toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1})+" %";
   const target = {value:"",innerHTML:""};
   const yearly = appFunction("yearly","economic",["keys","data","calc","eur","pct","$"],{keys,data,calc,eur,pct,$:(id:string)=>target});
-  const esc = (v:unknown) => String(v??"");
   const practiceGuidance = appFunction("practiceGuidance","measurePotential",["esc"],{esc});
   const hasData = (k:string) => Object.hasOwn(data.months,k);
   const causeDiagnosis = appFunction("causeDiagnosis","loop",["calc","hasData","month","eur","pct"],{calc,hasData,month:()=>"2026-10",eur,pct});
@@ -122,7 +123,7 @@ function runtime(data:any) {
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
     TEStudyContext:{htmlForReport:async()=>""},reportPriorityGuidance
   });
-  return {data,calc,wowPriority,yearly,report,practiceGuidance,causeDiagnosis,potentialHtml,reportPriorityGuidance,wowCard,riskForRow,trendCoverage,measurePotential,scenarioResult,inventoryMetrics,dataQuality,learnCalendarEffects,target,prev};
+  return {data,calc,wowPriority,yearly,report,practiceGuidance,causeDiagnosis,potentialHtml,reportPriorityGuidance,wowCard,riskForRow,trendCoverage,measurePotential,scenarioResult,inventoryMetrics,dataQuality,dataQualityPanel,learnCalendarEffects,target,prev};
 }
 Deno.test("real app calc, year table and report reconcile across all 24 months",()=>{
   const rt=runtime(appFixture());
@@ -1176,4 +1177,59 @@ Deno.test("advisory loop uses confirmed category-level checks and never infers o
   assert(loop.includes("Stichprobeninventur")&&loop.includes("Lieferschein")&&loop.includes("Retouren")&&loop.includes("Buchungsfehler"),"Loop must provide concrete inventory and posting checks");
   assert(!loop.includes("top.g.stock/top.g.revenue")&&!loop.includes("Artikelbewegungen")&&!loop.includes("Einzelartikel"),"Loop must not infer overstock from a fixed ratio or require article-level data");
   assert(loop.includes("Schwund, Abschriften, Inventurkorrekturen")&&loop.includes("nicht als Ursache voraussetzen"),"Loss types and hypotheses must remain separate");
+});
+
+
+Deno.test("group EK is never treated as confirmed without its explicit confirmation flag",()=>{
+  const data=appFixture(),m=data.months["2026-10"];
+  for(const g of Object.values(m.groups) as any[])g._ekEntered=true;
+  m.sourceEK=false;
+  m.groups.getraenke.ek=125;
+  m.groups.getraenke._ekEntered=false;
+  const rt=runtime(data),d=rt.calc("2026-10");
+  const drink=d.groups.find((g:any)=>g.id==="getraenke");
+  assert(drink?.ekEntered===false&&drink.actualMargin===null,"Unconfirmed beverage EK must not create an actual margin");
+  assert(d.sourceEK===false&&d.ekPartial===true,"Partial category EK coverage must remain explicitly incomplete");
+  assert(rt.dataQuality("2026-10").notes.some((x:string)=>x.includes("Getränke-EK ist gespeichert, aber nicht bestätigt")),"Data quality must explain the unconfirmed beverage EK");
+});
+
+Deno.test("monthly shrink and write-off confirmations are independent",()=>{
+  const data=appFixture(),m=data.months["2026-10"];
+  m.sourceShrink=false;m.shrinkEntered=false;m.shrink=30;
+  m.sourceWriteoff=true;m.writeoffEntered=true;m.writeoff=80;
+  let d=runtime(data).calc("2026-10");
+  assert(d.sourceShrink===false&&d.sourceWriteoff===true,"Confirmed write-offs must not depend on shrink confirmation");
+  m.sourceShrink=true;m.shrinkEntered=true;
+  m.sourceWriteoff=false;m.writeoffEntered=false;
+  d=runtime(data).calc("2026-10");
+  assert(d.sourceShrink===true&&d.sourceWriteoff===false,"Confirmed shrink must not automatically confirm write-offs");
+});
+
+Deno.test("group-level write-off confirmation remains separate from shrink",()=>{
+  const data=appFixture(),m=data.months["2026-10"];
+  for(const g of Object.values(m.groups) as any[]){g._shrinkEntered=true;g._writeoffEntered=false;}
+  m.sourceShrink=false;m.sourceWriteoff=false;
+  m.groups.getraenke._writeoffEntered=true;
+  const d=runtime(data).calc("2026-10");
+  assert(d.sourceShrink===true,"Complete confirmed shrink coverage must remain available");
+  assert(d.sourceWriteoff===false&&d.writeoffPartial===true,"One confirmed write-off group must not make all group write-offs complete");
+});
+
+Deno.test("complete category inventory sum is canonical and a differing monthly total is surfaced",()=>{
+  const data=appFixture(),m=data.months["2026-10"];
+  m.sourceInventory=true;m.stock=99999;
+  const categoryTotal=Object.entries(m.groups).filter(([id])=>id!=="waschen").reduce((sum,[,g]:any)=>sum+Number(g.stock||0),0);
+  const rt=runtime(data),d=rt.calc("2026-10"),quality=rt.dataQuality("2026-10");
+  assert(Math.abs(d.stock-categoryTotal)<0.001,"Complete category stock sum must be the canonical displayed stock");
+  assert(quality.findings.some((x:any)=>x.label==="Bestandsabgleich"),"Monthly-vs-category stock difference must be surfaced for reconciliation");
+});
+
+Deno.test("critical data-quality findings are visible in overview and analysis through one shared panel",()=>{
+  const data=appFixture(),m=data.months["2026-10"];
+  m.groups.getraenke.ek=123;m.groups.getraenke._ekEntered=false;m.sourceEK=false;
+  const rt=runtime(data),panel=rt.dataQualityPanel("2026-10");
+  assert(panel.includes("Datenqualität")&&panel.includes("Getränke-EK ist gespeichert"),"Shared data-quality panel must surface the critical stored-but-unconfirmed EK");
+  assert(html.includes("dataQualityPanel(k)+riskStatusPanel(k)"),"Dashboard must show the shared data-quality and risk summaries");
+  assert(html.includes("let html=dataQualityPanel(k)+riskStatusPanel(k)"),"Analysis must show the same shared data-quality and risk summaries");
+  assert(html.includes("'+dataQualityPanel(month())+riskStatusPanel(month())+'"),"Report must show the same shared data-quality and risk summaries");
 });
