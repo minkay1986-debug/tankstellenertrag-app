@@ -38,7 +38,7 @@ Deno.test("modeled potential overlaps gross-profit levers but keeps confirmed sh
   const rt=runtime(appFixture());
   const row={g:{id:"backshop",revenue:1000,actualMargin:50,margin:55,shrink:20,writeoff:10},
     reasons:["Ist-Marge unter Ihrem Zielwert","Ist-Marge liegt 3 %-Pkt. unter dem Vormonat","Umsatz rückläufig","Schwund auffällig","Abschriften auffällig"],
-    targetMarginGap:2,marginDrop:3,prevRevenue:1100,
+    targetMarginGap:2,marginDrop:3,prevRevenue:1100,salesDropSignal:true,
     dataStatus:{groupEkAvailable:true,monthlySourceAvailable:true,previousMonthAvailable:true,shrinkSourceAvailable:true,writeoffSourceAvailable:true}};
   const parts:any[]=rt.measurePotential(row);
   const gross=parts.filter((p:any)=>p.kind==="zusätzlicher Rohertrag").reduce((sum:number,p:any)=>sum+p.amount,0);
@@ -46,6 +46,17 @@ Deno.test("modeled potential overlaps gross-profit levers but keeps confirmed sh
   assert(Math.abs(gross-12.5)<0.001,"Overlapping margin and sales scenarios must use only the largest gross-profit lever");
   assert(Math.abs(savings-3)<0.001,"Confirmed shrink and write-offs must remain separate 10% savings levers");
   assert(parts.length===3,"Expected one overlap-adjusted gross-profit lever plus two separate loss-reduction levers");
+});
+Deno.test("seasonally suppressed sales decline cannot create modeled sales potential",()=>{
+  const rt=runtime(appFixture());
+  const row:any={g:{id:"backshop",revenue:1000,actualMargin:50,margin:55,shrink:0,writeoff:0},
+    reasons:["Umsatz rückläufig"],targetMarginGap:0,marginDrop:0,prevRevenue:1100,
+    dataStatus:{groupEkAvailable:true,monthlySourceAvailable:true,previousMonthAvailable:true,shrinkSourceAvailable:false,writeoffSourceAvailable:false}};
+  row.salesDropSignal=false;
+  assert(rt.measurePotential(row).length===0,"Seasonally explained revenue decline must not create a sales scenario");
+  row.salesDropSignal=true;
+  const parts=rt.measurePotential(row);
+  assert(parts.length===1&&Math.abs(parts[0].amount-12.5)<0.001,"A confirmed non-seasonal sales signal must retain its modeled potential");
 });
 Deno.test("all 24 monthly report calculations preserve revenue and margin",()=>{for(const m of months){const prior=months.find(x=>x.key===`${m.year-1}-${String(m.month).padStart(2,"0")}`);const prev=months.find(x=>x.key===`${m.year}-${String(m.month-1).padStart(2,"0")}`)||months.find(x=>x.key===`${m.year-1}-12`);const r=optimizer.evaluateGroup({name:"Shop",actualRevenue:m.revenue,previousRevenue:prev?.revenue??null,priorYearRevenue:prior?.revenue??null,marginPct:m.marginPct,previousMarginPct:prev?.marginPct??null,shrinkPct:m.shrinkPct,dataComplete:true});assert(r.actualRevenue===m.revenue,`${m.key}: revenue mismatch`);assert(r.marginPct===m.marginPct,`${m.key}: margin mismatch`);if(prior)assert(Number.isFinite(r.expectedRevenue),`${m.key}: expected revenue missing`);}});
 Deno.test("annual aggregation and year-on-year growth reconcile",()=>{const y25=months.filter(x=>x.year===2025).reduce((s,x)=>s+x.revenue,0),y26=months.filter(x=>x.year===2026).reduce((s,x)=>s+x.revenue,0);assert(y26>y25,"2026 should exceed 2025");assert(Math.abs((y26/y25-1)*100-4)<.02,"Expected approximately +4% YoY");assert(months.filter(x=>x.year===2025).length===12&&months.filter(x=>x.year===2026).length===12,"Each year must contain 12 months");});
@@ -71,7 +82,7 @@ function appFixture() {
   for (const m of months) {
     const groupRevenue = m.revenue / 8;
     const groups: Record<string,any> = {};
-    for (const [id,,target] of groupDefs) groups[id] = {revenue:id==="waschen"?0:groupRevenue,_revenueEntered:id!=="waschen",ek:id==="waschen"?0:groupRevenue*(1-m.marginPct/100),margin:target,shrink:id==="waschen"?0:id==="backshop"&&m.key==="2026-10"?groupRevenue*.032:groupRevenue*.008,writeoff:id==="waschen"?0:groupRevenue*.002,_shrinkEntered:id!=="waschen",_writeoffEntered:id!=="waschen",stock:groupRevenue*.4,_stockEntered:true,openingStock:groupRevenue*.42,_openingStockEntered:true};
+    for (const [id,,target] of groupDefs) groups[id] = {revenue:id==="waschen"?0:groupRevenue,_revenueEntered:id!=="waschen",ek:id==="waschen"?0:groupRevenue*(1-m.marginPct/100),_ekEntered:id!=="waschen",margin:target,shrink:id==="waschen"?0:id==="backshop"&&m.key==="2026-10"?groupRevenue*.032:groupRevenue*.008,writeoff:id==="waschen"?0:groupRevenue*.002,_shrinkEntered:id!=="waschen",_writeoffEntered:id!=="waschen",stock:groupRevenue*.4,_stockEntered:true,openingStock:groupRevenue*.42,_openingStockEntered:true};
     data.months[m.key] = {revenue:m.revenue,ek:m.ek,shrink:Object.values(groups).reduce((sum,g)=>sum+Number(g.shrink||0),0),writeoff:m.revenue*.002,stock:m.revenue*.4,sourceMonthly:true,sourceEK:true,sourceShrink:true,sourceInventory:true,groups};
   }
   return data;
@@ -83,6 +94,7 @@ function runtime(data:any) {
   const prev = (k:string) => {const [y,mo]=k.split("-").map(Number);const d=new Date(y,mo-2,1);const p=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;return Object.hasOwn(data.months,p)?p:null;};
   const calc = appFunction("calc","reconciliation",["GROUPS","data","settings","mrow"],{GROUPS,data,settings,mrow});
   const inventoryMetrics = appFunction("inventoryMetrics","reconciliation",["g","days"],{});
+  const latestConfirmedStock = appFunction("latestConfirmedStock","inventoryMetrics",["data"],{data});
 
   const learnCalendarEffects = appFunction("learnCalendarEffects","forecastSeason",["months","calFn","calcFn","station"],{station:{city:"Testort"}});
   const wowPriority = appFunction("wowPriority","riskLevel",["calc","prev","settings","data","inventoryMetrics"],{calc,prev,settings,data,inventoryMetrics});
@@ -90,10 +102,11 @@ function runtime(data:any) {
   const eur = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Number(v)||0);
   const eurExact = (v:number) => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(v)||0);
   const dataQuality = appFunction("dataQuality","hasData",["mrow","calc","prev","eur","GROUPS"],{mrow,calc,prev,eur,GROUPS});
+  const esc = (v:unknown) => String(v??"");
+  const dataQualityPanel = appFunction("dataQualityPanel","dashboard",["dataQuality","esc"],{dataQuality,esc});
   const pct = (v:number) => (Number(v)||0).toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1})+" %";
   const target = {value:"",innerHTML:""};
   const yearly = appFunction("yearly","economic",["keys","data","calc","eur","pct","$"],{keys,data,calc,eur,pct,$:(id:string)=>target});
-  const esc = (v:unknown) => String(v??"");
   const practiceGuidance = appFunction("practiceGuidance","measurePotential",["esc"],{esc});
   const hasData = (k:string) => Object.hasOwn(data.months,k);
   const causeDiagnosis = appFunction("causeDiagnosis","loop",["calc","hasData","month","eur","pct"],{calc,hasData,month:()=>"2026-10",eur,pct});
@@ -103,15 +116,17 @@ function runtime(data:any) {
   const trendCoverage = appFunction("trendCoverage","riskLevel",[],{});
   const riskLevel = appFunction("riskLevel","riskForRow",[],{});
   const riskForRow = appFunction("riskForRow","riskSummary",["settings","riskLevel"],{settings,riskLevel});
+  const riskSummary = appFunction("riskSummary","riskStatusPanel",["wowPriority","riskForRow"],{wowPriority,riskForRow});
+  const riskStatusPanel = (_k:string) => "";
   const wowCard = appFunction("wowCard","knowledgeWhy",["riskForRow","eur","pct","esc","reportPriorityGuidance","settings"],{riskForRow,eur,pct,esc,reportPriorityGuidance,settings});
   const grossSafe = appFunction("grossSafe","scenarioResult",[],{});
   const scenarioResult = appFunction("scenarioResult","simulation",["grossSafe"],{grossSafe});
-  const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext","reportPriorityGuidance"],{
+  const report = appFunction("report","settingsUI",["calc","month","settings","wowPriority","prev","eur","pct","esc","$","station","TEStudyContext","reportPriorityGuidance","dataQualityPanel","riskStatusPanel"],{
     calc,month:()=> "2026-10",settings,wowPriority,prev,eur,pct,esc:(v:unknown)=>String(v??""),$:(id:string)=>target,
     station:{station_name:"Teststation",postcode:"00000",city:"Testort"},
-    TEStudyContext:{htmlForReport:async()=>""},reportPriorityGuidance
+    TEStudyContext:{htmlForReport:async()=>""},reportPriorityGuidance,dataQualityPanel,riskStatusPanel
   });
-  return {data,calc,wowPriority,yearly,report,practiceGuidance,causeDiagnosis,potentialHtml,reportPriorityGuidance,wowCard,riskForRow,trendCoverage,measurePotential,scenarioResult,inventoryMetrics,dataQuality,learnCalendarEffects,target,prev};
+  return {data,calc,wowPriority,yearly,report,practiceGuidance,causeDiagnosis,potentialHtml,reportPriorityGuidance,wowCard,riskForRow,riskSummary,riskStatusPanel,trendCoverage,measurePotential,scenarioResult,inventoryMetrics,latestConfirmedStock,dataQuality,dataQualityPanel,learnCalendarEffects,target,prev};
 }
 Deno.test("real app calc, year table and report reconcile across all 24 months",()=>{
   const rt=runtime(appFixture());
@@ -179,7 +194,7 @@ Deno.test("practical guidance is actionable, prioritised and labels missing data
   assert(html.includes("'+practiceGuidance(r)+'</div>'")||html.includes("practiceGuidance(r)"),"Guidance is not wired into the real advisory tile/report renderer");
 });
 
-Deno.test("app has all requested renderers and renderAll calls them",()=>{for(const fn of ["function renderMeinMonat()","function yearly()","function report()","function analysis()","function renderAll()"])assert(html.includes(fn),"Missing "+fn);const renderAllFn=html.slice(html.indexOf("function renderAll()"),html.indexOf("function parseHuth("));assert(["renderMeinMonat()","analysis()","yearly()","report()"].every(call=>renderAllFn.includes(call)),"renderAll must invoke month, analysis, year and report renderers");for(const id of ['id="monthly"','id="yearly"','id="report"','id="dashboard"'])assert(html.includes(id),"Missing section "+id);const yearFn=html.slice(html.indexOf("function yearly()"),html.indexOf("function economic()"));assert(yearFn.includes("Jahresübersicht")&&yearFn.includes("gewichtete Marge"),"Yearly view must show annual totals and weighted margin");const monthFn=html.slice(html.indexOf("function renderMeinMonat()"),html.indexOf("function renderCustomScenarioInputs"));for(const check of ["focus","shrink","action"])assert(monthFn.includes(check),"Missing monthly check tile "+check);const analysisFn=html.slice(html.indexOf("function analysis()"),html.indexOf("function renderCustomScenarioInputs"));assert(analysisFn.includes("Daten-TÜV")&&analysisFn.includes("Bestandsabgleich")&&analysisFn.includes("Ihre wichtigsten Prüffelder"),"Analysis is missing a required check area");const reportFn=html.slice(html.indexOf("function report()"),html.indexOf("function settingsUI()"));for(const item of ["Shop-Umsatz","Rohertrag","Marge","Schwund","Bestand EK","Notizen / Maßnahmen"])assert(reportFn.includes(item),"Report missing "+item);});
+Deno.test("app has all requested renderers and renderAll calls them",()=>{for(const fn of ["function renderMeinMonat()","function yearly()","function report()","function analysis()","function renderAll()"])assert(html.includes(fn),"Missing "+fn);const renderAllFn=html.slice(html.indexOf("function renderAll()"),html.indexOf("function parseHuth("));assert(["renderMeinMonat()","analysis()","yearly()","report()"].every(call=>renderAllFn.includes(call)),"renderAll must invoke month, analysis, year and report renderers");for(const id of ['id="monthly"','id="yearly"','id="report"','id="dashboard"'])assert(html.includes(id),"Missing section "+id);const yearFn=html.slice(html.indexOf("function yearly()"),html.indexOf("function economic()"));assert(yearFn.includes("Jahresübersicht")&&yearFn.includes("gewichtete Marge"),"Yearly view must show annual totals and weighted margin");const monthFn=html.slice(html.indexOf("function renderMeinMonat()"),html.indexOf("function renderCustomScenarioInputs"));for(const check of ["focus","shrink","action"])assert(monthFn.includes(check),"Missing monthly check tile "+check);assert(monthFn.includes("d.sourceMonthly===true&&p.sourceMonthly===true"),"Mein Monat must not compare partial revenue coverage as a complete shop comparison");assert(monthFn.includes("d.sourceEK===true&&p.sourceEK===true"),"Mein Monat gross-profit and margin comparisons require confirmed EK in both periods");assert(monthFn.includes("d.sourceMonthly===true&&d.sourceShrink===true")&&monthFn.includes("p.sourceMonthly===true&&p.sourceShrink===true"),"Shrink-rate comparison requires confirmed revenue and shrink sources in both periods");const analysisFn=html.slice(html.indexOf("function analysis()"),html.indexOf("function renderCustomScenarioInputs"));assert(analysisFn.includes("Daten-TÜV")&&analysisFn.includes("Bestandsabgleich")&&analysisFn.includes("Ihre wichtigsten Prüffelder"),"Analysis is missing a required check area");const reportFn=html.slice(html.indexOf("function report()"),html.indexOf("function settingsUI()"));for(const item of ["Shop-Umsatz","Rohertrag","Marge","Schwund","Bestand EK","Notizen / Maßnahmen"])assert(reportFn.includes(item),"Report missing "+item);});
 
 Deno.test("advice separates achieved margin target from operational review risk",()=>{
   const rt=runtime(appFixture());
@@ -436,6 +451,7 @@ Deno.test("report renders every signal, separates actual and target margin, and 
 Deno.test("missing shrink source suppresses shrink signals, risk and euro potential even if stale amounts remain",()=>{
   const rt=runtime(appFixture()),key="2026-10";
   rt.data.months[key].sourceShrink=false;
+  rt.data.months[key].sourceWriteoff=false;
   setScenarioGroup(rt,"2026-10","backshop",{revenue:1000,shrink:80,writeoff:60});
   const row=scenarioRow(rt,key,"backshop");
   assert(!row||(!row.reasons.includes("Schwund auffällig")&&!row.reasons.includes("Abschriften auffällig")),"Unconfirmed shrink data must not create operational alerts");
@@ -1130,4 +1146,115 @@ Deno.test("one-time measure implementation costs are deducted once, not twelve t
   assert(result.annualBalance===result.monthlyBalance*12-result.oneTime,"Annual formula must subtract oneTime only once");
   assert(html.includes("Saldo im ersten Monat inklusive Einmalaufwand"),"The first-month balance must be clearly labelled");
   assert(html.includes("12-Monats-Saldo inklusive einmaligem Aufwand (nicht × 12)"),"The annual summary must state that one-time costs are not multiplied by twelve");
+});
+
+
+Deno.test("data quality exposes unconfirmed category EK and partial group source coverage",()=>{
+  const data=appFixture(),month=data.months["2026-10"];
+  month.groups.backshop.ek=123;month.groups.backshop._ekEntered=false;
+  month.groups.kaffee._shrinkEntered=false;month.groups.kaffee.shrink=17;
+  month.groups.backshop.writeoff=9;month.groups.backshop._writeoffEntered=false;
+  const quality=runtime(data).dataQuality("2026-10");
+  assert(quality.notes.some((x:string)=>x.includes("EK ist gespeichert, aber nicht bestätigt")),"Unconfirmed stored group EK must be visible");
+  assert(quality.notes.some((x:string)=>x.includes("Schwund ist nur für")),"Partial shrink coverage must be visible");
+  assert(quality.notes.some((x:string)=>x.includes("Abschriftenwert ist gespeichert, aber nicht separat bestätigt")),"Unconfirmed group writeoff must be visible");
+});
+
+Deno.test("inventory review never claims overstock from coverage or stock-to-sales ratio alone",()=>{
+  const data=appFixture(),current=data.months["2026-10"],previous=data.months["2026-09"];
+  current.groups.backshop.stock=9000;current.groups.backshop._stockEntered=true;
+  previous.groups.backshop.stock=1000;previous.groups.backshop._stockEntered=true;
+  current.sourceInventory=true;previous.sourceInventory=true;
+  const rt=runtime(data),row=rt.wowPriority("2026-10").find((x:any)=>x.g.id==="backshop");
+  assert(row,"Confirmed category should be available for review");
+  assert(row.reasons.includes("Bestandsquote gestiegen"),"A changed ratio may trigger a review signal");
+  assert(!row.reasons.some((x:string)=>/Überbestand|Zielreichweite/.test(x)),"No overstock claim may be generated without movement and target data");
+  const explanation=rt.wowCard(row,0);
+  assert(explanation.includes("kein Warenumschlag")&&explanation.includes("kein Verlustnachweis"),"The visible risk explanation must explain the ratio's limits");
+});
+
+
+Deno.test("advisory loop uses confirmed category-level checks and never infers overstock from a fixed ratio",()=>{
+  const start=html.indexOf("function loop(top){"),end=html.indexOf("\nfunction",start+20);
+  assert(start>=0&&end>start,"Could not locate advisory loop");
+  const loop=html.slice(start,end);
+  assert(loop.includes("Stichprobeninventur")&&loop.includes("Lieferschein")&&loop.includes("Retouren")&&loop.includes("Buchungsfehler"),"Loop must provide concrete inventory and posting checks");
+  assert(!loop.includes("top.g.stock/top.g.revenue")&&!loop.includes("Artikelbewegungen")&&!loop.includes("Einzelartikel"),"Loop must not infer overstock from a fixed ratio or require article-level data");
+  assert(loop.includes("Schwund, Abschriften, Inventurkorrekturen")&&loop.includes("nicht als Ursache voraussetzen"),"Loss types and hypotheses must remain separate");
+});
+
+
+Deno.test("group EK is never treated as confirmed without its explicit confirmation flag",()=>{
+  const data=appFixture(),m=data.months["2026-10"];
+  for(const g of Object.values(m.groups) as any[])g._ekEntered=true;
+  m.sourceEK=false;
+  m.groups.getraenke.ek=125;
+  m.groups.getraenke._ekEntered=false;
+  const rt=runtime(data),d=rt.calc("2026-10");
+  const drink=d.groups.find((g:any)=>g.id==="getraenke");
+  assert(drink?.ekEntered===false&&drink.actualMargin===null,"Unconfirmed beverage EK must not create an actual margin");
+  assert(d.sourceEK===false&&d.ekPartial===true,"Partial category EK coverage must remain explicitly incomplete");
+  assert(rt.dataQuality("2026-10").notes.some((x:string)=>x.includes("Getränke-EK ist gespeichert, aber nicht bestätigt")),"Data quality must explain the unconfirmed beverage EK");
+});
+
+Deno.test("monthly shrink and write-off confirmations are independent",()=>{
+  const data=appFixture(),m=data.months["2026-10"];
+  for(const g of Object.values(m.groups) as any[]){g._shrinkEntered=false;g._writeoffEntered=false;}
+  m.sourceShrink=false;m.shrinkEntered=false;m.shrink=30;
+  m.sourceWriteoff=true;m.writeoffEntered=true;m.writeoff=80;
+  let d=runtime(data).calc("2026-10");
+  assert(d.sourceShrink===false&&d.sourceWriteoff===true,"Confirmed write-offs must not depend on shrink confirmation");
+  m.sourceShrink=true;m.shrinkEntered=true;
+  m.sourceWriteoff=false;m.writeoffEntered=false;
+  d=runtime(data).calc("2026-10");
+  assert(d.sourceShrink===true&&d.sourceWriteoff===false,"Confirmed shrink must not automatically confirm write-offs");
+});
+
+Deno.test("unconfirmed monthly write-off total is distinguished from fully confirmed group values",()=>{
+  const data=appFixture(),m=data.months["2026-10"];
+  delete m.sourceWriteoff;
+  m.writeoff=100;
+  const rt=runtime(data),d=rt.calc("2026-10"),quality=rt.dataQuality("2026-10");
+  assert(d.sourceWriteoff===true,"Complete confirmed group write-off values remain usable without a confirmed monthly aggregate");
+  assert(quality.anomalies.some((x:string)=>x.includes("Abschriften-Monatsgesamtwert ist nicht bestätigt")&&x.includes("Warengruppenwerte werden separat ausgewertet")),"Data quality must distinguish an unconfirmed monthly aggregate from confirmed category values");
+});
+
+Deno.test("group-level write-off confirmation remains separate from shrink",()=>{
+  const data=appFixture(),m=data.months["2026-10"];
+  for(const g of Object.values(m.groups) as any[]){g._shrinkEntered=true;g._writeoffEntered=false;}
+  delete m.sourceShrink;delete m.sourceWriteoff;
+  m.groups.getraenke._writeoffEntered=true;
+  const d=runtime(data).calc("2026-10");
+  assert(d.sourceShrink===true,"Complete confirmed shrink coverage must remain available");
+  assert(d.sourceWriteoff===false&&d.writeoffPartial===true,"One confirmed write-off group must not make all group write-offs complete");
+});
+
+
+Deno.test("reachability reuses the last confirmed end stock and exposes its age",()=>{
+  const data=appFixture();
+  data.months["2026-10"].groups.getraenke._stockEntered=false;
+  const rt=runtime(data),latest=rt.latestConfirmedStock("getraenke","2026-10");
+  assert(latest?.month==="2026-09"&&latest.ageMonths===1,"Missing current-month inventory must use the latest confirmed prior end stock and show its age");
+  data.months["2026-10"].groups.getraenke.stock=4321;
+  data.months["2026-10"].groups.getraenke._stockEntered=true;
+  const current=rt.latestConfirmedStock("getraenke","2026-10");
+  assert(current?.month==="2026-10"&&current.ageMonths===0&&current.stock===4321,"A newly confirmed current-month stock must take precedence");
+});
+Deno.test("complete category inventory sum is canonical and a differing monthly total is surfaced",()=>{
+  const data=appFixture(),m=data.months["2026-10"];
+  m.sourceInventory=true;m.stock=99999;
+  const categoryTotal=Object.entries(m.groups).filter(([id])=>id!=="waschen").reduce((sum,[,g]:any)=>sum+Number(g.stock||0),0);
+  const rt=runtime(data),d=rt.calc("2026-10"),quality=rt.dataQuality("2026-10");
+  assert(Math.abs(d.stock-categoryTotal)<0.001,"Complete category stock sum must be the canonical displayed stock");
+  assert(quality.findings.some((x:any)=>x.label==="Bestandsabgleich"),"Monthly-vs-category stock difference must be surfaced for reconciliation");
+});
+
+Deno.test("critical data-quality findings are visible in overview and analysis through one shared panel",()=>{
+  const data=appFixture(),m=data.months["2026-10"];
+  m.groups.getraenke.ek=123;m.groups.getraenke._ekEntered=false;m.sourceEK=false;
+  const rt=runtime(data),panel=rt.dataQualityPanel("2026-10");
+  assert(panel.includes("Datenqualität")&&panel.includes("Getränke-EK ist gespeichert"),"Shared data-quality panel must surface the critical stored-but-unconfirmed EK");
+  assert(html.includes("dataQualityPanel(k)+riskStatusPanel(k)"),"Dashboard must show the shared data-quality and risk summaries");
+  assert(html.includes("let html=dataQualityPanel(k)+riskStatusPanel(k)"),"Analysis must show the same shared data-quality and risk summaries");
+  assert(html.includes("'+dataQualityPanel(month())+riskStatusPanel(month())+'"),"Report must show the same shared data-quality and risk summaries");
 });

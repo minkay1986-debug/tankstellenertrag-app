@@ -108,14 +108,22 @@ Deno.test({
   sanitizeResources: false,
   sanitizeOps: false,
   fn: async () => {
+    // Use a rolling period inside the handler's 45-day recent-data window.
+    // A fixed September date eventually ages out and makes this integration
+    // test fail even though station discovery and recent-file parsing work.
+    const end = new Date(Date.now() - 7 * 86400000);
+    const start = new Date(end.getTime() - 2 * 86400000);
+    const toDate = (date: Date) => date.toISOString().slice(0, 10);
+    const startDate = toDate(start);
+    const endDate = toDate(end);
     const response = await handler(new Request("https://local.test", {
       method: "POST",
       headers: { Origin: origin, Authorization: "Bearer test", "Content-Type": "application/json" },
       body: JSON.stringify({
         latitude: 49.3,
         longitude: 10.8,
-        start_date: "2026-09-25",
-        end_date: "2026-09-27",
+        start_date: startDate,
+        end_date: endDate,
       }),
     }));
     const payload = await response.json();
@@ -129,14 +137,14 @@ Deno.test({
       throw new Error("No recent daily observations returned");
     }
     if (payload.daily.some((row: Record<string, unknown>) =>
-      typeof row.date !== "string" || row.date < "2026-09-25" || row.date > "2026-09-27"
+      typeof row.date !== "string" || row.date < startDate || row.date > endDate
     )) {
       throw new Error("Recent test returned dates outside the requested range");
     }
     console.log(JSON.stringify({
       integration: "passed",
       region: "Franconia",
-      period: "2026-09-25/2026-09-27",
+      period: `${startDate}/${endDate}`,
       station_id: payload.station_id,
       approximate_distance_km: payload.approximate_distance_km,
       days_returned: payload.days_returned,
@@ -144,7 +152,6 @@ Deno.test({
     }));
   },
 });
-
 
 Deno.test("rejects missing authorization before calling DWD", async () => {
   const response = await handler(new Request("https://local.test", {
