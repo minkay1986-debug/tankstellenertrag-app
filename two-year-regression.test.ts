@@ -1211,7 +1211,7 @@ Deno.test("monthly shrink and write-off confirmations are independent",()=>{
 Deno.test("group-level write-off confirmation remains separate from shrink",()=>{
   const data=appFixture(),m=data.months["2026-10"];
   for(const g of Object.values(m.groups) as any[]){g._shrinkEntered=true;g._writeoffEntered=false;}
-  m.sourceShrink=false;m.sourceWriteoff=false;
+  delete m.sourceShrink;delete m.sourceWriteoff;
   m.groups.getraenke._writeoffEntered=true;
   const d=runtime(data).calc("2026-10");
   assert(d.sourceShrink===true,"Complete confirmed shrink coverage must remain available");
