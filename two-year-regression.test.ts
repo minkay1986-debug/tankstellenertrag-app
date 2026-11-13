@@ -1344,3 +1344,12 @@ Deno.test("missing requested metric check runs before direct and general advisor
   assert(replyStart>=0&&noDataAt>replyStart&&directAt>noDataAt&&generalAt>noDataAt,
     "Missing requested data must be checked before any generic answer path");
 });
+
+
+Deno.test("personal questions are blocked before any supplementary AI request",()=>{
+  const chatStart=html.indexOf("function initAdvisorChat()");
+  const guardAt=html.indexOf("advisorIsPersonQuestion(q)",chatStart);
+  const aiCallAt=html.indexOf("requestAdvisorAi(q,fallback||'')",chatStart);
+  assert(chatStart>=0&&guardAt>chatStart&&aiCallAt>guardAt,
+    "The person-data guard must short-circuit before the AI worker receives the question");
+});
