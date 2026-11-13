@@ -1290,6 +1290,13 @@ Deno.test("named employee questions remain blocked without blocking business mar
   assert(!isPerson("Wie hoch ist der Umsatz von Müller GmbH?"),"Company names must not be mistaken for individual people");
   assert(!isPerson("Wie viele Kollegen waren gestern im Dienst?"),"Anonymous staffing counts must remain available");
   assert(!isPerson("Wie hoch ist der durchschnittliche Umsatz je Mitarbeiter?"),"Average business metrics per employee must remain available");
+  assert(isPerson("Wie beurteilst du die Zuverlässigkeit von Martin?"),"Reliability assessments of named people must be blocked");
+  assert(isPerson("Wie viele Krankheitstage hatte Anna dieses Jahr?"),"Named-person absence history must be blocked");
+  assert(isPerson("Kannst du mir sagen, wie zuverlässig Herr Krüger ist?"),"Indirect reliability questions with titles must be blocked");
+  assert(isPerson("Kannst du die Umsätze einzelner Mitarbeiter vergleichen?"),"Individual employee sales comparisons must be blocked");
+  assert(!isPerson("Wie hoch ist die Marge von Red Bull?"),"Brand margin questions must remain available");
+  assert(!isPerson("Wer ist unser zuverlässiger Getränkelieferant?"),"Supplier discovery must remain available");
+  assert(!isPerson("Wie hoch ist der Umsatz je Schichtleiter?"),"Aggregate metrics per role must remain available");
   assert(isPerson("Hat Frau Maier die Warenbestellung freigegeben?"),"Named-person questions must be blocked when a title is used");
   assert(isPerson("Weißt du, ob Kevin heute Inventur gemacht hat?"),"Named-person questions in subordinate clauses must be blocked");
   assert(isPerson("Kannst du mir sagen, ob Herr Bauer krank war?"),"Named-person health questions in indirect phrasing must be blocked");
