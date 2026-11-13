@@ -1900,7 +1900,7 @@ function advisorIsPersonQuestion(raw){
  const namedSubjectAction=/\b(?:[Hh]at|[Mm]acht|[Tt]at|[Aa]rbeitet|[Kk]ommt|[Ff]ehlt|[Vv]ergisst|[Ee]rledigt|[Kk]ontrolliert|[Aa]ngenommen|[Ff]reigegeben|[Gg]eprüft|[Gg]eprueft|[Gg]eliefert|[Bb]estellt|[Gg]ezählt|[Gg]ezaehlt|[Kk]assiert|[Aa]bgeschlossen)\s+[A-ZÄÖÜ][a-zäöüß]+(?:-[a-zäöüß]+)*\b/.test(original)
   && !businessEntityQuestion;
  const namedSubjectAtStart=/^(?:[Hh]at|[Mm]acht|[Ww]ar|[Ii]st|[Aa]rbeitet|[Kk]ontrolliert|[Ee]rledigt)\s+(?:(?:Herr|Frau)\s+)?([A-ZÄÖÜ][a-zäöüß]+(?:-[a-zäöüß]+)*)\b/.exec(original);
- const explicitNamedSubject=isName(namedSubjectAtStart?.[1])&&!businessEntityQuestion;
+ const explicitNamedSubject=isName(namedSubjectAtStart?.[1]);
  const legalEntitySuffix=/\b(gmbh|ag|kg|ohg|ug|gbr)\b/.test(normalized);
  const genericWhoQuestion=!businessEntityQuestion&&!/lieferant/i.test(normalized)&&/\b(wer|wen|wem|wessen)\b.{0,100}\b(hat|macht|tat|arbeitet|war|ist|kommt|fehlt|vergisst|erledigt|kontrolliert|abgeschlossen|ist verantwortlich|verursacht)\b/.test(normalized);
  return (personEntity&&personAssessment&&!aggregateHeadcount&&!aggregatePerEmployee)
