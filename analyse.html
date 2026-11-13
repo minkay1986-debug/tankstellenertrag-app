@@ -1889,8 +1889,11 @@ function advisorIsPersonQuestion(raw){
   ||/^(?!(?:Wie|Was|Wer|Wen|Wem|Welche|Welcher|Welches|Wieso|Warum|Weshalb|Wann|Wo|Wohin|Womit|Wodurch)\b)[A-ZÄÖÜ][a-zäöüß-]{2,}\s+(?:hat|macht|tat|arbeitet|war|ist|kommt|fehlt|vergisst|erledigt|kontrolliert)\b/.test(original)
   ||/\b(?:was ist mit|was war mit|wie geht es)\s+[A-ZÄÖÜ][a-zäöüß-]{2,}\b/i.test(original);
  const personalIntent=/\b(was hat|was macht|was tat|was ist mit|was war mit|wie geht es|wie ist|wie war|wer ist|wer war|wie arbeitet|wie verhaelt sich|wie verhielt sich|wie oft war|warum war|warum hat|wieso hat|weshalb hat|wieso war|weshalb war|keine inventur gemacht|leistung|verhalten|fehlzeiten|anwesenheit|krankheit|krankmeldung|schicht|pause|gehalt|lohn|kuendigen|entlassen|abmahnen|zuverlaessig|zuverlassig|zuverlässig|zuverlaessigkeit|zuverlässigkeit|pünktlich|punktlich|puenktlich|unpunktlich|unpuenktlich|unpünktlich|arbeitsleistung|arbeitszeit|privatleben|adresse|telefonnummer)\b/.test(normalized);
- const genericWhoQuestion=/\b(wer|wen|wem|wessen)\b.{0,80}\b(hat|macht|tat|arbeitet|war|ist|kommt|fehlt|vergisst|erledigt|kontrolliert|abgeschlossen|ist verantwortlich)\b/.test(normalized);
- return (personEntity&&personAssessment)||(namedSubject&&personalIntent)||genericWhoQuestion;
+ const namedSubjectAction=/^(?:hat|macht|tat|arbeitet|war|ist|kommt|fehlt|vergisst|erledigt|kontrolliert)\s+[A-ZÄÖÜ][a-zäöüß-]{2,}\b/.test(original)
+  &&/\b(gestern|heute|schicht|krank|krankmeldung|inventur|gearbeitet|arbeitszeit|pause|fehlzeit|zuverlaessig|zuverlässig|verhalten|leistung)\b/.test(normalized);
+ const businessEntityQuestion=/\b(lieferant\\w*|hersteller\\w*|anbieter\\w*|marke\\w*|produkt\\w*|artikel\\w*|warengruppe\\w*|sortiment\\w*|kunde\\w*|wettbewerber\\w*)\b/.test(normalized);
+ const genericWhoQuestion=!businessEntityQuestion&&/\b(wer|wen|wem|wessen)\b.{0,80}\b(hat|macht|tat|arbeitet|war|ist|kommt|fehlt|vergisst|erledigt|kontrolliert|abgeschlossen|ist verantwortlich)\b/.test(normalized);
+ return (personEntity&&personAssessment)||(namedSubject&&personalIntent)||namedSubjectAction||genericWhoQuestion;
 }
 function advisorReply(raw){
  if(advisorIsPersonQuestion(raw))return advisorEvidenceResponse('<b>Keine personenbezogenen Informationen verfügbar</b><p>TankstellenErtrag liegen keine personenbezogenen Mitarbeiter- oder Tätigkeitsdaten vor. Wir können deshalb nicht feststellen, was eine bestimmte Person – auch wenn du einen Namen nennst – gestern gemacht hat, wie sie gearbeitet hat oder welche persönlichen Eigenschaften bzw. Leistungen sie hat.</p><p>Die Anwendung wertet betriebliche Monats- und Warengruppendaten aus, keine individuellen Mitarbeiterprofile. Bitte gib hier auch keine vertraulichen oder sensiblen Personaldaten ein.</p>','missing');
