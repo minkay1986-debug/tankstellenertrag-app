@@ -1267,6 +1267,8 @@ Deno.test("named employee questions remain blocked without blocking business mar
   assert(isPerson("Wieso hat Kevin keine Inventur gemacht?"),"Named employee activity question must be blocked");
   assert(isPerson("Was macht Kevin?"),"Direct question about a named person must be blocked");
   assert(isPerson("Wie ist Kevin?"),"General assessment of a named person must be blocked");
+  assert(isPerson("Was ist mit Kevin?"),"Named-person status questions must be blocked");
+  assert(isPerson("Wie geht es Kevin?"),"Questions about a named person's condition must be blocked");
   assert(isPerson("Wie zuverlässig ist Kevin?"),"Named employee assessment must be blocked");
   assert(isPerson("Wer hat gestern Schicht gemacht?"),"Unnamed question about an employee action must be blocked");
   assert(isPerson("Wie zuverlässig ist der Mitarbeiter?"),"Employee assessment must be blocked");
