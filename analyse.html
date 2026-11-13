@@ -1889,13 +1889,12 @@ function advisorIsPersonQuestion(raw){
   ||/^(?!(?:Wie|Was|Wer|Wen|Wem|Welche|Welcher|Welches|Wieso|Warum|Weshalb|Wann|Wo|Wohin|Womit|Wodurch)\b)[A-ZÄÖÜ][a-zäöüß-]{2,}\s+(?:hat|macht|tat|arbeitet|war|ist|kommt|fehlt|vergisst|erledigt|kontrolliert)\b/.test(original)
   ||/\b(?:was ist mit|was war mit|wie geht es)\s+[A-ZÄÖÜ][a-zäöüß-]{2,}\b/i.test(original);
  const personalIntent=/\b(was hat|was macht|was tat|was ist mit|was war mit|wie geht es|wie ist|wie war|wer ist|wer war|wie arbeitet|wie verhaelt sich|wie verhielt sich|wie oft war|warum war|warum hat|wieso hat|weshalb hat|wieso war|weshalb war|keine inventur gemacht|leistung|verhalten|fehlzeiten|anwesenheit|krankheit|krankmeldung|schicht|pause|gehalt|lohn|kuendigen|entlassen|abmahnen|zuverlaessig|zuverlassig|zuverlässig|zuverlaessigkeit|zuverlässigkeit|pünktlich|punktlich|puenktlich|unpunktlich|unpuenktlich|unpünktlich|arbeitsleistung|arbeitszeit|privatleben|adresse|telefonnummer)\b/.test(normalized);
- const businessEntityQuestion=/\\b(lieferant\\w*|hersteller\\w*|anbieter\\w*|marke\\w*|produkt\\w*|artikel\\w*|warengruppe\\w*|sortiment\\w*|kunde\\w*|wettbewerber\\w*)\\b/.test(normalized);
- const aggregateHeadcount=/\\b(wie viele|anzahl|zahl der)\\s+(mitarbeiter|beschäftigte|beschaeftigte)\\b/.test(normalized)
-  && !/\\b(wer|welcher|welche|zuverlaessig|zuverlässig|leistung|verhalten|krank|fehlzeit|schicht|pause|gehalt|lohn|arbeitszeit)\\b/.test(normalized);
- const actionVerbs='(?:hat|macht|tat|arbeitet|war|ist|kommt|fehlt|vergisst|erledigt|kontrolliert|angenommen|geprueft|geprüft|geliefert|bestellt|gezaehlt|gezählt|kassiert|geoeffnet|geöffnet|geschlossen)';
- const namedSubjectAction=/^(?:[Hh]at|[Mm]acht|[Tt]at|[Aa]rbeitet|[Ww]ar|[Ii]st|[Kk]ommt|[Ff]ehlt|[Vv]ergisst|[Ee]rledigt|[Kk]ontrolliert)\\s+[A-ZÄÖÜ][a-zäöüß-]{2,}\\b/.test(original)
+ const businessEntityQuestion=/\b(lieferant\w*|hersteller\w*|anbieter\w*|marke\w*|produkt\w*|artikel\w*|warengruppe\w*|sortiment\w*|kunde\w*|wettbewerber\w*)\b/.test(normalized);
+ const aggregateHeadcount=/\b(wie viele|anzahl|zahl der)\s+(mitarbeiter|beschäftigte|beschaeftigte)\b/.test(normalized)
+  && !/\b(wer|welcher|welche|zuverlaessig|zuverlässig|leistung|verhalten|krank|fehlzeit|schicht|pause|gehalt|lohn|arbeitszeit)\b/.test(normalized);
+ const namedSubjectAction=/^(?:[Hh]at|[Mm]acht|[Tt]at|[Aa]rbeitet|[Ww]ar|[Ii]st|[Kk]ommt|[Ff]ehlt|[Vv]ergisst|[Ee]rledigt|[Kk]ontrolliert)\s+[A-ZÄÖÜ][a-zäöüß-]{2,}\b/.test(original)
   && !businessEntityQuestion
-  &&/\\b(gestern|heute|schicht|krank|krankmeldung|inventur|gearbeitet|arbeitszeit|pause|fehlzeit|zuverlaessig|zuverlässig|verhalten|leistung)\\b/.test(normalized);
+  &&/\b(gestern|heute|schicht|krank|krankmeldung|inventur|gearbeitet|arbeitszeit|pause|fehlzeit|zuverlaessig|zuverlässig|verhalten|leistung|angenommen|geprueft|geprüft|geliefert|bestellt|gezaehlt|gezählt|kassiert|geoeffnet|geöffnet|geschlossen)\b/.test(normalized);
  const genericWhoQuestion=!businessEntityQuestion&&/\b(wer|wen|wem|wessen)\b.{0,80}\b(hat|macht|tat|arbeitet|war|ist|kommt|fehlt|vergisst|erledigt|kontrolliert|abgeschlossen|ist verantwortlich)\b/.test(normalized);
  return (personEntity&&personAssessment&&!aggregateHeadcount)||(namedSubject&&personalIntent)||namedSubjectAction||genericWhoQuestion;
 }
