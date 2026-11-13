@@ -1272,6 +1272,7 @@ Deno.test("named employee questions remain blocked without blocking business mar
   assert(isPerson("Wie zuverlässig ist der Mitarbeiter?"),"Employee assessment must be blocked");
   assert(!isPerson("Vergleiche die Warengruppenmargen von Kaffee und Backwaren."),"Business margin comparison must remain available");
   assert(!isPerson("Welche Warengruppen haben die höchste Marge?"),"Which-category questions must not be mistaken for person questions");
+  assert(!isPerson("Wie ist die Marge bei Backwaren?"),"Category margin questions must not be mistaken for named-person questions");
   assert(!isPerson("Wie hoch sind die Personalkosten im Verhältnis zum Umsatz?"),"Aggregate personnel costs must remain a business metric");
 });
 
