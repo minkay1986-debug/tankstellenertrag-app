@@ -1901,6 +1901,8 @@ function advisorReply(raw){
  // Konkrete Fragen zu eigenen Kennzahlen müssen vor allgemeinen Direktantworten
  // in die datenbasierte Auswertung, damit unbestätigte Werte nie überschrieben werden.
  const metricQuestion=advisorNorm(raw);
+ const asksForGroupMetric=/\b(kaffee|backwaren|backshop|getraenke|getränke|tabak|drogerie|lebensmittel|suesswaren|süßwaren|eis|waschen)\b/.test(metricQuestion)&&/\b(marge|rohertrag|wareneinsatz|umsatz|ertrag)\b/.test(metricQuestion);
+ if(asksForGroupMetric)return advisorEvidenceResponse(advisorReplyBase(raw),'data');
  const asksForPersonalMetric=/\b(mein|meine|meinen|bei mir|bei uns|aktueller monat|diesen monat)\b/.test(metricQuestion);
  const asksForMetricChange=/\b(umsatz|marge|rohertrag|wareneinsatz|schwund|abschrift|bestand)\b/.test(metricQuestion)&&/\b(gesunken|gefallen|rueckgang|ruecklaeufig|veraendert|veraenderung|warum|wieso|weshalb|vergleich|gegenueber|vormonat|vorjahr)\b/.test(metricQuestion);
  if(asksForPersonalMetric&&asksForMetricChange)return advisorEvidenceResponse(advisorReplyBase(raw),'data');
