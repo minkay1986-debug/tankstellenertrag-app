@@ -1280,6 +1280,18 @@ Deno.test("named employee questions remain blocked without blocking business mar
   assert(!isPerson("Welche Warengruppen haben die höchste Marge?"),"Which-category questions must not be mistaken for person questions");
   assert(!isPerson("Wie ist die Marge bei Backwaren?"),"Category margin questions must not be mistaken for named-person questions");
   assert(!isPerson("Wie hoch sind die Personalkosten im Verhältnis zum Umsatz?"),"Aggregate personnel costs must remain a business metric");
+  assert(isPerson("Hat Frau Maier die Warenbestellung freigegeben?"),"Named-person questions must be blocked when a title is used");
+  assert(isPerson("Weißt du, ob Kevin heute Inventur gemacht hat?"),"Named-person questions in subordinate clauses must be blocked");
+  assert(isPerson("Kannst du mir sagen, ob Herr Bauer krank war?"),"Named-person health questions in indirect phrasing must be blocked");
+  assert(isPerson("Wie hat sich Sabine bei der Arbeit verhalten?"),"Named-person conduct questions must be blocked in indirect word order");
+  assert(isPerson("Welche Person hat den Kassenfehlbetrag verursacht?"),"Questions about a person's responsibility must be blocked");
+  assert(isPerson("Hat Markus die Lieferung kontrolliert?"),"Named-person operational questions must be blocked");
+  assert(isPerson("Kannst du die Arbeitsleistung von Peter bewerten?"),"Named-person performance questions must be blocked");
+  assert(!isPerson("Wie hoch ist der durchschnittliche Umsatz je Mitarbeiter?"),"Aggregate revenue per employee must remain available");
+  assert(!isPerson("Wie zuverlässig ist Hersteller Müller bei Lieferungen?"),"Manufacturer reliability must remain a business entity question");
+  assert(isPerson("Hat Sabine die Bestellung beim Lieferanten Müller aufgegeben?"),"A named employee must still be blocked when a supplier is also mentioned");
+  assert(!isPerson("Wie viele Kollegen waren gestern im Dienst?"),"Anonymous shift headcount must remain available");
+
   assert(isPerson("Hat Müller die Lieferung angenommen?"),"Named-person operational actions must be blocked");
   assert(isPerson("Hat Müller die Bestellung geprüft?"),"Named-person order checks must be blocked");
   assert(!isPerson("Wie viele Mitarbeiter sind beschäftigt?"),"Anonymous aggregate headcount must remain available");
