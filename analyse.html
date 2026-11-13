@@ -1864,6 +1864,12 @@ function advisorReply(raw){
  if(asksAboutPerson||namedPersonQuestion)return advisorEvidenceResponse('<b>Keine personenbezogenen Informationen verfügbar</b><p>TankstellenErtrag liegen keine personenbezogenen Mitarbeiter- oder Tätigkeitsdaten vor. Wir können deshalb nicht feststellen, was eine bestimmte Person – auch wenn du einen Namen nennst – gestern gemacht hat, wie sie gearbeitet hat oder welche persönlichen Eigenschaften bzw. Leistungen sie hat.</p><p>Die Anwendung wertet betriebliche Monats- und Warengruppendaten aus, keine individuellen Mitarbeiterprofile. Bitte gib hier auch keine vertraulichen oder sensiblen Personaldaten ein.</p>','missing');
  const scope=advisorScopeGuard(raw);
  if(scope)return scope;
+ // Konkrete Fragen zu eigenen Kennzahlen müssen vor allgemeinen Direktantworten
+ // in die datenbasierte Auswertung, damit unbestätigte Werte nie überschrieben werden.
+ const metricQuestion=advisorNorm(raw);
+ const asksForPersonalMetric=/\b(mein|meine|meinen|bei mir|bei uns|aktueller monat|diesen monat)\b/.test(metricQuestion);
+ const asksForMetricChange=/\b(umsatz|marge|rohertrag|wareneinsatz|schwund|abschrift|bestand)\b/.test(metricQuestion)&&/\b(gesunken|gefallen|rueckgang|ruecklaeufig|veraendert|veraenderung|warum|wieso|weshalb|vergleich|gegenueber|vormonat|vorjahr)\b/.test(metricQuestion);
+ if(asksForPersonalMetric&&asksForMetricChange)return advisorEvidenceResponse(advisorReplyBase(raw),'data');
  // Datenbasierte Priorisierung muss vor allgemeinen Direkt-/Rückfrageantworten laufen.
  const priorityQuery=advisorNorm(raw);
  if(/potenzial|wirtschaftlich|priorit|welche drei|drei dinge|erste drei|wichtigsten.{0,24}pruef|naechsten.{0,24}pruef|(?:drei|3).{0,32}(?:pruef|kontroll|massnahmen)|(?:pruef|kontroll|massnahmen).{0,32}(?:drei|3)/.test(priorityQuery))return advisorEvidenceResponse(advisorReplyBase(raw),'data');
