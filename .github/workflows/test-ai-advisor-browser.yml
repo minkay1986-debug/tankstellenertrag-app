@@ -96,7 +96,7 @@ jobs:
             beforePersonalQuestion, { timeout: 15000 });
           const personalAnswer = await page.locator('#advisorChatMessages .chat-message.assistant').last().innerText();
           const aiCallsForPersonalQuestion = await page.evaluate(() => window.__advisorAiCallCount);
-          if (!personalAnswer.includes('Keine personenbezogenen Informationen verfügbar')) {
+          if (!personalAnswer.includes('keine personenbezogenen Mitarbeiter- oder Tätigkeitsdaten')) {
             throw new Error('Personal question was not blocked by the rule-based advisor: ' + personalAnswer);
           }
           if (aiCallsForPersonalQuestion !== 0) {
