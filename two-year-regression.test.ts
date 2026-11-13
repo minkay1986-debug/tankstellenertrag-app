@@ -974,7 +974,7 @@ Deno.test("advisor labels unconfirmed monthly and group revenue instead of quoti
   const sales=reply("Warum ist mein Umsatz gesunken?");
   assert(sales.includes("Shop-Umsatz aktuell: nicht bestätigt")&&!sales.includes("987.654"),"Sales advice must not quote unconfirmed shop revenue");
   const margin=reply("Wie ist die Marge bei Backwaren?");
-  assert(margin.includes("Umsatz nicht bestätigt")&&!margin.includes("9.876,00"),"Group margin advice must not quote stale group revenue");
+  assert(margin.includes("Umsatz nicht bestätigt")&&!margin.includes("9.876,00"),"Group margin advice must not quote stale group revenue. Actual answer: "+margin);
   const order=reply("Welche Warengruppen haben den niedrigsten Umsatz und wo sollte ich nachbestellen?");
   assert(!order.includes("Backwaren (9.876,00"),"Ordering advice must not rank unconfirmed stale group revenue");
 });
