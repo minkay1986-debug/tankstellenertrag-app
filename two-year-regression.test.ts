@@ -764,13 +764,14 @@ function advisorTestReply(data:any, key="2026-12") {
   const advisorDirectAnswer = appFunction("advisorDirectAnswer","advisorHasCurrentMonthData",
     ["advisorNorm","month","calc","data"],{advisorNorm,month,calc:rt.calc,data});
   const advisorEvidenceResponse = appFunction("advisorEvidenceResponse","advisorReply",[],{});
+  const advisorIsPersonQuestion = appFunction("advisorIsPersonQuestion","advisorReply",["advisorNorm"],{advisorNorm});
   const advisorReplyBase = appFunction("advisorReplyBase","advisorEvidenceResponse",
     ["advisorNorm","month","calc","prev","data","reconciliation","dataQuality","settings","GROUPS","inventoryMetrics","inventoryPeriodDays","wowPriority","potentialHtml"],
     {advisorNorm,month,calc:rt.calc,prev:rt.prev,data,reconciliation,dataQuality,settings,GROUPS:groupDefs,inventoryMetrics:rt.inventoryMetrics,inventoryPeriodDays,wowPriority:rt.wowPriority,potentialHtml});
   const advisorGeneralGuidanceAnswer = appFunction("advisorGeneralGuidanceAnswer","advisorReplyBase",["advisorNorm"],{advisorNorm});
   return appFunction("advisorReply","initAdvisorChat",
-    ["advisorScopeGuard","advisorNorm","advisorDirectAnswer","advisorGeneralGuidanceAnswer","advisorNoDataAnswer","advisorHasCurrentMonthData","advisorReplyBase","advisorKnowledgeHtml","advisorEvidenceResponse"],
-    {advisorScopeGuard:()=>"",advisorNorm,advisorDirectAnswer,advisorGeneralGuidanceAnswer,
+    ["advisorIsPersonQuestion","advisorScopeGuard","advisorNorm","advisorDirectAnswer","advisorGeneralGuidanceAnswer","advisorNoDataAnswer","advisorHasCurrentMonthData","advisorReplyBase","advisorKnowledgeHtml","advisorEvidenceResponse"],
+    {advisorIsPersonQuestion,advisorScopeGuard:()=>"",advisorNorm,advisorDirectAnswer,advisorGeneralGuidanceAnswer,
       advisorNoDataAnswer:()=>"",advisorHasCurrentMonthData:()=>true,advisorReplyBase,advisorKnowledgeHtml:() => "",advisorEvidenceResponse});
 }
 
@@ -1261,7 +1262,7 @@ Deno.test("critical data-quality findings are visible in overview and analysis t
 
 
 Deno.test("named employee questions remain blocked without blocking business margin comparisons",()=>{
-  const norm=(v:string)=>String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ß/g,"ss").replace(/[^a-z0-9€%.,:+ -]/gi," ").replace(/\s+/g," ").trim();
+  const norm=appFunction("advisorNorm","advisorScopeGuard",[],{});
   const isPerson=appFunction("advisorIsPersonQuestion","advisorReply",["advisorNorm"],{advisorNorm:norm});
   assert(isPerson("Wieso hat Kevin keine Inventur gemacht?"),"Named employee activity question must be blocked");
   assert(isPerson("Was macht Kevin?"),"Direct question about a named person must be blocked");
@@ -1275,7 +1276,7 @@ Deno.test("named employee questions remain blocked without blocking business mar
 });
 
 Deno.test("requested revenue and margin data must be independently confirmed",()=>{
-  const norm=(v:string)=>String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ß/g,"ss").replace(/[^a-z0-9€%.,:+ -]/gi," ").replace(/\s+/g," ").trim();
+  const norm=appFunction("advisorNorm","advisorScopeGuard",[],{});
   let current:any={sourceMonthly:false,sourceEK:false,sourceShrink:false,sourceWriteoff:false,sourceInventory:false};
   const noData=appFunction("advisorNoDataAnswer","advisorGeneralGuidanceAnswer",
     ["advisorNorm","calc","month","advisorHasCurrentMonthData"],
