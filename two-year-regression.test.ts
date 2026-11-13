@@ -1258,3 +1258,42 @@ Deno.test("critical data-quality findings are visible in overview and analysis t
   assert(html.includes("let html=dataQualityPanel(k)+riskStatusPanel(k,true)"),"Analysis must show the shared data-quality and risk summaries with analysis-specific detail wording");
   assert(html.includes("'+dataQualityPanel(month())+riskStatusPanel(month())+'"),"Report must show the same shared data-quality and risk summaries");
 });
+
+
+Deno.test("named employee questions remain blocked without blocking business margin comparisons",()=>{
+  const norm=(v:string)=>String(v||"").toLowerCase().normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/ß/g,"ss").replace(/[^a-z0-9€%.,:+ -]/gi," ").replace(/\\s+/g," ").trim();
+  const isPerson=appFunction("advisorIsPersonQuestion","advisorReply",["advisorNorm"],{advisorNorm:norm});
+  assert(isPerson("Wieso hat Kevin keine Inventur gemacht?"),"Named employee activity question must be blocked");
+  assert(isPerson("Was macht Kevin?"),"Direct question about a named person must be blocked");
+  assert(isPerson("Wie zuverlässig ist der Mitarbeiter?"),"Employee assessment must be blocked");
+  assert(!isPerson("Vergleiche die Warengruppenmargen von Kaffee und Backwaren."),"Business margin comparison must remain available");
+  assert(!isPerson("Welche Warengruppen haben die höchste Marge?"),"Which-category questions must not be mistaken for person questions");
+  assert(!isPerson("Wie hoch sind die Personalkosten im Verhältnis zum Umsatz?"),"Aggregate personnel costs must remain a business metric");
+});
+
+Deno.test("requested revenue and margin data must be independently confirmed",()=>{
+  const norm=(v:string)=>String(v||"").toLowerCase().normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/ß/g,"ss").replace(/[^a-z0-9€%.,:+ -]/gi," ").replace(/\\s+/g," ").trim();
+  let current:any={sourceMonthly:false,sourceEK:false,sourceShrink:false,sourceWriteoff:false,sourceInventory:false};
+  const noData=appFunction("advisorNoDataAnswer","advisorGeneralGuidanceAnswer",
+    ["advisorNorm","calc","month","advisorHasCurrentMonthData"],
+    {advisorNorm:norm,calc:()=>current,month:()=>"2026-11",advisorHasCurrentMonthData:()=>true});
+  assert(noData("Wie hoch ist mein Umsatz diesen Monat?").length>0,
+    "Unconfirmed revenue must not be presented as a reliable number even if another source exists");
+  current={sourceMonthly:true,sourceEK:false};
+  assert(noData("Wie hoch ist mein Umsatz diesen Monat?")==="",
+    "Confirmed revenue may be answered independently");
+  assert(noData("Wie hoch ist meine Marge diesen Monat?").length>0,
+    "Margin requires both confirmed revenue and EK");
+  current={sourceMonthly:true,sourceEK:true};
+  assert(noData("Wie hoch ist meine Marge diesen Monat?")==="",
+    "Margin may be answered only after both required sources are confirmed");
+});
+
+Deno.test("missing requested metric check runs before direct and general advisory answers",()=>{
+  const replyStart=html.indexOf("function advisorReply(raw)");
+  const noDataAt=html.indexOf("const noData=advisorNoDataAnswer(raw);",replyStart);
+  const directAt=html.indexOf("const direct=advisorDirectAnswer(raw);",replyStart);
+  const generalAt=html.indexOf("const advisory=advisorGeneralGuidanceAnswer(raw);",replyStart);
+  assert(replyStart>=0&&noDataAt>replyStart&&directAt>noDataAt&&generalAt>noDataAt,
+    "Missing requested data must be checked before any generic answer path");
+});
