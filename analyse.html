@@ -1527,6 +1527,16 @@ try{
   .then(j=>{advisorKnowledgeEntries=Array.isArray(j&&j.entries)?j.entries:[];advisorKnowledgeReady=true})
   .catch(()=>{advisorKnowledgeReady=true;advisorKnowledgeEntries=[]});
 }catch(e){advisorKnowledgeReady=true;advisorKnowledgeEntries=[]}
+function advisorPersonDataGuard(raw){
+ const q=advisorNorm(raw),original=String(raw||'').trim();
+ const personalIntent=/\b(was hat|was macht|was tat|wie arbeitet|wie verhaelt sich|wie verhielt sich|wie oft war|warum war|warum hat|hat .* gemacht|hat .* gearbeitet|leistung von|verhalten von|fehlzeiten|anwesenheit|krankheit|krankmeldung|schicht von|pause von|gehalt von|lohn von|kuendigen|entlassen|abmahnen|zuverlaessigkeit|zuverlässigkeit|arbeitsleistung|arbeitszeit von|privatleben|adresse von|telefonnummer von)\b/.test(q);
+ const capitalized=(original.match(/\b[A-ZÄÖÜ][a-zäöüß-]{2,}\b/g)||[]);
+ const ignored=new Set(['Was','Wie','Wo','Wann','Warum','Wieviel','Welche','Welcher','Welches','Kann','Bitte','Zeige','Erkläre','Vergleiche','Analysiere','Hat','Ist','Macht','War','Waren','Heute','Gestern']);
+ const hasName=capitalized.some(x=>!ignored.has(x))||/^[A-ZÄÖÜ][a-zäöüß-]{2,}\b/.test(original);
+ const namedPersonIntent=hasName&&/\b(was|wie|wo|wann|warum|gestern|heute|gemacht|gearbeitet|arbeitet|macht|tat|leistung|verhalten|schicht|pause|krank|anwesend|fehlte|gehalt|lohn)\b/.test(q);
+ if(!personalIntent&&!namedPersonIntent)return '';
+ return '<b>Keine personenbezogenen Informationen verfügbar</b><p>TankstellenErtrag liegen keine personenbezogenen Mitarbeiter- oder Tätigkeitsdaten vor. Wir können deshalb nicht feststellen, was eine bestimmte Person – auch wenn du einen Namen nennst – gestern gemacht hat, wie sie gearbeitet hat oder welche persönlichen Eigenschaften bzw. Leistungen sie hat.</p><p>Die Anwendung wertet betriebliche Monats- und Warengruppendaten aus, keine individuellen Mitarbeiterprofile. Bitte gib hier auch keine vertraulichen oder sensiblen Personaldaten ein.</p>';
+}
 function advisorScopeGuard(raw){
  const q=advisorNorm(raw);
  if(/\b(artikelnummer|einzelartikel|artikelabsatz|artikelmenge|artikelgenau|artikelgenaue|sku|stuckmarge|stuckpreis|einzelverkauf|je artikel|pro artikel|welche artikel|artikel reduzieren|artikel auslisten|artikel fehlt)\b/.test(q)){
@@ -1858,6 +1868,8 @@ function advisorEvidenceResponse(answer,kind){
  return answer+footer;
 }
 function advisorReply(raw){
+ const personGuard=advisorPersonDataGuard(raw);
+ if(personGuard)return advisorEvidenceResponse(personGuard,'missing');
  const scope=advisorScopeGuard(raw);
  if(scope)return scope;
  // Datenbasierte Priorisierung muss vor allgemeinen Direkt-/Rückfrageantworten laufen.
