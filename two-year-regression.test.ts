@@ -1265,6 +1265,9 @@ Deno.test("named employee questions remain blocked without blocking business mar
   const isPerson=appFunction("advisorIsPersonQuestion","advisorReply",["advisorNorm"],{advisorNorm:norm});
   assert(isPerson("Wieso hat Kevin keine Inventur gemacht?"),"Named employee activity question must be blocked");
   assert(isPerson("Was macht Kevin?"),"Direct question about a named person must be blocked");
+  assert(isPerson("Wie ist Kevin?"),"General assessment of a named person must be blocked");
+  assert(isPerson("Wie zuverlässig ist Kevin?"),"Named employee assessment must be blocked");
+  assert(isPerson("Wer hat gestern Schicht gemacht?"),"Unnamed question about an employee action must be blocked");
   assert(isPerson("Wie zuverlässig ist der Mitarbeiter?"),"Employee assessment must be blocked");
   assert(!isPerson("Vergleiche die Warengruppenmargen von Kaffee und Backwaren."),"Business margin comparison must remain available");
   assert(!isPerson("Welche Warengruppen haben die höchste Marge?"),"Which-category questions must not be mistaken for person questions");
