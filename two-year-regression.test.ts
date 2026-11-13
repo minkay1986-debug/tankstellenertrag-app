@@ -1280,6 +1280,13 @@ Deno.test("named employee questions remain blocked without blocking business mar
   assert(!isPerson("Welche Warengruppen haben die höchste Marge?"),"Which-category questions must not be mistaken for person questions");
   assert(!isPerson("Wie ist die Marge bei Backwaren?"),"Category margin questions must not be mistaken for named-person questions");
   assert(!isPerson("Wie hoch sind die Personalkosten im Verhältnis zum Umsatz?"),"Aggregate personnel costs must remain a business metric");
+  assert(isPerson("Hat Müller die Lieferung angenommen?"),"Named-person operational actions must be blocked");
+  assert(isPerson("Hat Müller die Bestellung geprüft?"),"Named-person order checks must be blocked");
+  assert(!isPerson("Wie viele Mitarbeiter sind beschäftigt?"),"Anonymous aggregate headcount must remain available");
+  assert(!isPerson("Hat der Lieferant Müller heute geliefert?"),"Supplier delivery questions must remain business questions");
+  assert(!isPerson("Wie viele Mitarbeiter haben wir im Schnitt pro Schicht?"),"Aggregate staffing levels must remain available");
+  assert(isPerson("Welche Mitarbeiter haben gestern Schicht gemacht?"),"Employee-specific shift activity must be blocked");
+  assert(!isPerson("Welche Artikel hat Müller geliefert?"),"Product delivery history must remain available as a business question");
 });
 
 Deno.test("requested revenue and margin data must be independently confirmed",()=>{
