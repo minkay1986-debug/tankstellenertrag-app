@@ -1261,7 +1261,7 @@ Deno.test("critical data-quality findings are visible in overview and analysis t
 
 
 Deno.test("named employee questions remain blocked without blocking business margin comparisons",()=>{
-  const norm=(v:string)=>String(v||"").toLowerCase().normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/ß/g,"ss").replace(/[^a-z0-9€%.,:+ -]/gi," ").replace(/\\s+/g," ").trim();
+  const norm=(v:string)=>String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ß/g,"ss").replace(/[^a-z0-9€%.,:+ -]/gi," ").replace(/\s+/g," ").trim();
   const isPerson=appFunction("advisorIsPersonQuestion","advisorReply",["advisorNorm"],{advisorNorm:norm});
   assert(isPerson("Wieso hat Kevin keine Inventur gemacht?"),"Named employee activity question must be blocked");
   assert(isPerson("Was macht Kevin?"),"Direct question about a named person must be blocked");
@@ -1272,7 +1272,7 @@ Deno.test("named employee questions remain blocked without blocking business mar
 });
 
 Deno.test("requested revenue and margin data must be independently confirmed",()=>{
-  const norm=(v:string)=>String(v||"").toLowerCase().normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/ß/g,"ss").replace(/[^a-z0-9€%.,:+ -]/gi," ").replace(/\\s+/g," ").trim();
+  const norm=(v:string)=>String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ß/g,"ss").replace(/[^a-z0-9€%.,:+ -]/gi," ").replace(/\s+/g," ").trim();
   let current:any={sourceMonthly:false,sourceEK:false,sourceShrink:false,sourceWriteoff:false,sourceInventory:false};
   const noData=appFunction("advisorNoDataAnswer","advisorGeneralGuidanceAnswer",
     ["advisorNorm","calc","month","advisorHasCurrentMonthData"],
