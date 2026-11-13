@@ -103,6 +103,28 @@ jobs:
             throw new Error('Personal question reached the supplementary AI function');
           }
           console.log(JSON.stringify({ personalQuestionBlocked: true, aiCallsForPersonalQuestion }, null, 2));
+          if (personalAnswer.includes('DATENLAGE') || personalAnswer.includes('Ergänzende KI-Fachberatung')) {
+            throw new Error('Personal refusal must not include generic advisory boilerplate or an AI answer');
+          }
+          await input.fill('Warum hat rudi keine Inventur gemacht?');
+          const beforeLowercaseName = await page.locator('#advisorChatMessages .chat-message.assistant').count();
+          await submit.click();
+          await page.waitForFunction((previous) =>
+            document.querySelectorAll('#advisorChatMessages .chat-message.assistant').length > previous,
+            beforeLowercaseName, { timeout: 15000 });
+          const lowercaseNameAnswer = await page.locator('#advisorChatMessages .chat-message.assistant').last().innerText();
+          const lowercaseNameAiCalls = await page.evaluate(() => window.__advisorAiCallCount);
+          if (!lowercaseNameAnswer.includes('Keine personenbezogenen Informationen verfügbar')) {
+            throw new Error('Lowercase named-person inventory question was not blocked: ' + lowercaseNameAnswer);
+          }
+          if (lowercaseNameAiCalls !== 0) {
+            throw new Error('Lowercase named-person question reached the supplementary AI function');
+          }
+          if (lowercaseNameAnswer.includes('DATENLAGE') || lowercaseNameAnswer.includes('Ergänzende KI-Fachberatung')) {
+            throw new Error('Lowercase named-person refusal contains duplicate generic or AI content');
+          }
+          console.log(JSON.stringify({ lowercaseNamedPersonBlocked: true, lowercaseNameAiCalls }, null, 2));
+
           console.log(JSON.stringify({ status: response.status(), title: await page.title(), testEndpointIsolated: true, chatInputVisible: true, answerReturned: true, answerPreview: answer.slice(0, 300), runtimeErrors: errors.length }, null, 2));
           await browser.close();
           NODE
