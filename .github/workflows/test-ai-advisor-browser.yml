@@ -81,6 +81,28 @@ jobs:
           const answer = await page.locator('#advisorChatMessages .chat-message.assistant').last().innerText();
           if (!answer.trim()) throw new Error('Advisor chat returned an empty answer');
           if (errors.length) throw new Error('Browser runtime errors: ' + errors.join('\n---\n'));
+          const beforePersonalQuestion = await page.locator('#advisorChatMessages .chat-message.assistant').count();
+          await page.evaluate(() => {
+            window.__advisorAiCallCount = 0;
+            window.requestAdvisorAi = async () => {
+              window.__advisorAiCallCount++;
+              return 'UNERWARTETE KI-ANTWORT';
+            };
+          });
+          await input.fill('Wie viele Krankheitstage hatte Anna?');
+          await submit.click();
+          await page.waitForFunction((previous) =>
+            document.querySelectorAll('#advisorChatMessages .chat-message.assistant').length > previous,
+            beforePersonalQuestion, { timeout: 15000 });
+          const personalAnswer = await page.locator('#advisorChatMessages .chat-message.assistant').last().innerText();
+          const aiCallsForPersonalQuestion = await page.evaluate(() => window.__advisorAiCallCount);
+          if (!personalAnswer.includes('keine personenbezogenen Mitarbeiter- oder Tätigkeitsdaten')) {
+            throw new Error('Personal question was not blocked by the rule-based advisor: ' + personalAnswer);
+          }
+          if (aiCallsForPersonalQuestion !== 0) {
+            throw new Error('Personal question reached the supplementary AI function');
+          }
+          console.log(JSON.stringify({ personalQuestionBlocked: true, aiCallsForPersonalQuestion }, null, 2));
           console.log(JSON.stringify({ status: response.status(), title: await page.title(), testEndpointIsolated: true, chatInputVisible: true, answerReturned: true, answerPreview: answer.slice(0, 300), runtimeErrors: errors.length }, null, 2));
           await browser.close();
           NODE

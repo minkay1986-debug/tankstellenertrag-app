@@ -2035,6 +2035,12 @@ function initAdvisorChat(){
    await advisorKnowledgePromise;
    const fallback=advisorReply(q);
    body.innerHTML=advisorCompactHtml(q,fallback||'<p>Die Auswertung lieferte keine Antwort. Bitte prüfe, ob Monatsdaten geladen sind.</p>');
+   // Personenbezogene Fragen bleiben vollständig in der regelbasierten Sperre.
+   // Sie dürfen weder als Frage noch als Kontext an den KI-Worker übertragen werden.
+   if(advisorIsPersonQuestion(q)){
+    reply.scrollIntoView({block:'nearest',behavior:'smooth'});
+    return;
+   }
    const aiStatus=document.createElement('div');aiStatus.className='advisor-ai-loading';aiStatus.setAttribute('role','status');aiStatus.setAttribute('aria-live','polite');aiStatus.innerHTML='<span class="advisor-coffee" aria-hidden="true"><span class="advisor-coffee-steam">〰</span><span class="advisor-coffee-cup"></span><span class="advisor-coffee-handle"></span></span><span class="advisor-ai-loading-text"><strong>Die KI brüht deine Beratung auf …</strong>Die regelbasierte Auswertung steht bereits oben. Die ergänzende KI-Fachberatung wird separat erstellt.</span>';
    const aiTile=document.createElement('section');aiTile.className='advisor-ai-answer';aiTile.setAttribute('aria-label','Ergänzende KI-Fachberatung');
    const aiTitle=document.createElement('b');aiTitle.textContent='Ergänzende KI-Fachberatung';aiTile.appendChild(aiTitle);
