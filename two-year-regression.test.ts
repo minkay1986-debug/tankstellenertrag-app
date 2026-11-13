@@ -1271,6 +1271,10 @@ Deno.test("named employee questions remain blocked without blocking business mar
   assert(isPerson("Wie geht es Kevin?"),"Questions about a named person's condition must be blocked");
   assert(isPerson("Wie zuverlässig ist Kevin?"),"Named employee assessment must be blocked");
   assert(isPerson("Wer hat gestern Schicht gemacht?"),"Unnamed question about an employee action must be blocked");
+  assert(isPerson("Hat Müller gestern gearbeitet?"),"Inverted named-person work questions must be blocked");
+  assert(isPerson("Hat Sven heute Inventur gemacht?"),"Named-person inventory questions must be blocked");
+  assert(!isPerson("Wer ist mein bester Lieferant?"),"Supplier identity questions must remain business questions");
+  assert(!isPerson("Welcher Hersteller liefert die besten Kaffeeprodukte?"),"Manufacturer questions must remain business questions");
   assert(isPerson("Wie zuverlässig ist der Mitarbeiter?"),"Employee assessment must be blocked");
   assert(!isPerson("Vergleiche die Warengruppenmargen von Kaffee und Backwaren."),"Business margin comparison must remain available");
   assert(!isPerson("Welche Warengruppen haben die höchste Marge?"),"Which-category questions must not be mistaken for person questions");
