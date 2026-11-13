@@ -2032,15 +2032,20 @@ function initAdvisorChat(){
   const head=document.createElement('b');head.textContent='TankstellenErtrag';reply.appendChild(head);
   const body=document.createElement('div');body.innerHTML='<p>Ich prüfe deine Frage …</p>';reply.appendChild(body);messages.appendChild(reply);input.value='';
   try{
-   await advisorKnowledgePromise;
-   const fallback=advisorReply(q);
-   body.innerHTML=advisorCompactHtml(q,fallback||'<p>Die Auswertung lieferte keine Antwort. Bitte prüfe, ob Monatsdaten geladen sind.</p>');
-   // Personenbezogene Fragen bleiben vollständig in der regelbasierten Sperre.
-   // Sie dürfen weder als Frage noch als Kontext an den KI-Worker übertragen werden.
-   if(advisorIsPersonQuestion(q)){
+   // Privacy guard runs before any asynchronous knowledge loading or AI request.
+   if(typeof advisorIsPersonQuestion!=='function'){
+    body.innerHTML='<b>Beratung vorsorglich gestoppt</b><p>Die Personen-Schutzprüfung ist derzeit nicht verfügbar. Bitte versuche es später erneut.</p>';
     reply.scrollIntoView({block:'nearest',behavior:'smooth'});
     return;
    }
+   if(advisorIsPersonQuestion(q)){
+    body.innerHTML='<b>Keine personenbezogenen Informationen verfügbar</b><p>TankstellenErtrag liegen keine personenbezogenen Mitarbeiter- oder Tätigkeitsdaten vor. Wir können deshalb nicht feststellen, was eine bestimmte Person – auch wenn du einen Namen nennst – gemacht hat oder welche persönlichen Eigenschaften bzw. Leistungen sie hat.</p><p>Die Anwendung wertet betriebliche Monats- und Warengruppendaten aus, keine individuellen Mitarbeiterprofile. Bitte gib hier auch keine vertraulichen oder sensiblen Personaldaten ein.</p>';
+    reply.scrollIntoView({block:'nearest',behavior:'smooth'});
+    return;
+   }
+   await advisorKnowledgePromise;
+   const fallback=advisorReply(q);
+   body.innerHTML=advisorCompactHtml(q,fallback||'<p>Die Auswertung lieferte keine Antwort. Bitte prüfe, ob Monatsdaten geladen sind.</p>');
    const aiStatus=document.createElement('div');aiStatus.className='advisor-ai-loading';aiStatus.setAttribute('role','status');aiStatus.setAttribute('aria-live','polite');aiStatus.innerHTML='<span class="advisor-coffee" aria-hidden="true"><span class="advisor-coffee-steam">〰</span><span class="advisor-coffee-cup"></span><span class="advisor-coffee-handle"></span></span><span class="advisor-ai-loading-text"><strong>Die KI brüht deine Beratung auf …</strong>Die regelbasierte Auswertung steht bereits oben. Die ergänzende KI-Fachberatung wird separat erstellt.</span>';
    const aiTile=document.createElement('section');aiTile.className='advisor-ai-answer';aiTile.setAttribute('aria-label','Ergänzende KI-Fachberatung');
    const aiTitle=document.createElement('b');aiTitle.textContent='Ergänzende KI-Fachberatung';aiTile.appendChild(aiTitle);
