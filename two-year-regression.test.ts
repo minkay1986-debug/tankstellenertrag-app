@@ -1280,6 +1280,16 @@ Deno.test("named employee questions remain blocked without blocking business mar
   assert(!isPerson("Welche Warengruppen haben die höchste Marge?"),"Which-category questions must not be mistaken for person questions");
   assert(!isPerson("Wie ist die Marge bei Backwaren?"),"Category margin questions must not be mistaken for named-person questions");
   assert(!isPerson("Wie hoch sind die Personalkosten im Verhältnis zum Umsatz?"),"Aggregate personnel costs must remain a business metric");
+  assert(isPerson("Hat Thomas gestern die Kasse abgeschlossen?"),"Indirectly phrased named-person actions must be blocked");
+  assert(isPerson("Weißt du, ob Kevin heute Inventur gemacht hat?"),"Named-person questions in subordinate clauses must be blocked");
+  assert(isPerson("Wie hat sich Sabine bei der Arbeit verhalten?"),"Named-person behavior questions must be blocked");
+  assert(isPerson("Welche Person hat den Kassenfehlbetrag verursacht?"),"Questions about an individual's responsibility must be blocked");
+  assert(isPerson("Hat Sabine die Bestellung beim Lieferanten Müller aufgegeben?"),"Named employee questions remain blocked when a supplier is mentioned too");
+  assert(!isPerson("Wie hoch ist unser Personalaufwand im Verhältnis zum Umsatz?"),"Aggregate personnel expense ratios must remain available");
+  assert(!isPerson("Wie ist die Preisentwicklung bei Coca-Cola?"),"Brand price trend questions must remain available");
+  assert(!isPerson("Wie hoch ist der Umsatz von Müller GmbH?"),"Company names must not be mistaken for individual people");
+  assert(!isPerson("Wie viele Kollegen waren gestern im Dienst?"),"Anonymous staffing counts must remain available");
+  assert(!isPerson("Wie hoch ist der durchschnittliche Umsatz je Mitarbeiter?"),"Average business metrics per employee must remain available");
   assert(isPerson("Hat Frau Maier die Warenbestellung freigegeben?"),"Named-person questions must be blocked when a title is used");
   assert(isPerson("Weißt du, ob Kevin heute Inventur gemacht hat?"),"Named-person questions in subordinate clauses must be blocked");
   assert(isPerson("Kannst du mir sagen, ob Herr Bauer krank war?"),"Named-person health questions in indirect phrasing must be blocked");
