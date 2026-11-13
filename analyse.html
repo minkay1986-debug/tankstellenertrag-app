@@ -1821,7 +1821,28 @@ function advisorHasCurrentMonthData(k=month()){
  });
  return top||sources||groups;
 }
-function advisorNoDataAnswer(raw){const q=advisorNorm(raw);const asksForStationNumbers=/\b(mein|meine|meinen|meinem|bei mir|bei uns|diesen monat|aktueller monat|aktuell|konkret|berechne|berechnen|zeige|analysiere|vergleiche|wie hoch ist|wie viel habe ich|welche artikel bei mir|welche warengruppe bei mir)\b/.test(q);if(!asksForStationNumbers||!/marge|rohertrag|wareneinsatz|umsatz|ertrag|gewinn|verlust|schwund|abschrift|inventur|bestand|bestell|sortiment|warengruppe|verkauf|absatz|vergleich|rentabel|profitabel|einkauf|artikel/.test(q))return '';return '<b>Für diese Auswertung fehlen noch belastbare Monatsdaten.</b><p>In der aktuellen Sitzung sind für diesen Monat keine bestätigten Stationswerte erkennbar. Deshalb behandle ich angezeigte Standardwerte von 0 € nicht als Nachweis für tatsächlich null Umsatz, Wareneinsatz oder Schwund und gebe keine scheinbar genaue Kennzahl aus.</p><p>Trage die Werte ein oder lade den Monats-/EK-Import. Wenn ein Wert tatsächlich 0 ist, trage ausdrücklich 0 ein und speichere den Monat; dann bleibt dieser Nullwert als erfasst gekennzeichnet.</p>';}
+function advisorNoDataAnswer(raw){
+ const q=advisorNorm(raw);
+ const asksForStationNumbers=/\b(mein|meine|meinen|meinem|bei mir|bei uns|diesen monat|aktueller monat|aktuell|konkret|berechne|berechnen|zeige|analysiere|vergleiche|wie hoch ist|wie viel habe ich|welche artikel bei mir|welche warengruppe bei mir)\b/.test(q);
+ if(!asksForStationNumbers||!/marge|rohertrag|wareneinsatz|umsatz|ertrag|gewinn|verlust|schwund|abschrift|inventur|bestand|bestell|sortiment|warengruppe|verkauf|absatz|vergleich|rentabel|profitabel|einkauf|artikel/.test(q))return '';
+ const d=calc(month());
+ const asksMargin=/\b(marge|rohertrag|ertrag)\b/.test(q);
+ const asksRevenue=/\b(umsatz|verkauf|absatz)\b/.test(q);
+ const asksEk=/\b(ek|einkauf|wareneinsatz)\b/.test(q);
+ const asksShrink=/\b(schwund)\b/.test(q);
+ const asksWriteoff=/\b(abschrift)\w*\b/.test(q);
+ const asksStock=/\b(inventur|bestand)\b/.test(q);
+ let confirmed=true;
+ if(asksMargin)confirmed=d?.sourceMonthly===true&&d?.sourceEK===true;
+ else if(asksRevenue)confirmed=d?.sourceMonthly===true;
+ else if(asksEk)confirmed=d?.sourceEK===true;
+ else if(asksShrink)confirmed=d?.sourceShrink===true;
+ else if(asksWriteoff)confirmed=d?.sourceWriteoff===true;
+ else if(asksStock)confirmed=d?.sourceInventory===true;
+ else confirmed=advisorHasCurrentMonthData();
+ if(confirmed)return '';
+ return '<b>Für die angefragte Kennzahl fehlen bestätigte Daten.</b><p>Die benötigte Datenquelle ist für den ausgewählten Monat nicht als bestätigt gekennzeichnet. Ein angezeigter Standardwert von 0 € ist kein Nachweis für tatsächlich null Umsatz, Wareneinsatz oder Schwund. Ich gebe deshalb keine scheinbar genaue Zahl oder Entwicklung aus.</p><p>Prüfe den passenden Monats- bzw. EK-Import und den Zeitraum. Wenn ein Wert tatsächlich 0 ist, muss dieser Nullwert ausdrücklich erfasst und gespeichert sein.</p>';
+}
 function advisorGeneralGuidanceAnswer(raw){const q=advisorNorm(raw);
 if(/warum bleibt.*(monatsende|ende).*(umsatz|haengen|hängen)|trotz gutem umsatz/.test(q))return '<b>Warum trotz gutem Umsatz wenig Rohertrag bleibt</b><p>Umsatz allein sagt noch nicht, wie viel Rohertrag entsteht. Prüfe zuerst Wareneinsatz und Marge je Warengruppe, danach Rabatte/Aktionen, Produktmix sowie separat erfasste Abschriften und Schwund. Gleiche jeweils denselben Zeitraum und dieselbe Warengruppe ab.</p><p>Das sind Prüfschritte, keine festgestellte Ursache. Für eine konkrete Rangfolge brauche ich bestätigte Umsatz- und EK-/Wareneinsatzdaten.</p>';
 if(/welche bereiche.*(ertragsverlust|verluste)|zuerst.*(ertragsverlust|verluste)|wie ordne ich meinen schwund/.test(q))return '<b>Prüfreihenfolge für mögliche Ertragsverluste</b><ol><li>Vollständigkeit von Umsatz, EK/Wareneinsatz und Zeitraum prüfen.</li><li>Rohertrag und Marge nach Warengruppe vergleichen.</li><li>Schwund, Abschriften und Bestandsdifferenzen getrennt abgleichen.</li><li>Erst danach Ursachen als Hypothesen priorisieren.</li></ol><p>Verwende keine pauschalen Branchenverluste oder Schwellenwerte als Beweis für deine Station.</p>';
@@ -1857,13 +1878,52 @@ function advisorEvidenceResponse(answer,kind){
  const footer='<section class="advisor-evidence-frame"><p><b>'+label.title+'</b><br>'+label.text+'</p><p><b>VERMUTUNG / URSACHE</b><br>Eine zeitliche Veränderung oder Auffälligkeit beweist für sich allein keine Ursache. Preis-, Mengen-, Mix-, Aktions- und Buchungseffekte nur dann als Ursache benennen, wenn sie durch passende Daten belegt sind; sonst ausdrücklich als Hypothese behandeln.</p><p><b>HANDLUNGSVORSCHLAG</b><br>Prüfschritte und Maßnahmen sind Empfehlungen. Eine Wirkung gilt erst nach Vergleich derselben bestätigten Kennzahl mit dokumentiertem Ausgangswert und geeignetem Folgezeitraum als beobachtet – nicht automatisch als durch die Maßnahme verursacht.</p></section>';
  return answer+footer;
 }
+function advisorIsPersonQuestion(raw){
+ const normalized=advisorNorm(raw),original=String(raw||'').trim();
+ const personEntity=/\b(mitarbeiter\w*|personal|kolleg\w*|teammitglied\w*|beschäftigt\w*|beschaeftigt\w*|angestellt\w*|fahrer\w*|kassierer\w*|schichtleiter\w*|aushilfe\w*|person(?:en)?)\b/.test(normalized);
+ const personAssessment=/\b(wer|wen|wem|wessen|welcher|welche|welches|wie viele|wie oft|einzeln\w*|individuell\w*|zuverlaessig\w*|zuverlassig|zuverlässig\w*|zuverlaessigkeit|zuverlässigkeit|leistung\w*|verhalten\w*|krank\w*|krankheitstag\w*|fehlzeit\w*|unpünktlich\w*|unpuenktlich\w*|pünktlich\w*|puenktlich\w*|verantwortlich\w*|schuld\w*|arbeitet|gearbeitet|alleine|kommt|fehlt|vergisst|erledigt|kontrolliert|abgeschlossen)\b/.test(normalized);
+ const businessEntityQuestion=/\b(lieferant\w*|hersteller\w*|anbieter\w*|marke\w*|produkt\w*|artikel\w*|warengruppe\w*|sortiment\w*|kunde\w*|wettbewerber\w*|gmbh|ag|kg|ohg|ug|gbr|red bull|coca cola|coca-cola|getraenk\\w*lieferant|getränk\\w*lieferant)\b/.test(normalized);
+ const aggregateHeadcount=/\b(wie viele|anzahl|zahl der)\s+(mitarbeiter|kollegen|beschäftigte|beschaeftigte)\b/.test(normalized)
+  && !/\b(wer|welcher|welche|krank|krankheitstag|krankmeldung|zuverlaessig|zuverlässig|leistung|verhalten|fehlzeit|gehalt|lohn|adresse|telefonnummer)\b/.test(normalized);
+ const aggregatePerEmployee=/\b(umsatz|rohertrag|ertrag|kosten|absatz|verkauf|produktivit[aä]t)\b/.test(normalized)
+  &&/\b(je|pro)\s+(mitarbeiter|kollege|beschäftigte|beschaeftigte|schichtleiter|kassierer|fahrer|aushilfe)\b/.test(normalized)
+  && !/\b(wer|welcher|welche|einzeln|individuell|zuverlaessig|zuverlässig|leistung|verhalten|krank|fehlzeit|gehalt|lohn|arbeitszeit|adresse|telefonnummer)\b/.test(normalized);
+ const genericRole=/^(?:herr|frau|hersteller|lieferant|anbieter|marke|produkt|artikel|warengruppe|sortiment|kunde|wettbewerber|mitarbeiter|kollege|beschäftigte|beschaeftigte|person|schicht|umsatz|rohertrag|ertrag|gewinn|verlust|bestand|kaffee|backwaren|getränke|getraenke|coca-cola|red-bull|hat|macht|wie|was|wer|welche|welcher|welches|kannst|weißt|weisst|ob|dass|die|der|das|den|dem|des|ein|eine|einer|einem|einen|eines|unser|unsere|unserem|unseren|unserer|mein|meine|meinem|meinen|meiner|dein|deine|ihr|ihre|sich|es|wir|uns|dieser|diese|dieses|diesen|bei|von|mit|für|fuer)$/i;
+ const isName=(value)=>!!value&&!genericRole.test(value);
+ const namedPerson=/\b(?:Herr|Frau)\s+([A-ZÄÖÜ][a-zäöüß]+(?:-[a-zäöüß]+)*)\b/i.exec(original);
+ const namedAfterCue=/\b(?:ob|dass|sich|von|für|fuer|über|ueber|bei|mit|hat|macht|tat|arbeitet|war|ist|hatte|kommt|fehlt|vergisst|erledigt|kontrolliert|angenommen|geprüft|geprueft|geliefert|bestellt|gezählt|gezaehlt|kassiert|abgeschlossen|geht es)\b\s+(?!(?:sich|mit|der|die|das|den|dem|des|ein|eine|einer|einem|einen|eines|unser|unsere|unserem|unseren|unserer|mein|meine|meinem|meinen|meiner)\b)([A-ZÄÖÜ][a-zäöüß]+(?:-[a-zäöüß]+)*)\b/i.exec(original);
+ const namedAtStart=/^(?!(?:Wie|Was|Wer|Wen|Wem|Welche|Welcher|Welches|Wieso|Warum|Weshalb|Wann|Wo|Wohin|Womit|Wodurch|Kannst|Weißt|Weisst|Sagst|Bitte|Ich|Wir|Hat|Macht|War|Ist|Kommt|Fehlt|Kontrolliert|Erledigt)\b)([A-ZÄÖÜ][a-zäöüß]+(?:-[a-zäöüß]+)*)\b/.exec(original);
+ const namedAfterWhy=/\bwarum\s+([A-ZÄÖÜ][a-zäöüß]+(?:-[a-zäöüß]+)*)\b/.exec(original);
+ const namedPersonPresent=[namedPerson?.[1],namedAfterCue?.[1],namedAtStart?.[1],namedAfterWhy?.[1]].some(isName);
+
+ const personalIntent=/\b(was hat|was macht|was tat|was ist mit|was war mit|wie geht es|wie ist|wie war|wer ist|wer war|wie arbeitet|wie beurteilt|wie bewertest|wie verhaelt sich|wie verhielt sich|wie oft war|warum war|warum hat|wieso hat|weshalb hat|wieso war|weshalb war|keine inventur gemacht|zuverlaessig\w*|zuverlässig\w*|zuverlaessigkeit|zuverlassig\w*|zuverlassigkeit|zuverlässigkeit|leistung|verhalten|fehlzeiten|anwesenheit|krank|krank\w*|krankheit|krankheitstage|krankmeldung|schicht|pause|gehalt|lohn|kuendigen|entlassen|abmahnen|pünktlich|punktlich|puenktlich|unpunktlich|unpuenktlich|unpünktlich|arbeitsleistung|arbeitszeit|privatleben|warum|nicht da|warenannahme|alleine gearbeitet|adresse|telefonnummer|inventur|bestellung|kasse|lieferung|dienst|dienstplan|gearbeitet|geprüft|geprueft|freigegeben|kontrolliert|übernommen|uebernommen|verursacht|bewerten|vergleichen)\b/.test(normalized);
+ const namedSubjectAction=/\b(?:[Hh]at|[Mm]acht|[Tt]at|[Aa]rbeitet|[Kk]ommt|[Ff]ehlt|[Vv]ergisst|[Ee]rledigt|[Kk]ontrolliert|[Aa]ngenommen|[Ff]reigegeben|[Gg]eprüft|[Gg]eprueft|[Gg]eliefert|[Bb]estellt|[Gg]ezählt|[Gg]ezaehlt|[Kk]assiert|[Aa]bgeschlossen)\s+[A-ZÄÖÜ][a-zäöüß]+(?:-[a-zäöüß]+)*\b/.test(original)
+  && !businessEntityQuestion;
+ const namedSubjectAtStart=/^(?:[Hh]at|[Mm]acht|[Ww]ar|[Ii]st|[Aa]rbeitet|[Kk]ontrolliert|[Ee]rledigt)\s+(?:(?:Herr|Frau)\s+)?([A-ZÄÖÜ][a-zäöüß]+(?:-[a-zäöüß]+)*)\b/.exec(original);
+ const explicitNamedSubject=isName(namedSubjectAtStart?.[1]);
+ const legalEntitySuffix=/\b(gmbh|ag|kg|ohg|ug|gbr)\b/.test(normalized);
+ const genericWhoQuestion=!businessEntityQuestion&&!/lieferant/i.test(normalized)&&/\b(wer|wen|wem|wessen)\b.{0,100}\b(hat|macht|tat|arbeitet|war|ist|kommt|fehlt|vergisst|erledigt|kontrolliert|abgeschlossen|ist verantwortlich|verursacht)\b/.test(normalized);
+ return (personEntity&&personAssessment&&!aggregateHeadcount&&!aggregatePerEmployee)
+  ||explicitNamedSubject
+  ||(namedPersonPresent&&personalIntent&&!legalEntitySuffix&&!businessEntityQuestion)
+  ||namedSubjectAction
+  ||genericWhoQuestion;
+}
 function advisorReply(raw){
- const personQuestion=advisorNorm(raw),personOriginal=String(raw||'').trim();
- const asksAboutPerson=/\b(was hat|was macht|was tat|wie arbeitet|wie verhaelt sich|wie verhielt sich|wie oft war|warum war|warum hat|hat .* gemacht|hat .* gearbeitet|leistung von|verhalten von|fehlzeiten|anwesenheit|krankheit|krankmeldung|schicht von|pause von|gehalt von|lohn von|kuendigen|entlassen|abmahnen|zuverlaessigkeit|zuverlässigkeit|arbeitsleistung|arbeitszeit von|privatleben|adresse von|telefonnummer von)\b/.test(personQuestion);
- const namedPersonQuestion=/\\b(?:hat|macht|tat|von|bei|mit)\\s+[A-ZÄÖÜ][a-zäöüß-]{2,}\\b/.test(personOriginal)||/^[A-ZÄÖÜ][a-zäöüß-]{2,}\\s+(?:gestern|heute|gemacht|gearbeitet|arbeitet|macht|war|ist)\\b/.test(personOriginal);
- if(asksAboutPerson||namedPersonQuestion)return advisorEvidenceResponse('<b>Keine personenbezogenen Informationen verfügbar</b><p>TankstellenErtrag liegen keine personenbezogenen Mitarbeiter- oder Tätigkeitsdaten vor. Wir können deshalb nicht feststellen, was eine bestimmte Person – auch wenn du einen Namen nennst – gestern gemacht hat, wie sie gearbeitet hat oder welche persönlichen Eigenschaften bzw. Leistungen sie hat.</p><p>Die Anwendung wertet betriebliche Monats- und Warengruppendaten aus, keine individuellen Mitarbeiterprofile. Bitte gib hier auch keine vertraulichen oder sensiblen Personaldaten ein.</p>','missing');
+ if(advisorIsPersonQuestion(raw))return advisorEvidenceResponse('<b>Keine personenbezogenen Informationen verfügbar</b><p>TankstellenErtrag liegen keine personenbezogenen Mitarbeiter- oder Tätigkeitsdaten vor. Wir können deshalb nicht feststellen, was eine bestimmte Person – auch wenn du einen Namen nennst – gestern gemacht hat, wie sie gearbeitet hat oder welche persönlichen Eigenschaften bzw. Leistungen sie hat.</p><p>Die Anwendung wertet betriebliche Monats- und Warengruppendaten aus, keine individuellen Mitarbeiterprofile. Bitte gib hier auch keine vertraulichen oder sensiblen Personaldaten ein.</p>','missing');
  const scope=advisorScopeGuard(raw);
  if(scope)return scope;
+ // Fehlende angefragte Kennzahlen vor allen allgemeinen Antwortregeln abfangen.
+ const noData=advisorNoDataAnswer(raw);
+ if(noData)return advisorEvidenceResponse(noData,'missing');
+ // Konkrete Fragen zu eigenen Kennzahlen müssen vor allgemeinen Direktantworten
+ // in die datenbasierte Auswertung, damit unbestätigte Werte nie überschrieben werden.
+ const metricQuestion=advisorNorm(raw);
+ const asksForGroupMetric=/\b(kaffee|backwaren|backshop|getraenke|getränke|tabak|drogerie|lebensmittel|suesswaren|süßwaren|eis|waschen)\b/.test(metricQuestion)&&/\b(marge|rohertrag|wareneinsatz|umsatz|ertrag)\b/.test(metricQuestion);
+ if(asksForGroupMetric)return advisorEvidenceResponse(advisorReplyBase(raw),'data');
+ const asksForPersonalMetric=/\b(mein|meine|meinen|bei mir|bei uns|aktueller monat|diesen monat)\b/.test(metricQuestion);
+ const asksForMetricChange=/\b(umsatz|marge|rohertrag|wareneinsatz|schwund|abschrift|bestand)\b/.test(metricQuestion)&&/\b(gesunken|gefallen|rueckgang|ruecklaeufig|veraendert|veraenderung|warum|wieso|weshalb|vergleich|gegenueber|vormonat|vorjahr)\b/.test(metricQuestion);
+ if(asksForPersonalMetric&&asksForMetricChange)return advisorEvidenceResponse(advisorReplyBase(raw),'data');
  // Datenbasierte Priorisierung muss vor allgemeinen Direkt-/Rückfrageantworten laufen.
  const priorityQuery=advisorNorm(raw);
  if(/potenzial|wirtschaftlich|priorit|welche drei|drei dinge|erste drei|wichtigsten.{0,24}pruef|naechsten.{0,24}pruef|(?:drei|3).{0,32}(?:pruef|kontroll|massnahmen)|(?:pruef|kontroll|massnahmen).{0,32}(?:drei|3)/.test(priorityQuery))return advisorEvidenceResponse(advisorReplyBase(raw),'data');
@@ -1871,8 +1931,6 @@ function advisorReply(raw){
  if(direct)return advisorEvidenceResponse(direct,'guidance');
  const advisory=advisorGeneralGuidanceAnswer(raw);
  if(advisory)return advisorEvidenceResponse(advisory,'guidance');
- const noData=advisorNoDataAnswer(raw);
- if(noData&&!advisorHasCurrentMonthData())return advisorEvidenceResponse(noData,'missing');
  const base=advisorReplyBase(raw);
  const knowledge=advisorKnowledgeHtml(raw);
  return advisorEvidenceResponse(knowledge?base+knowledge:base,'data');

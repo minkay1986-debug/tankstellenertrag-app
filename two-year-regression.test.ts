@@ -764,13 +764,14 @@ function advisorTestReply(data:any, key="2026-12") {
   const advisorDirectAnswer = appFunction("advisorDirectAnswer","advisorHasCurrentMonthData",
     ["advisorNorm","month","calc","data"],{advisorNorm,month,calc:rt.calc,data});
   const advisorEvidenceResponse = appFunction("advisorEvidenceResponse","advisorReply",[],{});
+  const advisorIsPersonQuestion = appFunction("advisorIsPersonQuestion","advisorReply",["advisorNorm"],{advisorNorm});
   const advisorReplyBase = appFunction("advisorReplyBase","advisorEvidenceResponse",
     ["advisorNorm","month","calc","prev","data","reconciliation","dataQuality","settings","GROUPS","inventoryMetrics","inventoryPeriodDays","wowPriority","potentialHtml"],
     {advisorNorm,month,calc:rt.calc,prev:rt.prev,data,reconciliation,dataQuality,settings,GROUPS:groupDefs,inventoryMetrics:rt.inventoryMetrics,inventoryPeriodDays,wowPriority:rt.wowPriority,potentialHtml});
   const advisorGeneralGuidanceAnswer = appFunction("advisorGeneralGuidanceAnswer","advisorReplyBase",["advisorNorm"],{advisorNorm});
   return appFunction("advisorReply","initAdvisorChat",
-    ["advisorScopeGuard","advisorNorm","advisorDirectAnswer","advisorGeneralGuidanceAnswer","advisorNoDataAnswer","advisorHasCurrentMonthData","advisorReplyBase","advisorKnowledgeHtml","advisorEvidenceResponse"],
-    {advisorScopeGuard:()=>"",advisorNorm,advisorDirectAnswer,advisorGeneralGuidanceAnswer,
+    ["advisorIsPersonQuestion","advisorScopeGuard","advisorNorm","advisorDirectAnswer","advisorGeneralGuidanceAnswer","advisorNoDataAnswer","advisorHasCurrentMonthData","advisorReplyBase","advisorKnowledgeHtml","advisorEvidenceResponse"],
+    {advisorIsPersonQuestion,advisorScopeGuard:()=>"",advisorNorm,advisorDirectAnswer,advisorGeneralGuidanceAnswer,
       advisorNoDataAnswer:()=>"",advisorHasCurrentMonthData:()=>true,advisorReplyBase,advisorKnowledgeHtml:() => "",advisorEvidenceResponse});
 }
 
@@ -973,7 +974,7 @@ Deno.test("advisor labels unconfirmed monthly and group revenue instead of quoti
   const sales=reply("Warum ist mein Umsatz gesunken?");
   assert(sales.includes("Shop-Umsatz aktuell: nicht bestätigt")&&!sales.includes("987.654"),"Sales advice must not quote unconfirmed shop revenue");
   const margin=reply("Wie ist die Marge bei Backwaren?");
-  assert(margin.includes("Umsatz nicht bestätigt")&&!margin.includes("9.876,00"),"Group margin advice must not quote stale group revenue");
+  assert(margin.includes("Umsatz nicht bestätigt")&&!margin.includes("9.876,00"),"Group margin advice must not quote stale group revenue. Actual answer: "+margin);
   const order=reply("Welche Warengruppen haben den niedrigsten Umsatz und wo sollte ich nachbestellen?");
   assert(!order.includes("Backwaren (9.876,00"),"Ordering advice must not rank unconfirmed stale group revenue");
 });
@@ -1257,4 +1258,89 @@ Deno.test("critical data-quality findings are visible in overview and analysis t
   assert(html.includes("dataQualityPanel(k)+riskStatusPanel(k)"),"Dashboard must show the shared data-quality and risk summaries");
   assert(html.includes("let html=dataQualityPanel(k)+riskStatusPanel(k,true)"),"Analysis must show the shared data-quality and risk summaries with analysis-specific detail wording");
   assert(html.includes("'+dataQualityPanel(month())+riskStatusPanel(month())+'"),"Report must show the same shared data-quality and risk summaries");
+});
+
+
+Deno.test("named employee questions remain blocked without blocking business margin comparisons",()=>{
+  const norm=appFunction("advisorNorm","advisorScopeGuard",[],{});
+  const isPerson=appFunction("advisorIsPersonQuestion","advisorReply",["advisorNorm"],{advisorNorm:norm});
+  assert(isPerson("Wieso hat Kevin keine Inventur gemacht?"),"Named employee activity question must be blocked");
+  assert(isPerson("Was macht Kevin?"),"Direct question about a named person must be blocked");
+  assert(isPerson("Wie ist Kevin?"),"General assessment of a named person must be blocked");
+  assert(isPerson("Was ist mit Kevin?"),"Named-person status questions must be blocked");
+  assert(isPerson("Wie geht es Kevin?"),"Questions about a named person's condition must be blocked");
+  assert(isPerson("Wie zuverlässig ist Kevin?"),"Named employee assessment must be blocked");
+  assert(isPerson("Wer hat gestern Schicht gemacht?"),"Unnamed question about an employee action must be blocked");
+  assert(isPerson("Hat Müller gestern gearbeitet?"),"Inverted named-person work questions must be blocked");
+  assert(isPerson("Hat Sven heute Inventur gemacht?"),"Named-person inventory questions must be blocked");
+  assert(!isPerson("Wer ist mein bester Lieferant?"),"Supplier identity questions must remain business questions");
+  assert(!isPerson("Welcher Hersteller liefert die besten Kaffeeprodukte?"),"Manufacturer questions must remain business questions");
+  assert(isPerson("Wie zuverlässig ist der Mitarbeiter?"),"Employee assessment must be blocked");
+  assert(!isPerson("Vergleiche die Warengruppenmargen von Kaffee und Backwaren."),"Business margin comparison must remain available");
+  assert(!isPerson("Welche Warengruppen haben die höchste Marge?"),"Which-category questions must not be mistaken for person questions");
+  assert(!isPerson("Wie ist die Marge bei Backwaren?"),"Category margin questions must not be mistaken for named-person questions");
+  assert(!isPerson("Wie hoch sind die Personalkosten im Verhältnis zum Umsatz?"),"Aggregate personnel costs must remain a business metric");
+  assert(isPerson("Hat Thomas gestern die Kasse abgeschlossen?"),"Indirectly phrased named-person actions must be blocked");
+  assert(isPerson("Weißt du, ob Kevin heute Inventur gemacht hat?"),"Named-person questions in subordinate clauses must be blocked");
+  assert(isPerson("Wie hat sich Sabine bei der Arbeit verhalten?"),"Named-person behavior questions must be blocked");
+  assert(isPerson("Welche Person hat den Kassenfehlbetrag verursacht?"),"Questions about an individual's responsibility must be blocked");
+  assert(isPerson("Hat Sabine die Bestellung beim Lieferanten Müller aufgegeben?"),"Named employee questions remain blocked when a supplier is mentioned too");
+  assert(!isPerson("Wie hoch ist unser Personalaufwand im Verhältnis zum Umsatz?"),"Aggregate personnel expense ratios must remain available");
+  assert(!isPerson("Wie ist die Preisentwicklung bei Coca-Cola?"),"Brand price trend questions must remain available");
+  assert(!isPerson("Wie hoch ist der Umsatz von Müller GmbH?"),"Company names must not be mistaken for individual people");
+  assert(!isPerson("Wie viele Kollegen waren gestern im Dienst?"),"Anonymous staffing counts must remain available");
+  assert(!isPerson("Wie hoch ist der durchschnittliche Umsatz je Mitarbeiter?"),"Average business metrics per employee must remain available");
+  assert(isPerson("Wie beurteilst du die Zuverlässigkeit von Martin?"),"Reliability assessments of named people must be blocked");
+  assert(isPerson("Wie viele Krankheitstage hatte Anna dieses Jahr?"),"Named-person absence history must be blocked");
+  assert(isPerson("Kannst du mir sagen, wie zuverlässig Herr Krüger ist?"),"Indirect reliability questions with titles must be blocked");
+  assert(isPerson("Kannst du die Umsätze einzelner Mitarbeiter vergleichen?"),"Individual employee sales comparisons must be blocked");
+  assert(!isPerson("Wie hoch ist die Marge von Red Bull?"),"Brand margin questions must remain available");
+  assert(!isPerson("Wer ist unser zuverlässiger Getränkelieferant?"),"Supplier discovery must remain available");
+  assert(!isPerson("Wie hoch ist der Umsatz je Schichtleiter?"),"Aggregate metrics per role must remain available");
+  assert(isPerson("Hat Frau Maier die Warenbestellung freigegeben?"),"Named-person questions must be blocked when a title is used");
+  assert(isPerson("Weißt du, ob Kevin heute Inventur gemacht hat?"),"Named-person questions in subordinate clauses must be blocked");
+  assert(isPerson("Kannst du mir sagen, ob Herr Bauer krank war?"),"Named-person health questions in indirect phrasing must be blocked");
+  assert(isPerson("Wie hat sich Sabine bei der Arbeit verhalten?"),"Named-person conduct questions must be blocked in indirect word order");
+  assert(isPerson("Welche Person hat den Kassenfehlbetrag verursacht?"),"Questions about a person's responsibility must be blocked");
+  assert(isPerson("Hat Markus die Lieferung kontrolliert?"),"Named-person operational questions must be blocked");
+  assert(isPerson("Kannst du die Arbeitsleistung von Peter bewerten?"),"Named-person performance questions must be blocked");
+  assert(!isPerson("Wie hoch ist der durchschnittliche Umsatz je Mitarbeiter?"),"Aggregate revenue per employee must remain available");
+  assert(!isPerson("Wie zuverlässig ist Hersteller Müller bei Lieferungen?"),"Manufacturer reliability must remain a business entity question");
+  assert(isPerson("Hat Sabine die Bestellung beim Lieferanten Müller aufgegeben?"),"A named employee must still be blocked when a supplier is also mentioned");
+  assert(!isPerson("Wie viele Kollegen waren gestern im Dienst?"),"Anonymous shift headcount must remain available");
+
+  assert(isPerson("Hat Müller die Lieferung angenommen?"),"Named-person operational actions must be blocked");
+  assert(isPerson("Hat Müller die Bestellung geprüft?"),"Named-person order checks must be blocked");
+  assert(!isPerson("Wie viele Mitarbeiter sind beschäftigt?"),"Anonymous aggregate headcount must remain available");
+  assert(!isPerson("Hat der Lieferant Müller heute geliefert?"),"Supplier delivery questions must remain business questions");
+  assert(!isPerson("Wie viele Mitarbeiter haben wir im Schnitt pro Schicht?"),"Aggregate staffing levels must remain available");
+  assert(isPerson("Welche Mitarbeiter haben gestern Schicht gemacht?"),"Employee-specific shift activity must be blocked");
+  assert(!isPerson("Welche Artikel hat Müller geliefert?"),"Product delivery history must remain available as a business question");
+});
+
+Deno.test("requested revenue and margin data must be independently confirmed",()=>{
+  const norm=appFunction("advisorNorm","advisorScopeGuard",[],{});
+  let current:any={sourceMonthly:false,sourceEK:false,sourceShrink:false,sourceWriteoff:false,sourceInventory:false};
+  const noData=appFunction("advisorNoDataAnswer","advisorGeneralGuidanceAnswer",
+    ["advisorNorm","calc","month","advisorHasCurrentMonthData"],
+    {advisorNorm:norm,calc:()=>current,month:()=>"2026-11",advisorHasCurrentMonthData:()=>true});
+  assert(noData("Wie hoch ist mein Umsatz diesen Monat?").length>0,
+    "Unconfirmed revenue must not be presented as a reliable number even if another source exists");
+  current={sourceMonthly:true,sourceEK:false};
+  assert(noData("Wie hoch ist mein Umsatz diesen Monat?")==="",
+    "Confirmed revenue may be answered independently");
+  assert(noData("Wie hoch ist meine Marge diesen Monat?").length>0,
+    "Margin requires both confirmed revenue and EK");
+  current={sourceMonthly:true,sourceEK:true};
+  assert(noData("Wie hoch ist meine Marge diesen Monat?")==="",
+    "Margin may be answered only after both required sources are confirmed");
+});
+
+Deno.test("missing requested metric check runs before direct and general advisory answers",()=>{
+  const replyStart=html.indexOf("function advisorReply(raw)");
+  const noDataAt=html.indexOf("const noData=advisorNoDataAnswer(raw);",replyStart);
+  const directAt=html.indexOf("const direct=advisorDirectAnswer(raw);",replyStart);
+  const generalAt=html.indexOf("const advisory=advisorGeneralGuidanceAnswer(raw);",replyStart);
+  assert(replyStart>=0&&noDataAt>replyStart&&directAt>noDataAt&&generalAt>noDataAt,
+    "Missing requested data must be checked before any generic answer path");
 });
