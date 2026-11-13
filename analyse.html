@@ -2037,7 +2037,7 @@ function initAdvisorChat(){
    body.innerHTML=advisorCompactHtml(q,fallback||'<p>Die Auswertung lieferte keine Antwort. Bitte prüfe, ob Monatsdaten geladen sind.</p>');
    // Personenbezogene Fragen bleiben vollständig in der regelbasierten Sperre.
    // Sie dürfen weder als Frage noch als Kontext an den KI-Worker übertragen werden.
-   if(typeof advisorIsPersonQuestion==='function'&&advisorIsPersonQuestion(q)){
+   if(advisorIsPersonQuestion(q)){
     reply.scrollIntoView({block:'nearest',behavior:'smooth'});
     return;
    }
