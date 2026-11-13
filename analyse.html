@@ -1894,6 +1894,9 @@ function advisorReply(raw){
  if(advisorIsPersonQuestion(raw))return advisorEvidenceResponse('<b>Keine personenbezogenen Informationen verfügbar</b><p>TankstellenErtrag liegen keine personenbezogenen Mitarbeiter- oder Tätigkeitsdaten vor. Wir können deshalb nicht feststellen, was eine bestimmte Person – auch wenn du einen Namen nennst – gestern gemacht hat, wie sie gearbeitet hat oder welche persönlichen Eigenschaften bzw. Leistungen sie hat.</p><p>Die Anwendung wertet betriebliche Monats- und Warengruppendaten aus, keine individuellen Mitarbeiterprofile. Bitte gib hier auch keine vertraulichen oder sensiblen Personaldaten ein.</p>','missing');
  const scope=advisorScopeGuard(raw);
  if(scope)return scope;
+ // Fehlende angefragte Kennzahlen vor allen allgemeinen Antwortregeln abfangen.
+ const noData=advisorNoDataAnswer(raw);
+ if(noData)return advisorEvidenceResponse(noData,'missing');
  // Konkrete Fragen zu eigenen Kennzahlen müssen vor allgemeinen Direktantworten
  // in die datenbasierte Auswertung, damit unbestätigte Werte nie überschrieben werden.
  const metricQuestion=advisorNorm(raw);
@@ -1907,9 +1910,6 @@ function advisorReply(raw){
  if(direct)return advisorEvidenceResponse(direct,'guidance');
  const advisory=advisorGeneralGuidanceAnswer(raw);
  if(advisory)return advisorEvidenceResponse(advisory,'guidance');
- // Fehlende angefragte Kennzahlen vor allgemeinen Antwortregeln abfangen.
- const noData=advisorNoDataAnswer(raw);
- if(noData)return advisorEvidenceResponse(noData,'missing');
  const base=advisorReplyBase(raw);
  const knowledge=advisorKnowledgeHtml(raw);
  return advisorEvidenceResponse(knowledge?base+knowledge:base,'data');
