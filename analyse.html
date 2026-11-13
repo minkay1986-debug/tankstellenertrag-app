@@ -1886,7 +1886,7 @@ function advisorIsPersonQuestion(raw){
  // Bei Namen nur handlungsbezogene Fragen sperren. Präpositionen wie "mit", "von" oder "bei"
  // sind ausdrücklich kein Namenssignal, da danach oft Warengruppen/Produkte stehen.
  const namedSubject=/\b(?:hat|macht|tat|arbeitet|war|ist|kommt|fehlt|vergisst|erledigt|kontrolliert)\s+[A-ZÄÖÜ][a-zäöüß-]{2,}\b/.test(original)
-  ||/^[A-ZÄÖÜ][a-zäöüß-]{2,}\s+(?:hat|macht|tat|arbeitet|war|ist|kommt|fehlt|vergisst|erledigt|kontrolliert)\b/.test(original);
+  ||/^(?!(?:Wie|Was|Wer|Wen|Wem|Welche|Welcher|Welches|Wieso|Warum|Weshalb|Wann|Wo|Wohin|Womit|Wodurch)\b)[A-ZÄÖÜ][a-zäöüß-]{2,}\s+(?:hat|macht|tat|arbeitet|war|ist|kommt|fehlt|vergisst|erledigt|kontrolliert)\b/.test(original);
  const personalIntent=/\b(was hat|was macht|was tat|was ist mit|was war mit|wie geht es|wie ist|wie war|wer ist|wer war|wie arbeitet|wie verhaelt sich|wie verhielt sich|wie oft war|warum war|warum hat|wieso hat|weshalb hat|wieso war|weshalb war|keine inventur gemacht|leistung|verhalten|fehlzeiten|anwesenheit|krankheit|krankmeldung|schicht|pause|gehalt|lohn|kuendigen|entlassen|abmahnen|zuverlaessig|zuverlassig|zuverlässig|zuverlaessigkeit|zuverlässigkeit|pünktlich|punktlich|puenktlich|unpunktlich|unpuenktlich|unpünktlich|arbeitsleistung|arbeitszeit|privatleben|adresse|telefonnummer)\b/.test(normalized);
  const genericWhoQuestion=/\b(wer|wen|wem|wessen)\b.{0,80}\b(hat|macht|tat|arbeitet|war|ist|kommt|fehlt|vergisst|erledigt|kontrolliert|abgeschlossen|ist verantwortlich)\b/.test(normalized);
  return (personEntity&&personAssessment)||(namedSubject&&personalIntent)||genericWhoQuestion;
