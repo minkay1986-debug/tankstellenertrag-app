@@ -1,5 +1,5 @@
-/* KI-Pilot: getrenntes Security-Testprojekt und isolierter Worker.
-   Aktiviert sich nur auf dem lokalen Testserver bzw. dem eigenen Pages-Branch-Preview. */
+/* Isoliertes Security-Testprojekt: lokale Tests und alle Cloudflare Pages Branch-Previews.
+   Die produktive Domain app.tankstellenertrag.de bleibt ausschließlich mit Live-Supabase verbunden. */
 const tseAdvisorLocalTest = (location.hostname === 'localhost' && location.port === '4173') || location.hostname.endsWith('.tankstellenertrag-preview.pages.dev');
 window.TANKSTELLENERTRAG_SUPABASE = tseAdvisorLocalTest ? {
   url: 'https://rzydxhnphwuocttdncsm.supabase.co',
