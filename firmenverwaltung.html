@@ -32,9 +32,9 @@ window.TANKSTELLENERTRAG_CLIENT=client;
 let overview=null;
 const $=id=>document.getElementById(id);
 function say(t,err=false){$('status').textContent=t;$('status').style.borderColor=err?'#a94d4d':'var(--line)'}
-function opt(v,t){return '<option value="'+String(v).replaceAll('&','&amp;').replaceAll('"','&quot;')+'">'+String(t).replaceAll('&','&amp;').replaceAll('<','&lt;')+'</option>'}
+function esc(v){return String(v??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[m]))}\nfunction opt(v,t){return '<option value="'+esc(v)+'">'+esc(t)+'</option>'}
 function fill(id,items,label){$(id).innerHTML=items.map(x=>opt(x.id,label(x))).join('')}
-function companyName(id){return overview.companies.find(c=>c.id===id)?.name||'Nicht zugeordnet'}
+function companyName(id){return esc(overview.companies.find(c=>c.id===id)?.name||'Nicht zugeordnet')}
 async function load(){
  if(!client){say('Supabase-Client konnte nicht initialisiert werden.',true);return}
  const {data:{session},error:se}=await client.auth.getSession();if(se||!session){say('Bitte zuerst mit dem Admin-Konto anmelden.',true);return}
@@ -44,9 +44,9 @@ async function load(){
  fill('memberUser',overview.users,u=>u.email+' · '+u.id.slice(0,8));
  fill('accessUser',overview.users,u=>u.email);
  fill('accessStation',overview.stations,s=>s.station_name+' · '+companyName(s.company_id));
- $('stationList').innerHTML=overview.stations.map(s=>'<div class="station"><div><b>'+s.station_name+'</b><div class="muted">'+(s.city||'')+' · '+companyName(s.company_id)+'</div></div><select data-station-company="'+s.id+'">'+opt('', '– Firma auswählen –')+overview.companies.map(c=>opt(c.id,c.name+' · '+c.company_code)).join('')+'</select><button class="secondary" data-save-station="'+s.id+'">Zuordnung speichern</button></div>').join('')||'<p>Keine Stationen gefunden.</p>';
+ $('stationList').innerHTML=overview.stations.map(s=>'<div class="station"><div><b>'+esc(s.station_name)+'</b><div class="muted">'+esc(s.city||'')+' · '+companyName(s.company_id)+'</div></div><select data-station-company="'+esc(s.id)+'">'+opt('', '– Firma auswählen –')+overview.companies.map(c=>opt(c.id,c.name+' · '+c.company_code)).join('')+'</select><button class="secondary" data-save-station="'+esc(s.id)+'">Zuordnung speichern</button></div>').join('')||'<p>Keine Stationen gefunden.</p>';
  overview.stations.forEach(s=>{const el=document.querySelector('[data-station-company="'+s.id+'"]');if(el)el.value=s.company_id||''});
- $('companyList').innerHTML=overview.companies.map(c=>'<div class="company"><b>'+c.name+'</b><span class="code">'+c.company_code+'</span><span class="muted">'+(c.legal_name||'')+' · Marke: '+(c.brand||'–')+'</span></div>').join('')||'Noch keine Firmen angelegt.';
+ $('companyList').innerHTML=overview.companies.map(c=>'<div class="company"><b>'+esc(c.name)+'</b><span class="code">'+esc(c.company_code)+'</span><span class="muted">'+esc(c.legal_name||'')+' · Marke: '+esc(c.brand||'–')+'</span></div>').join('')||'Noch keine Firmen angelegt.';
  document.querySelectorAll('[data-save-station]').forEach(b=>b.onclick=async()=>{b.disabled=true;const id=b.dataset.saveStation;const company=document.querySelector('[data-station-company="'+id+'"]').value||null;const {error}=await client.rpc('tse_admin_set_station_company',{p_station_id:id,p_company_id:company});b.disabled=false;if(error){say('Stationszuordnung fehlgeschlagen: '+error.message,true);return}say('Stationszuordnung gespeichert.');await load()});
 }
 $('createCompany').onclick=async()=>{const b=$('createCompany');b.disabled=true;const {data,error}=await client.rpc('tse_admin_create_company',{p_name:$('companyName').value,p_legal_name:$('legalName').value,p_brand:$('brand').value});b.disabled=false;if(error){say('Firma nicht angelegt: '+error.message,true);return}say('Firma angelegt · Kennung: '+data.company_code);$('companyName').value=$('legalName').value=$('brand').value='';await load()};
