@@ -2,7 +2,7 @@ name: Browser smoke test (analyse.html)
 
 on:
   push:
-    branches: [main]
+    branches: [main, feature/station-assignment-roles-test-2026-11-13]
     paths:
       - 'analyse.html'
       - 'index.html'
