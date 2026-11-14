@@ -111,6 +111,7 @@ for select to authenticated using (
   owner_id=(select auth.uid()) or (select private.tse_can_access_station(id))
 );
 
+drop policy if exists "company admins create stations" on public.stations;
 drop policy if exists "owners or company admins create stations" on public.stations;
 create policy "owners or company admins create stations" on public.stations
 for insert to authenticated with check (
@@ -118,6 +119,7 @@ for insert to authenticated with check (
   or (company_id is not null and (select private.tse_can_manage_company(company_id)))
 );
 
+drop policy if exists "company admins update stations" on public.stations;
 drop policy if exists "owners or company admins update stations" on public.stations;
 create policy "owners or company admins update stations" on public.stations
 for update to authenticated
@@ -130,6 +132,7 @@ with check (
   or (company_id is not null and (select private.tse_can_manage_company(company_id)))
 );
 
+drop policy if exists "company admins delete stations" on public.stations;
 drop policy if exists "owners or company admins delete stations" on public.stations;
 create policy "owners or company admins delete stations" on public.stations
 for delete to authenticated using (
@@ -159,3 +162,10 @@ grant select on public.companies,public.company_memberships,public.station_assig
 grant select,insert,update,delete on public.stations to authenticated;
 grant select,insert,update on public.station_snapshots to authenticated;
 grant select on public.station_snapshot_history to authenticated;
+
+-- Remove legacy helpers from the exposed schema if this migration is applied
+-- over an intermediate test deployment. The private versions above are used
+-- by every policy from this migration onward.
+drop function if exists public.tse_is_company_member(uuid);
+drop function if exists public.tse_can_access_station(uuid);
+drop function if exists public.tse_can_manage_company(uuid);
