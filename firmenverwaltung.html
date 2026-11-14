@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TankstellenErtrag · Firmen- & Rechteverwaltung</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./supabase-config.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#0b1119;--panel:#131e2b;--line:#26384a;--muted:#9aabba;--orange:#f28a24;--blue:#8bc8ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#18283a,#0b1119 60%);color:#eef5fc;font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:1180px;margin:auto;padding:28px 18px 60px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:24px}.eyebrow{color:var(--orange);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}h1{font-size:clamp(25px,4vw,36px);margin:5px 0}p{color:var(--muted);line-height:1.5}.panel{background:linear-gradient(145deg,#172536,#111b28);border:1px solid var(--line);border-radius:18px;padding:20px;margin:14px 0;box-shadow:0 16px 40px #0003}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.panel h2{margin:0 0 8px;font-size:19px}.field{display:grid;gap:6px;margin:12px 0}label{font-size:12px;color:#bdcbd8;font-weight:700}input,select{width:100%;background:#0c1520;border:1px solid #34485d;border-radius:10px;padding:11px;color:#f4f8ff;font:inherit;min-width:0}button{border:0;border-radius:10px;padding:11px 15px;background:linear-gradient(110deg,#f28a24,#e56c18);color:#17120c;font-weight:800;cursor:pointer}button.secondary{background:#23384c;color:#e8f4ff;border:1px solid #3b566e}button:disabled{opacity:.5;cursor:wait}.muted{color:var(--muted);font-size:13px}.status{padding:12px;border-radius:10px;background:#101a25;border:1px solid var(--line);margin:12px 0;white-space:pre-wrap}.company,.station{border-top:1px solid var(--line);padding:12px 0;display:grid;gap:5px}.code{font-family:ui-monospace,monospace;color:#ffc17a;font-size:13px}.row{display:grid;grid-template-columns:1.2fr 1fr 1fr auto;gap:8px;align-items:center}.station{grid-template-columns:1.3fr 1fr auto;align-items:center}.pill{font-size:11px;padding:4px 8px;border-radius:99px;background:#20364a;color:#b8ddfa;display:inline-block}.hidden{display:none!important}@media(max-width:760px){.grid{grid-template-columns:1fr}.row,.station{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+</style></head><body><main>
+<div class="top"><div><div class="eyebrow">Systemadministration</div><h1>Firmen & Stationsrechte</h1><p>Firmen eindeutig trennen, Nutzer zuordnen und pro Station Lese- oder Schreibrechte vergeben.</p></div><button class="secondary" id="reload">Aktualisieren</button></div>
+<div id="status" class="status">Prüfe Anmeldung …</div>
+<div id="admin" class="hidden">
+<div class="grid">
+<section class="panel"><h2>Neue Firma anlegen</h2><p class="muted">Die Firmenkennung wird automatisch erzeugt und kann nicht frei vergeben werden.</p>
+<div class="field"><label>Anzeige-/Firmenname</label><input id="companyName" placeholder="z. B. Muster Tankstellenbetrieb"></div>
+<div class="field"><label>Rechtlicher Firmenname</label><input id="legalName" placeholder="z. B. Muster Tankstellen GmbH"></div>
+<div class="field"><label>Marke (optional)</label><input id="brand" placeholder="z. B. AVIA, ARAL oder freie Tankstelle"></div>
+<button id="createCompany">Firma sicher anlegen</button></section>
+<section class="panel"><h2>Firma → Nutzerrolle</h2><p class="muted">Erst die Firma auswählen, dann den bestehenden registrierten Nutzer zuordnen.</p>
+<div class="field"><label>Firma</label><select id="memberCompany"></select></div><div class="field"><label>Nutzerkonto</label><select id="memberUser"></select></div>
+<div class="field"><label>Rolle</label><select id="memberRole"><option value="company_admin">Firmenadministrator</option><option value="regional_manager">Regionalleiter</option><option value="station_manager">Stationsleiter</option></select></div>
+<button id="saveMember">Nutzer der Firma zuordnen</button></section>
+</div>
+<section class="panel"><h2>Stationen einer Firma zuordnen</h2><p class="muted">Eine Station kann genau einer Firma zugeordnet sein. Bestehende Firmendaten werden nicht anhand der Marke automatisch zusammengeführt.</p><div id="stationList"></div></section>
+<section class="panel"><h2>Individuelle Stationsrechte</h2><p class="muted">Nur Nutzer, die bereits Mitglied der Firmenkennung sind, können Stationsrechte erhalten.</p>
+<div class="row"><div class="field"><label>Station</label><select id="accessStation"></select></div><div class="field"><label>Nutzer</label><select id="accessUser"></select></div><div class="field"><label>Berechtigung</label><select id="accessLevel"><option value="read">Nur Lesen</option><option value="write">Lesen & Schreiben</option><option value="none">Zugriff entziehen</option></select></div><button id="saveAccess">Speichern</button></div></section>
+<section class="panel"><h2>Firmenübersicht</h2><div id="companyList" class="muted">Wird geladen …</div></section>
+</div></main>
+<script>
+const cfg=window.TANKSTELLENERTRAG_SUPABASE||{};
+const client=window.TANKSTELLENERTRAG_CLIENT||(window.supabase&&cfg.url&&cfg.publishableKey?window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:'tankstellenertrag-auth',storage:window.localStorage}}):null);
+window.TANKSTELLENERTRAG_CLIENT=client;
+let overview=null;
+const $=id=>document.getElementById(id);
+function say(t,err=false){$('status').textContent=t;$('status').style.borderColor=err?'#a94d4d':'var(--line)'}
+function opt(v,t){return '<option value="'+String(v).replaceAll('&','&amp;').replaceAll('"','&quot;')+'">'+String(t).replaceAll('&','&amp;').replaceAll('<','&lt;')+'</option>'}
+function fill(id,items,label){$(id).innerHTML=items.map(x=>opt(x.id,label(x))).join('')}
+function companyName(id){return overview.companies.find(c=>c.id===id)?.name||'Nicht zugeordnet'}
+async function load(){
+ if(!client){say('Supabase-Client konnte nicht initialisiert werden.',true);return}
+ const {data:{session},error:se}=await client.auth.getSession();if(se||!session){say('Bitte zuerst mit dem Admin-Konto anmelden.',true);return}
+ const {data,error}=await client.rpc('tse_admin_overview');if(error){say('Keine Admin-Berechtigung oder Datenbankmigration fehlt: '+error.message,true);return}
+ overview=data;$('admin').classList.remove('hidden');say('Angemeldet als '+session.user.email+' · Admin-Zugriff bestätigt.');
+ fill('memberCompany',overview.companies,c=>c.name+' · '+c.company_code);
+ fill('memberUser',overview.users,u=>u.email+' · '+u.id.slice(0,8));
+ fill('accessUser',overview.users,u=>u.email);
+ fill('accessStation',overview.stations,s=>s.station_name+' · '+companyName(s.company_id));
+ $('stationList').innerHTML=overview.stations.map(s=>'<div class="station"><div><b>'+s.station_name+'</b><div class="muted">'+(s.city||'')+' · '+companyName(s.company_id)+'</div></div><select data-station-company="'+s.id+'">'+opt('', '– Firma auswählen –')+overview.companies.map(c=>opt(c.id,c.name+' · '+c.company_code)).join('')+'</select><button class="secondary" data-save-station="'+s.id+'">Zuordnung speichern</button></div>').join('')||'<p>Keine Stationen gefunden.</p>';
+ overview.stations.forEach(s=>{const el=document.querySelector('[data-station-company="'+s.id+'"]');if(el)el.value=s.company_id||''});
+ $('companyList').innerHTML=overview.companies.map(c=>'<div class="company"><b>'+c.name+'</b><span class="code">'+c.company_code+'</span><span class="muted">'+(c.legal_name||'')+' · Marke: '+(c.brand||'–')+'</span></div>').join('')||'Noch keine Firmen angelegt.';
+ document.querySelectorAll('[data-save-station]').forEach(b=>b.onclick=async()=>{b.disabled=true;const id=b.dataset.saveStation;const company=document.querySelector('[data-station-company="'+id+'"]').value||null;const {error}=await client.rpc('tse_admin_set_station_company',{p_station_id:id,p_company_id:company});b.disabled=false;if(error){say('Stationszuordnung fehlgeschlagen: '+error.message,true);return}say('Stationszuordnung gespeichert.');await load()});
+}
+$('createCompany').onclick=async()=>{const b=$('createCompany');b.disabled=true;const {data,error}=await client.rpc('tse_admin_create_company',{p_name:$('companyName').value,p_legal_name:$('legalName').value,p_brand:$('brand').value});b.disabled=false;if(error){say('Firma nicht angelegt: '+error.message,true);return}say('Firma angelegt · Kennung: '+data.company_code);$('companyName').value=$('legalName').value=$('brand').value='';await load()};
+$('saveMember').onclick=async()=>{const {error}=await client.rpc('tse_admin_set_membership',{p_company_id:$('memberCompany').value,p_user_id:$('memberUser').value,p_role:$('memberRole').value});if(error){say('Nutzerzuordnung fehlgeschlagen: '+error.message,true);return}say('Nutzer wurde der Firmenkennung zugeordnet.');await load()};
+$('saveAccess').onclick=async()=>{const {error}=await client.rpc('tse_admin_set_station_access',{p_station_id:$('accessStation').value,p_user_id:$('accessUser').value,p_access:$('accessLevel').value});if(error){say('Stationsrecht nicht geändert: '+error.message,true);return}say('Stationsrecht gespeichert.');await load()};
+$('reload').onclick=load;load();
+</script></body></html>
