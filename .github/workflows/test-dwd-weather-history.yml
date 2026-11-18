@@ -9,6 +9,7 @@ on:
       - "analyse.html"
       - "two-year-regression.test.ts"
       - ".github/workflows/test-dwd-weather-history.yml"
+      - ".github/workflows/news-automation.yml"
   workflow_dispatch:
 
 permissions:
