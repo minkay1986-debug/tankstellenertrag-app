@@ -8,6 +8,7 @@ on:
       - 'supabase-config.js'
       - 'ai-advisor-worker/**'
       - '.github/workflows/test-ai-advisor-browser.yml'
+      - '.github/workflows/news-automation.yml'
   workflow_dispatch:
 
 permissions:
