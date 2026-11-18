@@ -51,6 +51,3 @@ jobs:
             - News-Link auf der Startseite, falls noch nicht vorhanden
 
             Bitte die erforderlichen Statusprüfungen abwarten und anschließend prüfen/mergen.
-          labels: |
-            automated
-            news
