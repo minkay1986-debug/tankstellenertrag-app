@@ -38,7 +38,9 @@ jobs:
       - name: Create or update News pull request
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Personal Access Token (fine-grained) with Contents: Read and write + Pull requests: Read and write.
+          # Using a PAT allows the resulting pull_request event to trigger the repository CI workflows.
+          token: ${{ secrets.NEWS_AUTOMATION_TOKEN }}
           branch: automation/news-updates
           delete-branch: true
           commit-message: "chore: update Tankstellen news [news-bot]"
