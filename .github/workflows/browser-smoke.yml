@@ -9,6 +9,7 @@ on:
       - 'two-year-regression.test.ts'
       - 'ertragsoptimierer.test.ts'
       - '.github/workflows/browser-smoke.yml'
+      - '.github/workflows/news-automation.yml'
   pull_request:
     branches: [main]
     paths:
