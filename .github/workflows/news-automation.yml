@@ -4,22 +4,19 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "15 6 * * *"
-  push:
-    paths:
-      - "scripts/build_news.py"
-      - "news.html"
-      - ".github/workflows/news-automation.yml"
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
-  publish:
-    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[news-bot]') }}
+  prepare-news:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout main
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Build news
         run: python scripts/build_news.py
@@ -28,21 +25,31 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          p=Path("index.html")
-          s=p.read_text(encoding="utf-8")
+          p = Path("index.html")
+          s = p.read_text(encoding="utf-8")
           if 'href="./news.html"' not in s:
-              s=s.replace('<a href="#wissen">Branchenwissen</a>', '<a href="#wissen">Branchenwissen</a><a href="./news.html">News</a>')
-              p.write_text(s,encoding="utf-8")
+              s = s.replace(
+                  '<a href="#wissen">Branchenwissen</a>',
+                  '<a href="#wissen">Branchenwissen</a><a href="./news.html">News</a>'
+              )
+              p.write_text(s, encoding="utf-8")
           PY
 
-      - name: Commit generated news
-        run: |
-          git config user.name "TankstellenErtrag News Bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add news news.html news-sitemap.xml index.html
-          if git diff --cached --quiet; then
-            echo "Keine neuen Meldungen."
-            exit 0
-          fi
-          git commit -m "chore: update Tankstellen news [news-bot]"
-          git push
+      - name: Create or update News pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          # Personal Access Token (fine-grained) with Contents: Read and write + Pull requests: Read and write.
+          # Using a PAT allows the resulting pull_request event to trigger the repository CI workflows.
+          token: ${{ secrets.NEWS_AUTOMATION_TOKEN }}
+          branch: automation/news-updates
+          delete-branch: true
+          commit-message: "chore: update Tankstellen news [news-bot]"
+          title: "Automatische TankstellenErtrag-News aktualisieren"
+          body: |
+            Dieser Pull Request wurde automatisch durch den TankstellenErtrag-News-Workflow erstellt.
+
+            - Neue Branchenmeldungen und News-Seiten
+            - Aktualisierte News-Sitemap
+            - News-Link auf der Startseite, falls noch nicht vorhanden
+
+            Bitte die erforderlichen Statusprüfungen abwarten und anschließend prüfen/mergen.
