@@ -116,3 +116,23 @@ REVOKE ALL ON FUNCTION public.tse_admin_remove_membership(uuid,uuid) FROM PUBLIC
 GRANT EXECUTE ON FUNCTION public.tse_admin_remove_membership(uuid,uuid) TO authenticated, service_role;
 REVOKE EXECUTE ON FUNCTION public.tse_admin_create_company(text,text,text), public.tse_admin_overview(), public.tse_admin_set_membership(uuid,uuid,text), public.tse_admin_set_station_access(uuid,uuid,text), public.tse_admin_set_station_company(uuid,uuid) FROM anon, PUBLIC;
 GRANT EXECUTE ON FUNCTION public.tse_admin_create_company(text,text,text), public.tse_admin_overview(), public.tse_admin_set_membership(uuid,uuid,text), public.tse_admin_set_station_access(uuid,uuid,text), public.tse_admin_set_station_company(uuid,uuid) TO authenticated, service_role;
+
+
+-- Fix the test admin overview: stations table has no city column in this schema.
+CREATE OR REPLACE FUNCTION public.tse_admin_overview()
+RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path TO ''
+AS $function$
+declare out_json jsonb;
+begin
+  if not private.tse_is_platform_admin() then raise exception 'not_authorized'; end if;
+  select jsonb_build_object(
+    'companies',(select coalesce(jsonb_agg(to_jsonb(c) order by c.name),'[]'::jsonb) from public.companies c),
+    'stations',(select coalesce(jsonb_agg(jsonb_build_object('id',s.id,'station_name',s.station_name,'company_id',s.company_id,'owner_id',s.owner_id) order by s.station_name),'[]'::jsonb) from public.stations s),
+    'memberships',(select coalesce(jsonb_agg(to_jsonb(m)),'[]'::jsonb) from public.company_memberships m),
+    'assignments',(select coalesce(jsonb_agg(to_jsonb(a)),'[]'::jsonb) from public.station_assignments a),
+    'users',(select coalesce(jsonb_agg(jsonb_build_object('id',u.id,'email',u.email,'created_at',u.created_at) order by u.email),'[]'::jsonb) from auth.users u where u.deleted_at is null)
+  ) into out_json;
+  return out_json;
+end $function$;
+REVOKE EXECUTE ON FUNCTION public.tse_admin_overview() FROM anon, PUBLIC;
+GRANT EXECUTE ON FUNCTION public.tse_admin_overview() TO authenticated, service_role;
