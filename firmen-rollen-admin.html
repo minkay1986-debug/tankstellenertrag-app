@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Firmen- & Rollenverwaltung · TankstellenErtrag</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#0d1115;--panel:#171e24;--line:#2e3942;--text:#edf3f8;--muted:#a8b4bf;--blue:#67b5ff;--orange:#f47b20;--red:#f07171;--green:#63d49a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#172534,#0d1115 55%);color:var(--text);font:14px/1.5 system-ui,sans-serif}
+.wrap{max-width:1200px;margin:auto;padding:24px 16px 50px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+h1{font-size:clamp(24px,4vw,36px);margin:5px 0}.eyebrow{color:var(--blue);font-weight:800;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.panel{background:linear-gradient(145deg,rgba(28,38,48,.96),rgba(16,22,28,.98));border:1px solid var(--line);border-radius:16px;padding:16px;margin:16px 0;box-shadow:0 10px 28px rgba(0,0,0,.18)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+label{display:block;color:var(--muted);font-size:12px;margin:8px 0 5px}input,select{width:100%;padding:10px 12px;border-radius:9px;border:1px solid #3a4652;background:#10161c;color:var(--text);outline:none}input:focus,select:focus{border-color:var(--blue)}
+button,.btn{border:1px solid #41505d;border-radius:9px;padding:10px 13px;background:#26313b;color:var(--text);font-weight:700;cursor:pointer}button:hover{border-color:var(--blue)}button:disabled{opacity:.55;cursor:wait}.primary{background:linear-gradient(135deg,#ed852a,#c85b16);border-color:#f69b53}.danger{color:#ffb3b3;background:#352327;border-color:#673c42}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.status{padding:11px 13px;border-radius:10px;background:#202a33;color:var(--muted);margin:12px 0}.status.ok{color:#b6f3d1;border:1px solid #2b6045}.status.error{color:#ffc2c2;border:1px solid #704141}.muted{color:var(--muted)}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.tile{padding:12px;border-radius:12px;background:#111a21;border:1px solid var(--line}.tile strong{display:block;font-size:23px}.tile small{color:var(--muted)}
+table{width:100%;border-collapse:collapse;min-width:600px}th,td{text-align:left;padding:10px;border-bottom:1px solid #2a333b;vertical-align:middle}th{color:#b5d8f7;font-size:12px}td small{display:block;color:var(--muted)}.tablewrap{overflow:auto}.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.badge{border:1px solid #435260;border-radius:99px;padding:3px 8px;color:#b8d8f3;font-size:11px}.hidden{display:none!important}.back{color:#9ccfff;text-decoration:none}
+@media(max-width:760px){.grid,.grid3{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.wrap{padding:14px 11px}.panel{padding:13px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header class="top"><div><div class="eyebrow">Interne · Testumgebung</div><h1>Firmen- & Rollenverwaltung</h1><p class="muted">Unternehmen, Benutzer, Rollen und Stationsrechte zentral verwalten.</p></div><div class="toolbar"><a class="back" href="./">← Zur Website</a><button id="reload">Neu laden</button><button id="logout">Abmelden</button></div></header>
+<div id="status" class="status">Sitzung wird geprüft …</div>
+<div id="app" class="hidden">
+<section class="panel"><div class="kpis" id="kpis"></div></section>
+<section class="panel"><h2>Unternehmen anlegen</h2><div class="grid3"><div><label>Firmenname *</label><input id="newName" maxlength="160" placeholder="z. B. Muster Tankstellen GmbH"></div><div><label>Rechtlicher Name *</label><input id="newLegal" maxlength="160" placeholder="Vollständige Firmierung"></div><div><label>Marke (optional)</label><input id="newBrand" maxlength="80" placeholder="Marke / Konzept"></div></div><div class="toolbar" style="margin-top:12px"><button id="createCompany" class="primary">Unternehmen erstellen</button></div></section>
+<section class="panel"><div class="section-title"><h2>Unternehmen</h2><span class="badge">Superadmin</span></div><div class="tablewrap"><table><thead><tr><th>Firma</th><th>Rechtsname</th><th>Code</th><th>Marke</th><th>Mitglieder</th></tr></thead><tbody id="companies"></tbody></table></div></section>
+<section class="panel"><h2>Benutzer einer Firma zuweisen</h2><div class="grid3"><div><label>Unternehmen</label><select id="memberCompany"></select></div><div><label>Benutzerkonto</label><select id="memberUser"></select></div><div><label>Rolle</label><select id="memberRole"><option value="company_admin">Firmenadministrator</option><option value="regional_manager">Regionalleiter</option><option value="station_manager">Stationsleiter</option></select></div></div><div class="toolbar" style="margin-top:12px"><button id="saveMember" class="primary">Mitgliedschaft speichern</button></div></section>
+<section class="panel"><h2>Mitgliedschaften</h2><div class="tablewrap"><table><thead><tr><th>Unternehmen</th><th>Benutzer</th><th>Rolle</th><th>Aktion</th></tr></thead><tbody id="members"></tbody></table></div></section>
+<section class="panel"><h2>Tankstellen einem Unternehmen zuordnen</h2><div class="grid"><div><label>Tankstelle</label><select id="companyStation"></select></div><div><label>Unternehmen (leer = Zuordnung entfernen)</label><select id="stationCompany"></select></div></div><div class="toolbar" style="margin-top:12px"><button id="saveStationCompany" class="primary">Firmenzuordnung speichern</button></div></section>
+<section class="panel"><h2>Stationszugriff vergeben</h2><div class="grid3"><div><label>Tankstelle</label><select id="accessStation"></select></div><div><label>Mitglied</label><select id="accessUser"></select></div><div><label>Zugriff</label><select id="accessLevel"><option value="read">Lesen</option><option value="write">Lesen & bearbeiten</option><option value="none">Kein Zugriff / entfernen</option></select></div></div><div class="toolbar" style="margin-top:12px"><button id="saveAccess" class="primary">Stationsrecht speichern</button></div></section>
+<section class="panel"><h2>Stationszuweisungen</h2><div class="tablewrap"><table><thead><tr><th>Tankstelle</th><th>Mitglied</th><th>Recht</th></tr></thead><tbody id="assignments"></tbody></table></div></section>
+</div></main>
+<script>
+(async()=>{
+const status=document.getElementById('status'),app=document.getElementById('app');const cfg=window.TANKSTELLENERTRAG_SUPABASE;
+const say=(m,t='')=>{status.textContent=m;status.className='status'+(t?' '+t:'')};
+if(!window.supabase||!cfg?.url||!cfg?.publishableKey){say('Supabase-Konfiguration nicht verfügbar.','error');return}
+const client=window.TANKSTELLENERTRAG_CLIENT||window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:'tankstellenertrag-auth',storage:localStorage}});
+const {data:{session},error}=await client.auth.getSession();if(error||!session){say('Bitte zuerst auf der Website anmelden.','error');return}
+if((session.user.email||'').toLowerCase()!=='svenkrick@gmx.de'){say('Zugriff verweigert. Nur Superadmin.','error');return}
+app.classList.remove('hidden');
+let data={companies:[],stations:[],memberships:[],assignments:[],users:[]};
+const roleNames={company_admin:'Firmenadministrator',regional_manager:'Regionalleiter',station_manager:'Stationsleiter'};
+const byId=(arr,id)=>arr.find(x=>x.id===id);
+const userById=id=>data.users.find(u=>u.id===id);
+const companyById=id=>data.companies.find(c=>c.id===id);
+const stationById=id=>data.stations.find(s=>s.id===id);
+const option=(label,value)=>{const o=document.createElement('option');o.value=value;o.textContent=label;return o};
+const fill=(el,items,selected)=>{el.replaceChildren();items.forEach(x=>{const o=option(x.label,x.value);if(selected&&selected===x.value)o.selected=true;el.append(o)})};
+const safe=(s)=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function render(){
+document.getElementById('kpis').innerHTML=[['Unternehmen',data.companies.length],['Tankstellen',data.stations.length],['Mitgliedschaften',data.memberships.length],['Zuweisungen',data.assignments.length]].map(([a,b])=>'<div class="tile"><small>'+a+'</small><strong>'+b+'</strong></div>').join('');
+const companies=document.getElementById('companies');companies.replaceChildren();
+data.companies.forEach(c=>{const tr=document.createElement('tr');tr.innerHTML='<td>'+safe(c.name)+'</td><td>'+safe(c.legal_name)+'</td><td>'+safe(c.company_code)+'</td><td>'+safe(c.brand||'–')+'</td><td>'+data.memberships.filter(m=>m.company_id===c.id).length+'</td>';companies.append(tr)});
+fill(document.getElementById('memberCompany'),data.companies.map(c=>({label:c.name+' · '+(c.company_code||''),value:c.id})));
+fill(document.getElementById('memberUser'),data.users.map(u=>({label:(u.email||u.id)+(u.id===session.user.id?' (du)':''),value:u.id})));
+fill(document.getElementById('companyStation'),data.stations.map(s=>({label:(s.station_name||'Station')+' · '+(s.city||'')+' · '+s.id.slice(0,8),value:s.id})));
+fill(document.getElementById('stationCompany'),[{label:'– nicht zugeordnet –',value:''},...data.companies.map(c=>({label:c.name,value:c.id}))]);
+fill(document.getElementById('accessStation'),data.stations.map(s=>({label:(s.station_name||'Station')+' · '+(s.city||''),value:s.id})));
+fill(document.getElementById('accessUser'),data.users.map(u=>({label:u.email||u.id,value:u.id})));
+const members=document.getElementById('members');members.replaceChildren();
+data.memberships.forEach(m=>{const tr=document.createElement('tr');const c=companyById(m.company_id),u=userById(m.user_id);tr.innerHTML='<td>'+safe(c?.name||m.company_id)+'</td><td>'+safe(u?.email||m.user_id)+'</td><td>'+safe(roleNames[m.role]||m.role)+'</td><td><button class="danger" data-remove="'+m.company_id+'" data-user="'+m.user_id+'">Entfernen</button></td>';members.append(tr)});
+members.querySelectorAll('[data-remove]').forEach(btn=>btn.onclick=async()=>{if(!confirm('Mitgliedschaft und Stationszuweisungen dieser Firma entfernen?'))return;await rpc('tse_admin_remove_membership',{p_company_id:btn.dataset.remove,p_user_id:btn.dataset.user})});
+const assignments=document.getElementById('assignments');assignments.replaceChildren();
+data.assignments.forEach(a=>{const s=stationById(a.station_id),u=userById(a.user_id),tr=document.createElement('tr');tr.innerHTML='<td>'+safe(s?.station_name||a.station_id)+'</td><td>'+safe(u?.email||a.user_id)+'</td><td>'+safe(a.access_level==='write'?'Lesen & bearbeiten':'Lesen')+'</td>';assignments.append(tr)});
+}
+async function rpc(name,args){say('Aktion wird ausgeführt …');const {error}=await client.rpc(name,args);if(error){say('Fehler: '+(error.message||'RPC fehlgeschlagen'), 'error');return false}say('Gespeichert.','ok');await load();return true}
+async function load(){say('Daten werden geladen …');const {data:d,error:e}=await client.rpc('tse_admin_overview');if(e){say('Verwaltungsdaten konnten nicht geladen werden: '+e.message,'error');return}data=d||data;render();say('Verwaltung geladen.','ok')}
+document.getElementById('createCompany').onclick=async()=>{const name=document.getElementById('newName').value.trim(),legal=document.getElementById('newLegal').value.trim(),brand=document.getElementById('newBrand').value.trim();if(name.length<2||legal.length<2){say('Name und Rechtsname sind erforderlich.','error');return}say('Firma wird erstellt …');const {data:d,error:e}=await client.rpc('tse_admin_create_company',{p_name:name,p_legal_name:legal,p_brand:brand||null});if(e){say('Fehler: '+e.message,'error');return}say('Unternehmen erstellt · Code '+(d?.company_code||''),'ok');document.getElementById('newName').value='';document.getElementById('newLegal').value='';document.getElementById('newBrand').value='';await load()};
+document.getElementById('saveMember').onclick=()=>rpc('tse_admin_set_membership',{p_company_id:document.getElementById('memberCompany').value,p_user_id:document.getElementById('memberUser').value,p_role:document.getElementById('memberRole').value});
+document.getElementById('saveStationCompany').onclick=()=>rpc('tse_admin_set_station_company',{p_station_id:document.getElementById('companyStation').value,p_company_id:document.getElementById('stationCompany').value||null});
+document.getElementById('saveAccess').onclick=()=>rpc('tse_admin_set_station_access',{p_station_id:document.getElementById('accessStation').value,p_user_id:document.getElementById('accessUser').value,p_access:document.getElementById('accessLevel').value});
+document.getElementById('reload').onclick=load;document.getElementById('logout').onclick=async()=>{await client.auth.signOut();location.href='./'};
+await load();
+})();
+</script>
+</body></html>
