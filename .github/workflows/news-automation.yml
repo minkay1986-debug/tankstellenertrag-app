@@ -9,47 +9,63 @@ on:
       - main
     paths:
       - "scripts/build_news.py"
-      - "news.html"
       - ".github/workflows/news-automation.yml"
 
 permissions:
   contents: write
+  pull-requests: write
+
+concurrency:
+  group: tankstellenertrag-news
+  cancel-in-progress: false
 
 jobs:
   publish:
-    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[news-bot]') }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout main
         uses: actions/checkout@v5
+        with:
+          ref: main
 
       - name: Build news
         run: python scripts/build_news.py
 
-      - name: Add News link to landing page
+      - name: Ensure News link on homepage
         run: |
           python - <<'PY'
           from pathlib import Path
-          p=Path("index.html")
-          s=p.read_text(encoding="utf-8")
+          p = Path("index.html")
+          s = p.read_text(encoding="utf-8")
           if 'href="./news.html"' not in s:
-              s=s.replace('<a href="#wissen">Branchenwissen</a>', '<a href="#wissen">Branchenwissen</a><a href="./news.html">News</a>')
-              p.write_text(s,encoding="utf-8")
+              old = '<a href="#wissen">Branchenwissen</a>'
+              if old not in s:
+                  raise SystemExit("Navigation anchor for News link was not found")
+              s = s.replace(old, old + '<a href="./news.html">News</a>', 1)
+              p.write_text(s, encoding="utf-8")
           PY
 
-      - name: Commit generated news
-        shell: bash
-        run: |
-          set -euxo pipefail
-          git config user.name "TankstellenErtrag News Bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add news news.html news-sitemap.xml index.html
-          echo "=== Staged changes ==="
-          git status --short
-          if git diff --cached --quiet; then
-            echo "Keine neuen Meldungen – kein Commit erforderlich."
-            exit 0
-          fi
-          git commit -m "chore: update Tankstellen news [news-bot]"
-          echo "=== Push target: ${GITHUB_REF} ==="
-          git push origin "HEAD:${GITHUB_REF}"
+      - name: Show generated changes
+        run: git status --short
+
+      - name: Create or update News pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: automation/news-updates
+          delete-branch: false
+          commit-message: "chore: update Tankstellen news [news-bot]"
+          title: "Automatisches TankstellenErtrag-News-Update"
+          body: |
+            Dieser Pull Request wurde automatisch durch die TankstellenErtrag-News-Automatisierung erstellt.
+
+            - Generierte und fachlich gefilterte Branchenmeldungen
+            - Aktualisierte News-Übersicht und Sitemap
+            - Bestehende Repository-Schutzregeln und erforderliche Prüfungen bleiben aktiv
+
+            Bitte die vorgeschriebenen CI-Prüfungen abwarten, bevor gemergt wird.
+          add-paths: |
+            news/**
+            news.html
+            news-sitemap.xml
+            index.html
