@@ -5,6 +5,8 @@ on:
   schedule:
     - cron: "15 6 * * *"
   push:
+    branches:
+      - main
     paths:
       - "scripts/build_news.py"
       - "news.html"
@@ -19,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Build news
         run: python scripts/build_news.py
@@ -36,13 +38,18 @@ jobs:
           PY
 
       - name: Commit generated news
+        shell: bash
         run: |
+          set -euxo pipefail
           git config user.name "TankstellenErtrag News Bot"
           git config user.email "actions@users.noreply.github.com"
           git add news news.html news-sitemap.xml index.html
+          echo "=== Staged changes ==="
+          git status --short
           if git diff --cached --quiet; then
-            echo "Keine neuen Meldungen."
+            echo "Keine neuen Meldungen – kein Commit erforderlich."
             exit 0
           fi
           git commit -m "chore: update Tankstellen news [news-bot]"
-          git push
+          echo "=== Push target: ${GITHUB_REF} ==="
+          git push origin "HEAD:${GITHUB_REF}"
