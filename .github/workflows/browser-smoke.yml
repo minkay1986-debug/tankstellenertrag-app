@@ -15,6 +15,7 @@ on:
       - 'analyse.html'
       - 'index.html'
       - '.github/workflows/browser-smoke.yml'
+      - '.github/workflows/news-automation.yml'
       - 'two-year-regression.test.ts'
       - 'ertragsoptimierer.test.ts'
   workflow_dispatch:
