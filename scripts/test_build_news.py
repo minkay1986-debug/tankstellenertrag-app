@@ -1,6 +1,6 @@
 import unittest
 
-from scripts.build_news import classify, is_duplicate, useful_summary
+from scripts.build_news import classify, is_duplicate, useful_summary, article_summary
 
 
 class NewsQualityTests(unittest.TestCase):
@@ -53,6 +53,14 @@ class NewsQualityTests(unittest.TestCase):
             "Sortimente beeinflussen die Auswahl am Verkaufsort."
         )
         self.assertTrue(useful_summary("Convenience im Tankstellenshop", description))
+
+    def test_extracts_publisher_meta_description(self):
+        html = b'<html><head><meta property="og:description" content="Die Studie zeigt neue Entwicklungen im Tankstellenshop und beschreibt konkrete Auswirkungen auf Sortiment, Nachfrage und Einkaufsverhalten."></head></html>'
+        self.assertIn("Die Studie zeigt", article_summary("https://example.test/article", lambda _: html))
+
+    def test_ignores_short_or_missing_meta_description(self):
+        html = b'<html><head><meta name="description" content="Zu kurz"></head></html>'
+        self.assertEqual(article_summary("https://example.test/article", lambda _: html), "")
 
     def test_detects_near_duplicate_headlines(self):
         self.assertTrue(
