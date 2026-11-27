@@ -6,6 +6,7 @@ import urllib.parse
 import urllib.request
 from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
+from html.parser import HTMLParser
 from xml.etree import ElementTree as ET
 
 BASE = "https://app.tankstellenertrag.de"
@@ -99,6 +100,36 @@ def classify(title, description=""):
             return category
     return None
 
+class MetaDescriptionParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.descriptions = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag.lower() != "meta":
+            return
+        values = {key.lower(): value for key, value in attrs if key and value}
+        key = (values.get("name") or values.get("property") or "").lower()
+        if key in ("description", "og:description", "twitter:description"):
+            value = clean(values.get("content", ""))
+            if value:
+                self.descriptions.append(value)
+
+
+def article_summary(link, fetcher=fetch):
+    """Read a publisher-provided meta description; never invent one."""
+    try:
+        raw = fetcher(link)
+        if isinstance(raw, bytes):
+            raw = raw[:1_000_000].decode("utf-8", errors="replace")
+        parser = MetaDescriptionParser()
+        parser.feed(raw[:1_000_000])
+        return next((value for value in parser.descriptions if len(value) >= 60), "")
+    except Exception as exc:
+        print(f"[SUMMARY] Artikelbeschreibung nicht abrufbar: {type(exc).__name__}")
+        return ""
+
+
 def useful_summary(title, description, source=""):
     """Accept only a source description that adds information beyond title/publisher."""
     text = clean(description)
@@ -168,6 +199,10 @@ def collect_items(fetcher=fetch, now=None):
                     rejected += 1
                     continue
                 summary = useful_summary(title, description, source)
+                if not summary:
+                    # Google News RSS often supplies only headline + publisher.
+                    # Try the publisher page's own description metadata.
+                    summary = useful_summary(title, article_summary(link, fetcher), source)
                 if not summary:
                     rejected += 1
                     print(f"[FILTER] Keine belastbare Kurzbeschreibung: {title[:100]}")
