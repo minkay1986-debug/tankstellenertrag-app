@@ -1,0 +1,27 @@
+name: News quality tests
+
+on:
+  pull_request:
+    paths:
+      - "scripts/build_news.py"
+      - "scripts/test_build_news.py"
+      - ".github/workflows/test-news-quality.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  news-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Run news relevance and summary tests
+        run: python -m unittest scripts.test_build_news -v
