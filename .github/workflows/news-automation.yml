@@ -9,6 +9,7 @@ on:
       - main
     paths:
       - "scripts/build_news.py"
+      - "scripts/test_build_news.py"
       - ".github/workflows/news-automation.yml"
 
 permissions:
@@ -27,6 +28,9 @@ jobs:
         uses: actions/checkout@v5
         with:
           ref: main
+
+      - name: Test news relevance and summary filters
+        run: python -m unittest scripts.test_build_news
 
       - name: Build news
         run: python scripts/build_news.py
