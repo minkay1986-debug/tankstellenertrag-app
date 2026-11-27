@@ -4,6 +4,8 @@ import os
 import re
 import urllib.parse
 import urllib.request
+import urllib.error
+import time
 from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
 from html.parser import HTMLParser
@@ -133,9 +135,42 @@ def is_duplicate(candidate, existing):
     return False
 
 def fetch(url):
-    request = urllib.request.Request(url, headers={"User-Agent": "TankstellenErtrag-NewsBot/2.0"})
-    with urllib.request.urlopen(request, timeout=20) as response:
-        return response.read()
+    """Fetch RSS/article content with bounded retries for transient provider errors."""
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (compatible; TankstellenErtrag-NewsBot/2.1; "
+            "+https://app.tankstellenertrag.de)"
+        ),
+        "Accept": "application/rss+xml, application/xml, text/xml, text/html;q=0.9, */*;q=0.8",
+        "Accept-Language": "de-DE,de;q=0.9,en;q=0.7",
+        "Cache-Control": "no-cache",
+    }
+    retryable_statuses = {408, 425, 429, 500, 502, 503, 504}
+    last_error = None
+    for attempt in range(4):
+        request = urllib.request.Request(url, headers=headers)
+        try:
+            with urllib.request.urlopen(request, timeout=30) as response:
+                return response.read()
+        except urllib.error.HTTPError as exc:
+            last_error = exc
+            if exc.code not in retryable_statuses or attempt == 3:
+                raise
+            retry_after = exc.headers.get("Retry-After", "") if exc.headers else ""
+            try:
+                delay = min(max(float(retry_after), 1), 20)
+            except (TypeError, ValueError):
+                delay = 2 ** attempt
+            print(f"[RETRY] HTTP {exc.code}; Versuch {attempt + 1}/4 in {delay:g}s")
+            time.sleep(delay)
+        except (urllib.error.URLError, TimeoutError, ConnectionError) as exc:
+            last_error = exc
+            if attempt == 3:
+                raise
+            delay = 2 ** attempt
+            print(f"[RETRY] Netzwerkfehler; Versuch {attempt + 1}/4 in {delay}s")
+            time.sleep(delay)
+    raise last_error
 
 class MetaDescriptionParser(HTMLParser):
     def __init__(self):
