@@ -25,3 +25,6 @@ jobs:
 
       - name: Run news relevance and summary tests
         run: python -m unittest scripts.test_build_news -v
+
+      - name: Integration test with live RSS feeds
+        run: python scripts/build_news.py

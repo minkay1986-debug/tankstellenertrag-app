@@ -4,8 +4,11 @@ import os
 import re
 import urllib.parse
 import urllib.request
+import urllib.error
+import time
 from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
+from html.parser import HTMLParser
 from xml.etree import ElementTree as ET
 
 BASE = "https://app.tankstellenertrag.de"
@@ -132,9 +135,72 @@ def is_duplicate(candidate, existing):
     return False
 
 def fetch(url):
-    request = urllib.request.Request(url, headers={"User-Agent": "TankstellenErtrag-NewsBot/2.0"})
-    with urllib.request.urlopen(request, timeout=20) as response:
-        return response.read()
+    """Fetch RSS/article content with bounded retries for transient provider errors."""
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (compatible; TankstellenErtrag-NewsBot/2.1; "
+            "+https://app.tankstellenertrag.de)"
+        ),
+        "Accept": "application/rss+xml, application/xml, text/xml, text/html;q=0.9, */*;q=0.8",
+        "Accept-Language": "de-DE,de;q=0.9,en;q=0.7",
+        "Cache-Control": "no-cache",
+    }
+    retryable_statuses = {408, 425, 429, 500, 502, 503, 504}
+    last_error = None
+    for attempt in range(4):
+        request = urllib.request.Request(url, headers=headers)
+        try:
+            with urllib.request.urlopen(request, timeout=30) as response:
+                return response.read()
+        except urllib.error.HTTPError as exc:
+            last_error = exc
+            if exc.code not in retryable_statuses or attempt == 3:
+                raise
+            retry_after = exc.headers.get("Retry-After", "") if exc.headers else ""
+            try:
+                delay = min(max(float(retry_after), 1), 20)
+            except (TypeError, ValueError):
+                delay = 2 ** attempt
+            print(f"[RETRY] HTTP {exc.code}; Versuch {attempt + 1}/4 in {delay:g}s")
+            time.sleep(delay)
+        except (urllib.error.URLError, TimeoutError, ConnectionError) as exc:
+            last_error = exc
+            if attempt == 3:
+                raise
+            delay = 2 ** attempt
+            print(f"[RETRY] Netzwerkfehler; Versuch {attempt + 1}/4 in {delay}s")
+            time.sleep(delay)
+    raise last_error
+
+class MetaDescriptionParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.descriptions = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag.lower() != "meta":
+            return
+        values = {key.lower(): value for key, value in attrs if key and value}
+        key = (values.get("name") or values.get("property") or "").lower()
+        if key in ("description", "og:description", "twitter:description"):
+            value = clean(values.get("content", ""))
+            if value:
+                self.descriptions.append(value)
+
+
+def article_summary(link, fetcher=fetch):
+    """Read a publisher-provided meta description; never invent one."""
+    try:
+        raw = fetcher(link)
+        if isinstance(raw, bytes):
+            raw = raw[:1_000_000].decode("utf-8", errors="replace")
+        parser = MetaDescriptionParser()
+        parser.feed(raw[:1_000_000])
+        return next((value for value in parser.descriptions if len(value) >= 60), "")
+    except Exception as exc:
+        print(f"[SUMMARY] Artikelbeschreibung nicht abrufbar: {type(exc).__name__}")
+        return ""
+
 
 def collect_items(fetcher=fetch, now=None):
     now = now or datetime.now(timezone.utc)
@@ -168,6 +234,10 @@ def collect_items(fetcher=fetch, now=None):
                     rejected += 1
                     continue
                 summary = useful_summary(title, description, source)
+                if not summary:
+                    # Google News RSS often supplies only headline + publisher.
+                    # Try the publisher page's own description metadata.
+                    summary = useful_summary(title, article_summary(link, fetcher), source)
                 if not summary:
                     rejected += 1
                     print(f"[FILTER] Keine belastbare Kurzbeschreibung: {title[:100]}")
